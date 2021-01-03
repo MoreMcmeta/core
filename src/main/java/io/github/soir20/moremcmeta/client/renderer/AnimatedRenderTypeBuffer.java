@@ -2,6 +2,7 @@ package io.github.soir20.moremcmeta.client.renderer;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import io.github.soir20.moremcmeta.MoreMcmeta;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
@@ -27,6 +28,8 @@ public class AnimatedRenderTypeBuffer implements IRenderTypeBuffer {
     public IVertexBuilder getBuffer(@Nonnull RenderType renderType) {
         String texturePath = extractTexture(renderType.toString());
         ResourceLocation texture = new ResourceLocation(texturePath);
+
+        MoreMcmeta.LOGGER.debug(texturePath);
 
         /* If we use an animated buffer without swapping the render type,
            the entity won't render correctly, so check both together. */
