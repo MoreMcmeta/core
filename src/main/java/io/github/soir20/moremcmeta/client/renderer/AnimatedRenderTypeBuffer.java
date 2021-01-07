@@ -2,17 +2,17 @@ package io.github.soir20.moremcmeta.client.renderer;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import io.github.soir20.moremcmeta.MoreMcmeta;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.renderer.SpriteAwareVertexBuilder;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
 
-import static io.github.soir20.moremcmeta.MoreMcmeta.ATLAS_LOCATION;
+import static io.github.soir20.moremcmeta.MoreMcmeta.ATLASES;
 
 @MethodsReturnNonnullByDefault
 public class AnimatedRenderTypeBuffer implements IRenderTypeBuffer {
@@ -29,13 +29,13 @@ public class AnimatedRenderTypeBuffer implements IRenderTypeBuffer {
         String texturePath = extractTexture(renderType.toString());
         ResourceLocation texture = new ResourceLocation(texturePath);
 
-        MoreMcmeta.LOGGER.debug(texturePath);
+        String folder = texture.getPath().substring(0, texture.getPath().indexOf('/'));
 
         /* If we use an animated buffer without swapping the render type,
            the entity won't render correctly, so check both together. */
         if (ANIMATED_TEXTURES.contains(texture)) {
-            RenderMaterial material = new RenderMaterial(ATLAS_LOCATION, texture);
-            return material.getSprite().wrapBuffer(BUFFER.getBuffer(renderType));
+            AtlasTexture atlas = ATLASES.get(folder).apply(texture);
+            return new SpriteAwareVertexBuilder(BUFFER.getBuffer(renderType), atlas.getSprite(texture));
         } else {
             return BUFFER.getBuffer(renderType);
         }

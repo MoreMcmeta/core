@@ -64,7 +64,9 @@ public class AtlasReloadListener implements ISelectiveResourceReloadListener {
                 }
         );
 
-        atlas.stitch(resourceManager, spriteLocations, profiler, Minecraft.getInstance().gameSettings.mipmapLevels);
+        AtlasTexture.SheetData sheetData = atlas.stitch(resourceManager, spriteLocations, profiler,
+                Minecraft.getInstance().gameSettings.mipmapLevels);
+        atlas.upload(sheetData);
     }
 
     private static String removeExtension(String path) {

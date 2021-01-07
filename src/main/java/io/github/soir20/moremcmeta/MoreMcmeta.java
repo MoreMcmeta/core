@@ -3,7 +3,6 @@ package io.github.soir20.moremcmeta;
 import com.google.common.collect.ImmutableMap;
 import io.github.soir20.moremcmeta.resource.AtlasReloadListener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -18,7 +17,6 @@ public final class MoreMcmeta
 {
     public static final String MODID = "moremcmeta";
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final ResourceLocation ATLAS_LOCATION = Atlases.SHULKER_BOX_ATLAS;
     public static final String ATLAS_PREFIX = "moremcmeta:textures/atlas/";
 
     public static final ImmutableMap<String, Function<ResourceLocation, AtlasTexture>> ATLASES;
