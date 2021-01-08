@@ -27,20 +27,14 @@ public final class MoreMcmeta
         AtlasTexture colormapAtlas = new AtlasTexture(new ResourceLocation(ATLAS_PREFIX + "colormap.png"));
         AtlasTexture entityAtlas = new AtlasTexture(new ResourceLocation(ATLAS_PREFIX + "entity.png"));
         AtlasTexture guiAtlas = new AtlasTexture(new ResourceLocation(ATLAS_PREFIX + "gui.png"));
+        AtlasTexture mapAtlas = new AtlasTexture(new ResourceLocation(ATLAS_PREFIX + "map.png"));
 
-        builder.put("colormap", (tex) -> colormapAtlas)
-                .put("entity", (tex) -> entityAtlas)
-                .put("environment", MoreMcmeta::getEnvironmentTextureAtlas)
-                .put("gui", (tex) -> guiAtlas);
+        builder//.put("colormap", (tex) -> colormapAtlas)
+                //.put("entity", (tex) -> entityAtlas)
+                //.put("gui", (tex) -> guiAtlas)
+                .put("map", (tex) -> mapAtlas);
 
         ATLASES = builder.build();
-    }
-
-    private static AtlasTexture getEnvironmentTextureAtlas(ResourceLocation texture) {
-        String path = texture.getPath();
-        int lastDirIndex = path.lastIndexOf('/');
-        String atlasLocation = ATLAS_PREFIX + path.substring(lastDirIndex);
-        return new AtlasTexture(new ResourceLocation(atlasLocation));
     }
 
     public MoreMcmeta() {

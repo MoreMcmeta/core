@@ -2,6 +2,7 @@ package io.github.soir20.moremcmeta.client.renderer;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import io.github.soir20.moremcmeta.MoreMcmeta;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
@@ -33,9 +34,9 @@ public class AnimatedRenderTypeBuffer implements IRenderTypeBuffer {
 
         /* If we use an animated buffer without swapping the render type,
            the entity won't render correctly, so check both together. */
-        if (ANIMATED_TEXTURES.contains(texture)) {
+        if (ATLASES.containsKey(folder)) {
             AtlasTexture atlas = ATLASES.get(folder).apply(texture);
-            return new SpriteAwareVertexBuilder(BUFFER.getBuffer(renderType), atlas.getSprite(texture));
+            return new FluentSpriteAwareVertexBuilder(BUFFER.getBuffer(renderType), atlas.getSprite(texture));
         } else {
             return BUFFER.getBuffer(renderType);
         }
