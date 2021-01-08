@@ -1,10 +1,12 @@
 package io.github.soir20.moremcmeta.resource;
 
+import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.MoreMcmeta;
+import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTexture;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.profiler.IProfiler;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.client.resources.data.AnimationMetadataSection;
+import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.resource.IResourceType;
@@ -12,10 +14,9 @@ import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class AtlasReloadListener implements ISelectiveResourceReloadListener {
     private IResourceManager resourceManager;
@@ -31,47 +32,39 @@ public class AtlasReloadListener implements ISelectiveResourceReloadListener {
     public void onResourceManagerReload(IResourceManager resManager, Predicate<IResourceType> resourcePredicate) {
         if (resourcePredicate.test(getResourceType())) {
             resourceManager = resManager;
-            Set<String> folders = MoreMcmeta.ATLASES.keySet();
 
-            for (String folder : folders) {
+            for (String folder : MoreMcmeta.FOLDERS) {
                 Collection<ResourceLocation> folderMetadata = resourceManager.getAllResourceLocations(
                         "textures/" + folder,
                         fileName -> fileName.endsWith(".png")
                 );
 
-                Map<AtlasTexture, List<ResourceLocation>> uploadGroups = folderMetadata.stream().distinct().collect(
-                        Collectors.groupingBy(MoreMcmeta.ATLASES.get(folder))
-                );
-
-                uploadGroups.forEach(this::uploadToTexManager);
+                folderMetadata.forEach(this::uploadToTexManager);
             }
         }
     }
 
-    private void uploadToTexManager(AtlasTexture atlas, Collection<ResourceLocation> textures) {
-        TextureManager texManager = Minecraft.getInstance().getTextureManager();
-        IProfiler profiler = Minecraft.getInstance().getProfiler();
+    private void uploadToTexManager(ResourceLocation resourcelocation) {
+        try (IResource iresource = resourceManager.getResource(resourcelocation)) {
+            NativeImage nativeImage = NativeImage.read(iresource.getInputStream());
 
-        Stream<ResourceLocation> spriteLocations = textures.stream().map(
-                texture -> {
-                    String spritePath = removeExtension(texture.getPath()).replace("textures/", "");
-                    ResourceLocation spriteLocation = new ResourceLocation(texture.getNamespace(), spritePath);
+            AnimationMetadataSection metadata = iresource.getMetadata(AnimationMetadataSection.SERIALIZER);
+            if (metadata == null) {
+                metadata = AnimationMetadataSection.EMPTY;
+            }
 
-                    MoreMcmeta.LOGGER.info("Uploading animated texture for {} to texture manager", spritePath);
-                    texManager.loadTexture(texture, atlas);
+            Pair<Integer, Integer> pair = metadata.getSpriteSize(nativeImage.getWidth(), nativeImage.getHeight());
 
-                    return spriteLocation;
-                }
-        );
+            AnimatedTexture texture = new AnimatedTexture(resourcelocation, pair.getFirst(), pair.getSecond(),
+                    metadata, 0, nativeImage);
 
-        AtlasTexture.SheetData sheetData = atlas.stitch(resourceManager, spriteLocations, profiler,
-                Minecraft.getInstance().gameSettings.mipmapLevels);
-        atlas.upload(sheetData);
+            Minecraft.getInstance().getTextureManager().loadTexture(resourcelocation, texture);
+        } catch (RuntimeException runtimeException) {
+            MoreMcmeta.LOGGER.error("Unable to parse animation metadata from {} : {}",
+                    resourcelocation, runtimeException);
+        } catch (IOException ioException) {
+            MoreMcmeta.LOGGER.error("Using missing texture, unable to load {} : {}",
+                    resourcelocation, ioException);
+        }
     }
-
-    private static String removeExtension(String path) {
-        int extStart = path.lastIndexOf('.');
-        return path.substring(0, extStart);
-    }
-
 }
