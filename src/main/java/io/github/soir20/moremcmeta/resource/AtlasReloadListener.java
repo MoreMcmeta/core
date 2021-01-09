@@ -47,18 +47,16 @@ public class AtlasReloadListener implements ISelectiveResourceReloadListener {
     private void uploadToTexManager(ResourceLocation resourcelocation) {
         try (IResource iresource = resourceManager.getResource(resourcelocation)) {
             NativeImage nativeImage = NativeImage.read(iresource.getInputStream());
-
             AnimationMetadataSection metadata = iresource.getMetadata(AnimationMetadataSection.SERIALIZER);
-            if (metadata == null) {
-                metadata = AnimationMetadataSection.EMPTY;
+
+            if (metadata != null) {
+                Pair<Integer, Integer> pair = metadata.getSpriteSize(nativeImage.getWidth(), nativeImage.getHeight());
+
+                AnimatedTexture texture = new AnimatedTexture(resourcelocation, pair.getFirst(), pair.getSecond(),
+                        metadata, 0, nativeImage);
+
+                Minecraft.getInstance().getTextureManager().loadTexture(resourcelocation, texture);
             }
-
-            Pair<Integer, Integer> pair = metadata.getSpriteSize(nativeImage.getWidth(), nativeImage.getHeight());
-
-            AnimatedTexture texture = new AnimatedTexture(resourcelocation, pair.getFirst(), pair.getSecond(),
-                    metadata, 0, nativeImage);
-
-            Minecraft.getInstance().getTextureManager().loadTexture(resourcelocation, texture);
         } catch (RuntimeException runtimeException) {
             MoreMcmeta.LOGGER.error("Unable to parse animation metadata from {} : {}",
                     resourcelocation, runtimeException);
