@@ -12,7 +12,7 @@ public final class MoreMcmeta
 {
     public static final String MODID = "moremcmeta";
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final String[] FOLDERS = {"colormap", "entity", "gui", "map"};
+    public static final String[] FOLDERS = {"entity", "gui", "map"};
 
     public MoreMcmeta() {
         IReloadableResourceManager manager =
