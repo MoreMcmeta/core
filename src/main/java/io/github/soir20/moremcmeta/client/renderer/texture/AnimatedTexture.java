@@ -42,7 +42,7 @@ public class AnimatedTexture extends Texture implements ITickable {
         }
     }
 
-    public void updateAnimation() {
+    private void updateAnimation() {
         bindTexture();
         SPRITE.updateAnimation();
     }
