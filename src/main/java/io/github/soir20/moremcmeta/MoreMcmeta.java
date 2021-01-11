@@ -1,5 +1,6 @@
 package io.github.soir20.moremcmeta;
 
+import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper;
 import io.github.soir20.moremcmeta.resource.AtlasReloadListener;
 import net.minecraft.client.Minecraft;
@@ -22,8 +23,8 @@ public final class MoreMcmeta
         TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft.getTextureManager());
         Logger logger = LogManager.getLogger();
 
-        manager.addReloadListener(new AtlasReloadListener(FOLDERS, texManager, AnimationMetadataSection.SERIALIZER,
-                logger));
+        manager.addReloadListener(new AtlasReloadListener<>(FOLDERS, texManager,
+                AnimatedTexture::new, AnimationMetadataSection.SERIALIZER, logger));
         logger.debug("Added atlas reload listener");
     }
 }

@@ -1,7 +1,7 @@
 package io.github.soir20.moremcmeta.resource;
 
 import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTexture;
+import io.github.soir20.moremcmeta.client.renderer.texture.IAnimatedTextureFactory;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureLoader;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
@@ -19,18 +19,20 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class AtlasReloadListener implements ISelectiveResourceReloadListener {
+public class AtlasReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
     private final String[] FOLDERS;
     private final ITextureLoader TEXTURE_LOADER;
+    private final IAnimatedTextureFactory<T> TEXTURE_FACTORY;
     private final IMetadataSectionSerializer<AnimationMetadataSection> SERIALIZER;
     private final Logger LOGGER;
 
     private IResourceManager resourceManager;
 
-    public AtlasReloadListener(String[] folders, ITextureLoader texLoader,
+    public AtlasReloadListener(String[] folders, ITextureLoader texLoader, IAnimatedTextureFactory<T> texFactory,
                                IMetadataSectionSerializer<AnimationMetadataSection> serializer, Logger logger) {
         FOLDERS = folders;
         TEXTURE_LOADER = texLoader;
+        TEXTURE_FACTORY = texFactory;
         SERIALIZER = serializer;
         LOGGER = logger;
     }
@@ -67,7 +69,7 @@ public class AtlasReloadListener implements ISelectiveResourceReloadListener {
                 Pair<Integer, Integer> pair = metadata.getSpriteSize(nativeImage.getWidth(),
                         nativeImage.getHeight());
 
-                AnimatedTexture texture = new AnimatedTexture(resourcelocation, pair.getFirst(), pair.getSecond(),
+                T texture = TEXTURE_FACTORY.createAnimatedTexture(resourcelocation, pair.getFirst(), pair.getSecond(),
                         metadata, 0, nativeImage);
 
                 TEXTURE_LOADER.loadTexture(resourcelocation, texture);

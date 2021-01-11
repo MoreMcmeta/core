@@ -9,7 +9,7 @@ import net.minecraft.util.ResourceLocation;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class AnimatedTexture extends Texture implements IAnimatedTexture {
+public class AnimatedTexture extends Texture implements ITickable {
     private final TextureAtlasSprite SPRITE;
 
     public AnimatedTexture(ResourceLocation location, int width, int height, AnimationMetadataSection metadata,
