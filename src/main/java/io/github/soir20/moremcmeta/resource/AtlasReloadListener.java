@@ -48,12 +48,12 @@ public class AtlasReloadListener implements ISelectiveResourceReloadListener {
             resourceManager = resManager;
 
             for (String folder : FOLDERS) {
-                Collection<ResourceLocation> folderMetadata = resourceManager.getAllResourceLocations(
+                Collection<ResourceLocation> animatedFiles = resourceManager.getAllResourceLocations(
                         "textures/" + folder,
                         fileName -> fileName.endsWith(".png")
                 );
 
-                folderMetadata.forEach(this::uploadToTexManager);
+                animatedFiles.forEach(this::uploadToTexManager);
             }
         }
     }
