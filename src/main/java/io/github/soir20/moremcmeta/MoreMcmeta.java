@@ -13,7 +13,6 @@ import net.minecraftforge.fml.common.Mod;
 public final class MoreMcmeta
 {
     public static final String MODID = "moremcmeta";
-    public static final Logger LOGGER = LogManager.getLogger();
     public static final String[] FOLDERS = {"entity", "gui", "map"};
 
     public MoreMcmeta() {
@@ -21,9 +20,10 @@ public final class MoreMcmeta
         IReloadableResourceManager manager =
                 ((IReloadableResourceManager) minecraft.getResourceManager());
         TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft.getTextureManager());
+        Logger logger = LogManager.getLogger();
 
         manager.addReloadListener(new AtlasReloadListener(FOLDERS, texManager, AnimationMetadataSection.SERIALIZER,
-                LOGGER));
-        MoreMcmeta.LOGGER.debug("Added atlas reload listener");
+                logger));
+        logger.debug("Added atlas reload listener");
     }
 }
