@@ -64,7 +64,8 @@ public class AtlasReloadListener implements ISelectiveResourceReloadListener {
             AnimationMetadataSection metadata = iresource.getMetadata(SERIALIZER);
 
             if (metadata != null) {
-                Pair<Integer, Integer> pair = metadata.getSpriteSize(nativeImage.getWidth(), nativeImage.getHeight());
+                Pair<Integer, Integer> pair = metadata.getSpriteSize(nativeImage.getWidth(),
+                        nativeImage.getHeight());
 
                 AnimatedTexture texture = new AnimatedTexture(resourcelocation, pair.getFirst(), pair.getSecond(),
                         metadata, 0, nativeImage);
