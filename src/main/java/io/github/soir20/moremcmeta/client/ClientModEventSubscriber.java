@@ -14,10 +14,18 @@ import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Handles client-relevant events.
+ * @author soir20
+ */
 @Mod.EventBusSubscriber(modid = MoreMcmeta.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 @SuppressWarnings("unused")
 public class ClientModEventSubscriber {
 
+    /**
+     * Adds the texture reload listener before resources are loaded for the first time.
+     * @param event     the mod construction event
+     */
     @SubscribeEvent
     public static void onPreInit(final FMLConstructModEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
@@ -28,7 +36,7 @@ public class ClientModEventSubscriber {
 
         manager.addReloadListener(new TextureReloadListener<>(MoreMcmeta.FOLDERS, texManager,
                 AnimatedTexture::new, AnimationMetadataSection.SERIALIZER, logger));
-        logger.debug("Added atlas reload listener");
+        logger.debug("Added texture reload listener");
     }
 
 }
