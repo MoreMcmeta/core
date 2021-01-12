@@ -14,7 +14,7 @@ public class TextureManagerWrapperTest {
     }
 
     @Test
-    public void testLoadTexture() {
+    public void loadTexture_ManagerExists_ManagerHasTextures() {
         TextureManager textureManager = createTexManager();
         TextureManagerWrapper wrapper = new TextureManagerWrapper(() -> textureManager);
         MockAnimatedTexture tex1 = new MockAnimatedTexture();
