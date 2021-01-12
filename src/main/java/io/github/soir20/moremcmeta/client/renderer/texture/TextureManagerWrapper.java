@@ -6,18 +6,19 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TextureManagerWrapper implements ITextureLoader {
-    private final TextureManager TEXTURE_MANAGER;
+    private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
 
-    public TextureManagerWrapper(TextureManager texManager) {
-        TEXTURE_MANAGER = texManager;
+    public TextureManagerWrapper(Supplier<TextureManager> texManagerGetter) {
+        TEXTURE_MANAGER_GETTER = texManagerGetter;
     }
 
     @Override
     public void loadTexture(ResourceLocation textureLocation, Texture textureObj) {
-        TEXTURE_MANAGER.loadTexture(textureLocation, textureObj);
+        TEXTURE_MANAGER_GETTER.get().loadTexture(textureLocation, textureObj);
     }
 }

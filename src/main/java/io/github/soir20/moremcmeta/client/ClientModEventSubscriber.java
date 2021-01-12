@@ -23,7 +23,7 @@ public class ClientModEventSubscriber {
         Minecraft minecraft = Minecraft.getInstance();
         IReloadableResourceManager manager =
                 ((IReloadableResourceManager) minecraft.getResourceManager());
-        TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft.getTextureManager());
+        TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft::getTextureManager);
         Logger logger = LogManager.getLogger();
 
         manager.addReloadListener(new AtlasReloadListener<>(MoreMcmeta.FOLDERS, texManager,
