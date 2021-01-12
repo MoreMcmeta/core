@@ -22,7 +22,8 @@ import java.util.Collection;
 import java.util.function.Predicate;
 
 /**
- * Uploads animated textures to the texture manager on texture reloading so they will always be used for rendering.
+ * Uploads animated textures to the texture manager on texture reloading so they will always be used for
+ * rendering.
  * @param <T>   tickable texture type
  * @author soir20
  */
@@ -43,8 +44,10 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      * @param serializer    serializer for .mcmeta files
      * @param logger        logs listener-related messages to the game's output
      */
-    public TextureReloadListener(String[] folders, ITextureLoader texLoader, IAnimatedTextureFactory<T> texFactory,
-                               IMetadataSectionSerializer<AnimationMetadataSection> serializer, Logger logger) {
+    public TextureReloadListener(String[] folders, ITextureLoader texLoader,
+                                 IAnimatedTextureFactory<T> texFactory,
+                                 IMetadataSectionSerializer<AnimationMetadataSection> serializer,
+                                 Logger logger) {
         FOLDERS = folders;
         TEXTURE_LOADER = texLoader;
         TEXTURE_FACTORY = texFactory;
@@ -69,7 +72,8 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      */
     @Override
     @ParametersAreNonnullByDefault
-    public void onResourceManagerReload(IResourceManager resManager, Predicate<IResourceType> resourcePredicate) {
+    public void onResourceManagerReload(IResourceManager resManager,
+                                        Predicate<IResourceType> resourcePredicate) {
         if (resourcePredicate.test(getResourceType())) {
             resourceManager = resManager;
 
