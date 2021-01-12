@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-public class AtlasReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
+public class TextureReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
     private final String[] FOLDERS;
     private final ITextureLoader TEXTURE_LOADER;
     private final IAnimatedTextureFactory<T> TEXTURE_FACTORY;
@@ -30,7 +30,7 @@ public class AtlasReloadListener<T extends Texture & ITickable> implements ISele
 
     private IResourceManager resourceManager;
 
-    public AtlasReloadListener(String[] folders, ITextureLoader texLoader, IAnimatedTextureFactory<T> texFactory,
+    public TextureReloadListener(String[] folders, ITextureLoader texLoader, IAnimatedTextureFactory<T> texFactory,
                                IMetadataSectionSerializer<AnimationMetadataSection> serializer, Logger logger) {
         FOLDERS = folders;
         TEXTURE_LOADER = texLoader;
@@ -42,7 +42,7 @@ public class AtlasReloadListener<T extends Texture & ITickable> implements ISele
     @Override
     public IResourceType getResourceType()
     {
-        return VanillaResourceType.MODELS;
+        return VanillaResourceType.TEXTURES;
     }
 
     @Override
@@ -71,8 +71,8 @@ public class AtlasReloadListener<T extends Texture & ITickable> implements ISele
                 Pair<Integer, Integer> pair = metadata.getSpriteSize(nativeImage.getWidth(),
                         nativeImage.getHeight());
 
-                T texture = TEXTURE_FACTORY.createAnimatedTexture(resourcelocation, pair.getFirst(), pair.getSecond(),
-                        metadata, 0, nativeImage);
+                T texture = TEXTURE_FACTORY.createAnimatedTexture(resourcelocation, pair.getFirst(),
+                        pair.getSecond(), metadata, 0, nativeImage);
 
                 TEXTURE_LOADER.loadTexture(resourcelocation, texture);
             }
