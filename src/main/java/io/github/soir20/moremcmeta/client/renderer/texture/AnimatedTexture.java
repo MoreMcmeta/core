@@ -1,7 +1,12 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.texture.*;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.ITickable;
+import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.client.renderer.texture.Texture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
