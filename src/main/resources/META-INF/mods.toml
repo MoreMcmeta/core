@@ -11,7 +11,7 @@ loaderVersion="[35,)" #mandatory This is typically bumped every Minecraft versio
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
 license="All rights reserved"
 # A URL to refer people to when problems occur with this mod
-issueTrackerURL="http://my.issue.tracker/" #optional
+issueTrackerURL="https://github.com/soir20/MoreMcmeta/issues" #optional
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
 # The modid of the mod
@@ -33,9 +33,9 @@ logoFile="examplemod.png" #optional
 # A text field displayed in the mod UI
 authors="Soir" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description='''This mod adds support for using .mcmeta files to animate mob textures like block and item textures.'''
+description='''Animate Minecraft entity, GUI, and map textures with the .mcmeta format--just like block and item textures.'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.wounded]] #optional
+[[dependencies.moremcmeta]] #optional
     # the modid of the dependency
     modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
@@ -47,7 +47,7 @@ description='''This mod adds support for using .mcmeta files to animate mob text
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
 # Here's another dependency
-[[dependencies.wounded]]
+[[dependencies.moremcmeta]]
     modId="minecraft"
     mandatory=true
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
