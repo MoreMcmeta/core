@@ -2,6 +2,7 @@ package io.github.soir20.moremcmeta.resource;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.client.renderer.texture.IAnimatedTextureFactory;
+import io.github.soir20.moremcmeta.client.renderer.texture.INativeImageFactory;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureLoader;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.NativeImage;
@@ -31,6 +32,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
     private final String[] FOLDERS;
     private final ITextureLoader TEXTURE_LOADER;
     private final IAnimatedTextureFactory<T> TEXTURE_FACTORY;
+    private final INativeImageFactory IMAGE_FACTORY;
     private final IMetadataSectionSerializer<AnimationMetadataSection> SERIALIZER;
     private final Logger LOGGER;
 
@@ -45,12 +47,13 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      * @param logger        logs listener-related messages to the game's output
      */
     public TextureReloadListener(String[] folders, ITextureLoader texLoader,
-                                 IAnimatedTextureFactory<T> texFactory,
+                                 IAnimatedTextureFactory<T> texFactory, INativeImageFactory imageFactory,
                                  IMetadataSectionSerializer<AnimationMetadataSection> serializer,
                                  Logger logger) {
         FOLDERS = folders;
         TEXTURE_LOADER = texLoader;
         TEXTURE_FACTORY = texFactory;
+        IMAGE_FACTORY = imageFactory;
         SERIALIZER = serializer;
         LOGGER = logger;
     }
@@ -94,7 +97,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      */
     private void uploadToTexManager(ResourceLocation resourceLocation) {
         try (IResource iresource = resourceManager.getResource(resourceLocation)) {
-            NativeImage nativeImage = NativeImage.read(iresource.getInputStream());
+            NativeImage nativeImage = IMAGE_FACTORY.createNativeImage(iresource.getInputStream());
             AnimationMetadataSection metadata = iresource.getMetadata(SERIALIZER);
 
             if (metadata != null) {

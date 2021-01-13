@@ -5,6 +5,7 @@ import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper;
 import io.github.soir20.moremcmeta.resource.TextureReloadListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
@@ -35,7 +36,7 @@ public class ClientModEventSubscriber {
         Logger logger = LogManager.getLogger();
 
         manager.addReloadListener(new TextureReloadListener<>(MoreMcmeta.FOLDERS, texManager,
-                AnimatedTexture::new, AnimationMetadataSection.SERIALIZER, logger));
+                AnimatedTexture::new, NativeImage::read, AnimationMetadataSection.SERIALIZER, logger));
         logger.debug("Added texture reload listener");
     }
 
