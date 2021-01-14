@@ -1,12 +1,14 @@
 # MoreMcmeta
 **MoreMcmeta** allows you to animate Minecraft entity, GUI, and map textures with the `.mcmeta` format—just like block and item textures.
 
+![MoreMcmeta logo](https://github.com/soir20/MoreMcmeta/blob/main/src/main/resources/moremcmeta-logo-black.png?raw=true)
+
 This means:
 * more possibilities for resource packs
 * [a familiar animation format](#the-mcmeta-format)
 * not a coremod—better compatibility with other mods
 
-##Table of Contents
+## Table of Contents
 * [Download](#download)
 * [Install](#install)
 * [The `.mcmeta` Format](#the-mcmeta-format)
