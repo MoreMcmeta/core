@@ -9,13 +9,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 /**
- * Wraps the {@link TextureManager} so that it implements the {@link ITextureLoader} interface and is compatible
- * with the reload listener.
+ * Wraps the {@link TextureManager} because it is not immediately available during mod construction.
  * @author soir20
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TextureManagerWrapper implements ITextureLoader {
+public class TextureManagerWrapper {
     private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
 
     /**
@@ -32,7 +31,6 @@ public class TextureManagerWrapper implements ITextureLoader {
      * @param textureLocation   file location of texture identical to how it is used in a entity/gui/map
      * @param textureObj        the actual texture that should be used (atlas or otherwise)
      */
-    @Override
     public void loadTexture(ResourceLocation textureLocation, Texture textureObj) {
         TEXTURE_MANAGER_GETTER.get().loadTexture(textureLocation, textureObj);
     }

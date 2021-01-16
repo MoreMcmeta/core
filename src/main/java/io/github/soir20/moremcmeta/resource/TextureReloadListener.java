@@ -3,7 +3,6 @@ package io.github.soir20.moremcmeta.resource;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.client.renderer.texture.IAnimatedTextureFactory;
 import io.github.soir20.moremcmeta.client.renderer.texture.INativeImageFactory;
-import io.github.soir20.moremcmeta.client.renderer.texture.ITextureLoader;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.Texture;
@@ -20,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 /**
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
  */
 public class TextureReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
     private final String[] FOLDERS;
-    private final ITextureLoader TEXTURE_LOADER;
+    private final BiConsumer<ResourceLocation, Texture> TEXTURE_LOADER;
     private final IAnimatedTextureFactory<T> TEXTURE_FACTORY;
     private final INativeImageFactory IMAGE_FACTORY;
     private final IMetadataSectionSerializer<AnimationMetadataSection> SERIALIZER;
@@ -46,7 +46,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      * @param serializer    serializer for .mcmeta files
      * @param logger        logs listener-related messages to the game's output
      */
-    public TextureReloadListener(String[] folders, ITextureLoader texLoader,
+    public TextureReloadListener(String[] folders, BiConsumer<ResourceLocation, Texture> texLoader,
                                  IAnimatedTextureFactory<T> texFactory, INativeImageFactory imageFactory,
                                  IMetadataSectionSerializer<AnimationMetadataSection> serializer,
                                  Logger logger) {
@@ -107,7 +107,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
                 T texture = TEXTURE_FACTORY.createAnimatedTexture(resourceLocation, pair.getFirst(),
                         pair.getSecond(), metadata, 0, nativeImage);
 
-                TEXTURE_LOADER.loadTexture(resourceLocation, texture);
+                TEXTURE_LOADER.accept(resourceLocation, texture);
             }
         } catch (RuntimeException runtimeException) {
             LOGGER.error("Unable to parse animation metadata from {} : {}",

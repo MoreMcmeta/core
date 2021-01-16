@@ -35,7 +35,7 @@ public class ClientModEventSubscriber {
         TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft::getTextureManager);
         Logger logger = LogManager.getLogger();
 
-        manager.addReloadListener(new TextureReloadListener<>(MoreMcmeta.FOLDERS, texManager,
+        manager.addReloadListener(new TextureReloadListener<>(MoreMcmeta.FOLDERS, texManager::loadTexture,
                 AnimatedTexture::new, NativeImage::read, AnimationMetadataSection.SERIALIZER, logger));
         logger.debug("Added texture reload listener");
     }

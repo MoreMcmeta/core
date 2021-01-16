@@ -22,7 +22,8 @@ public interface IAnimatedTextureFactory<T extends Texture & ITickable> {
      * @param metadata      animation metadata (.mcmeta information)
      * @param mipmapLevels  number of mipmap levels to use
      * @param nativeImage   native image corresponding to the texture
-     * @return  animated texture usable by a {@link ITextureLoader}
+     * @return  animated texture that can be loaded into the
+     *          {@link net.minecraft.client.renderer.texture.TextureManager}
      */
     T createAnimatedTexture(ResourceLocation location, int width, int height,
                                            AnimationMetadataSection metadata, int mipmapLevels,
