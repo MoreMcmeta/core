@@ -56,13 +56,13 @@ public class RGBAInterpolator<T extends IRGBAImage> {
         int maxHeight = Math.max(start.getHeight(), end.getHeight());
         T output = IMAGE_FACTORY.apply(maxWidth, maxHeight);
 
-        for (int column = 0; column < maxHeight; column++) {
-            for (int row = 0; row < maxWidth; row++) {
-                int startColor= getPixel(start, row, column);
-                int endColor = getPixel(end, row, column);
+        for (int yPos = 0; yPos < maxHeight; yPos++) {
+            for (int xPos = 0; xPos < maxWidth; xPos++) {
+                int startColor= getPixel(start, xPos, yPos);
+                int endColor = getPixel(end, xPos, yPos);
                 int mixedColor = mixPixel(startProportion, startColor, endColor);
 
-                output.setPixel(row, column, mixedColor);
+                output.setPixel(xPos, yPos, mixedColor);
             }
         }
 
