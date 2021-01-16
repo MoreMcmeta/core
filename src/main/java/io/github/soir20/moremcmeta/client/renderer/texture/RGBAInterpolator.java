@@ -95,7 +95,7 @@ public class RGBAInterpolator<T extends IRGBAImage> {
         int blue = mixComponent(startProportion,
                 extractComponent(startColor, Component.BLUE), extractComponent(endColor, Component.BLUE));
 
-        return startColor & 0b11111111000000000000000000000000 | red << 16 | blue << 8 | green;
+        return startColor & 0b11111111000000000000000000000000 | red << 16 | green << 8 | blue;
     }
 
     /**
