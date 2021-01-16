@@ -43,6 +43,36 @@ public class RGBAInterpolator<T extends IRGBAImage> {
     }
 
     private int mixPixel(double ratio, int startColor, int endColor) {
+        int red = mixComponent(ratio,
+                extractComponent(startColor, Component.RED), extractComponent(endColor, Component.RED));
+        int green = mixComponent(ratio,
+                extractComponent(startColor, Component.GREEN), extractComponent(endColor, Component.GREEN));
+        int blue = mixComponent(ratio,
+                extractComponent(startColor, Component.BLUE), extractComponent(endColor, Component.BLUE));
+
+        return startColor & -16777216 | red << 16 | blue << 8 | green;
+    }
+
+    private int mixComponent(double ratio, int startColor, int endColor) {
         return (int) (ratio * startColor + (1.0 - ratio) * endColor);
+    }
+
+    private int extractComponent(int color, Component component) {
+        switch (component) {
+            case RED:
+                return color >> 16 & 255;
+            case GREEN:
+                return color >> 8 & 255;
+            case BLUE:
+                return color & 255;
+        }
+
+        throw new IllegalArgumentException("Must specify a valid RGB component");
+    }
+
+    private enum Component {
+        RED,
+        GREEN,
+        BLUE
     }
 }
