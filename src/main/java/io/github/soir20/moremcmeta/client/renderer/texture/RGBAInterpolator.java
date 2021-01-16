@@ -9,6 +9,7 @@ import java.util.function.BiFunction;
  * Generates interpolated images in between two other images.
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
  * @param <T>   type of image to mix
+ * @author soir20
  */
 public class RGBAInterpolator<T extends IRGBAImage> {
     private final BiFunction<Integer, Integer, T> IMAGE_FACTORY;
@@ -129,6 +130,7 @@ public class RGBAInterpolator<T extends IRGBAImage> {
 
     /**
      * Represents a red, blue, or green component in an RGB color.
+     * @author soir20
      */
     private enum Component {
         RED,
