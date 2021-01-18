@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.texture.NativeImage;
  * the {@link RGBAInterpolator}.
  * @author soir20
  */
-public class NativeImageRGBAWrapper implements IRGBAImage, IUploadable {
+public class NativeImageRGBAWrapper implements IRGBAImage, IUploadableMipmap {
     private final NativeImage IMAGE;
 
     /**

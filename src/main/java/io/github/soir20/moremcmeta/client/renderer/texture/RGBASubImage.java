@@ -2,7 +2,7 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import java.util.Collection;
 
-public class RGBASubImage<T extends IRGBAImage & IUploadable> implements IMipmappableRGBAImage<T> {
+public class RGBASubImage<T extends IRGBAImage & IUploadableMipmap> implements IMipmappableRGBAImage<T> {
     private final MipmapContainer<T> MIPMAPS;
     private final int X_OFFSET;
     private final int Y_OFFSET;
