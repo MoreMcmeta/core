@@ -1,15 +1,10 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.ITickable;
-import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.Texture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -19,22 +14,24 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 public class AnimatedTexture extends Texture implements ITickable {
-    private final TextureAtlasSprite SPRITE;
+    private final AnimationFrameManager<NativeImageFrame> FRAME_MANAGER;
+    private final int FRAME_WIDTH;
+    private final int FRAME_HEIGHT;
+    private final int MIPMAP;
 
     /**
-     * Creates a new AnimatedTexture.
-     * @param location      file location of texture identical to how it is used in a entity/gui/map
-     * @param width         texture width
-     * @param height        texture height
-     * @param metadata      animation metadata (.mcmeta information)
-     * @param mipmapLevels  number of mipmap levels to use
-     * @param nativeImage   native image corresponding to this texture
+     * Creates a new animated texture.
+     *
+     * @param frameWidth                width of a single frame (same for all frames)
+     * @param frameHeight               height of a single frame (same for all frames)
+     * @param mipmap                    mipmap levels for all frames
      */
-    public AnimatedTexture(ResourceLocation location, int width, int height, AnimationMetadataSection metadata,
-                           int mipmapLevels, NativeImage nativeImage) {
-        TextureAtlasSprite.Info spriteInfo = new TextureAtlasSprite.Info(location, width, height, metadata);
-        SPRITE = new SingleTextureSprite(SingleTextureSprite.EMPTY_ATLAS, spriteInfo, mipmapLevels,
-                width, height, 0, 0, nativeImage);
+    public AnimatedTexture(AnimationFrameManager<NativeImageFrame> frameManager,
+                           int frameWidth, int frameHeight, int mipmap) {
+        FRAME_MANAGER = frameManager;
+        FRAME_WIDTH = frameWidth;
+        FRAME_HEIGHT = frameHeight;
+        MIPMAP = mipmap;
     }
 
     /**
@@ -54,8 +51,8 @@ public class AnimatedTexture extends Texture implements ITickable {
      * Uploads this image to OpenGL immediately.
      */
     private void loadImage() {
-        TextureUtil.prepareImage(getGlTextureId(), 0, SPRITE.getWidth(), SPRITE.getHeight());
-        SPRITE.uploadMipmaps();
+        TextureUtil.prepareImage(getGlTextureId(), MIPMAP, FRAME_WIDTH, FRAME_HEIGHT);
+        uploadCurrentFrame();
     }
 
     /**
@@ -74,36 +71,17 @@ public class AnimatedTexture extends Texture implements ITickable {
      * Updates this texture's animation immediately.
      */
     private void updateAnimation() {
+        FRAME_MANAGER.tick();
+
         bindTexture();
-        SPRITE.updateAnimation();
+        uploadCurrentFrame();
     }
 
     /**
-     * KEEP THIS CLASS PRIVATE. Unfortunately, TextureAtlasSprite's constructor is protected, and we can't
-     * extract its animation code without copying large swaths of it. We need this class to get access to the
-     * constructor without reflection.
-     * @author soir20
+     * Uploads the current frame immediately.
      */
-    private static class SingleTextureSprite extends TextureAtlasSprite {
-        private static final AtlasTexture EMPTY_ATLAS = new AtlasTexture(
-                new ResourceLocation("moremcmeta", "textures/atlas/empty.png")
-        );
-
-        /**
-         * Creates a new sprite, which should not be connected to an atlas.
-         * @param atlasTextureIn    pass {@link #EMPTY_ATLAS}
-         * @param spriteInfoIn      sprite information section
-         * @param mipmapLevelsIn    number of mipmap levels to use
-         * @param atlasWidthIn      pass sprite width
-         * @param atlasHeightIn     pass sprite height
-         * @param xIn               pass 0 (no other textures to offset this sprite)
-         * @param yIn               pass 0 (no other textures to offset this sprite)
-         * @param imageIn           native image data associated with this sprite
-         */
-        public SingleTextureSprite(AtlasTexture atlasTextureIn, Info spriteInfoIn, int mipmapLevelsIn,
-                                   int atlasWidthIn, int atlasHeightIn, int xIn, int yIn, NativeImage imageIn) {
-            super(atlasTextureIn, spriteInfoIn, mipmapLevelsIn, atlasWidthIn, atlasHeightIn, xIn, yIn, imageIn);
-        }
+    private void uploadCurrentFrame() {
+        FRAME_MANAGER.getCurrentFrame().uploadAt(0, 0);
     }
 
 }

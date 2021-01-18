@@ -8,7 +8,7 @@ import java.util.function.BiFunction;
  * @param <T>   type of image to mix
  * @author soir20
  */
-public class RGBAInterpolator<T extends IRGBAImage> {
+public class RGBAInterpolator<T extends IRGBAImage> implements IInterpolator<T> {
     private final BiFunction<Integer, Integer, T> IMAGE_GETTER;
 
     /**
@@ -34,7 +34,7 @@ public class RGBAInterpolator<T extends IRGBAImage> {
             throw new IllegalArgumentException("Step must be between 1 and steps - 1 (inclusive)");
         }
 
-        double ratio = (1.0 - step) / (double) steps;
+        double ratio = 1.0 - (step / (double) steps);
         return mixImage(ratio, start, end);
     }
 

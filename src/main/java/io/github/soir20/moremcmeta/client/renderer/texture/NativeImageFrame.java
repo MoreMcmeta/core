@@ -1,10 +1,10 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 public class NativeImageFrame {
-    private final RGBASubImage<NativeImageRGBAWrapper> IMAGE;
+    private final SubImage<NativeImageRGBAWrapper> IMAGE;
     private final int FRAME_TIME;
 
-    public NativeImageFrame(RGBASubImage<NativeImageRGBAWrapper> image, int frameTime) {
+    public NativeImageFrame(SubImage<NativeImageRGBAWrapper> image, int frameTime) {
         IMAGE = image;
         FRAME_TIME = frameTime;
     }
@@ -15,6 +15,10 @@ public class NativeImageFrame {
 
     public int getFrameTime() {
         return FRAME_TIME;
+    }
+
+    public SubImage<NativeImageRGBAWrapper> getImage() {
+        return IMAGE;
     }
 
 }

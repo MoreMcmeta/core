@@ -2,7 +2,7 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import java.util.Collection;
 
-public class RGBASubImage<T extends IRGBAImage & IUploadableMipmap> implements IMipmappableRGBAImage<T> {
+public class SubImage<T extends IUploadableMipmap> implements IMipmappableImage<T> {
     private final MipmapContainer<T> MIPMAPS;
     private final int X_OFFSET;
     private final int Y_OFFSET;
@@ -12,8 +12,8 @@ public class RGBASubImage<T extends IRGBAImage & IUploadableMipmap> implements I
     private final boolean CLAMP;
     private final boolean AUTO_CLOSE;
 
-    public RGBASubImage(MipmapContainer<T> mipmaps, int xOffset, int yOffset, int width, int height,
-                        boolean blur, boolean clamp, boolean autoClose) {
+    public SubImage(MipmapContainer<T> mipmaps, int xOffset, int yOffset, int width, int height,
+                    boolean blur, boolean clamp, boolean autoClose) {
         MIPMAPS = mipmaps;
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
@@ -24,17 +24,14 @@ public class RGBASubImage<T extends IRGBAImage & IUploadableMipmap> implements I
         AUTO_CLOSE = autoClose;
     }
 
-    @Override
     public T getMipmap(int level) {
         return MIPMAPS.getMipmap(level);
     }
 
-    @Override
     public boolean isMipmapped() {
         return MIPMAPS.getMipmapLevels().size() > 1;
     }
 
-    @Override
     public Collection<Integer> getMipmapLevels() {
         return MIPMAPS.getMipmapLevels();
     }
