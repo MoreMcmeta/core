@@ -1,8 +1,5 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.function.BiFunction;
 
 /**
@@ -12,36 +9,33 @@ import java.util.function.BiFunction;
  * @author soir20
  */
 public class RGBAInterpolator<T extends IRGBAImage> {
-    private final BiFunction<Integer, Integer, T> IMAGE_FACTORY;
+    private final BiFunction<Integer, Integer, T> IMAGE_GETTER;
 
     /**
      * Creates a new interpolator.
-     * @param imageFactory      accepts a width and height to produce interpolated images.
-     *                          Colors are overwritten. The longest width and the longest height
-     *                          are selected between the start and end images.
+     * @param imageGetter      accepts a width and height to produce interpolated images.
+     *                         Colors are overwritten. The longest width and the longest height
+     *                         are selected between the start and end images.
      */
-    public RGBAInterpolator(BiFunction<Integer, Integer, T> imageFactory) {
-        IMAGE_FACTORY = imageFactory;
+    public RGBAInterpolator(BiFunction<Integer, Integer, T> imageGetter) {
+        IMAGE_GETTER = imageGetter;
     }
 
     /**
-     * Generates interpolated images between two images.
-     * @param steps     the number of steps it should take from the start image to reach the end image.
-     *                  Total images generated = steps - 1
+     * Generates an interpolate images between two images.
+     * @param steps     the number of steps it should take from the start image to reach the end image
+     * @param step      the current step in the interpolation. Start at 1, and end at steps - 1.
      * @param start     the image to start interpolation at (not returned)
      * @param end       the image to end interpolation at (not returned)
-     * @return  the interpolated frames (not including the start and end frames)
+     * @return  the interpolated frame at this step
      */
-    public Collection<T> interpolate(int steps, T start, T end) {
-        List<T> output = new ArrayList<>();
-
-        // Don't start at 0 because that would generate the start image
-        for (int step = 1; step < steps; step++) {
-            double ratio = (1.0 - step) / (double) steps;
-            output.add(mixImage(ratio, start, end));
+    public T interpolate(int steps, int step, T start, T end) {
+        if (step < 1 || step >= steps) {
+            throw new IllegalArgumentException("Step must be between 1 and steps - 1 (inclusive)");
         }
 
-        return output;
+        double ratio = (1.0 - step) / (double) steps;
+        return mixImage(ratio, start, end);
     }
 
     /**
@@ -54,7 +48,7 @@ public class RGBAInterpolator<T extends IRGBAImage> {
     private T mixImage(double startProportion, T start, T end) {
         int maxWidth = Math.max(start.getWidth(), end.getWidth());
         int maxHeight = Math.max(start.getHeight(), end.getHeight());
-        T output = IMAGE_FACTORY.apply(maxWidth, maxHeight);
+        T output = IMAGE_GETTER.apply(maxWidth, maxHeight);
 
         for (int yPos = 0; yPos < maxHeight; yPos++) {
             for (int xPos = 0; xPos < maxWidth; xPos++) {

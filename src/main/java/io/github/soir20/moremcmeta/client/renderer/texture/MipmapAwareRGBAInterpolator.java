@@ -1,32 +1,30 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
-public class MipmapAwareRGBAInterpolator<T extends IRGBAImage> {
-    private final RGBAInterpolator<T> INTERPOLATOR;
+public class MipmapAwareRGBAInterpolator<T extends IRGBAImage, E extends IMipmappableRGBAImage<T>> {
+    private final Function<MipmapContainer<T>, E> CONTAINER_GETTER;
+    private final Function<Integer, BiFunction<Integer, Integer, T>> IMAGE_GETTER;
 
-    public MipmapAwareRGBAInterpolator(BiFunction<Integer, Integer, T> imageFactory) {
-        INTERPOLATOR = new RGBAInterpolator<>(imageFactory);
+    public MipmapAwareRGBAInterpolator(Function<MipmapContainer<T>, E> containerGetter,
+            Function<Integer, BiFunction<Integer, Integer, T>> mipmappableImageGetter) {
+        CONTAINER_GETTER = containerGetter;
+        IMAGE_GETTER = mipmappableImageGetter;
     }
 
-    public Collection<MipmapContainer<T>> interpolate(int steps, int mipmap, IMipmappableRGBAImage<T> start,
-                                                      IMipmappableRGBAImage<T> end) {
-        List<MipmapContainer<T>> mipmapContainers = Collections.nCopies(steps, new MipmapContainer<>());
+    public E interpolate(int steps, int step, int mipmap, E start, E end) {
+        MipmapContainer<T> mipmaps = new MipmapContainer<>();
 
         for (int level = 0; level < mipmap; level++) {
-            Collection<T> frames = INTERPOLATOR.interpolate(steps, start.getMipmap(level), end.getMipmap(level));
+            RGBAInterpolator<T> interpolator = new RGBAInterpolator<>(IMAGE_GETTER.apply(mipmap));
+            T mipmappedFrame = interpolator.interpolate(steps, step,
+                    start.getMipmap(level), end.getMipmap(level));
 
-            int frameIndex = 0;
-            for (T frame : frames) {
-                mipmapContainers.get(frameIndex).addMipmap(level, frame);
-                frameIndex++;
-            }
+            mipmaps.addMipmap(level, mipmappedFrame);
         }
 
-        return mipmapContainers;
+        return CONTAINER_GETTER.apply(mipmaps);
     }
 
 }
