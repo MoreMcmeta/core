@@ -10,15 +10,15 @@ import net.minecraft.client.resources.data.AnimationMetadataSection;
  * @param <T>   tickable texture type
  * @author soir20
  */
-public interface IAnimatedTextureReader<T extends Texture & ITickable> {
+public interface IAnimatedTextureReader<T extends Texture & ITickable, E extends IUploadableMipmap> {
 
     /**
      * Creates an animated texture based on file data
-     * @param image     the image to read from
-     * @param metadata  image animation metadata
+     * @param mipmappedImage    the image to read from
+     * @param metadata          image animation metadata
      * @return animated texture that can be loaded into the
      *         {@link net.minecraft.client.renderer.texture.TextureManager}
      */
-    T readAnimatedTexture(NativeImage image, AnimationMetadataSection metadata);
+    T readAnimatedTexture(MipmapContainer<E> mipmappedImage, AnimationMetadataSection metadata);
 
 }

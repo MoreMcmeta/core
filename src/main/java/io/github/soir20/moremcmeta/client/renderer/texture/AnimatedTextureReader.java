@@ -1,28 +1,31 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.renderer.texture.MipmapGenerator;
-import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.crash.ReportedException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class AnimatedTextureReader<T> implements IAnimatedTextureReader<AnimatedTexture> {
+public class AnimatedTextureReader<T extends IRGBAImage & IUploadableMipmap, E extends IAnimationFrame<T>>
+        implements IAnimatedTextureReader<AnimatedTexture<E>, T> {
     private final int MIPMAP;
+    private final BiFunction<Integer, Integer, T> IMAGE_FACTORY;
+    private final BiFunction<SubImage<T>, Integer, E> FRAME_FACTORY;
 
-    public AnimatedTextureReader(int mipmap) {
+    public AnimatedTextureReader(int mipmap, BiFunction<Integer, Integer, T> imageFactory,
+                                 BiFunction<SubImage<T>, Integer, E> frameFactory) {
         MIPMAP = mipmap;
+        IMAGE_FACTORY = imageFactory;
+        FRAME_FACTORY = frameFactory;
     }
 
     @Override
-    public AnimatedTexture readAnimatedTexture(NativeImage image, AnimationMetadataSection metadata) {
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
+    public AnimatedTexture<E> readAnimatedTexture(MipmapContainer<T> mipmappedImage,
+                                               AnimationMetadataSection metadata) {
+        int imageWidth = mipmappedImage.getMipmap(0).getWidth();
+        int imageHeight = mipmappedImage.getMipmap(0).getHeight();
 
         if (imageWidth <= 0 || imageHeight <= 0) {
             throw new IllegalArgumentException("Image must not be empty");
@@ -32,56 +35,24 @@ public class AnimatedTextureReader<T> implements IAnimatedTextureReader<Animated
         int frameWidth = frameSize.getFirst();
         int frameHeight = frameSize.getSecond();
 
-        MipmapContainer<NativeImageRGBAWrapper> mipmappedImage =
-                createMipmappedImage(image, frameWidth, frameHeight);
-
         int numFramesX = imageWidth / frameWidth;
         int numFramesY = imageHeight / frameHeight;
 
-        List<NativeImageFrame> frames;
+        List<E> frames;
         if (metadata.getFrameCount() > 0) {
             frames = getPredefinedFrames(mipmappedImage, metadata, frameWidth, frameHeight, numFramesX);
         } else {
             frames = findFrames(mipmappedImage, frameWidth, frameHeight, numFramesX, numFramesY);
         }
 
-        Function<NativeImageFrame, Integer> frameTimeCalculator =
+        Function<E, Integer> frameTimeCalculator =
                 getFrameTimeCalculator(metadata.getFrameTime());
-        IInterpolator<NativeImageFrame> interpolator = getFrameInterpolator(frameWidth, frameHeight);
+        IInterpolator<E> interpolator = getFrameInterpolator(frameWidth, frameHeight);
 
-        AnimationFrameManager<NativeImageFrame> frameManager =
+        AnimationFrameManager<E> frameManager =
                 new AnimationFrameManager<>(frames, frameTimeCalculator, interpolator);
 
-        return new AnimatedTexture(frameManager, frameWidth, frameHeight, MIPMAP);
-    }
-
-    private MipmapContainer<NativeImageRGBAWrapper> createMipmappedImage(NativeImage image,
-                                                                         int frameWidth, int frameHeight) {
-        NativeImage[] mipmaps = generateMipmaps(image, frameWidth, frameHeight);
-        MipmapContainer<NativeImageRGBAWrapper> mipmappedImage = new MipmapContainer<>();
-
-        for (int level = 0; level < mipmaps.length; level++) {
-            NativeImageRGBAWrapper wrappedMipmap = new NativeImageRGBAWrapper(mipmaps[level]);
-            mipmappedImage.addMipmap(level, wrappedMipmap);
-        }
-
-        return mipmappedImage;
-    }
-
-    private NativeImage[] generateMipmaps(NativeImage image, int frameWidth, int frameHeight) {
-        try {
-            return MipmapGenerator.generateMipmaps(image, MIPMAP);
-        } catch (Throwable throwable) {
-            CrashReport report = CrashReport.makeCrashReport(throwable,
-                    "Generating mipmaps for texture");
-            CrashReportCategory category = report.makeCategory("Animated texture mipmapping");
-
-            category.addDetail("Image size", image.getWidth() + " x " + image.getHeight());
-            category.addDetail("Frame size", frameWidth + " x " + frameHeight);
-            category.addDetail("Mipmap levels", MIPMAP);
-
-            throw new ReportedException(report);
-        }
+        return new AnimatedTexture<>(frameManager, frameWidth, frameHeight, MIPMAP);
     }
 
     private Pair<Integer, Integer> frameIndexToPosition(int index, int numFramesX) {
@@ -90,10 +61,9 @@ public class AnimatedTextureReader<T> implements IAnimatedTextureReader<Animated
         return new Pair<>(xPos, yPos);
     }
 
-    private List<NativeImageFrame> getPredefinedFrames(MipmapContainer<NativeImageRGBAWrapper> mipmaps,
-                                                       AnimationMetadataSection metadata, int frameWidth,
-                                                       int frameHeight, int numFramesX) {
-        List<NativeImageFrame> frames = new ArrayList<>();
+    private List<E> getPredefinedFrames(MipmapContainer<T> mipmaps, AnimationMetadataSection metadata,
+                                        int frameWidth, int frameHeight, int numFramesX) {
+        List<E> frames = new ArrayList<>();
 
         for (int frame = 0; frame < metadata.getFrameCount(); frame++) {
             int index = metadata.getFrameIndex(frame);
@@ -103,62 +73,57 @@ public class AnimatedTextureReader<T> implements IAnimatedTextureReader<Animated
             int xOffset = framePos.getFirst() * frameWidth;
             int yOffset = framePos.getSecond() * frameHeight;
 
-            SubImage<NativeImageRGBAWrapper> frameImage = new SubImage<>(mipmaps,
-                    xOffset, yOffset, frameWidth, frameHeight, false, false, false);
+            SubImage<T> frameImage = new SubImage<>(mipmaps, xOffset, yOffset, frameWidth, frameHeight,
+                    false, false, false);
 
-            frames.add(new NativeImageFrame(frameImage, time));
+            frames.add(FRAME_FACTORY.apply(frameImage, time));
         }
 
         return frames;
     }
 
-    private List<NativeImageFrame> findFrames(MipmapContainer<NativeImageRGBAWrapper> mipmaps, int frameWidth,
-                                              int frameHeight, int numFramesX, int numFramesY) {
-        List<NativeImageFrame> frames = new ArrayList<>();
+    private List<E> findFrames(MipmapContainer<T> mipmaps, int frameWidth, int frameHeight,
+                               int numFramesX, int numFramesY) {
+        List<E> frames = new ArrayList<>();
 
         for (int row = 0; row < numFramesY; row++) {
             for (int column = 0; column < numFramesX; column++) {
-                SubImage<NativeImageRGBAWrapper> frameImage = new SubImage<>(mipmaps,
+                SubImage<T> frameImage = new SubImage<>(mipmaps,
                         column * frameWidth, row * frameHeight, frameWidth, frameHeight,
                         false, false, false);
 
-                frames.add(new NativeImageFrame(frameImage,  -1));
+                frames.add(FRAME_FACTORY.apply(frameImage,  -1));
             }
         }
 
         return frames;
     }
 
-    private Function<NativeImageFrame, Integer> getFrameTimeCalculator(int metadataFrameTime) {
+    private Function<E, Integer> getFrameTimeCalculator(int metadataFrameTime) {
         return (frame) -> {
             int singleFrameTime = frame.getFrameTime();
             return singleFrameTime == -1 ? metadataFrameTime : singleFrameTime;
         };
     }
 
-    private IInterpolator<NativeImageFrame> getFrameInterpolator(int frameWidth, int frameHeight) {
-        NativeImage interpolationHolder = new NativeImage(frameWidth, frameHeight, false);
-        NativeImageRGBAWrapper wrappedHolder = new NativeImageRGBAWrapper(interpolationHolder);
+    private IInterpolator<E> getFrameInterpolator(int frameWidth, int frameHeight) {
+        RGBAInterpolator<T> interpolator = new RGBAInterpolator<>(IMAGE_FACTORY);
 
-        RGBAInterpolator<NativeImageRGBAWrapper> interpolator =
-                new RGBAInterpolator<>((width, height) -> wrappedHolder);
-
-        return (int steps, int step, NativeImageFrame start, NativeImageFrame end) -> {
-            MipmapContainer<NativeImageRGBAWrapper> mipmaps = new MipmapContainer<>();
+        return (int steps, int step, E start, E end) -> {
+            MipmapContainer<T> mipmaps = new MipmapContainer<>();
 
             for (int level = 0; level < MIPMAP; level++) {
-                NativeImageRGBAWrapper startImage = start.getImage().getMipmap(level);
-                NativeImageRGBAWrapper endImage = end.getImage().getMipmap(level);
+                T startImage = start.getImage().getMipmap(level);
+                T endImage = end.getImage().getMipmap(level);
 
-                NativeImageRGBAWrapper interpolated =
-                        interpolator.interpolate(steps, step, startImage, endImage);
+                T interpolated = interpolator.interpolate(steps, step, startImage, endImage);
 
                 mipmaps.addMipmap(level, interpolated);
             }
 
-            SubImage<NativeImageRGBAWrapper> subImage = new SubImage<>(mipmaps, 0, 0,
-                    frameWidth, frameHeight, false, false, false);
-            return new NativeImageFrame(subImage, 1);
+            SubImage<T> subImage = new SubImage<>(mipmaps, 0, 0, frameWidth, frameHeight,
+                    false, false, false);
+            return FRAME_FACTORY.apply(subImage, 1);
         };
     }
 
