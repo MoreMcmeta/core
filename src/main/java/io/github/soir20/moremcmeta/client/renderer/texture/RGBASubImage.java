@@ -2,7 +2,7 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import java.util.Collection;
 
-public class RGBASubImage<T extends IRGBAImage & IUploadable> implements IMipmappableRGBAImage {
+public class RGBASubImage<T extends IRGBAImage & IUploadable> implements IMipmappableRGBAImage<T> {
     private final MipmapContainer<T> MIPMAPS;
     private final int X_OFFSET;
     private final int Y_OFFSET;
@@ -25,23 +25,8 @@ public class RGBASubImage<T extends IRGBAImage & IUploadable> implements IMipmap
     }
 
     @Override
-    public int getPixel(int level, int x, int y) {
-        return MIPMAPS.getMipmap(level).getPixel(X_OFFSET + x, Y_OFFSET + y);
-    }
-
-    @Override
-    public void setPixel(int level, int x, int y, int color) {
-        MIPMAPS.getMipmap(level).setPixel(X_OFFSET + x, Y_OFFSET + y, color);
-    }
-
-    @Override
-    public int getWidth(int level) {
-        return WIDTH >> level;
-    }
-
-    @Override
-    public int getHeight(int level) {
-        return HEIGHT >> level;
+    public T getMipmap(int level) {
+        return MIPMAPS.getMipmap(level);
     }
 
     @Override
@@ -60,8 +45,8 @@ public class RGBASubImage<T extends IRGBAImage & IUploadable> implements IMipmap
             int mipmappedY = y >> level;
             int mipmappedSkipX = X_OFFSET >> level;
             int mipmappedSkipY = Y_OFFSET >> level;
-            int mipmappedWidth = getWidth(level);
-            int mipmappedHeight = getHeight(level);
+            int mipmappedWidth = WIDTH >> level;
+            int mipmappedHeight = HEIGHT >> level;
 
             if (mipmappedWidth > 0 && mipmappedHeight > 0) {
                 MIPMAPS.getMipmap(level).uploadAt(mipmappedX, mipmappedY, mipmappedSkipX, mipmappedSkipY,
