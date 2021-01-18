@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.texture.NativeImage;
  * the {@link RGBAInterpolator}.
  * @author soir20
  */
-public class NativeImageRGBAWrapper implements IRGBAImage {
+public class NativeImageRGBAWrapper implements IRGBAImage, IUploadable {
     private final NativeImage IMAGE;
 
     /**
@@ -56,6 +56,21 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
     @Override
     public int getHeight() {
         return IMAGE.getHeight();
+    }
+
+    /**
+     * Gets the wrapped image.
+     * @return  the wrapped image
+     */
+    public NativeImage getImage() {
+        return IMAGE;
+    }
+
+    @Override
+    public void uploadAt(int xPos, int yPos, int skipX, int skipY, int width, int height,
+                            int mipmap, boolean blur, boolean clamp, boolean shouldMipmap, boolean autoClose) {
+        IMAGE.uploadTextureSub(mipmap, xPos, yPos, skipX, skipY, width, height,
+                blur, clamp, shouldMipmap, autoClose);
     }
 
 }
