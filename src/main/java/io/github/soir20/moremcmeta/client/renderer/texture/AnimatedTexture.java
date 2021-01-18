@@ -13,8 +13,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-public class AnimatedTexture extends Texture implements ITickable {
-    private final AnimationFrameManager<NativeImageFrame> FRAME_MANAGER;
+public class AnimatedTexture<T extends IAnimationFrame<? extends IUploadableMipmap>>
+        extends Texture implements ITickable {
+    private final AnimationFrameManager<T> FRAME_MANAGER;
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final int MIPMAP;
@@ -26,7 +27,7 @@ public class AnimatedTexture extends Texture implements ITickable {
      * @param frameHeight               height of a single frame (same for all frames)
      * @param mipmap                    mipmap levels for all frames
      */
-    public AnimatedTexture(AnimationFrameManager<NativeImageFrame> frameManager,
+    public AnimatedTexture(AnimationFrameManager<T> frameManager,
                            int frameWidth, int frameHeight, int mipmap) {
         FRAME_MANAGER = frameManager;
         FRAME_WIDTH = frameWidth;

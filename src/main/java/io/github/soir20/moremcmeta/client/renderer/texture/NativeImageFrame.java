@@ -1,6 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-public class NativeImageFrame {
+public class NativeImageFrame implements IAnimationFrame<NativeImageRGBAWrapper> {
     private final SubImage<NativeImageRGBAWrapper> IMAGE;
     private final int FRAME_TIME;
 
