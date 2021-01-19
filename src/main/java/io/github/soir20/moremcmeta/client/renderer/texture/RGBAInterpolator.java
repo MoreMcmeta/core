@@ -5,11 +5,11 @@ import java.util.function.BiFunction;
 /**
  * Generates interpolated images in between two other images.
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
- * @param <T>   type of image to mix
+ * @param <I>   type of image to mix
  * @author soir20
  */
-public class RGBAInterpolator<T extends IRGBAImage> implements IInterpolator<T> {
-    private final BiFunction<Integer, Integer, T> IMAGE_GETTER;
+public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> {
+    private final BiFunction<Integer, Integer, I> IMAGE_GETTER;
 
     /**
      * Creates a new interpolator.
@@ -17,7 +17,7 @@ public class RGBAInterpolator<T extends IRGBAImage> implements IInterpolator<T> 
      *                         Colors are overwritten. The longest width and the longest height
      *                         are selected between the start and end images.
      */
-    public RGBAInterpolator(BiFunction<Integer, Integer, T> imageGetter) {
+    public RGBAInterpolator(BiFunction<Integer, Integer, I> imageGetter) {
         IMAGE_GETTER = imageGetter;
     }
 
@@ -29,7 +29,7 @@ public class RGBAInterpolator<T extends IRGBAImage> implements IInterpolator<T> 
      * @param end       the image to end interpolation at (not returned)
      * @return  the interpolated frame at this step
      */
-    public T interpolate(int steps, int step, T start, T end) {
+    public I interpolate(int steps, int step, I start, I end) {
         if (step < 1 || step >= steps) {
             throw new IllegalArgumentException("Step must be between 1 and steps - 1 (inclusive)");
         }
@@ -45,10 +45,10 @@ public class RGBAInterpolator<T extends IRGBAImage> implements IInterpolator<T> 
      * @param end               end image (unchanged)
      * @return  the image with mixed colors (using the largest dimension in each direction)
      */
-    private T mixImage(double startProportion, T start, T end) {
+    private I mixImage(double startProportion, I start, I end) {
         int maxWidth = Math.max(start.getWidth(), end.getWidth());
         int maxHeight = Math.max(start.getHeight(), end.getHeight());
-        T output = IMAGE_GETTER.apply(maxWidth, maxHeight);
+        I output = IMAGE_GETTER.apply(maxWidth, maxHeight);
 
         for (int yPos = 0; yPos < maxHeight; yPos++) {
             for (int xPos = 0; xPos < maxWidth; xPos++) {
@@ -70,7 +70,7 @@ public class RGBAInterpolator<T extends IRGBAImage> implements IInterpolator<T> 
      * @param y         y-coordinate of the pixel
      * @return  the color of the pixel or a transparent pixel
      */
-    private int getPixel(T image, int x, int y) {
+    private int getPixel(I image, int x, int y) {
         return x > image.getWidth() || y > image.getHeight() ? 0 : image.getPixel(x, y);
     }
 

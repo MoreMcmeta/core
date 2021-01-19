@@ -6,9 +6,9 @@ import java.util.Collection;
  * An image that can be mipmapped.
  * @author soir20
  */
-public interface IMipmappableImage<T> {
+public interface IMipmappableImage<I> {
 
-    T getMipmap(int level);
+    I getMipmap(int level);
 
     boolean isMipmapped();
 

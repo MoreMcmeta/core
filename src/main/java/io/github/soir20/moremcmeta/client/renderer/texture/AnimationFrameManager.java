@@ -8,17 +8,17 @@ import java.util.function.Function;
 
 /**
  * Manages the current frame in an animation.
- * @param <T>   animation frame class
+ * @param <F>   animation frame class
  * @author soir20
  */
-public class AnimationFrameManager<T> implements ITickable {
-    private final List<T> FRAMES;
-    private final Function<T, Integer> FRAME_TIME_CALCULATOR;
-    private final IInterpolator<T> INTERPOLATOR;
+public class AnimationFrameManager<F> implements ITickable {
+    private final List<F> FRAMES;
+    private final Function<F, Integer> FRAME_TIME_CALCULATOR;
+    private final IInterpolator<F> INTERPOLATOR;
 
     private int ticksInThisFrame;
     private int currentFrameIndex;
-    private T currentFrame;
+    private F currentFrame;
 
     /**
      * Creates an animation frame manager that does not interpolate between frames.
@@ -27,7 +27,7 @@ public class AnimationFrameManager<T> implements ITickable {
      *                              In most cases, pass a function that gets the
      *                              time from the frame or returns a default value.
      */
-    public AnimationFrameManager(List<T> frames, Function<T, Integer> frameTimeCalculator) {
+    public AnimationFrameManager(List<F> frames, Function<F, Integer> frameTimeCalculator) {
         FRAMES = new ArrayList<>();
         FRAMES.addAll(frames);
         FRAME_TIME_CALCULATOR = frameTimeCalculator;
@@ -42,8 +42,8 @@ public class AnimationFrameManager<T> implements ITickable {
      *                              time from the frame or returns a default value.
      * @param interpolator          interpolates between frames of the animation
      */
-    public AnimationFrameManager(List<T> frames, Function<T, Integer> frameTimeCalculator,
-                                 IInterpolator<T> interpolator) {
+    public AnimationFrameManager(List<F> frames, Function<F, Integer> frameTimeCalculator,
+                                 IInterpolator<F> interpolator) {
         FRAMES = new ArrayList<>();
         FRAMES.addAll(frames);
         FRAME_TIME_CALCULATOR = frameTimeCalculator;
@@ -54,7 +54,7 @@ public class AnimationFrameManager<T> implements ITickable {
      * Gets the current frame of the animation.
      * @return  the current frame of the animation
      */
-    public T getCurrentFrame() {
+    public F getCurrentFrame() {
         return currentFrame;
     }
 

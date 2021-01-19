@@ -2,8 +2,8 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import java.util.Collection;
 
-public class SubImage<T extends IUploadableMipmap> implements IMipmappableImage<T> {
-    private final MipmapContainer<T> MIPMAPS;
+public class SubImage<I extends IUploadableMipmap> implements IMipmappableImage<I> {
+    private final MipmapContainer<I> MIPMAPS;
     private final int X_OFFSET;
     private final int Y_OFFSET;
     private final int WIDTH;
@@ -12,7 +12,7 @@ public class SubImage<T extends IUploadableMipmap> implements IMipmappableImage<
     private final boolean CLAMP;
     private final boolean AUTO_CLOSE;
 
-    public SubImage(MipmapContainer<T> mipmaps, int xOffset, int yOffset, int width, int height,
+    public SubImage(MipmapContainer<I> mipmaps, int xOffset, int yOffset, int width, int height,
                     boolean blur, boolean clamp, boolean autoClose) {
         MIPMAPS = mipmaps;
         X_OFFSET = xOffset;
@@ -24,7 +24,7 @@ public class SubImage<T extends IUploadableMipmap> implements IMipmappableImage<
         AUTO_CLOSE = autoClose;
     }
 
-    public T getMipmap(int level) {
+    public I getMipmap(int level) {
         return MIPMAPS.getMipmap(level);
     }
 

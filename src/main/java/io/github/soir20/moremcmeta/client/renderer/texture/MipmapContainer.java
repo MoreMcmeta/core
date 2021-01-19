@@ -3,18 +3,18 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 import java.util.HashMap;
 import java.util.Set;
 
-public class MipmapContainer<T> {
-    private final HashMap<Integer, T> mipmaps;
+public class MipmapContainer<I> {
+    private final HashMap<Integer, I> mipmaps;
 
     public MipmapContainer() {
         mipmaps = new HashMap<>();
     }
 
-    public void addMipmap(int level, T image) {
+    public void addMipmap(int level, I image) {
         mipmaps.put(level, image);
     }
 
-    public T getMipmap(int level) {
+    public I getMipmap(int level) {
         return mipmaps.get(level);
     }
 
