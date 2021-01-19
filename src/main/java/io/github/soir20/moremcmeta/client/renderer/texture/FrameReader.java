@@ -7,14 +7,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class FrameReader<F extends IAnimationFrame<? extends IUploadableMipmap>> implements IFrameReader<F> {
+/**
+ * Creates animated (tickable) textures.
+ * @param <F>   tickable texture type
+ * @author soir20
+ */
+public class FrameReader<F extends IAnimationFrame<? extends IUploadableMipmap>> {
     private final Function<FrameData, F> FRAME_FACTORY;
 
     public FrameReader(Function<FrameData, F> frameFactory) {
         FRAME_FACTORY = frameFactory;
     }
 
-    @Override
+    /**
+     * Creates frames based on file data.
+     * @param imageWidth        the width of the source image
+     * @param imageHeight       the height of the source image
+     * @param metadata          image animation metadata
+     * @return frames that can be used in an animated texture
+     */
     public List<F> read(int imageWidth, int imageHeight, AnimationMetadataSection metadata) {
         if (imageWidth <= 0 || imageHeight <= 0) {
             throw new IllegalArgumentException("Image must not be empty");
@@ -65,12 +76,51 @@ public class FrameReader<F extends IAnimationFrame<? extends IUploadableMipmap>>
         for (int row = 0; row < numFramesY; row++) {
             for (int column = 0; column < numFramesX; column++) {
                 FrameData data = new FrameData(frameWidth, frameHeight,
-                        column * frameWidth, row * frameHeight, IFrameReader.EMPTY_TIME);
+                        column * frameWidth, row * frameHeight, FrameData.EMPTY_TIME);
                 frames.add(FRAME_FACTORY.apply(data));
             }
         }
 
         return frames;
+    }
+
+    public static class FrameData {
+        public static final int EMPTY_TIME = -1;
+
+        private final int WIDTH;
+        private final int HEIGHT;
+        private final int X_OFFSET;
+        private final int Y_OFFSET;
+        private final int TIME;
+
+        public FrameData(int width, int height, int xOffset, int yOffset, int time) {
+            WIDTH = width;
+            HEIGHT = height;
+            X_OFFSET = xOffset;
+            Y_OFFSET = yOffset;
+            TIME = time;
+        }
+
+        public int getWidth() {
+            return WIDTH;
+        }
+
+        public int getHeight() {
+            return HEIGHT;
+        }
+
+        public int getXOffset() {
+            return X_OFFSET;
+        }
+
+        public int getYOffset() {
+            return Y_OFFSET;
+        }
+
+        public int getTime() {
+            return TIME;
+        }
+
     }
 
 }
