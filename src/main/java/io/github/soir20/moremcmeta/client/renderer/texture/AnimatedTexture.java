@@ -10,13 +10,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * An animated texture that an update on tick.
- * @param <T>   animation frame type
+ * @param <F>   animation frame type
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-public class AnimatedTexture<T extends IAnimationFrame<? extends IUploadableMipmap>>
+public class AnimatedTexture<F extends IAnimationFrame<? extends IUploadableMipmap>>
         extends Texture implements ITickable {
-    private final AnimationFrameManager<T> FRAME_MANAGER;
+    private final AnimationFrameManager<F> FRAME_MANAGER;
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final int MIPMAP;
@@ -28,7 +28,7 @@ public class AnimatedTexture<T extends IAnimationFrame<? extends IUploadableMipm
      * @param frameHeight               height of a single frame (same for all frames)
      * @param mipmap                    mipmap levels for all frames
      */
-    public AnimatedTexture(AnimationFrameManager<T> frameManager,
+    public AnimatedTexture(AnimationFrameManager<F> frameManager,
                            int frameWidth, int frameHeight, int mipmap) {
         FRAME_MANAGER = frameManager;
         FRAME_WIDTH = frameWidth;
