@@ -10,6 +10,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * An animated texture that an update on tick.
+ * @param <T>   animation frame type
  * @author soir20
  */
 @ParametersAreNonnullByDefault
@@ -22,7 +23,7 @@ public class AnimatedTexture<T extends IAnimationFrame<? extends IUploadableMipm
 
     /**
      * Creates a new animated texture.
-     *
+     * @param frameManager              manages the frames of the texture's animation
      * @param frameWidth                width of a single frame (same for all frames)
      * @param frameHeight               height of a single frame (same for all frames)
      * @param mipmap                    mipmap levels for all frames
