@@ -1,10 +1,9 @@
 package io.github.soir20.moremcmeta.resource;
 
-import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.client.renderer.texture.IAnimatedTextureFactory;
-import io.github.soir20.moremcmeta.client.renderer.texture.INativeImageFactory;
+import io.github.soir20.moremcmeta.client.renderer.texture.IAnimatedTextureReader;
+import io.github.soir20.moremcmeta.client.renderer.texture.IUploadableMipmap;
+import io.github.soir20.moremcmeta.client.renderer.texture.MipmapContainer;
 import net.minecraft.client.renderer.texture.ITickable;
-import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.resources.IResource;
@@ -18,21 +17,25 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * Uploads animated textures to the texture manager on texture reloading so they will always be used for
  * rendering.
  * @param <T>   tickable texture type
+ * @param <E>   input image type
  * @author soir20
  */
-public class TextureReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
+public class TextureReloadListener<T extends Texture & ITickable, E extends IUploadableMipmap>
+        implements ISelectiveResourceReloadListener {
     private final String[] FOLDERS;
     private final BiConsumer<ResourceLocation, Texture> TEXTURE_LOADER;
-    private final IAnimatedTextureFactory<T> TEXTURE_FACTORY;
-    private final INativeImageFactory IMAGE_FACTORY;
+    private final IAnimatedTextureReader<T, E> TEXTURE_READER;
+    private final Function<InputStream, MipmapContainer<E>> IMAGE_FACTORY;
     private final IMetadataSectionSerializer<AnimationMetadataSection> SERIALIZER;
     private final Logger LOGGER;
 
@@ -42,17 +45,18 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      * Creates a TextureReloadListener.
      * @param folders       folders to search for animated textures (exclude folders animated by default)
      * @param texLoader     uploads animated textures to the game's texture manager
-     * @param texFactory    creates animated textures
+     * @param texReader     reads animated textures
      * @param serializer    serializer for .mcmeta files
      * @param logger        logs listener-related messages to the game's output
      */
     public TextureReloadListener(String[] folders, BiConsumer<ResourceLocation, Texture> texLoader,
-                                 IAnimatedTextureFactory<T> texFactory, INativeImageFactory imageFactory,
+                                 IAnimatedTextureReader<T, E> texReader,
+                                 Function<InputStream, MipmapContainer<E>> imageFactory,
                                  IMetadataSectionSerializer<AnimationMetadataSection> serializer,
                                  Logger logger) {
         FOLDERS = folders;
         TEXTURE_LOADER = texLoader;
-        TEXTURE_FACTORY = texFactory;
+        TEXTURE_READER = texReader;
         IMAGE_FACTORY = imageFactory;
         SERIALIZER = serializer;
         LOGGER = logger;
@@ -97,16 +101,11 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      */
     private void uploadToTexManager(ResourceLocation resourceLocation) {
         try (IResource iresource = resourceManager.getResource(resourceLocation)) {
-            NativeImage nativeImage = IMAGE_FACTORY.createNativeImage(iresource.getInputStream());
+            MipmapContainer<E> image = IMAGE_FACTORY.apply(iresource.getInputStream());
             AnimationMetadataSection metadata = iresource.getMetadata(SERIALIZER);
 
             if (metadata != null) {
-                Pair<Integer, Integer> pair = metadata.getSpriteSize(nativeImage.getWidth(),
-                        nativeImage.getHeight());
-
-                T texture = TEXTURE_FACTORY.createAnimatedTexture(resourceLocation, pair.getFirst(),
-                        pair.getSecond(), metadata, 0, nativeImage);
-
+                T texture = TEXTURE_READER.readAnimatedTexture(image, metadata);
                 TEXTURE_LOADER.accept(resourceLocation, texture);
             }
         } catch (RuntimeException runtimeException) {
