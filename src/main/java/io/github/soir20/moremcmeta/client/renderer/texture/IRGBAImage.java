@@ -1,5 +1,9 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.mojang.datafixers.util.Pair;
+
+import java.util.Set;
+
 /**
  * An image with an RGB color scheme.
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
@@ -34,5 +38,7 @@ public interface IRGBAImage {
      * @return  the height of this image
      */
     int getHeight();
+
+    Set<Pair<Integer, Integer>> getInterpolatablePoints();
 
 }
