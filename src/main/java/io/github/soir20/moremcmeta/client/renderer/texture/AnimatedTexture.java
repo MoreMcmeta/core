@@ -14,8 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-public class AnimatedTexture<F extends IAnimationFrame<? extends IUploadableMipmap>>
-        extends Texture implements ITickable {
+public class AnimatedTexture<F extends IAnimationFrame> extends Texture implements ITickable {
     private final AnimationFrameManager<F> FRAME_MANAGER;
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;

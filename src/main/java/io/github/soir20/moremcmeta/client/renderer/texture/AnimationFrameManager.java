@@ -21,20 +21,6 @@ public class AnimationFrameManager<F> implements ITickable {
     private F currentFrame;
 
     /**
-     * Creates an animation frame manager that does not interpolate between frames.
-     * @param frames                frames of the animation
-     * @param frameTimeCalculator   calculates the frame time for a given frame.
-     *                              In most cases, pass a function that gets the
-     *                              time from the frame or returns a default value.
-     */
-    public AnimationFrameManager(List<F> frames, Function<F, Integer> frameTimeCalculator) {
-        FRAMES = new ArrayList<>();
-        FRAMES.addAll(frames);
-        FRAME_TIME_CALCULATOR = frameTimeCalculator;
-        INTERPOLATOR = null;
-    }
-
-    /**
      * Creates an animation frame manager that interpolates between frames.
      * @param frames                frames of the animation
      * @param frameTimeCalculator   calculates the frame time for a given frame.
@@ -68,7 +54,7 @@ public class AnimationFrameManager<F> implements ITickable {
         int maxTime = FRAME_TIME_CALCULATOR.apply(getCurrentFrame());
         int nextFrameIndex = (currentFrameIndex + 1) % FRAMES.size();
 
-        if (INTERPOLATOR != null && ticksInThisFrame < maxTime) {
+        if (ticksInThisFrame < maxTime) {
             currentFrame = INTERPOLATOR.interpolate(maxTime, ticksInThisFrame,
                     currentFrame, FRAMES.get(nextFrameIndex));
         } else if (ticksInThisFrame == maxTime) {
