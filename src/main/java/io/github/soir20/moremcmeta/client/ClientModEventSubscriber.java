@@ -1,11 +1,10 @@
 package io.github.soir20.moremcmeta.client;
 
 import io.github.soir20.moremcmeta.MoreMcmeta;
-import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTexture;
+import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper;
 import io.github.soir20.moremcmeta.resource.TextureReloadListener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
@@ -35,8 +34,10 @@ public class ClientModEventSubscriber {
         TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft::getTextureManager);
         Logger logger = LogManager.getLogger();
 
-        manager.addReloadListener(new TextureReloadListener<>(MoreMcmeta.FOLDERS, texManager::loadTexture,
-                AnimatedTexture::new, NativeImage::read, AnimationMetadataSection.SERIALIZER, logger));
+        AnimatedTextureReader texReader = new AnimatedTextureReader(0, logger);
+
+        manager.addReloadListener(new TextureReloadListener<>(MoreMcmeta.FOLDERS, texReader::read,
+                texManager::loadTexture, AnimationMetadataSection.SERIALIZER, logger));
         logger.debug("Added texture reload listener");
     }
 
