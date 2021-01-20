@@ -11,15 +11,19 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
     private final NativeImage IMAGE;
     private final int X_OFFSET;
     private final int Y_OFFSET;
+    private final int WIDTH;
+    private final int HEIGHT;
 
     /**
      * Creates a new {@link NativeImage} wrapper.
      * @param image     the image to wrap
      */
-    public NativeImageRGBAWrapper(NativeImage image, int xOffset, int yOffset) {
+    public NativeImageRGBAWrapper(NativeImage image, int xOffset, int yOffset, int width, int height) {
         IMAGE = image;
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
+        WIDTH = width;
+        HEIGHT = height;
     }
 
     /**
@@ -50,7 +54,7 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
      */
     @Override
     public int getWidth() {
-        return IMAGE.getWidth();
+        return WIDTH;
     }
 
     /**
@@ -59,7 +63,7 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
      */
     @Override
     public int getHeight() {
-        return IMAGE.getHeight();
+        return HEIGHT;
     }
 
     /**

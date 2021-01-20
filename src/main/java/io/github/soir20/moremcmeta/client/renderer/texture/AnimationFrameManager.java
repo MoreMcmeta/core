@@ -34,6 +34,7 @@ public class AnimationFrameManager<F> implements ITickable {
         FRAMES.addAll(frames);
         FRAME_TIME_CALCULATOR = frameTimeCalculator;
         INTERPOLATOR = interpolator;
+        currentFrame = FRAMES.get(0);
     }
 
     /**
@@ -51,16 +52,17 @@ public class AnimationFrameManager<F> implements ITickable {
     public void tick() {
         ticksInThisFrame++;
 
-        int maxTime = FRAME_TIME_CALCULATOR.apply(getCurrentFrame());
+        F currentPredefinedFrame = FRAMES.get(currentFrameIndex);
+        int maxTime = FRAME_TIME_CALCULATOR.apply(currentPredefinedFrame);
         int nextFrameIndex = (currentFrameIndex + 1) % FRAMES.size();
 
-        if (ticksInThisFrame < maxTime) {
-            currentFrame = INTERPOLATOR.interpolate(maxTime, ticksInThisFrame,
-                    currentFrame, FRAMES.get(nextFrameIndex));
-        } else if (ticksInThisFrame == maxTime) {
+        if (ticksInThisFrame >= maxTime) {
             currentFrameIndex = nextFrameIndex;
             currentFrame = FRAMES.get(nextFrameIndex);
             ticksInThisFrame = 0;
+        } else if (INTERPOLATOR != null) {
+            currentFrame = INTERPOLATOR.interpolate(maxTime, ticksInThisFrame,
+                    currentPredefinedFrame, FRAMES.get(nextFrameIndex));
         }
     }
 

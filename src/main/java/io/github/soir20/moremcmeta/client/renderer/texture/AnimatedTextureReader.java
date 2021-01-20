@@ -62,7 +62,7 @@ public class AnimatedTextureReader {
         }
 
         RGBAInterpolator<NativeImageRGBAWrapper> interpolator = new RGBAInterpolator<>((width, height) ->
-                new NativeImageRGBAWrapper(widthsToImage.get(width), 0, 0));
+                new NativeImageRGBAWrapper(widthsToImage.get(width), 0, 0, width, height));
 
         return (int steps, int step, NativeImageFrame start, NativeImageFrame end) -> {
             NativeImage[] mipmaps = new NativeImage[MIPMAP + 1];
