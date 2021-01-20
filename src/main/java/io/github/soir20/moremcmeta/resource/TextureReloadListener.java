@@ -1,8 +1,5 @@
 package io.github.soir20.moremcmeta.resource;
 
-import io.github.soir20.moremcmeta.client.renderer.texture.IAnimatedTextureReader;
-import io.github.soir20.moremcmeta.client.renderer.texture.IUploadableMipmap;
-import io.github.soir20.moremcmeta.client.renderer.texture.MipmapContainer;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
@@ -20,22 +17,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
  * Uploads animated textures to the texture manager on texture reloading so they will always be used for
  * rendering.
  * @param <T>   tickable texture type
- * @param <E>   input image type
  * @author soir20
  */
-public class TextureReloadListener<T extends Texture & ITickable, E extends IUploadableMipmap>
+public class TextureReloadListener<T extends Texture & ITickable>
         implements ISelectiveResourceReloadListener {
     private final String[] FOLDERS;
     private final BiConsumer<ResourceLocation, Texture> TEXTURE_LOADER;
-    private final IAnimatedTextureReader<T, E> TEXTURE_READER;
-    private final Function<InputStream, MipmapContainer<E>> IMAGE_FACTORY;
+    private final BiFunction<InputStream, AnimationMetadataSection, T> TEXTURE_READER;
     private final IMetadataSectionSerializer<AnimationMetadataSection> SERIALIZER;
     private final Logger LOGGER;
 
@@ -44,20 +39,19 @@ public class TextureReloadListener<T extends Texture & ITickable, E extends IUpl
     /**
      * Creates a TextureReloadListener.
      * @param folders       folders to search for animated textures (exclude folders animated by default)
-     * @param texLoader     uploads animated textures to the game's texture manager
      * @param texReader     reads animated textures
+     * @param texLoader     uploads animated textures to the game's texture manager
      * @param serializer    serializer for .mcmeta files
      * @param logger        logs listener-related messages to the game's output
      */
-    public TextureReloadListener(String[] folders, BiConsumer<ResourceLocation, Texture> texLoader,
-                                 IAnimatedTextureReader<T, E> texReader,
-                                 Function<InputStream, MipmapContainer<E>> imageFactory,
+    public TextureReloadListener(String[] folders,
+                                 BiFunction<InputStream, AnimationMetadataSection, T> texReader,
+                                 BiConsumer<ResourceLocation, Texture> texLoader,
                                  IMetadataSectionSerializer<AnimationMetadataSection> serializer,
                                  Logger logger) {
         FOLDERS = folders;
-        TEXTURE_LOADER = texLoader;
         TEXTURE_READER = texReader;
-        IMAGE_FACTORY = imageFactory;
+        TEXTURE_LOADER = texLoader;
         SERIALIZER = serializer;
         LOGGER = logger;
     }
@@ -101,11 +95,11 @@ public class TextureReloadListener<T extends Texture & ITickable, E extends IUpl
      */
     private void uploadToTexManager(ResourceLocation resourceLocation) {
         try (IResource iresource = resourceManager.getResource(resourceLocation)) {
-            MipmapContainer<E> image = IMAGE_FACTORY.apply(iresource.getInputStream());
+            InputStream stream = iresource.getInputStream();
             AnimationMetadataSection metadata = iresource.getMetadata(SERIALIZER);
 
             if (metadata != null) {
-                T texture = TEXTURE_READER.readAnimatedTexture(image, metadata);
+                T texture = TEXTURE_READER.apply(stream, metadata);
                 TEXTURE_LOADER.accept(resourceLocation, texture);
             }
         } catch (RuntimeException runtimeException) {

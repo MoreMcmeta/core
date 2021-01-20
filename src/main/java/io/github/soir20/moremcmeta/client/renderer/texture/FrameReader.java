@@ -12,7 +12,7 @@ import java.util.function.Function;
  * @param <F>   tickable texture type
  * @author soir20
  */
-public class FrameReader<F extends IAnimationFrame<? extends IUploadableMipmap>> {
+public class FrameReader<F extends IAnimationFrame> {
     private final Function<FrameData, F> FRAME_FACTORY;
 
     public FrameReader(Function<FrameData, F> frameFactory) {

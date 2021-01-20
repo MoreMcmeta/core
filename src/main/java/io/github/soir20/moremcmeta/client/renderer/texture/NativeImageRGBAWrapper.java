@@ -7,15 +7,19 @@ import net.minecraft.client.renderer.texture.NativeImage;
  * the {@link RGBAInterpolator}.
  * @author soir20
  */
-public class NativeImageRGBAWrapper implements IRGBAImage, IUploadableMipmap {
+public class NativeImageRGBAWrapper implements IRGBAImage {
     private final NativeImage IMAGE;
+    private final int X_OFFSET;
+    private final int Y_OFFSET;
 
     /**
      * Creates a new {@link NativeImage} wrapper.
      * @param image     the image to wrap
      */
-    public NativeImageRGBAWrapper(NativeImage image) {
+    public NativeImageRGBAWrapper(NativeImage image, int xOffset, int yOffset) {
         IMAGE = image;
+        X_OFFSET = xOffset;
+        Y_OFFSET = yOffset;
     }
 
     /**
@@ -26,7 +30,7 @@ public class NativeImageRGBAWrapper implements IRGBAImage, IUploadableMipmap {
      */
     @Override
     public int getPixel(int x, int y) {
-        return IMAGE.getPixelRGBA(x, y);
+        return IMAGE.getPixelRGBA(x + X_OFFSET, y + Y_OFFSET);
     }
 
     /**
@@ -37,7 +41,7 @@ public class NativeImageRGBAWrapper implements IRGBAImage, IUploadableMipmap {
      */
     @Override
     public void setPixel(int x, int y, int color) {
-        IMAGE.setPixelRGBA(x, y, color);
+        IMAGE.setPixelRGBA(x + X_OFFSET, y + Y_OFFSET, color);
     }
 
     /**
@@ -64,13 +68,6 @@ public class NativeImageRGBAWrapper implements IRGBAImage, IUploadableMipmap {
      */
     public NativeImage getImage() {
         return IMAGE;
-    }
-
-    @Override
-    public void uploadAt(int xPos, int yPos, int skipX, int skipY, int width, int height,
-                            int mipmap, boolean blur, boolean clamp, boolean shouldMipmap, boolean autoClose) {
-        IMAGE.uploadTextureSub(mipmap, xPos, yPos, skipX, skipY, width, height,
-                blur, clamp, shouldMipmap, autoClose);
     }
 
 }

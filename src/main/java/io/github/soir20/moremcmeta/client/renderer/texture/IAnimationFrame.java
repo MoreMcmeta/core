@@ -1,8 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-public interface IAnimationFrame<I extends IUploadableMipmap> {
-
-    IMipmappableImage<I> getImage();
+public interface IAnimationFrame {
 
     int getFrameTime();
 
