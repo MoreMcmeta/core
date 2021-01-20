@@ -52,7 +52,7 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
 
         for (int yPos = 0; yPos < maxHeight; yPos++) {
             for (int xPos = 0; xPos < maxWidth; xPos++) {
-                int startColor= getPixel(start, xPos, yPos);
+                int startColor = getPixel(start, xPos, yPos);
                 int endColor = getPixel(end, xPos, yPos);
                 int mixedColor = mixPixel(startProportion, startColor, endColor);
 
