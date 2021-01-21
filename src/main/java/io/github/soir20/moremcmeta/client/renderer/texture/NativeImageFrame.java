@@ -46,9 +46,24 @@ public class NativeImageFrame implements IAnimationFrame {
         return FRAME_TIME;
     }
 
-    public NativeImageRGBAWrapper getImageWrapper(int level) {
-        return new NativeImageRGBAWrapper(MIPMAPS[level], X_OFFSET >> level, Y_OFFSET >> level,
-                WIDTH >> level, HEIGHT >> level);
+    public int getWidth() {
+        return WIDTH;
+    }
+    
+    public int getHeight() {
+        return HEIGHT;
+    }
+
+    public int getXOffset() {
+        return X_OFFSET;
+    }
+
+    public int getYOffset() {
+        return Y_OFFSET;
+    }
+
+    public NativeImage getImage(int level) {
+        return MIPMAPS[level];
     }
 
 }

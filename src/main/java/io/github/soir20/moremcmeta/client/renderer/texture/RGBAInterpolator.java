@@ -1,5 +1,8 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.mojang.datafixers.util.Pair;
+
+import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
@@ -50,14 +53,16 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
         int maxHeight = Math.max(start.getHeight(), end.getHeight());
         I output = IMAGE_GETTER.apply(maxWidth, maxHeight);
 
-        for (int yPos = 0; yPos < maxHeight; yPos++) {
-            for (int xPos = 0; xPos < maxWidth; xPos++) {
-                int startColor = getPixel(start, xPos, yPos);
-                int endColor = getPixel(end, xPos, yPos);
-                int mixedColor = mixPixel(startProportion, startColor, endColor);
+        Set<Pair<Integer, Integer>> points = output.getInterpolatablePoints();
+        for (Pair<Integer, Integer> point : points) {
+            int xPos = point.getFirst();
+            int yPos = point.getSecond();
 
-                output.setPixel(xPos, yPos, mixedColor);
-            }
+            int startColor = getPixel(start, xPos, yPos);
+            int endColor = getPixel(end, xPos, yPos);
+            int mixedColor = mixPixel(startProportion, startColor, endColor);
+
+            output.setPixel(xPos, yPos, mixedColor);
         }
 
         return output;
