@@ -35,6 +35,12 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
         MIPMAP = mipmap;
     }
 
+    @Override
+    public void bindTexture() {
+        super.bindTexture();
+        uploadCurrentFrame();
+    }
+
     /**
      * Uploads this texture to OpenGL on the appropriate thread.
      * @param manager   resource manager
@@ -75,7 +81,6 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
         FRAME_MANAGER.tick();
 
         bindTexture();
-        uploadCurrentFrame();
     }
 
     /**

@@ -19,6 +19,7 @@ public class AnimationFrameManager<F> implements ITickable {
     private int ticksInThisFrame;
     private int currentFrameIndex;
     private F currentFrame;
+    private boolean doInterpolation;
 
     /**
      * Creates an animation frame manager that interpolates between frames.
@@ -42,6 +43,16 @@ public class AnimationFrameManager<F> implements ITickable {
      * @return  the current frame of the animation
      */
     public F getCurrentFrame() {
+        if (doInterpolation) {
+            F currentPredefinedFrame = FRAMES.get(currentFrameIndex);
+            int maxTime = FRAME_TIME_CALCULATOR.apply(currentPredefinedFrame);
+            int nextFrameIndex = (currentFrameIndex + 1) % FRAMES.size();
+
+            currentFrame = INTERPOLATOR.interpolate(maxTime, ticksInThisFrame, currentPredefinedFrame,
+                    FRAMES.get(nextFrameIndex));
+            doInterpolation = false;
+        }
+
         return currentFrame;
     }
 
@@ -60,9 +71,9 @@ public class AnimationFrameManager<F> implements ITickable {
             currentFrameIndex = nextFrameIndex;
             currentFrame = FRAMES.get(nextFrameIndex);
             ticksInThisFrame = 0;
+            doInterpolation = false;
         } else if (INTERPOLATOR != null) {
-            currentFrame = INTERPOLATOR.interpolate(maxTime, ticksInThisFrame,
-                    currentPredefinedFrame, FRAMES.get(nextFrameIndex));
+            doInterpolation = true;
         }
     }
 
