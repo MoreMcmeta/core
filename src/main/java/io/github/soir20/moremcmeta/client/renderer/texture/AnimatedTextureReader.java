@@ -58,10 +58,12 @@ public class AnimatedTextureReader {
         IRGBAImage.VisibleArea.Builder noMipmapBuilder = new IRGBAImage.VisibleArea.Builder();
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
+                int frameX = x % frameWidth;
+                int frameY = y % frameHeight;
 
-                // We want to detect a point that is visible in any frame
-                if ((image.getPixelRGBA(x, y) >> 24 & 255) > 0) {
-                    noMipmapBuilder.addPixel(x % frameWidth, y % frameHeight);
+                // We want to detect a point that changes in any frame
+                if (image.getPixelRGBA(x, y) != image.getPixelRGBA(frameX, frameY)) {
+                    noMipmapBuilder.addPixel(frameX, frameY);
                 }
 
             }
