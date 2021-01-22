@@ -41,14 +41,24 @@ public class AnimatedTextureReader {
         int frameHeight = frames.get(0).getHeight();
 
         List<IRGBAImage.VisibleArea> visibleAreas = getInterpolatablePoints(image, frameWidth, frameHeight);
+        NativeImageFrameInterpolator interpolator = new NativeImageFrameInterpolator(mipmaps, visibleAreas,
+                frameWidth, frameHeight);
 
         AnimationFrameManager<NativeImageFrame> frameManager = new AnimationFrameManager<>(
                 frames,
                 getFrameTimeCalculator(metadata.getFrameTime()),
-                new NativeImageFrameInterpolator(mipmaps, visibleAreas, frameWidth, frameHeight)
+                interpolator
         );
 
-        return new AnimatedTexture<>(frameManager, frameWidth, frameHeight, MIPMAP);
+        Runnable closeMipmaps = () -> {
+            for (NativeImage mipmap : mipmaps) {
+                mipmap.close();
+            }
+
+            interpolator.close();
+        };
+
+        return new AnimatedTexture<>(frameManager, frameWidth, frameHeight, MIPMAP, closeMipmaps);
     }
 
     private List<IRGBAImage.VisibleArea> getInterpolatablePoints(NativeImage image,
