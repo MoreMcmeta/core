@@ -14,11 +14,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-public class AnimatedTexture<F extends IAnimationFrame> extends Texture implements ITickable {
+public class AnimatedTexture<F extends IAnimationFrame> extends Texture implements ITickable, AutoCloseable {
     private final AnimationFrameManager<F> FRAME_MANAGER;
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final int MIPMAP;
+    private final Runnable CLOSE_ACTION;
 
     /**
      * Creates a new animated texture.
@@ -28,11 +29,12 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      * @param mipmap                    mipmap levels for all frames
      */
     public AnimatedTexture(AnimationFrameManager<F> frameManager,
-                           int frameWidth, int frameHeight, int mipmap) {
+                           int frameWidth, int frameHeight, int mipmap, Runnable closeAction) {
         FRAME_MANAGER = frameManager;
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
         MIPMAP = mipmap;
+        CLOSE_ACTION = closeAction;
     }
 
     @Override
@@ -88,6 +90,14 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      */
     private void uploadCurrentFrame() {
         FRAME_MANAGER.getCurrentFrame().uploadAt(0, 0);
+    }
+
+    /**
+     * Closes all resources that this texture uses.
+     */
+    @Override
+    public void close() {
+        CLOSE_ACTION.run();
     }
 
 }
