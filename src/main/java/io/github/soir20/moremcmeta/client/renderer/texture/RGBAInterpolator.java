@@ -2,7 +2,6 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.datafixers.util.Pair;
 
-import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
@@ -53,7 +52,7 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
         int maxHeight = Math.max(start.getHeight(), end.getHeight());
         I output = IMAGE_GETTER.apply(maxWidth, maxHeight);
 
-        Set<Pair<Integer, Integer>> points = output.getInterpolatablePoints();
+        IRGBAImage.VisibleArea points = output.getVisibleArea();
         for (Pair<Integer, Integer> point : points) {
             int xPos = point.getFirst();
             int yPos = point.getSecond();

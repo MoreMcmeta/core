@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 public class AnimatedTextureReader {
@@ -42,45 +40,46 @@ public class AnimatedTextureReader {
         int frameWidth = frames.get(0).getWidth();
         int frameHeight = frames.get(0).getHeight();
 
-        List<Set<Pair<Integer, Integer>>> points = getInterpolatablePoints(image, frameWidth, frameHeight);
+        List<IRGBAImage.VisibleArea> visibleAreas = getInterpolatablePoints(image, frameWidth, frameHeight);
 
         AnimationFrameManager<NativeImageFrame> frameManager = new AnimationFrameManager<>(
                 frames,
                 getFrameTimeCalculator(metadata.getFrameTime()),
-                getFrameInterpolator(points, frameWidth, frameHeight)
+                getFrameInterpolator(visibleAreas, frameWidth, frameHeight)
         );
 
         return new AnimatedTexture<>(frameManager, frameWidth, frameHeight, MIPMAP);
     }
 
-    private List<Set<Pair<Integer, Integer>>> getInterpolatablePoints(NativeImage image,
-                                                                int frameWidth, int frameHeight) {
-        List<Set<Pair<Integer, Integer>>> points = new ArrayList<>();
-        points.add(new HashSet<>());
+    private List<IRGBAImage.VisibleArea> getInterpolatablePoints(NativeImage image,
+                                                                 int frameWidth, int frameHeight) {
+        List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
 
+        IRGBAImage.VisibleArea.Builder noMipmapBuilder = new IRGBAImage.VisibleArea.Builder();
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
 
                 // We want to detect a point that is visible in any frame
                 if ((image.getPixelRGBA(x, y) >> 24 & 255) > 0) {
-                    points.get(0).add(new Pair<>(x % frameWidth, y % frameHeight));
+                    noMipmapBuilder.addPixel(x % frameWidth, y % frameHeight);
                 }
 
             }
         }
+        visibleAreas.add(noMipmapBuilder.build());
 
         // Point coordinates will be different for all mipmap levels
         for (int level = 1; level < MIPMAP; level++) {
-            HashSet<Pair<Integer, Integer>> levelPoints = new HashSet<>();
+            IRGBAImage.VisibleArea.Builder mipmapBuilder = new IRGBAImage.VisibleArea.Builder();
 
-            for (Pair<Integer, Integer> point : points.get(0)) {
-                levelPoints.add(new Pair<>(point.getFirst() >> level, point.getSecond() >> level));
+            for (Pair<Integer, Integer> point : visibleAreas.get(0)) {
+                mipmapBuilder.addPixel(point.getFirst() >> level, point.getSecond() >> level);
             }
 
-            points.add(levelPoints);
+            visibleAreas.add(mipmapBuilder.build());
         }
 
-        return points;
+        return visibleAreas;
     }
 
     private Function<NativeImageFrame, Integer> getFrameTimeCalculator(int metadataFrameTime) {
@@ -90,21 +89,21 @@ public class AnimatedTextureReader {
         };
     }
 
-    private IInterpolator<NativeImageFrame> getFrameInterpolator(List<Set<Pair<Integer, Integer>>> points,
+    private IInterpolator<NativeImageFrame> getFrameInterpolator(List<IRGBAImage.VisibleArea> visibleAreas,
                                                                  int frameWidth, int frameHeight) {
 
         // Directly convert mipmapped widths to their associated image
-        HashMap<Integer, Pair<NativeImage, Set<Pair<Integer, Integer>>>> widthsToImage = new HashMap<>();
+        HashMap<Integer, Pair<NativeImage, IRGBAImage.VisibleArea>> widthsToImage = new HashMap<>();
         for (int level = 0; level <= MIPMAP; level++) {
             int mipmappedWidth = frameWidth >> level;
             int mipmappedHeight = frameHeight >> level;
             NativeImage mipmap = new NativeImage(mipmappedWidth, mipmappedHeight, true);
 
-            widthsToImage.put(mipmappedWidth, new Pair<>(mipmap, points.get(level)));
+            widthsToImage.put(mipmappedWidth, new Pair<>(mipmap, visibleAreas.get(level)));
         }
 
         RGBAInterpolator<NativeImageRGBAWrapper> interpolator = new RGBAInterpolator<>((width, height) -> {
-            Pair<NativeImage, Set<Pair<Integer, Integer>>> imageAndPoints = widthsToImage.get(width);
+            Pair<NativeImage, IRGBAImage.VisibleArea> imageAndPoints = widthsToImage.get(width);
 
             return new NativeImageRGBAWrapper(imageAndPoints.getFirst(), 0, 0, width, height,
                     imageAndPoints.getSecond());
@@ -120,7 +119,7 @@ public class AnimatedTextureReader {
                         start.getYOffset() >> level,
                         frameWidth >> level,
                         frameHeight >> level,
-                        points.get(level)
+                        visibleAreas.get(level)
                 );
                 NativeImageRGBAWrapper endImage = new NativeImageRGBAWrapper(
                         end.getImage(level),
@@ -128,7 +127,7 @@ public class AnimatedTextureReader {
                         end.getYOffset() >> level,
                         frameWidth >> level,
                         frameHeight >> level,
-                        points.get(level)
+                        visibleAreas.get(level)
                 );
 
                 NativeImageRGBAWrapper interpolated = interpolator.interpolate(steps, step, startImage, endImage);

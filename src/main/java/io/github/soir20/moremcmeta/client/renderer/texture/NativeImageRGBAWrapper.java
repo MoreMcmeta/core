@@ -1,9 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.texture.NativeImage;
-
-import java.util.Set;
 
 /**
  * Wraps a {@link NativeImage} so it is compatible with the {@link IRGBAImage} interface and
@@ -16,20 +13,20 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
     private final int Y_OFFSET;
     private final int WIDTH;
     private final int HEIGHT;
-    private final Set<Pair<Integer, Integer>> INTERPOLATABLE_POINTS;
+    private final VisibleArea VISIBLE_AREA;
 
     /**
      * Creates a new {@link NativeImage} wrapper.
      * @param image     the image to wrap
      */
     public NativeImageRGBAWrapper(NativeImage image, int xOffset, int yOffset, int width, int height,
-                                  Set<Pair<Integer, Integer>> interpolatablePoints) {
+                                  VisibleArea visibleArea) {
         IMAGE = image;
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
         WIDTH = width;
         HEIGHT = height;
-        INTERPOLATABLE_POINTS = interpolatablePoints;
+        VISIBLE_AREA = visibleArea;
     }
 
     /**
@@ -73,8 +70,8 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
     }
 
     @Override
-    public Set<Pair<Integer, Integer>> getInterpolatablePoints() {
-        return INTERPOLATABLE_POINTS;
+    public VisibleArea getVisibleArea() {
+        return VISIBLE_AREA;
     }
 
     /**
