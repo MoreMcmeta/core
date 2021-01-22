@@ -45,7 +45,7 @@ public class AnimatedTextureReader {
         AnimationFrameManager<NativeImageFrame> frameManager = new AnimationFrameManager<>(
                 frames,
                 getFrameTimeCalculator(metadata.getFrameTime()),
-                getFrameInterpolator(mipmaps, visibleAreas, frameWidth, frameHeight)
+                new NativeImageFrameInterpolator(mipmaps, visibleAreas, frameWidth, frameHeight)
         );
 
         return new AnimatedTexture<>(frameManager, frameWidth, frameHeight, MIPMAP);
@@ -91,29 +91,45 @@ public class AnimatedTextureReader {
         };
     }
 
-    private IInterpolator<NativeImageFrame> getFrameInterpolator(NativeImage[] originalMipmaps,
-                                                                 List<IRGBAImage.VisibleArea> visibleAreas,
-                                                                 int frameWidth, int frameHeight) {
+    private class NativeImageFrameInterpolator implements IInterpolator<NativeImageFrame>, AutoCloseable {
+        private final int FRAME_WIDTH;
+        private final int FRAME_HEIGHT;
+        private final List<IRGBAImage.VisibleArea> VISIBLE_AREAS;
+        private final RGBAInterpolator<NativeImageRGBAWrapper> INTERPOLATOR;
+        private final NativeImage[] MIPMAPS;
 
-        // Directly convert mipmapped widths to their associated image
-        HashMap<Integer, Pair<NativeImage, IRGBAImage.VisibleArea>> widthsToImage = new HashMap<>();
-        for (int level = 0; level <= MIPMAP; level++) {
-            int mipmappedWidth = frameWidth >> level;
-            int mipmappedHeight = frameHeight >> level;
-            NativeImage mipmap = new NativeImage(mipmappedWidth, mipmappedHeight, true);
-            mipmap.copyImageData(originalMipmaps[MIPMAP]);
+        public NativeImageFrameInterpolator(NativeImage[] originalMipmaps,
+                                            List<IRGBAImage.VisibleArea> visibleAreas,
+                                            int frameWidth, int frameHeight) {
+            FRAME_WIDTH = frameWidth;
+            FRAME_HEIGHT = frameHeight;
+            MIPMAPS = new NativeImage[originalMipmaps.length];
 
-            widthsToImage.put(mipmappedWidth, new Pair<>(mipmap, visibleAreas.get(level)));
+            // Directly convert mipmapped widths to their associated image
+            HashMap<Integer, Pair<NativeImage, IRGBAImage.VisibleArea>> widthsToImage = new HashMap<>();
+            for (int level = 0; level <= MIPMAP; level++) {
+                int mipmappedWidth = FRAME_WIDTH >> level;
+                int mipmappedHeight = FRAME_HEIGHT >> level;
+
+                NativeImage mipmappedImage = new NativeImage(mipmappedWidth, mipmappedHeight, true);
+                mipmappedImage.copyImageData(originalMipmaps[MIPMAP]);
+                MIPMAPS[level] = mipmappedImage;
+
+                widthsToImage.put(mipmappedWidth, new Pair<>(mipmappedImage, visibleAreas.get(level)));
+            }
+
+            VISIBLE_AREAS = visibleAreas;
+
+            INTERPOLATOR = new RGBAInterpolator<>((width, height) -> {
+                Pair<NativeImage, IRGBAImage.VisibleArea> imageAndPoints = widthsToImage.get(width);
+
+                return new NativeImageRGBAWrapper(imageAndPoints.getFirst(), 0, 0, width, height,
+                        imageAndPoints.getSecond());
+            });
         }
 
-        RGBAInterpolator<NativeImageRGBAWrapper> interpolator = new RGBAInterpolator<>((width, height) -> {
-            Pair<NativeImage, IRGBAImage.VisibleArea> imageAndPoints = widthsToImage.get(width);
-
-            return new NativeImageRGBAWrapper(imageAndPoints.getFirst(), 0, 0, width, height,
-                    imageAndPoints.getSecond());
-        });
-
-        return (int steps, int step, NativeImageFrame start, NativeImageFrame end) -> {
+        @Override
+        public NativeImageFrame interpolate(int steps, int step, NativeImageFrame start, NativeImageFrame end) {
             NativeImage[] mipmaps = new NativeImage[MIPMAP + 1];
 
             for (int level = 0; level <= MIPMAP; level++) {
@@ -121,20 +137,20 @@ public class AnimatedTextureReader {
                         start.getImage(level),
                         start.getXOffset() >> level,
                         start.getYOffset() >> level,
-                        frameWidth >> level,
-                        frameHeight >> level,
-                        visibleAreas.get(level)
+                        FRAME_WIDTH >> level,
+                        FRAME_HEIGHT >> level,
+                        VISIBLE_AREAS.get(level)
                 );
                 NativeImageRGBAWrapper endImage = new NativeImageRGBAWrapper(
                         end.getImage(level),
                         end.getXOffset() >> level,
                         end.getYOffset() >> level,
-                        frameWidth >> level,
-                        frameHeight >> level,
-                        visibleAreas.get(level)
+                        FRAME_WIDTH >> level,
+                        FRAME_HEIGHT >> level,
+                        VISIBLE_AREAS.get(level)
                 );
 
-                NativeImageRGBAWrapper interpolated = interpolator.interpolate(steps, step, startImage, endImage);
+                NativeImageRGBAWrapper interpolated = INTERPOLATOR.interpolate(steps, step, startImage, endImage);
 
                 mipmaps[level] = interpolated.getImage();
             }
@@ -142,7 +158,14 @@ public class AnimatedTextureReader {
             FrameReader.FrameData data = new FrameReader.FrameData(mipmaps[0].getWidth(), mipmaps[0].getHeight(),
                     0, 0, 1);
             return new NativeImageFrame(data, mipmaps, false, false, false);
-        };
+        }
+
+        @Override
+        public void close() {
+            for (NativeImage mipmap : MIPMAPS) {
+                mipmap.close();
+            }
+        }
     }
 
 }
