@@ -71,7 +71,7 @@ public class AnimatedTextureReader {
         visibleAreas.add(noMipmapBuilder.build());
 
         // Point coordinates will be different for all mipmap levels
-        for (int level = 1; level < MIPMAP; level++) {
+        for (int level = 1; level <= MIPMAP; level++) {
             IRGBAImage.VisibleArea.Builder mipmapBuilder = new IRGBAImage.VisibleArea.Builder();
 
             for (Pair<Integer, Integer> point : visibleAreas.get(0)) {
