@@ -45,7 +45,7 @@ public class AnimatedTextureReader {
         AnimationFrameManager<NativeImageFrame> frameManager = new AnimationFrameManager<>(
                 frames,
                 getFrameTimeCalculator(metadata.getFrameTime()),
-                getFrameInterpolator(visibleAreas, frameWidth, frameHeight)
+                getFrameInterpolator(mipmaps, visibleAreas, frameWidth, frameHeight)
         );
 
         return new AnimatedTexture<>(frameManager, frameWidth, frameHeight, MIPMAP);
@@ -91,7 +91,8 @@ public class AnimatedTextureReader {
         };
     }
 
-    private IInterpolator<NativeImageFrame> getFrameInterpolator(List<IRGBAImage.VisibleArea> visibleAreas,
+    private IInterpolator<NativeImageFrame> getFrameInterpolator(NativeImage[] originalMipmaps,
+                                                                 List<IRGBAImage.VisibleArea> visibleAreas,
                                                                  int frameWidth, int frameHeight) {
 
         // Directly convert mipmapped widths to their associated image
@@ -100,6 +101,7 @@ public class AnimatedTextureReader {
             int mipmappedWidth = frameWidth >> level;
             int mipmappedHeight = frameHeight >> level;
             NativeImage mipmap = new NativeImage(mipmappedWidth, mipmappedHeight, true);
+            mipmap.copyImageData(originalMipmaps[MIPMAP]);
 
             widthsToImage.put(mipmappedWidth, new Pair<>(mipmap, visibleAreas.get(level)));
         }
