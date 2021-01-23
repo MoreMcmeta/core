@@ -1,8 +1,10 @@
 package io.github.soir20.moremcmeta.resource;
 
+import io.github.soir20.moremcmeta.client.renderer.texture.ITextureReader;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
+import net.minecraft.client.resources.data.TextureMetadataSection;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.resources.data.IMetadataSectionSerializer;
@@ -26,33 +28,36 @@ import java.util.function.Predicate;
  * @param <T>   tickable texture type
  * @author soir20
  */
-public class TextureReloadListener<T extends Texture & ITickable>
-        implements ISelectiveResourceReloadListener {
+public class TextureReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
     private final String[] FOLDERS;
     private final BiConsumer<ResourceLocation, Texture> TEXTURE_LOADER;
-    private final BiFunction<InputStream, AnimationMetadataSection, T> TEXTURE_READER;
-    private final IMetadataSectionSerializer<AnimationMetadataSection> SERIALIZER;
+    private final ITextureReader<T> TEXTURE_READER;
+    private final IMetadataSectionSerializer<TextureMetadataSection> TEXTURE_SERIALIZER;
+    private final IMetadataSectionSerializer<AnimationMetadataSection> ANIMATION_SERIALIZER;
     private final Logger LOGGER;
 
     private IResourceManager resourceManager;
 
     /**
      * Creates a TextureReloadListener.
-     * @param folders       folders to search for animated textures (exclude folders animated by default)
-     * @param texReader     reads animated textures
-     * @param texLoader     uploads animated textures to the game's texture manager
-     * @param serializer    serializer for .mcmeta files
-     * @param logger        logs listener-related messages to the game's output
+     * @param folders               folders to search for animated textures (exclude folders animated by default)
+     * @param texReader             reads animated textures
+     * @param texLoader             uploads animated textures to the game's texture manager
+     * @param texSerializer         serializer for blur and clamp data
+     * @param animationSerializer   serializer for animation data
+     * @param logger                logs listener-related messages to the game's output
      */
     public TextureReloadListener(String[] folders,
-                                 BiFunction<InputStream, AnimationMetadataSection, T> texReader,
+                                 ITextureReader<T>  texReader,
                                  BiConsumer<ResourceLocation, Texture> texLoader,
-                                 IMetadataSectionSerializer<AnimationMetadataSection> serializer,
+                                 IMetadataSectionSerializer<TextureMetadataSection> texSerializer,
+                                 IMetadataSectionSerializer<AnimationMetadataSection> animationSerializer,
                                  Logger logger) {
         FOLDERS = folders;
         TEXTURE_READER = texReader;
         TEXTURE_LOADER = texLoader;
-        SERIALIZER = serializer;
+        TEXTURE_SERIALIZER = texSerializer;
+        ANIMATION_SERIALIZER = animationSerializer;
         LOGGER = logger;
     }
 
@@ -96,10 +101,16 @@ public class TextureReloadListener<T extends Texture & ITickable>
     private void uploadToTexManager(ResourceLocation resourceLocation) {
         try (IResource iresource = resourceManager.getResource(resourceLocation)) {
             InputStream stream = iresource.getInputStream();
-            AnimationMetadataSection metadata = iresource.getMetadata(SERIALIZER);
 
-            if (metadata != null) {
-                T texture = TEXTURE_READER.apply(stream, metadata);
+            TextureMetadataSection textureMetadata = iresource.getMetadata(TEXTURE_SERIALIZER);
+            if (textureMetadata == null) {
+                textureMetadata = new TextureMetadataSection(false, false);
+            }
+
+            AnimationMetadataSection animationMetadata = iresource.getMetadata(ANIMATION_SERIALIZER);
+
+            if (animationMetadata != null) {
+                T texture = TEXTURE_READER.read(stream, textureMetadata, animationMetadata);
                 TEXTURE_LOADER.accept(resourceLocation, texture);
             }
         } catch (RuntimeException runtimeException) {

@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
+import net.minecraft.client.resources.data.TextureMetadataSection;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
-public class AnimatedTextureReader {
+public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<NativeImageFrame>> {
     private final int MIPMAP;
     private final Logger LOGGER;
 
@@ -22,7 +23,8 @@ public class AnimatedTextureReader {
         LOGGER = logger;
     }
 
-    public AnimatedTexture<NativeImageFrame> read(InputStream inputStream, AnimationMetadataSection metadata) {
+    public AnimatedTexture<NativeImageFrame> read(InputStream inputStream, TextureMetadataSection texMetadata,
+                                                  AnimationMetadataSection animationMetadata) {
         NativeImage image;
         try {
             image = NativeImage.read(inputStream);
@@ -33,20 +35,23 @@ public class AnimatedTextureReader {
 
         NativeImage[] mipmaps = MipmapGenerator.generateMipmaps(image, MIPMAP);
 
-        FrameReader<NativeImageFrame> frameReader = new FrameReader<>((frameData ->
-                new NativeImageFrame(frameData, mipmaps, false, false, false)));
+        boolean blur = texMetadata.getTextureBlur();
+        boolean clamp = texMetadata.getTextureClamp();
 
-        List<NativeImageFrame> frames = frameReader.read(image.getWidth(), image.getHeight(), metadata);
+        FrameReader<NativeImageFrame> frameReader = new FrameReader<>((frameData ->
+                new NativeImageFrame(frameData, mipmaps, blur, clamp, false)));
+
+        List<NativeImageFrame> frames = frameReader.read(image.getWidth(), image.getHeight(), animationMetadata);
         int frameWidth = frames.get(0).getWidth();
         int frameHeight = frames.get(0).getHeight();
 
         List<IRGBAImage.VisibleArea> visibleAreas = getInterpolatablePoints(image, frameWidth, frameHeight);
         NativeImageFrameInterpolator interpolator = new NativeImageFrameInterpolator(mipmaps, visibleAreas,
-                frameWidth, frameHeight);
+                frameWidth, frameHeight, blur, clamp);
 
         AnimationFrameManager<NativeImageFrame> frameManager = new AnimationFrameManager<>(
                 frames,
-                getFrameTimeCalculator(metadata.getFrameTime()),
+                getFrameTimeCalculator(animationMetadata.getFrameTime()),
                 interpolator
         );
 
@@ -104,15 +109,19 @@ public class AnimatedTextureReader {
     private class NativeImageFrameInterpolator implements IInterpolator<NativeImageFrame>, AutoCloseable {
         private final int FRAME_WIDTH;
         private final int FRAME_HEIGHT;
+        private final boolean BLUR;
+        private final boolean CLAMP;
         private final List<IRGBAImage.VisibleArea> VISIBLE_AREAS;
         private final RGBAInterpolator<NativeImageRGBAWrapper> INTERPOLATOR;
         private final NativeImage[] MIPMAPS;
 
         public NativeImageFrameInterpolator(NativeImage[] originalMipmaps,
                                             List<IRGBAImage.VisibleArea> visibleAreas,
-                                            int frameWidth, int frameHeight) {
+                                            int frameWidth, int frameHeight, boolean blur, boolean clamp) {
             FRAME_WIDTH = frameWidth;
             FRAME_HEIGHT = frameHeight;
+            BLUR = blur;
+            CLAMP = clamp;
             MIPMAPS = new NativeImage[originalMipmaps.length];
 
             // Directly convert mipmapped widths to their associated image
@@ -167,7 +176,7 @@ public class AnimatedTextureReader {
 
             FrameReader.FrameData data = new FrameReader.FrameData(mipmaps[0].getWidth(), mipmaps[0].getHeight(),
                     0, 0, 1);
-            return new NativeImageFrame(data, mipmaps, false, false, false);
+            return new NativeImageFrame(data, mipmaps, BLUR, CLAMP, false);
         }
 
         @Override
