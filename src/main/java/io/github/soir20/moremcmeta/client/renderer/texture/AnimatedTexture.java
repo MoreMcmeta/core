@@ -81,8 +81,6 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      */
     private void updateAnimation() {
         FRAME_MANAGER.tick();
-
-        bindTexture();
     }
 
     /**
