@@ -101,17 +101,18 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
         try (IResource iresource = resourceManager.getResource(resourceLocation)) {
             InputStream stream = iresource.getInputStream();
 
+            AnimationMetadataSection animationMetadata = iresource.getMetadata(ANIMATION_SERIALIZER);
+            if (animationMetadata == null) {
+                return;
+            }
+
             TextureMetadataSection textureMetadata = iresource.getMetadata(TEXTURE_SERIALIZER);
             if (textureMetadata == null) {
                 textureMetadata = new TextureMetadataSection(false, false);
             }
 
-            AnimationMetadataSection animationMetadata = iresource.getMetadata(ANIMATION_SERIALIZER);
-
-            if (animationMetadata != null) {
-                T texture = TEXTURE_READER.read(stream, textureMetadata, animationMetadata);
-                TEXTURE_LOADER.accept(resourceLocation, texture);
-            }
+            T texture = TEXTURE_READER.read(stream, textureMetadata, animationMetadata);
+            TEXTURE_LOADER.accept(resourceLocation, texture);
         } catch (RuntimeException runtimeException) {
             LOGGER.error("Unable to parse animation metadata from {} : {}",
                     resourceLocation, runtimeException);
