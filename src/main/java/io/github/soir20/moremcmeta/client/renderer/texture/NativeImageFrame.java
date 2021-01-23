@@ -2,6 +2,10 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import net.minecraft.client.renderer.texture.NativeImage;
 
+/**
+ * An animation frame based on a {@link NativeImage}.
+ * @author soir20
+ */
 public class NativeImageFrame implements IAnimationFrame {
     private final NativeImage[] MIPMAPS;
     private final int WIDTH;
