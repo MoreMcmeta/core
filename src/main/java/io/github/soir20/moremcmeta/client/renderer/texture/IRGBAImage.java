@@ -47,24 +47,49 @@ public interface IRGBAImage {
      */
     int getHeight();
 
+    /**
+     * Gets the visible area (iterable by point) of this image.
+     * @return  the visible area of this image
+     */
     VisibleArea getVisibleArea();
 
+    /**
+     * Represents a collection of visible points in an image.
+     * @author soir20
+     */
     class VisibleArea implements Iterable<Pair<Integer, Integer>> {
         private final Set<VisibleRow> VISIBLE_ROWS;
 
+        /**
+         * Gets the iterator for all the points in this area. The points are not in a guaranteed order.
+         * @return  the iterator for all points in this area
+         */
         @Override
         @Nonnull
         public Iterator<Pair<Integer, Integer>> iterator() {
             return new VisiblePointIterator(VISIBLE_ROWS);
         }
 
+        /**
+         * Builds a new, immutable visible area.
+         */
         public static class Builder {
+
+            // Keys are y (row) coordinates. Values are x (column) coordinates.
             private final Map<Integer, Set<Integer>> ROWS;
 
+            /**
+             * Creates a new builder for a visible area.
+             */
             public Builder() {
                 ROWS = new HashMap<>();
             }
 
+            /**
+             * Adds a visible pixel to the area.
+             * @param x     x-coordinate of the pixel
+             * @param y     y-coordinate of the pixel
+             */
             public void addPixel(int x, int y) {
                 if (!ROWS.containsKey(y)) {
                     ROWS.put(y, new HashSet<>());
@@ -73,6 +98,10 @@ public interface IRGBAImage {
                 ROWS.get(y).add(x);
             }
 
+            /**
+             * Builds the visible area based on the provided points.
+             * @return  the visible area
+             */
             public VisibleArea build() {
                 Set<VisibleRow> visibleRows = new HashSet<>();
 
@@ -101,26 +130,49 @@ public interface IRGBAImage {
 
         }
 
+        /**
+         * Creates a new visible area.
+         * @param rows  all of the visible horizontal strips in this image
+         */
         private VisibleArea(Set<VisibleRow> rows) {
             VISIBLE_ROWS = rows;
         }
 
+        /**
+         * Represents continuous, one-pixel-high horizontal strips in an image.
+         * @author soir20
+         */
         private static class VisibleRow {
             private final int X;
             private final int Y;
             private final int WIDTH;
 
+            /**
+             * Creates a new visible row in this image.
+             * @param x         left x-coordinate of the row
+             * @param y         left y-coordinate of the row
+             * @param width     width of the row in pixels
+             */
             public VisibleRow(int x, int y, int width) {
                 X = x;
                 Y = y;
                 WIDTH = width;
             }
 
+            /**
+             * Gets the hash code of this row.
+             * @return  the hash code of this row
+             */
             @Override
             public int hashCode() {
                 return Objects.hash(X, Y, WIDTH);
             }
 
+            /**
+             * Determines if this row is the same as another object.
+             * @param other     the other object to test
+             * @return  whether the two objects are identical rows
+             */
             @Override
             public boolean equals(Object other) {
                 if (!(other instanceof VisibleRow)) {
@@ -133,20 +185,36 @@ public interface IRGBAImage {
 
         }
 
+        /**
+         * Iterates over all the points in a {@link VisibleArea}.
+         * @author soir20
+         */
         private static class VisiblePointIterator implements Iterator<Pair<Integer, Integer>> {
             private final Iterator<VisibleRow> rowIterator;
             private VisibleRow currentRow;
             private int pixelCount;
 
+            /**
+             * Creates a new iterator.
+             * @param rows      all the visible rows in the visible area
+             */
             public VisiblePointIterator(Set<VisibleRow> rows) {
                 rowIterator = rows.iterator();
             }
 
+            /**
+             * Determines whether there are any points left to iterate over.
+             * @return  whether this iterator has any remaining points
+             */
             @Override
             public boolean hasNext() {
                 return rowIterator.hasNext() || (currentRow != null && pixelCount < currentRow.WIDTH);
             }
 
+            /**
+             * Gets the next point in a visible area. Order is not guaranteed.
+             * @return  the next point in a visible area
+             */
             @Override
             public Pair<Integer, Integer> next() {
                 if (currentRow == null || pixelCount == currentRow.WIDTH) {
@@ -157,6 +225,7 @@ public interface IRGBAImage {
                 pixelCount++;
                 return new Pair<>(currentRow.X + pixelCount - 1, currentRow.Y);
             }
+
         }
 
     }

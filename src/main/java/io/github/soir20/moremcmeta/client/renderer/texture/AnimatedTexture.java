@@ -9,7 +9,7 @@ import net.minecraft.resources.IResourceManager;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * An animated texture that an update on tick.
+ * An animated texture that updates on each tick.
  * @param <F>   animation frame type
  * @author soir20
  */

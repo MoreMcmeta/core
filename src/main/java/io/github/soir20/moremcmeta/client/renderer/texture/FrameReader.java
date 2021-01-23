@@ -8,13 +8,17 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Creates animated (tickable) textures.
+ * Creates all the frames in an animated texture.
  * @param <F>   tickable texture type
  * @author soir20
  */
 public class FrameReader<F extends IAnimationFrame> {
     private final Function<FrameData, F> FRAME_FACTORY;
 
+    /**
+     * Creates a new reader, which is reusable for all images with the given type of frame.
+     * @param frameFactory      creates frames based on frame data
+     */
     public FrameReader(Function<FrameData, F> frameFactory) {
         FRAME_FACTORY = frameFactory;
     }
@@ -23,7 +27,7 @@ public class FrameReader<F extends IAnimationFrame> {
      * Creates frames based on file data.
      * @param imageWidth        the width of the source image
      * @param imageHeight       the height of the source image
-     * @param metadata          image animation metadata
+     * @param metadata          image animation info
      * @return frames that can be used in an animated texture
      */
     public List<F> read(int imageWidth, int imageHeight, AnimationMetadataSection metadata) {
@@ -45,12 +49,26 @@ public class FrameReader<F extends IAnimationFrame> {
         }
     }
 
+    /**
+     * Converts a frame's index to its position in an image.
+     * @param index         index of a frame
+     * @param numFramesX    number of frames per row
+     * @return  a coordinate pair representing the frame's position: (frame widths, frame heights)
+     */
     private Pair<Integer, Integer> frameIndexToPosition(int index, int numFramesX) {
         int xPos = index % numFramesX;
         int yPos = index / numFramesX;
         return new Pair<>(xPos, yPos);
     }
 
+    /**
+     * Gets frames when they are already defined in metadata.
+     * @param metadata      image animation info
+     * @param frameWidth    width of a single frame
+     * @param frameHeight   height of a single frame
+     * @param numFramesX    number of frames per row
+     * @return  the list of predefined frames
+     */
     private List<F> getPredefinedFrames(AnimationMetadataSection metadata, int frameWidth, int frameHeight,
                                         int numFramesX) {
         List<F> frames = new ArrayList<>();
@@ -70,6 +88,14 @@ public class FrameReader<F extends IAnimationFrame> {
         return frames;
     }
 
+    /**
+     * Gets frames when they are not defined in metadata.
+     * @param frameWidth    width of a single frame (pixels)
+     * @param frameHeight   height of a single frame (pixels)
+     * @param numFramesX    number of frames per row
+     * @param numFramesY    number of frames per column
+     * @return  the list of discovered frames
+     */
     private List<F> findFrames(int frameWidth, int frameHeight, int numFramesX, int numFramesY) {
         List<F> frames = new ArrayList<>();
 
@@ -84,6 +110,10 @@ public class FrameReader<F extends IAnimationFrame> {
         return frames;
     }
 
+    /**
+     * Encapsulates data about a single frame.
+     * @author soir20
+     */
     public static class FrameData {
         public static final int EMPTY_TIME = -1;
 
@@ -93,6 +123,14 @@ public class FrameReader<F extends IAnimationFrame> {
         private final int Y_OFFSET;
         private final int TIME;
 
+        /**
+         * Creates a new holder for frame data.
+         * @param width     width of the frame (pixels)
+         * @param height    height of the frame (pixels)
+         * @param xOffset   x-offset of the frame (pixels)
+         * @param yOffset   y-offset of the frame (pixels)
+         * @param time      length of the frame (ticks)
+         */
         public FrameData(int width, int height, int xOffset, int yOffset, int time) {
             WIDTH = width;
             HEIGHT = height;
@@ -101,22 +139,42 @@ public class FrameReader<F extends IAnimationFrame> {
             TIME = time;
         }
 
+        /**
+         * Gets the width of this frame.
+         * @return  the width of the frame in pixels
+         */
         public int getWidth() {
             return WIDTH;
         }
 
+        /**
+         * Gets the height of this frame.
+         * @return  the height of the frame in pixels
+         */
         public int getHeight() {
             return HEIGHT;
         }
 
+        /**
+         * Gets the x-offset of this frame.
+         * @return  the x-offset of this frame in pixels
+         */
         public int getXOffset() {
             return X_OFFSET;
         }
 
+        /**
+         * Gets the y-offset of this frame.
+         * @return  the y-offset of this frame in pixels
+         */
         public int getYOffset() {
             return Y_OFFSET;
         }
 
+        /**
+         * Gets the length (time) of this frame.
+         * @return  the length of this frame (in ticks)
+         */
         public int getTime() {
             return TIME;
         }

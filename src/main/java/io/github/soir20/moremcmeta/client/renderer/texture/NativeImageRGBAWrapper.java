@@ -69,6 +69,10 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
         return HEIGHT;
     }
 
+    /**
+     * Gets the visible area (iterable by point) of this image.
+     * @return  the visible area of this image
+     */
     @Override
     public VisibleArea getVisibleArea() {
         return VISIBLE_AREA;

@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 /**
  * Manages the current frame in an animation.
- * @param <F>   animation frame class
+ * @param <F>   animation frame type
  * @author soir20
  */
 public class AnimationFrameManager<F> implements ITickable {
@@ -43,6 +43,8 @@ public class AnimationFrameManager<F> implements ITickable {
      * @return  the current frame of the animation
      */
     public F getCurrentFrame() {
+
+        // Doing interpolation when the frame is retrieved ensures we don't interpolate when the frame isn't used
         if (doInterpolation) {
             F currentPredefinedFrame = FRAMES.get(currentFrameIndex);
             int maxTime = FRAME_TIME_CALCULATOR.apply(currentPredefinedFrame);

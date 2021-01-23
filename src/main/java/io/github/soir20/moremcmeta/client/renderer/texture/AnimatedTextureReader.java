@@ -14,47 +14,61 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Reads an {@link AnimatedTexture} from file data.
+ * @author soir20
+ */
 public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<NativeImageFrame>> {
     private final int MIPMAP;
     private final Logger LOGGER;
 
+    /**
+     * Creates a new reader for animated textures.
+     * @param mipmap    number of mipmap levels to use
+     * @param logger    logger for reading-related messages
+     */
     public AnimatedTextureReader(int mipmap, Logger logger) {
         MIPMAP = mipmap;
         LOGGER = logger;
     }
 
+    /**
+     * Reads an {@link AnimatedTexture}.
+     * @param inputStream           input stream with image data
+     * @param texMetadata           texture metadata (blur and clamp options)
+     * @param animationMetadata     animation metadata (frames, frame time, etc.)
+     * @return  an animated texture based on the provided data
+     */
     public AnimatedTexture<NativeImageFrame> read(InputStream inputStream, TextureMetadataSection texMetadata,
-                                                  AnimationMetadataSection animationMetadata) {
-        NativeImage image;
-        try {
-            image = NativeImage.read(inputStream);
-        } catch (IOException e) {
-            LOGGER.error("Unable to read animated image from input stream");
-            return null;
-        }
+                                                  AnimationMetadataSection animationMetadata) throws IOException {
+        NativeImage image = NativeImage.read(inputStream);
+        LOGGER.debug("Successfully read image from input");
 
         NativeImage[] mipmaps = MipmapGenerator.generateMipmaps(image, MIPMAP);
 
         boolean blur = texMetadata.getTextureBlur();
         boolean clamp = texMetadata.getTextureClamp();
 
+        // Frames
         FrameReader<NativeImageFrame> frameReader = new FrameReader<>((frameData ->
                 new NativeImageFrame(frameData, mipmaps, blur, clamp, false)));
-
         List<NativeImageFrame> frames = frameReader.read(image.getWidth(), image.getHeight(), animationMetadata);
         int frameWidth = frames.get(0).getWidth();
         int frameHeight = frames.get(0).getHeight();
 
+        // Interpolation
         List<IRGBAImage.VisibleArea> visibleAreas = getInterpolatablePoints(image, frameWidth, frameHeight);
         NativeImageFrameInterpolator interpolator = new NativeImageFrameInterpolator(mipmaps, visibleAreas,
                 frameWidth, frameHeight, blur, clamp);
 
+        // Frame management
         AnimationFrameManager<NativeImageFrame> frameManager = new AnimationFrameManager<>(
                 frames,
                 getFrameTimeCalculator(animationMetadata.getFrameTime()),
                 interpolator
         );
 
+        // Resource cleanup
         Runnable closeMipmaps = () -> {
             for (NativeImage mipmap : mipmaps) {
                 mipmap.close();
@@ -66,10 +80,17 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         return new AnimatedTexture<>(frameManager, frameWidth, frameHeight, MIPMAP, closeMipmaps);
     }
 
-    private List<IRGBAImage.VisibleArea> getInterpolatablePoints(NativeImage image,
-                                                                 int frameWidth, int frameHeight) {
+    /**
+     * Gets the pixels that will change for every mipmap.
+     * @param image         the original image to analyze
+     * @param frameWidth    the width of a frame
+     * @param frameHeight   the height of a frame
+     * @return  pixels that change for every mipmap (starting with the default image)
+     */
+    private List<IRGBAImage.VisibleArea> getInterpolatablePoints(NativeImage image, int frameWidth, int frameHeight) {
         List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
 
+        // Find points in original image
         IRGBAImage.VisibleArea.Builder noMipmapBuilder = new IRGBAImage.VisibleArea.Builder();
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
@@ -99,6 +120,11 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         return visibleAreas;
     }
 
+    /**
+     * Calculates the time for a frame based on a default time.
+     * @param metadataFrameTime     the default frame time
+     * @return  a function that calculates the time for a given frame
+     */
     private Function<NativeImageFrame, Integer> getFrameTimeCalculator(int metadataFrameTime) {
         return (frame) -> {
             int singleFrameTime = frame.getFrameTime();
@@ -106,6 +132,10 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         };
     }
 
+    /**
+     * Interpolates between {@link NativeImageFrame}s.
+     * @author soir20
+     */
     private class NativeImageFrameInterpolator implements IInterpolator<NativeImageFrame>, AutoCloseable {
         private final int FRAME_WIDTH;
         private final int FRAME_HEIGHT;
@@ -115,6 +145,15 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         private final RGBAInterpolator<NativeImageRGBAWrapper> INTERPOLATOR;
         private final NativeImage[] MIPMAPS;
 
+        /**
+         * Creates a new interpolator.
+         * @param originalMipmaps   the original mipmaps to base interpolations off of (starting at the original)
+         * @param visibleAreas      the visible areas for each mipmap (starting at the original's area)
+         * @param frameWidth        the width of a frame in the original image
+         * @param frameHeight       the height of a frame in the original image
+         * @param blur              whether to blur the output
+         * @param clamp             whether to clamp the output
+         */
         public NativeImageFrameInterpolator(NativeImage[] originalMipmaps,
                                             List<IRGBAImage.VisibleArea> visibleAreas,
                                             int frameWidth, int frameHeight, boolean blur, boolean clamp) {
@@ -147,6 +186,14 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
             });
         }
 
+        /**
+         * Interpolates between a starting frame and an ending frame.
+         * @param steps     total steps between the start and end frame
+         * @param step      current step of the interpolation (between 1 and steps - 1)
+         * @param start     the frame to start interpolation from
+         * @param end       the frame to end interpolation at
+         * @return  the interpolated frame at the given step
+         */
         @Override
         public NativeImageFrame interpolate(int steps, int step, NativeImageFrame start, NativeImageFrame end) {
             NativeImage[] mipmaps = new NativeImage[MIPMAP + 1];
@@ -179,6 +226,9 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
             return new NativeImageFrame(data, mipmaps, BLUR, CLAMP, false);
         }
 
+        /**
+         * Closes all mipmapped images where interpolated frames are uploaded.
+         */
         @Override
         public void close() {
             for (NativeImage mipmap : MIPMAPS) {
