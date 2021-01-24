@@ -3,28 +3,29 @@ package io.github.soir20.moremcmeta.resource;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.github.soir20.moremcmeta.client.renderer.texture.MockAnimatedTexture;
-import io.github.soir20.moremcmeta.resource.data.MockAnimationMetadataSectionSerializer;
-import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.client.renderer.texture.Texture;
+import io.github.soir20.moremcmeta.resource.data.MockMetadataSectionSerializer;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
+import net.minecraft.client.resources.data.TextureMetadataSection;
 import net.minecraft.resources.IResourceManager;
+import net.minecraft.resources.data.IMetadataSectionSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class TextureReloadListenerTest {
-    private final String[] FOLDERS = {"entity", "gui", "map"};
     private final Logger LOGGER = LogManager.getLogger();
-    private final AnimationMetadataSection DUMMY_METADATA = new AnimationMetadataSection(ImmutableList.of(),
-            10, 10, 10, true);
+    private final IMetadataSectionSerializer<TextureMetadataSection> DUMMY_TEX_SERIALIZER =
+            new MockMetadataSectionSerializer<>(new TextureMetadataSection(false, false));
+    private final IMetadataSectionSerializer<AnimationMetadataSection> DUMMY_ANIM_SERIALIZER =
+            new MockMetadataSectionSerializer<>(new AnimationMetadataSection(ImmutableList.of(), 10,
+                    10, 10, true));
 
     @Test
     public void onResourceManagerReload_DifferentResourceType_Nothing() {
@@ -33,9 +34,8 @@ public class TextureReloadListenerTest {
                 ImmutableSet.of("bat.png", "creeper.png", "zombie.png"), ImmutableSet.of(), ImmutableSet.of()
         );
 
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(
-                FOLDERS, (location, texture) -> locations.add(location), MockAnimatedTexture::new,
-                this::createNativeImage, new MockAnimationMetadataSectionSerializer(DUMMY_METADATA), LOGGER);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                (location, texture) -> locations.add(location), DUMMY_TEX_SERIALIZER, DUMMY_ANIM_SERIALIZER, LOGGER);
 
         listener.onResourceManagerReload(mockManager, (type) -> type.equals(VanillaResourceType.MODELS));
 
@@ -45,20 +45,17 @@ public class TextureReloadListenerTest {
     @Test
     public void onResourceManagerReload_ValidLocationsValidMetadata_ManagerHasAllTextures() {
         List<ResourceLocation> locations = new ArrayList<>();
-        List<Texture> textures = new ArrayList<>();
         IResourceManager mockManager = new MockResourceManager(
                 ImmutableSet.of("bat.png", "creeper.png", "zombie.png"), ImmutableSet.of(), ImmutableSet.of()
         );
 
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(
-                FOLDERS, (location, texture) -> { locations.add(location); textures.add(texture); },
-                MockAnimatedTexture::new, this::createNativeImage,
-                new MockAnimationMetadataSectionSerializer(DUMMY_METADATA), LOGGER);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                (location, texture) -> locations.add(location), DUMMY_TEX_SERIALIZER, DUMMY_ANIM_SERIALIZER, LOGGER);
 
         listener.onResourceManagerReload(mockManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
 
+        assertEquals(3, locations.size());
         assertTrue(locations.stream().allMatch(location -> location.getPath().endsWith(".png")));
-        assertEquals(9, textures.size());
     }
 
     @Test
@@ -68,15 +65,13 @@ public class TextureReloadListenerTest {
                 ImmutableSet.of("bat.png", "creeper", "zombie.jpg"), ImmutableSet.of(), ImmutableSet.of()
         );
 
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(
-                FOLDERS, (location, texture) -> locations.add(location),
-                MockAnimatedTexture::new, this::createNativeImage,
-                new MockAnimationMetadataSectionSerializer(DUMMY_METADATA), LOGGER);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                (location, texture) -> locations.add(location), DUMMY_TEX_SERIALIZER, DUMMY_ANIM_SERIALIZER, LOGGER);
 
         listener.onResourceManagerReload(mockManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
 
-        assertTrue(locations.stream().allMatch(location -> location.getPath().endsWith("bat.png")));
-        assertEquals(3, locations.size());
+        assertEquals(1, locations.size());
+        assertTrue(locations.get(0).getPath().endsWith("bat.png"));
     }
 
     @Test
@@ -84,18 +79,16 @@ public class TextureReloadListenerTest {
         List<ResourceLocation> locations = new ArrayList<>();
         IResourceManager mockManager = new MockResourceManager(
                 ImmutableSet.of("bat.png", "creeper.png", "zombie.png"),
-                ImmutableSet.of("bat.png", "creeper.png", "zombie.png"), ImmutableSet.of()
-
+                ImmutableSet.of("creeper.png", "zombie.png"), ImmutableSet.of()
         );
 
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(
-                FOLDERS, (location, texture) -> locations.add(location), MockAnimatedTexture::new,
-                this::createNativeImage, new MockAnimationMetadataSectionSerializer(null),
-                LOGGER);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                (location, texture) -> locations.add(location), DUMMY_TEX_SERIALIZER, DUMMY_ANIM_SERIALIZER, LOGGER);
 
         listener.onResourceManagerReload(mockManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
 
-        assertTrue(locations.isEmpty());
+        assertEquals(1, locations.size());
+        assertTrue(locations.get(0).getPath().endsWith("bat.png"));
     }
 
     @Test
@@ -103,17 +96,16 @@ public class TextureReloadListenerTest {
         List<ResourceLocation> locations = new ArrayList<>();
         IResourceManager mockManager = new MockResourceManager(
                 ImmutableSet.of("bat.png", "creeper.png", "zombie.png"), ImmutableSet.of(),
-                ImmutableSet.of("bat.png", "creeper.png", "zombie.png")
+                ImmutableSet.of("bat.png", "zombie.png")
         );
 
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(
-                FOLDERS, (location, texture) -> locations.add(location), MockAnimatedTexture::new,
-                this::createNativeImage, new MockAnimationMetadataSectionSerializer(DUMMY_METADATA),
-                LOGGER);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                (location, texture) -> locations.add(location), DUMMY_TEX_SERIALIZER, DUMMY_ANIM_SERIALIZER, LOGGER);
 
         listener.onResourceManagerReload(mockManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
 
-        assertTrue(locations.isEmpty());
+        assertEquals(1, locations.size());
+        assertTrue(locations.get(0).getPath().endsWith("creeper.png"));
     }
 
     @Test
@@ -121,20 +113,15 @@ public class TextureReloadListenerTest {
         List<ResourceLocation> locations = new ArrayList<>();
         IResourceManager mockManager = new MockResourceManager(
                 ImmutableSet.of("bat.png", "creeper.png", "zombie.png"), ImmutableSet.of(),
-                ImmutableSet.of("bat.png", "creeper.png", "zombie.png")
+                ImmutableSet.of("bat.png", "creeper.png")
         );
 
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(
-                FOLDERS, (location, texture) -> locations.add(location), MockAnimatedTexture::new,
-                this::createNativeImage, new MockAnimationMetadataSectionSerializer(null),
-                LOGGER);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                (location, texture) -> locations.add(location), DUMMY_TEX_SERIALIZER, DUMMY_ANIM_SERIALIZER, LOGGER);
 
         listener.onResourceManagerReload(mockManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
 
-        assertTrue(locations.isEmpty());
-    }
-
-    private NativeImage createNativeImage(InputStream inputStreamIn) {
-        return new NativeImage(10, 10, false);
+        assertEquals(1, locations.size());
+        assertTrue(locations.get(0).getPath().endsWith("zombie.png"));
     }
 }
