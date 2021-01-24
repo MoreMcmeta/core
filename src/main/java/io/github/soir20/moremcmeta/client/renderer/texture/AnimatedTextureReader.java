@@ -62,11 +62,19 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
                 frameWidth, frameHeight, blur, clamp);
 
         // Frame management
-        AnimationFrameManager<NativeImageFrame> frameManager = new AnimationFrameManager<>(
-                frames,
-                getFrameTimeCalculator(animationMetadata.getFrameTime()),
-                interpolator
-        );
+        AnimationFrameManager<NativeImageFrame> frameManager;
+        if (animationMetadata.isInterpolate()) {
+             frameManager= new AnimationFrameManager<>(
+                    frames,
+                    getFrameTimeCalculator(animationMetadata.getFrameTime()),
+                    interpolator
+            );
+        } else {
+            frameManager= new AnimationFrameManager<>(
+                    frames,
+                    getFrameTimeCalculator(animationMetadata.getFrameTime())
+            );
+        }
 
         // Resource cleanup
         Runnable closeMipmaps = () -> {
