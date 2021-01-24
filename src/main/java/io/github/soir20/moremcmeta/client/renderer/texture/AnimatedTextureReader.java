@@ -64,13 +64,13 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         // Frame management
         AnimationFrameManager<NativeImageFrame> frameManager;
         if (animationMetadata.isInterpolate()) {
-             frameManager= new AnimationFrameManager<>(
+             frameManager = new AnimationFrameManager<>(
                     frames,
                     getFrameTimeCalculator(animationMetadata.getFrameTime()),
                     interpolator
             );
         } else {
-            frameManager= new AnimationFrameManager<>(
+            frameManager = new AnimationFrameManager<>(
                     frames,
                     getFrameTimeCalculator(animationMetadata.getFrameTime())
             );
