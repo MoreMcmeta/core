@@ -10,5 +10,4 @@ import net.minecraftforge.fml.common.Mod;
 public final class MoreMcmeta
 {
     public static final String MODID = "moremcmeta";
-    public static final String[] FOLDERS = {"entity", "environment", "gui", "map", "misc"};
 }

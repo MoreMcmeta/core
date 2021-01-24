@@ -28,7 +28,6 @@ import java.util.function.Predicate;
  * @author soir20
  */
 public class TextureReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
-    private final String[] FOLDERS;
     private final BiConsumer<ResourceLocation, Texture> TEXTURE_LOADER;
     private final ITextureReader<T> TEXTURE_READER;
     private final IMetadataSectionSerializer<TextureMetadataSection> TEXTURE_SERIALIZER;
@@ -39,20 +38,17 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
 
     /**
      * Creates a TextureReloadListener.
-     * @param folders               folders to search for animated textures (exclude folders animated by default)
      * @param texReader             reads animated textures
      * @param texLoader             uploads animated textures to the game's texture manager
      * @param texSerializer         serializer for blur and clamp data
      * @param animationSerializer   serializer for animation data
      * @param logger                logs listener-related messages to the game's output
      */
-    public TextureReloadListener(String[] folders,
-                                 ITextureReader<T>  texReader,
+    public TextureReloadListener(ITextureReader<T>  texReader,
                                  BiConsumer<ResourceLocation, Texture> texLoader,
                                  IMetadataSectionSerializer<TextureMetadataSection> texSerializer,
                                  IMetadataSectionSerializer<AnimationMetadataSection> animationSerializer,
                                  Logger logger) {
-        FOLDERS = folders;
         TEXTURE_READER = texReader;
         TEXTURE_LOADER = texLoader;
         TEXTURE_SERIALIZER = texSerializer;
@@ -82,14 +78,11 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
         if (resourcePredicate.test(getResourceType())) {
             resourceManager = resManager;
 
-            for (String folder : FOLDERS) {
-                Collection<ResourceLocation> animatedFiles = resourceManager.getAllResourceLocations(
-                        "textures/" + folder,
-                        fileName -> fileName.endsWith(".png")
-                );
-
-                animatedFiles.forEach(this::uploadToTexManager);
-            }
+            Collection<ResourceLocation> animatedFiles = resourceManager.getAllResourceLocations(
+                    "textures",
+                    fileName -> fileName.endsWith(".png")
+            );
+            animatedFiles.forEach(this::uploadToTexManager);
         }
     }
 
