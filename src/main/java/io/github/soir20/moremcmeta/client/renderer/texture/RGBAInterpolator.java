@@ -75,7 +75,11 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
      * @return  the color of the pixel or a transparent pixel
      */
     private int getPixel(I image, int x, int y) {
-        return image.getPixel(x, y);
+        if (x < image.getWidth() && y < image.getHeight()) {
+            return image.getPixel(x, y);
+        } else {
+            return 0;
+        }
     }
 
     /**
