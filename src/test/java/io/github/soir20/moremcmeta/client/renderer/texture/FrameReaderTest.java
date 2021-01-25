@@ -1,0 +1,230 @@
+package io.github.soir20.moremcmeta.client.renderer.texture;
+
+import com.google.common.collect.ImmutableList;
+import net.minecraft.client.resources.data.AnimationFrame;
+import net.minecraft.client.resources.data.AnimationMetadataSection;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+public class FrameReaderTest {
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
+    private final AnimationMetadataSection EMPTY_ANIM_DATA = new AnimationMetadataSection(ImmutableList.of(),
+            -1, -1, 1, false);
+
+    @Test
+    public void findFrames_EmptyWidth_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(0, 100, EMPTY_ANIM_DATA);
+    }
+
+    @Test
+    public void findFrames_EmptyHeight_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(100, 0, EMPTY_ANIM_DATA);
+    }
+
+    @Test
+    public void findFrames_BothDimensionsEmpty_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(0, 0, EMPTY_ANIM_DATA);
+    }
+
+    @Test
+    public void findFrames_AssumedWidthNotMultipleOfSize_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(100, 70, EMPTY_ANIM_DATA);
+    }
+
+    @Test
+    public void findFrames_AssumedHeightNotMultipleOfSize_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(70, 100, EMPTY_ANIM_DATA);
+    }
+
+    @Test
+    public void findFrames_DefinedWidthNotMultipleOfSize_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(100, 70, new AnimationMetadataSection(ImmutableList.of(),
+                30, 35, 1, false));
+    }
+
+    @Test
+    public void findFrames_DefinedHeightNotMultipleOfSize_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(70, 100, new AnimationMetadataSection(ImmutableList.of(),
+                35, 30, 1, false));
+    }
+
+    @Test
+    public void findFrames_SquareImageAssumedDimensions_SingleFrame() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        List<MockAnimationFrame> frames = frameReader.read(100, 100, EMPTY_ANIM_DATA);
+        assertEquals(1, frames.size());
+        assertEquals(100, frames.get(0).getWidth());
+        assertEquals(100, frames.get(0).getHeight());
+        assertEquals(0, frames.get(0).getXOffset());
+        assertEquals(0, frames.get(0).getYOffset());
+    }
+
+    @Test
+    public void findFrames_SquareImageDefinedDimensions_SingleFrame() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        List<MockAnimationFrame> frames = frameReader.read(100, 100,
+                new AnimationMetadataSection(ImmutableList.of(), 100, 100, 1, false));
+        assertEquals(1, frames.size());
+        assertEquals(100, frames.get(0).getWidth());
+        assertEquals(100, frames.get(0).getHeight());
+        assertEquals(0, frames.get(0).getXOffset());
+        assertEquals(0, frames.get(0).getYOffset());
+    }
+
+    @Test
+    public void findFrames_LongerWidthAssumedDimensions_MultipleSquareFrames() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 100;
+        int frameHeight = 100;
+
+        List<MockAnimationFrame> frames = frameReader.read(frameWidth * 5, frameHeight, EMPTY_ANIM_DATA);
+        assertEquals(5, frames.size());
+        for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
+            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
+            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).getXOffset());
+            assertEquals(0, frames.get(frameIndex).getYOffset());
+        }
+    }
+
+    @Test
+    public void findFrames_LongerHeightAssumedDimensions_MultipleSquareFrames() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 100;
+        int frameHeight = 100;
+
+        List<MockAnimationFrame> frames = frameReader.read(frameWidth, frameHeight * 5, EMPTY_ANIM_DATA);
+        assertEquals(5, frames.size());
+        for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
+            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
+            assertEquals(0, frames.get(frameIndex).getXOffset());
+            assertEquals(frameHeight * frameIndex, frames.get(frameIndex).getYOffset());
+        }
+    }
+
+    @Test
+    public void findFrames_LongerWidthDefinedDimensions_MultipleSquareFrames() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 100;
+        int frameHeight = 100;
+
+        List<MockAnimationFrame> frames = frameReader.read(frameWidth * 5, frameHeight,
+                new AnimationMetadataSection(ImmutableList.of(), frameWidth, frameHeight, 1, false));
+        assertEquals(5, frames.size());
+        for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
+            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
+            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).getXOffset());
+            assertEquals(0, frames.get(frameIndex).getYOffset());
+        }
+    }
+
+    @Test
+    public void findFrames_LongerHeightDefinedDimensions_MultipleSquareFrames() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 100;
+        int frameHeight = 100;
+
+        List<MockAnimationFrame> frames = frameReader.read(frameWidth, frameHeight * 5,
+                new AnimationMetadataSection(ImmutableList.of(), frameWidth, frameHeight, 1, false));
+        assertEquals(5, frames.size());
+        for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
+            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
+            assertEquals(0, frames.get(frameIndex).getXOffset());
+            assertEquals(frameHeight * frameIndex, frames.get(frameIndex).getYOffset());
+        }
+    }
+
+    @Test
+    public void findFrames_LandscapeRectangularDefinedDimensions_MultipleRectangularFrames() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 100;
+        int frameHeight = 20;
+
+        List<MockAnimationFrame> frames = frameReader.read(frameWidth * 5, frameHeight,
+                new AnimationMetadataSection(ImmutableList.of(), frameWidth, frameHeight, 1, false));
+        assertEquals(5, frames.size());
+        for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
+            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
+            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).getXOffset());
+            assertEquals(0, frames.get(frameIndex).getYOffset());
+        }
+    }
+
+    @Test
+    public void findFrames_PortraitRectangularDefinedDimensions_MultipleRectangularFrames() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 20;
+        int frameHeight = 100;
+
+        List<MockAnimationFrame> frames = frameReader.read(frameWidth * 5, frameHeight,
+                new AnimationMetadataSection(ImmutableList.of(), frameWidth, frameHeight, 1, false));
+        assertEquals(5, frames.size());
+        for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
+            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
+            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).getXOffset());
+            assertEquals(0, frames.get(frameIndex).getYOffset());
+        }
+    }
+
+    @Test
+    public void findFrames_WithInterpolation_NoInterpolatedFrames() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 100;
+        int frameHeight = 100;
+
+        List<MockAnimationFrame> frames = frameReader.read(frameWidth * 5, frameHeight,
+                new AnimationMetadataSection(ImmutableList.of(), frameWidth, frameHeight, 1, true));
+        assertEquals(5, frames.size());
+    }
+
+    @Test
+    public void findFrames_TimeDefined_FrameTimesEmpty() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 100;
+        int frameHeight = 100;
+
+        List<MockAnimationFrame> frames = frameReader.read(frameWidth * 5, frameHeight,
+                new AnimationMetadataSection(ImmutableList.of(), frameWidth, frameHeight, 1, false));
+        for (MockAnimationFrame frame : frames) {
+            assertEquals(1, frame.getFrameTime());
+        }
+    }
+
+
+}
