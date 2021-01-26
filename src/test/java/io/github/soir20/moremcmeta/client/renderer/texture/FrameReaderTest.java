@@ -422,6 +422,36 @@ public class FrameReaderTest {
     }
 
     @Test
+    public void getDefinedFrames_IndexJustOutOfImageBounds_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        List<AnimationFrame> predefinedFrames = new ArrayList<>();
+        predefinedFrames.add(new AnimationFrame(0, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(1, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(2, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(3, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(5, FrameReader.FrameData.EMPTY_TIME));
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(500, 100, new AnimationMetadataSection(predefinedFrames,
+                100, 100, 1, false));
+    }
+
+    @Test
+    public void getDefinedFrames_IndexFarOutOfImageBounds_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        List<AnimationFrame> predefinedFrames = new ArrayList<>();
+        predefinedFrames.add(new AnimationFrame(0, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(1, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(2, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(3, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(17, FrameReader.FrameData.EMPTY_TIME));
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(500, 100, new AnimationMetadataSection(predefinedFrames,
+                100, 100, 1, false));
+    }
+
+    @Test
     public void getDefinedFrames_SquareImageAssumedDimensions_SingleFrame() {
         FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);List<AnimationFrame> predefinedFrames = new ArrayList<>();
         predefinedFrames.add(new AnimationFrame(0, FrameReader.FrameData.EMPTY_TIME));
