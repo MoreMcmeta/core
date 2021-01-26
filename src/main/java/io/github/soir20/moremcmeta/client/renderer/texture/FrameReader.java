@@ -80,6 +80,10 @@ public class FrameReader<F extends IAnimationFrame> {
 
         for (int frame = 0; frame < metadata.getFrameCount(); frame++) {
             int index = metadata.getFrameIndex(frame);
+            if (index >= numFramesX * numFramesY) {
+                throw new IllegalArgumentException("Index " + index + " would put frame out of image bounds");
+            }
+
             int time = metadata.getFrameTimeSingle(frame);
 
             Pair<Integer, Integer> framePos = frameIndexToPosition(index, numFramesX);
