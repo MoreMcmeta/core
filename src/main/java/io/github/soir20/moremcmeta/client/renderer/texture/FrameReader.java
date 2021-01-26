@@ -35,6 +35,10 @@ public class FrameReader<F extends IAnimationFrame> {
             throw new IllegalArgumentException("Image must not be empty");
         }
 
+        if (metadata.getFrameWidth(-1) == 0 || metadata.getFrameHeight(-1) == 0) {
+            throw new IllegalArgumentException("Frame width and height must not be empty");
+        }
+
         Pair<Integer, Integer> frameSize = metadata.getSpriteSize(imageWidth, imageHeight);
         int frameWidth = frameSize.getFirst();
         int frameHeight = frameSize.getSecond();
