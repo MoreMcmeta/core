@@ -752,7 +752,7 @@ public class FrameReaderTest {
     }
 
     @Test
-    public void getDefinedFrames_FramesSkipped_DuplicatesIncluded() {
+    public void getDefinedFrames_FramesSkipped_SkippedFramesNotIncluded() {
         FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
         int frameWidth = 100;
         int frameHeight = 100;
