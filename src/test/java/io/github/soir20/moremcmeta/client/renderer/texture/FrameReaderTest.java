@@ -83,7 +83,7 @@ public class FrameReaderTest {
 
         expectedException.expect(IllegalArgumentException.class);
         frameReader.read(100, 100, new AnimationMetadataSection(ImmutableList.of(),
-                0, 0, 1, false));
+                0, 10, 1, false));
     }
 
     @Test
@@ -93,6 +93,15 @@ public class FrameReaderTest {
         expectedException.expect(IllegalArgumentException.class);
         frameReader.read(100, 100, new AnimationMetadataSection(ImmutableList.of(),
                 10, 0, 1, false));
+    }
+
+    @Test
+    public void findFrames_ZeroFrameBothDimensions_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(100, 100, new AnimationMetadataSection(ImmutableList.of(),
+                0, 0, 1, false));
     }
 
     @Test
@@ -379,7 +388,7 @@ public class FrameReaderTest {
 
         expectedException.expect(IllegalArgumentException.class);
         frameReader.read(100, 100, new AnimationMetadataSection(predefinedFrames,
-                0, 0, 1, false));
+                0, 10, 1, false));
     }
 
     @Test
@@ -395,6 +404,21 @@ public class FrameReaderTest {
         expectedException.expect(IllegalArgumentException.class);
         frameReader.read(100, 100, new AnimationMetadataSection(predefinedFrames,
                 10, 0, 1, false));
+    }
+
+    @Test
+    public void getDefinedFrames_ZeroFrameBothDimensions_IllegalArgException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        List<AnimationFrame> predefinedFrames = new ArrayList<>();
+        predefinedFrames.add(new AnimationFrame(0, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(1, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(2, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(3, FrameReader.FrameData.EMPTY_TIME));
+        predefinedFrames.add(new AnimationFrame(4, FrameReader.FrameData.EMPTY_TIME));
+
+        expectedException.expect(IllegalArgumentException.class);
+        frameReader.read(100, 100, new AnimationMetadataSection(predefinedFrames,
+                0, 0, 1, false));
     }
 
     @Test
