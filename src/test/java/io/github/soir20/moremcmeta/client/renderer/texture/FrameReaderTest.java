@@ -241,7 +241,7 @@ public class FrameReaderTest {
     }
 
     @Test
-    public void findFrames_TimeDefined_FrameTimesEmpty() {
+    public void findFrames_TimeDefined_FrameTimesDefault() {
         FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
         int frameWidth = 100;
         int frameHeight = 100;
@@ -249,7 +249,7 @@ public class FrameReaderTest {
         List<MockAnimationFrame> frames = frameReader.read(frameWidth * 5, frameHeight,
                 new AnimationMetadataSection(ImmutableList.of(), frameWidth, frameHeight, 1, false));
         for (MockAnimationFrame frame : frames) {
-            assertEquals(FrameReader.FrameData.EMPTY_TIME, frame.getFrameTime());
+            assertEquals(1, frame.getFrameTime());
         }
     }
 
@@ -634,7 +634,7 @@ public class FrameReaderTest {
     }
 
     @Test
-    public void getDefinedFrames_TimeNotDefined_FrameTimesDefault() {
+    public void getDefinedFrames_TimeNotDefined_FrameTimesEmpty() {
         FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
         int frameWidth = 100;
         int frameHeight = 100;

@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Reads an {@link AnimatedTexture} from file data.
@@ -64,16 +63,9 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         // Frame management
         AnimationFrameManager<NativeImageFrame> frameManager;
         if (animationMetadata.isInterpolate()) {
-             frameManager = new AnimationFrameManager<>(
-                    frames,
-                    getFrameTimeCalculator(animationMetadata.getFrameTime()),
-                    interpolator
-            );
+             frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime, interpolator);
         } else {
-            frameManager = new AnimationFrameManager<>(
-                    frames,
-                    getFrameTimeCalculator(animationMetadata.getFrameTime())
-            );
+            frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime);
         }
 
         // Resource cleanup
@@ -126,18 +118,6 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         }
 
         return visibleAreas;
-    }
-
-    /**
-     * Calculates the time for a frame based on a default time.
-     * @param metadataFrameTime     the default frame time
-     * @return  a function that calculates the time for a given frame
-     */
-    private Function<NativeImageFrame, Integer> getFrameTimeCalculator(int metadataFrameTime) {
-        return (frame) -> {
-            int singleFrameTime = frame.getFrameTime();
-            return singleFrameTime == -1 ? metadataFrameTime : singleFrameTime;
-        };
     }
 
     /**

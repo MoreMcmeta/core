@@ -47,9 +47,9 @@ public class FrameReader<F extends IAnimationFrame> {
         int numFramesY = imageHeight / frameHeight;
 
         if (metadata.getFrameCount() > 0) {
-            return getPredefinedFrames(metadata, frameWidth, frameHeight, numFramesX);
+            return getPredefinedFrames(metadata, frameWidth, frameHeight, numFramesX, numFramesY);
         } else {
-            return findFrames(frameWidth, frameHeight, numFramesX, numFramesY);
+            return findFrames(metadata, frameWidth, frameHeight, numFramesX, numFramesY);
         }
     }
 
@@ -71,10 +71,11 @@ public class FrameReader<F extends IAnimationFrame> {
      * @param frameWidth    width of a single frame
      * @param frameHeight   height of a single frame
      * @param numFramesX    number of frames per row
+     * @param numFramesY    number of frames per column
      * @return  the list of predefined frames
      */
     private List<F> getPredefinedFrames(AnimationMetadataSection metadata, int frameWidth, int frameHeight,
-                                        int numFramesX) {
+                                        int numFramesX, int numFramesY) {
         List<F> frames = new ArrayList<>();
 
         for (int frame = 0; frame < metadata.getFrameCount(); frame++) {
@@ -94,19 +95,21 @@ public class FrameReader<F extends IAnimationFrame> {
 
     /**
      * Gets frames when they are not defined in metadata.
+     * @param metadata      image animation info
      * @param frameWidth    width of a single frame (pixels)
      * @param frameHeight   height of a single frame (pixels)
      * @param numFramesX    number of frames per row
      * @param numFramesY    number of frames per column
      * @return  the list of discovered frames
      */
-    private List<F> findFrames(int frameWidth, int frameHeight, int numFramesX, int numFramesY) {
+    private List<F> findFrames(AnimationMetadataSection metadata, int frameWidth, int frameHeight,
+                               int numFramesX, int numFramesY) {
         List<F> frames = new ArrayList<>();
 
         for (int row = 0; row < numFramesY; row++) {
             for (int column = 0; column < numFramesX; column++) {
                 FrameData data = new FrameData(frameWidth, frameHeight,
-                        column * frameWidth, row * frameHeight, FrameData.EMPTY_TIME);
+                        column * frameWidth, row * frameHeight, metadata.getFrameTime());
                 frames.add(FRAME_FACTORY.apply(data));
             }
         }
