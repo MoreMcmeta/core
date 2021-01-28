@@ -12,7 +12,7 @@ This means:
 * [Download](#download)
 * [Install](#install)
 * [The `.mcmeta` Format](#the-mcmeta-format)
-* [Troubleshooting and Help](#troubleshooting)
+* [Troubleshooting](#troubleshooting)
 
 ## Download
 * CurseForge
