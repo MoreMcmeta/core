@@ -1,7 +1,7 @@
 # MoreMcmeta
 ![MoreMcmeta logo](https://github.com/soir20/MoreMcmeta/blob/main/src/main/resources/moremcmeta-logo-black.png?raw=true)
 
-With **MoreMcmeta**, animate Minecraft entity, GUI, and map textures with the `.mcmeta` format—just like block and item textures.
+With **MoreMcmeta**, animate Minecraft mob, environment, GUI and more textures with the `.mcmeta` format—just like block and item textures.
 
 This means:
 * more possibilities for resource packs
@@ -12,7 +12,7 @@ This means:
 * [Download](#download)
 * [Install](#install)
 * [The `.mcmeta` Format](#the-mcmeta-format)
-* [Frequently Asked Questions](#frequently-asked-questions)
+* [Troubleshooting and Help](#troubleshooting)
 
 ## Download
 * CurseForge
@@ -29,5 +29,12 @@ Please help [StopModReposts](https://stopmodreposts.org/). Avoid reposting sites
 4. Place the MoreMcmeta `.jar` file in your Forge installation's `mods` folder. There are no dependencies besides Forge.
 
 ## The `.mcmeta` Format
+See the [`.mcmeta` Format Guide](MCMETA-FORMAT.md).
 
-## Frequently Asked Questions
+## Troubleshooting
+See the [Troubleshooting Guide](TROUBLESHOOTING.md).
+
+## Suggestions and Bug Reports
+Use the [issue tracker](https://github.com/soir20/MoreMcmeta/issues) for all suggestions and bug reports. Please include applicable screenshots and example textures/`.mcmeta` files.
+
+Suggestions that break compatibility with the default `.mcmeta` format will not be accepted. However, suggestions that improve the `.mcmeta` format with backwards-compatibility will be considered.
