@@ -182,4 +182,5 @@ You should specify frame width and height in the `.mcmeta` file if you do not pl
 
 ### Image Example
 An animated inventory texture with the column format:
+
 ![animated inventory texture with the column format](https://github.com/soir20/MoreMcmeta/blob/main/src/main/resources/inventory-column-example.png?raw=true)
