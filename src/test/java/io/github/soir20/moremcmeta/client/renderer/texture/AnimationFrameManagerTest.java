@@ -7,6 +7,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests the {@link AnimationFrameManager}.
+ * @author soir20
+ */
 public class AnimationFrameManagerTest {
 
     @Test

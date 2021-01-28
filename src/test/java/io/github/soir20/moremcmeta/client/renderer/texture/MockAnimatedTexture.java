@@ -9,6 +9,10 @@ import net.minecraft.resources.IResourceManager;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.InputStream;
 
+/**
+ * Mocks the animated texture. Doesn't do anything besides being able to be used in a texture loader.
+ * @author soir20
+ */
 @ParametersAreNonnullByDefault
 public class MockAnimatedTexture extends Texture implements ITickable {
 

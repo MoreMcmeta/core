@@ -1,5 +1,9 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+/**
+ * Mocks an {@link IAnimationFrame}. Essentially a wrapper for frame data that can be validated.
+ * @author soir20
+ */
 public class MockAnimationFrame implements IAnimationFrame {
     private final int WIDTH;
     private final int HEIGHT;

@@ -19,6 +19,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests the {@link TextureReloadListener}.
+ * @author soir20
+ */
 public class TextureReloadListenerTest {
     private final Logger LOGGER = LogManager.getLogger();
     private final IMetadataSectionSerializer<TextureMetadataSection> DUMMY_TEX_SERIALIZER =

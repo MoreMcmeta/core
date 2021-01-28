@@ -12,6 +12,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests the {@link FrameReader} with predefined and not-defined frames.
+ * @author soir20
+ */
 public class FrameReaderTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

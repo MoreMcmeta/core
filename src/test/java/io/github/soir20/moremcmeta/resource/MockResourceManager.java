@@ -22,6 +22,10 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * A mock resource manager that can provide fake found/missing files and metadata.
+ * @author soir20
+ */
 @SuppressWarnings("unused")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

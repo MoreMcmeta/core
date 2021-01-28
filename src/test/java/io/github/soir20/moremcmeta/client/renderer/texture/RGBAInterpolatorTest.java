@@ -6,6 +6,11 @@ import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests the {@link RGBAInterpolator}. Use an online random number generator for
+ * RGBA component values in new tests.
+ * @author soir20
+ */
 public class RGBAInterpolatorTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

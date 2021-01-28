@@ -9,6 +9,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests the building and use of the {@link IRGBAImage.VisibleArea} class.
+ * @author soir20
+ */
 public class VisibleAreaTest {
 
     @Test

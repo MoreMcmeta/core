@@ -1,5 +1,9 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+/**
+ * Mocks an {@link IRGBAImage}. Keeps track of set pixel colors.
+ * @author soir20
+ */
 public class MockRGBAImage implements IRGBAImage {
     private final int[][] PIXELS;
     private final int WIDTH;

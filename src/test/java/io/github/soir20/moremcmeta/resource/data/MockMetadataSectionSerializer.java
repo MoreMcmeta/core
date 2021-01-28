@@ -5,6 +5,11 @@ import net.minecraft.resources.data.IMetadataSectionSerializer;
 
 import javax.annotation.Nullable;
 
+/**
+ * A mock serializer for any type of animation metadata. It wraps a pre-created metadata section.
+ * @param <M>
+ * @author soir20
+ */
 @SuppressWarnings("NullableProblems")
 public class MockMetadataSectionSerializer<M> implements IMetadataSectionSerializer<M> {
     private final M METADATA_RETURN_VALUE;
