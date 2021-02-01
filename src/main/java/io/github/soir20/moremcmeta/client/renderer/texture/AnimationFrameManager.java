@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Manages the current frame in an animation.
+ * Manages the current frame in an animation and, optionally, handles the creation of interpolated frames.
+ * Interpolation only occurs when an interpolated frame is requested.
  * @param <F>   animation frame type
  * @author soir20
  */
@@ -57,7 +58,7 @@ public class AnimationFrameManager<F> implements ITickable {
     }
 
     /**
-     * Gets the current frame of the animation.
+     * Gets the current frame of the animation, which may be an interpolated frame.
      * @return  the current frame of the animation
      */
     public F getCurrentFrame() {

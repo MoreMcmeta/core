@@ -53,7 +53,7 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
 
     /**
      * Gets the width of the image.
-     * @return  the width of the image
+     * @return  the width of the image in pixels
      */
     @Override
     public int getWidth() {
@@ -62,7 +62,7 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
 
     /**
      * Gets the height of the image.
-     * @return  the height of the image
+     * @return  the height of the image in pixels
      */
     @Override
     public int getHeight() {

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Creates all the frames in an animated texture.
+ * Creates all the frames in an animated texture. It is is reusable for all images with the given type of frame.
  * @param <F>   tickable texture type
  * @author soir20
  */
@@ -16,7 +16,7 @@ public class FrameReader<F extends IAnimationFrame> {
     private final Function<FrameData, F> FRAME_FACTORY;
 
     /**
-     * Creates a new reader, which is reusable for all images with the given type of frame.
+     * Creates a new reader.
      * @param frameFactory      creates frames based on frame data
      */
     public FrameReader(Function<FrameData, F> frameFactory) {

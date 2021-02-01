@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Reads an {@link AnimatedTexture} from file data.
+ * Reads an {@link AnimatedTexture} from file data. It is reusable for all animated textures with the same
+ * mipmap level.
  * @author soir20
  */
 public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<NativeImageFrame>> {
@@ -121,7 +122,8 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
     }
 
     /**
-     * Interpolates between {@link NativeImageFrame}s.
+     * Interpolates between {@link NativeImageFrame}s. All interpolated frames share a {@link NativeImage},
+     * which has its pixels replaced when interpolation occurs.
      * @author soir20
      */
     private class NativeImageFrameInterpolator implements IInterpolator<NativeImageFrame>, AutoCloseable {
@@ -175,7 +177,7 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         }
 
         /**
-         * Interpolates between a starting frame and an ending frame.
+         * Interpolates between a starting frame and an ending frame for all mipmap levels.
          * @param steps     total steps between the start and end frame
          * @param step      current step of the interpolation (between 1 and steps - 1)
          * @param start     the frame to start interpolation from

@@ -36,25 +36,25 @@ public interface IRGBAImage {
     void setPixel(int x, int y, int color);
 
     /**
-     * Gets the width of this image.
+     * Gets the width (pixels) of this image.
      * @return  the width of this image
      */
     int getWidth();
 
     /**
-     * Gets the height of this image.
+     * Gets the height (pixels) of this image.
      * @return  the height of this image
      */
     int getHeight();
 
     /**
-     * Gets the visible area (iterable by point) of this image.
+     * Gets the visible area (iterable by point) of this image. Order of points is not guaranteed.
      * @return  the visible area of this image
      */
     VisibleArea getVisibleArea();
 
     /**
-     * Represents a collection of visible points in an image.
+     * Represents a collection of unordered visible points in an image.
      * @author soir20
      */
     class VisibleArea implements Iterable<Pair<Integer, Integer>> {
