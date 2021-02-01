@@ -35,6 +35,7 @@ Use the **vanilla format** for these types of textures:
 Use the **MoreMcmeta format** for these types of textures:
 * mobs
 * other entities (such as the fishing rod's bobber)
+* armor
 * environmental textures (such as the sun and moon)
 * GUIs
 * map backgrounds
