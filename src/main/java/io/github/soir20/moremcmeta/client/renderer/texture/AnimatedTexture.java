@@ -37,6 +37,9 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
         CLOSE_ACTION = closeAction;
     }
 
+    /**
+     * Binds this texture to OpenGL for rendering. Interpolation (if used) occurs at this point as well.
+     */
     @Override
     public void bindTexture() {
         super.bindTexture();
@@ -44,7 +47,7 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
     }
 
     /**
-     * Uploads this texture to OpenGL on the appropriate thread.
+     * Uploads this texture to OpenGL on the rendering thread.
      * @param manager   resource manager
      */
     @Override
@@ -65,21 +68,11 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
     }
 
     /**
-     * Updates this texture's animation on the appropriate thread each tick.
+     * Updates this texture's animation each tick. The frames are not uploaded until they are used
+     * in {@link #bindTexture()}.
      */
     @Override
     public void tick() {
-        if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(this::updateAnimation);
-        } else {
-            updateAnimation();
-        }
-    }
-
-    /**
-     * Updates this texture's animation immediately.
-     */
-    private void updateAnimation() {
         FRAME_MANAGER.tick();
     }
 
