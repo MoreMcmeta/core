@@ -1,5 +1,5 @@
 # MoreMcmeta
-![MoreMcmeta logo](https://github.com/soir20/MoreMcmeta/blob/main/src/main/resources/moremcmeta-logo-black.png?raw=true)
+![MoreMcmeta logo](https://github.com/soir20/MoreMcmeta/blob/main/info/img/moremcmeta-logo-black.png?raw=true)
 
 With **MoreMcmeta**, animate Minecraft mob, environment, GUI and more textures with the `.mcmeta` format—just like block and item textures.
 
@@ -8,7 +8,7 @@ This means:
 * [a familiar animation format](#the-mcmeta-format)
 * not a coremod—better compatibility with other mods
 
-![Mob, GUI, shadow, moon, and enchantment glint examples](https://github.com/soir20/MoreMcmeta/blob/main/src/main/resources/demo.gif?raw=true)
+![Mob, GUI, shadow, moon, and enchantment glint examples](https://github.com/soir20/MoreMcmeta/blob/main/info/img/demo.gif?raw=true)
 
 ## Table of Contents
 * [Download](#download)
