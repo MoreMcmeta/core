@@ -15,6 +15,7 @@ This means:
 * [Install](#install)
 * [The `.mcmeta` Format](#the-mcmeta-format)
 * [Troubleshooting](#troubleshooting)
+* [Suggestions and Bug Reports](#suggestions-and-bug-reports)
 
 ## Download
 * CurseForge
