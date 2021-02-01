@@ -77,7 +77,9 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
     }
 
     /**
-     * Uploads the current frame immediately.
+     * Uploads the current frame immediately. The frame is always uploaded with (0, 0) as the top left coordinate
+     * of the frame since we cannot use an atlas without making invasive changes to Minecraft's code. (0, 0)
+     * is consistent with the texture UV coordinates used throughout all of Minecraft's code.
      */
     private void uploadCurrentFrame() {
         FRAME_MANAGER.getCurrentFrame().uploadAt(0, 0);
