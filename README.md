@@ -18,7 +18,7 @@ This means:
 * [Suggestions and Bug Reports](#suggestions-and-bug-reports)
 
 ## Download
-* CurseForge
+* [CurseForge](https://www.curseforge.com/minecraft/mc-mods/moremcmeta)
 * [GitHub](https://github.com/soir20/MoreMcmeta/releases)
 
 I am not responsible for any viruses, malware, etc. that may afflict your computer if you download from other sites.
@@ -32,10 +32,10 @@ Please help [StopModReposts](https://stopmodreposts.org/). Avoid reposting sites
 4. Place the MoreMcmeta `.jar` file in your Forge installation's `mods` folder. There are no dependencies besides Forge.
 
 ## The `.mcmeta` Format
-See the [`.mcmeta` Format Guide](MCMETA-FORMAT.md).
+See the [`.mcmeta` Format Guide](info/guides/MCMETA-FORMAT.md).
 
 ## Troubleshooting
-See the [Troubleshooting Guide](TROUBLESHOOTING.md).
+See the [Troubleshooting Guide](info/guides/TROUBLESHOOTING.md).
 
 ## Suggestions and Bug Reports
 Use the [issue tracker](https://github.com/soir20/MoreMcmeta/issues) for all suggestions and bug reports. Please include applicable screenshots and example textures/`.mcmeta` files.

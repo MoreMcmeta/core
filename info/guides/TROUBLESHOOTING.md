@@ -9,7 +9,7 @@ This guide aims to help you resolve common issues without needing to file a bug 
    * Make sure your animation data is under a `"moremcmeta"` heading, **not** an `"animation"` heading.
    * Please [report](https://github.com/soir20/MoreMcmeta/issues) the issue if you can't determine the cause. Include the textures/`.mcmeta` files you are using.
     
-3. Make sure you downloaded the mod from an [official site](README.md#download).
+3. Make sure you downloaded the mod from an [official site](../../README.md#download).
 
 4. Check that you are using a Forge profile in the Minecraft launcher.
 
@@ -39,6 +39,6 @@ To reduce the amount of work required for rendering, MoreMcmeta analyzes your te
 MoreMcmeta also only ticks (updates) the textures it controls when they are rendered, instead of updating them on every tick like block textures. This means GUIs that aren't open and mobs that aren't visible won't contribute to the frame rendering time.
 
 ## Other Issues
-Please ensure that you downloaded MoreMcmeta from an [official site](README.md#download) and are using the latest `.jar` file for your Minecraft version.
+Please ensure that you downloaded MoreMcmeta from an [official site](../../README.md#download) and are using the latest `.jar` file for your Minecraft version.
 
 If that does not resolve the problem, [report a bug](https://github.com/soir20/MoreMcmeta/issues). Include screenshots of the issue and example texture/`.mcmeta` files.
