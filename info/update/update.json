@@ -1,0 +1,10 @@
+{
+  "homepage": "https://www.curseforge.com/minecraft/mc-mods/moremcmeta",
+  "1.16": {
+    "1.0.0": "Initial release"
+  },
+  "promos": {
+    "1.16-latest": "1.0.0",
+    "1.16-recommended": "1.0.0"
+  }
+}
