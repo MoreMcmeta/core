@@ -1,7 +1,7 @@
 # Troubleshooting Guide
 This guide aims to help you resolve common issues without needing to file a bug report.
 
-## Nothing Happens When I Install the Mod
+## Nothing Happens When I Install the Mod / My Textures Look Strange
 1. Make sure you've [animated a texture](MCMETA-FORMAT.md). MoreMcmeta doesn't change the game until you animate a texture. See the default pack in the next bullet.
 
 2. Try using the trial resource pack. If the trial textures work, there may be an issue with your textures.
