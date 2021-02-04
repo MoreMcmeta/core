@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ResourceLocationException;
 import net.minecraftforge.resource.IResourceType;
 import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
@@ -69,13 +70,27 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
     public void onResourceManagerReload(IResourceManager resourceManager,
                                         Predicate<IResourceType> resourcePredicate) {
         if (resourcePredicate.test(getResourceType())) {
-            Collection<ResourceLocation> animationCandidates = resourceManager.getAllResourceLocations(
-                    "textures",
-                    fileName -> fileName.endsWith(METADATA_EXTENSION)
-            );
+            Collection<ResourceLocation> animationCandidates;
 
-            // Clean up any previously loaded textures because they may no longer be animated
-            LAST_TEXTURES_ADDED.forEach(TEXTURE_MANAGER::deleteTexture);
+            /* We should catch ResourceLocation errors to prevent bad texture names/paths from
+               removing all resource packs. We can't filter invalid folder names, so we don't filter
+               invalid texture names for consistency.
+               NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
+            try {
+                 animationCandidates = resourceManager.getAllResourceLocations(
+                        "textures",
+                        fileName -> fileName.endsWith(METADATA_EXTENSION)
+                 );
+            } catch (ResourceLocationException error) {
+                LOGGER.error("Found texture with invalid name; no textures will be animated: {}",
+                        error.toString());
+                return;
+            } finally {
+
+                // Clean up any previously loaded textures because they may no longer be animated
+                LAST_TEXTURES_ADDED.forEach(TEXTURE_MANAGER::deleteTexture);
+
+            }
 
             // Load all animated textures into the tex manager so they are used for rendering
             (new HashSet<>(animationCandidates)).forEach((metadataLocation) -> {
