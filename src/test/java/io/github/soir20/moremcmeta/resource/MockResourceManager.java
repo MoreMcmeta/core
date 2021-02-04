@@ -7,10 +7,8 @@ import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.resources.IResourcePack;
 import net.minecraft.resources.SimpleResource;
-import net.minecraft.resources.data.IMetadataSectionSerializer;
 import net.minecraft.util.ResourceLocation;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,7 +21,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * A mock resource manager that can provide fake found/missing files and metadata.
+ * A mock resource manager that can provide fake found/missing files.
  * @author soir20
  */
 @SuppressWarnings("unused")
@@ -32,15 +30,16 @@ import java.util.stream.Stream;
 public class MockResourceManager implements IResourceManager {
     private static final InputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
 
-    private final Set<String> FILES_TO_ADD;
-    private final Set<String> MISSING_FILES;
-    private final Set<String> INVALID_METADATA_FILES;
+    private final List<String> FILES_TO_ADD;
+    private final List<String> MISSING_FILES;
+    private final boolean USE_UNIQUE_PACK_NAMES;
 
-    public MockResourceManager(Set<String> filesToAdd, Set<String> missingFiles,
-                               Set<String> filesWithoutValidMetadata) {
+    private String lastPackName = "test";
+
+    public MockResourceManager(List<String> filesToAdd, List<String> missingFiles, boolean useUniquePackNames) {
         FILES_TO_ADD = filesToAdd;
         MISSING_FILES = missingFiles;
-        INVALID_METADATA_FILES = filesWithoutValidMetadata;
+        USE_UNIQUE_PACK_NAMES = useUniquePackNames;
     }
 
     @Override
@@ -56,7 +55,13 @@ public class MockResourceManager implements IResourceManager {
         if (isMissing) {
             throw new IOException();
         } else {
-            return new MockSimpleResource(resourceLocationIn, INVALID_METADATA_FILES);
+
+            // Add a dummy character to make pack names different for every resource
+            if (USE_UNIQUE_PACK_NAMES) {
+                lastPackName += "a";
+            }
+
+            return new MockSimpleResource(resourceLocationIn, lastPackName);
         }
     }
 
@@ -88,28 +93,15 @@ public class MockResourceManager implements IResourceManager {
         return Stream.of();
     }
 
+    /**
+     * Acts as fake resource. This is a separate class in case we need to override metadata parsing
+     * in the future.
+     * @author soir20
+     */
     private static class MockSimpleResource extends SimpleResource {
-        private final boolean HAS_METADATA;
-
-        public MockSimpleResource(ResourceLocation locationIn, Set<String> filesWithoutMetadata) {
-            super("test", locationIn, EMPTY_STREAM, null);
-            int fileNameStart = locationIn.getPath().lastIndexOf('/') + 1;
-            HAS_METADATA = !filesWithoutMetadata.contains(locationIn.getPath().substring(fileNameStart));
-        }
-
-        @Override
-        public boolean hasMetadata() {
-            return HAS_METADATA;
-        }
-
-        @Nullable
-        @Override
-        public <T> T getMetadata(IMetadataSectionSerializer<T> serializer) {
-            if (HAS_METADATA) {
-                return serializer.deserialize(null);
-            } else {
-                throw new RuntimeException();
-            }
+        public MockSimpleResource(ResourceLocation locationIn, String packName) {
+            super(packName, locationIn, EMPTY_STREAM, null);
         }
     }
+
 }

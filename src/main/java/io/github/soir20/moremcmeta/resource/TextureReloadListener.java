@@ -1,24 +1,24 @@
 package io.github.soir20.moremcmeta.resource;
 
+import io.github.soir20.moremcmeta.client.renderer.texture.ITextureManager;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureReader;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
-import net.minecraft.client.resources.data.AnimationMetadataSection;
-import net.minecraft.client.resources.data.TextureMetadataSection;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
-import net.minecraft.resources.data.IMetadataSectionSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.resource.IResourceType;
 import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.function.BiConsumer;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -28,32 +28,24 @@ import java.util.function.Predicate;
  * @author soir20
  */
 public class TextureReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
-    private final BiConsumer<ResourceLocation, Texture> TEXTURE_LOADER;
-    private final ITextureReader<T> TEXTURE_READER;
-    private final IMetadataSectionSerializer<TextureMetadataSection> TEXTURE_SERIALIZER;
-    private final IMetadataSectionSerializer<AnimationMetadataSection> ANIMATION_SERIALIZER;
-    private final Logger LOGGER;
+    private static final String METADATA_EXTENSION = ".moremcmeta";
 
-    private IResourceManager resourceManager;
+    private final ITextureManager TEXTURE_MANAGER;
+    private final ITextureReader<T> TEXTURE_READER;
+    private final Logger LOGGER;
+    private final Set<ResourceLocation> LAST_TEXTURES_ADDED;
 
     /**
      * Creates a TextureReloadListener.
      * @param texReader             reads animated textures
-     * @param texLoader             uploads animated textures to the game's texture manager
-     * @param texSerializer         serializer for blur and clamp data
-     * @param animationSerializer   serializer for animation data
+     * @param texManager            uploads animated textures to the game's texture manager
      * @param logger                logs listener-related messages to the game's output
      */
-    public TextureReloadListener(ITextureReader<T>  texReader,
-                                 BiConsumer<ResourceLocation, Texture> texLoader,
-                                 IMetadataSectionSerializer<TextureMetadataSection> texSerializer,
-                                 IMetadataSectionSerializer<AnimationMetadataSection> animationSerializer,
-                                 Logger logger) {
+    public TextureReloadListener(ITextureReader<T> texReader, ITextureManager texManager, Logger logger) {
         TEXTURE_READER = texReader;
-        TEXTURE_LOADER = texLoader;
-        TEXTURE_SERIALIZER = texSerializer;
-        ANIMATION_SERIALIZER = animationSerializer;
+        TEXTURE_MANAGER = texManager;
         LOGGER = logger;
+        LAST_TEXTURES_ADDED = new HashSet<>();
     }
 
     /**
@@ -67,52 +59,66 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
     }
 
     /**
-     * Uploads animated textures to the texture manager when the game's textures reload.
-     * @param resManager            the game's central resource manager
+     * Uploads animated textures to the texture manager when the game's textures reload. This event only
+     * fires for client-side resources, not data packs.
+     * @param resourceManager       the game's central resource manager
      * @param resourcePredicate     tests whether the listener should reload for this resource type
      */
     @Override
     @ParametersAreNonnullByDefault
-    public void onResourceManagerReload(IResourceManager resManager,
+    public void onResourceManagerReload(IResourceManager resourceManager,
                                         Predicate<IResourceType> resourcePredicate) {
         if (resourcePredicate.test(getResourceType())) {
-            resourceManager = resManager;
-
-            Collection<ResourceLocation> animatedFiles = resourceManager.getAllResourceLocations(
+            Collection<ResourceLocation> animationCandidates = resourceManager.getAllResourceLocations(
                     "textures",
-                    fileName -> fileName.endsWith(".png")
+                    fileName -> fileName.endsWith(METADATA_EXTENSION)
             );
-            animatedFiles.forEach(this::uploadToTexManager);
+
+            // Clean up any previously loaded textures because they may no longer be animated
+            LAST_TEXTURES_ADDED.forEach(TEXTURE_MANAGER::deleteTexture);
+
+            // Load all animated textures into the tex manager so they are used for rendering
+            (new HashSet<>(animationCandidates)).forEach((metadataLocation) -> {
+                ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
+                        metadataLocation.getPath().replace(METADATA_EXTENSION, ""));
+
+                T animatedTexture = getAnimatedTexture(resourceManager, textureLocation, metadataLocation);
+
+                if (animatedTexture != null) {
+                    LAST_TEXTURES_ADDED.add(textureLocation);
+                    TEXTURE_MANAGER.loadTexture(textureLocation, animatedTexture);
+                }
+            });
+
         }
     }
 
     /**
-     * Uploads an individual texture to the texture manager.
-     * @param resourceLocation  file location of texture identical to how it is used in a entity/gui/map
+     * Gets an animated texture from a file if the texture is animated.
+     * @param resourceManager   resource manager to get textures/metadata from
+     * @param textureLocation   location of the image/.png texture
+     * @param metadataLocation  file location of texture's metadata for this mod (not .mcmeta)
+     * @return the animated texture, or null if the file is not animated/not found
      */
-    private void uploadToTexManager(ResourceLocation resourceLocation) {
-        try (IResource iresource = resourceManager.getResource(resourceLocation)) {
-            InputStream stream = iresource.getInputStream();
+    @Nullable
+    private T getAnimatedTexture(IResourceManager resourceManager,
+                                 ResourceLocation textureLocation, ResourceLocation metadataLocation) {
+        try (IResource originalResource = resourceManager.getResource(textureLocation);
+                IResource metadataResource = resourceManager.getResource(metadataLocation)) {
 
-            AnimationMetadataSection animationMetadata = iresource.getMetadata(ANIMATION_SERIALIZER);
-            if (animationMetadata == null) {
-                return;
+            // We don't want to get metadata from a lower pack than the texture
+            if (originalResource.getPackName().equals(metadataResource.getPackName())) {
+                InputStream textureStream = originalResource.getInputStream();
+                InputStream metadataStream = metadataResource.getInputStream();
+
+                return TEXTURE_READER.read(textureStream, metadataStream);
             }
-
-            TextureMetadataSection textureMetadata = iresource.getMetadata(TEXTURE_SERIALIZER);
-            if (textureMetadata == null) {
-                textureMetadata = new TextureMetadataSection(false, false);
-            }
-
-            T texture = TEXTURE_READER.read(stream, textureMetadata, animationMetadata);
-            TEXTURE_LOADER.accept(resourceLocation, texture);
-        } catch (RuntimeException runtimeException) {
-            LOGGER.error("Unable to parse animation metadata from {} : {}",
-                    resourceLocation, runtimeException);
         } catch (IOException ioException) {
-            LOGGER.error("Using missing texture, unable to load {} : {}",
-                    resourceLocation, ioException);
+            LOGGER.error("Using missing texture, unable to load {}: {}",
+                    textureLocation, ioException);
         }
+
+        return null;
     }
 
 }

@@ -1,10 +1,13 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.client.resources.data.TextureMetadataSection;
+import net.minecraft.resources.SimpleResource;
+import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -34,20 +37,46 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
 
     /**
      * Reads an {@link AnimatedTexture}.
-     * @param inputStream           input stream with image data
-     * @param texMetadata           texture metadata (blur and clamp options)
-     * @param animationMetadata     animation metadata (frames, frame time, etc.)
+     * @param textureStream           input stream with image data
+     * @param metadataStream          input stream with texture and animation properties
      * @return  an animated texture based on the provided data
      */
-    public AnimatedTexture<NativeImageFrame> read(InputStream inputStream, TextureMetadataSection texMetadata,
-                                                  AnimationMetadataSection animationMetadata) throws IOException {
-        NativeImage image = NativeImage.read(inputStream);
+    public AnimatedTexture<NativeImageFrame> read(InputStream textureStream, InputStream metadataStream)
+            throws IOException {
+        NativeImage image = NativeImage.read(textureStream);
         LOGGER.debug("Successfully read image from input");
 
         NativeImage[] mipmaps = MipmapGenerator.generateMipmaps(image, MIPMAP);
 
-        boolean blur = texMetadata.getTextureBlur();
-        boolean clamp = texMetadata.getTextureClamp();
+        /* The SimpleResource class would normally handle metadata parsing when we originally
+           got the resource. However, the ResourceManager only looks for .mcmeta metadata, and its
+           nested structure and an unordered (stream) accessor for resource packs cannot be
+           easily overridden. However, we can create a dummy resource to parse the metadata. */
+        SimpleResource metadataParser = new SimpleResource("dummy", new ResourceLocation(""),
+                textureStream, metadataStream);
+
+        AnimationMetadataSection animationMetadata = null;
+        TextureMetadataSection textureMetadata = null;
+        try {
+            animationMetadata = metadataParser.getMetadata(AnimationMetadataSection.SERIALIZER);
+            textureMetadata = metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
+        } catch (JsonParseException jsonError) {
+            LOGGER.error("Unable to read texture metadata: {}", jsonError.toString());
+        } finally {
+
+            /* Use defaults if no metadata was read.
+               The metadata parser can set these to null even if there was no error. */
+            if (animationMetadata == null) {
+                animationMetadata = AnimationMetadataSection.EMPTY;
+            }
+
+            if (textureMetadata == null) {
+                textureMetadata = new TextureMetadataSection(false, false);
+            }
+        }
+
+        boolean blur = textureMetadata.getTextureBlur();
+        boolean clamp = textureMetadata.getTextureClamp();
 
         // Frames
         FrameReader<NativeImageFrame> frameReader = new FrameReader<>((frameData ->

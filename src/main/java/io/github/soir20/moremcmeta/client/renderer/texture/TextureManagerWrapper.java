@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TextureManagerWrapper {
+public class TextureManagerWrapper implements ITextureManager {
     private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
 
     /**
@@ -33,6 +33,15 @@ public class TextureManagerWrapper {
      */
     public void loadTexture(ResourceLocation textureLocation, Texture textureObj) {
         TEXTURE_MANAGER_GETTER.get().loadTexture(textureLocation, textureObj);
+    }
+
+    /**
+     * Deletes a texture so Minecraft is no longer aware of it. This also allows the texture to be replaced.
+     * @param textureLocation   file location of texture to delete
+     */
+    @Override
+    public void deleteTexture(ResourceLocation textureLocation) {
+        TEXTURE_MANAGER_GETTER.get().deleteTexture(textureLocation);
     }
 
 }

@@ -2,8 +2,6 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
-import net.minecraft.client.resources.data.AnimationMetadataSection;
-import net.minecraft.client.resources.data.TextureMetadataSection;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,13 +15,11 @@ public interface ITextureReader<T extends Texture & ITickable> {
 
     /**
      * Reads an animated texture from file data.
-     * @param stream                input stream of image data
-     * @param texMetadata           texture metadata (blur and clamp options)
-     * @param animationMetadata     animation metadata (frames, time info, etc.)
+     * @param textureStream     input stream of image data
+     * @param metadataStream    input stream of texture metadata (JSON)
      * @return  an animated texture
-     * @throws IOException  failure reading from the input stream
+     * @throws IOException  failure reading from either input stream
      */
-    T read(InputStream stream, TextureMetadataSection texMetadata, AnimationMetadataSection animationMetadata)
-            throws IOException;
+    T read(InputStream textureStream, InputStream metadataStream) throws IOException;
 
 }
