@@ -151,7 +151,30 @@ public class TextureReloadListenerTest {
         assertEquals(0, locations.size());
     }
 
+    @Test
+    public void onResourceManagerReload_ResourceLocationException_ManagerCleared() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
 
+        IResourceManager mockResourceManagerFirstReload = new MockResourceManager(
+                ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
+                ImmutableList.of(), false
+        );
+        IResourceManager mockResourceManagerSecondReload = new MockResourceManager(
+                ImmutableList.of("bat.png.moremcmeta", "bad location.png.moremcmeta", "fol der/ocelot.png.moremcmeta"),
+                ImmutableList.of(), false
+        );
+
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                mockTextureManager, LOGGER);
+
+        listener.onResourceManagerReload(mockResourceManagerFirstReload,
+                (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManagerSecondReload,
+                (type) -> type.equals(VanillaResourceType.TEXTURES));
+
+        List<ResourceLocation> locations = mockTextureManager.getLocations();
+        assertEquals(0, locations.size());
+    }
 
     @Test
     public void onResourceManagerReloadTwice_PreviouslyLoadedTextures_OldDeletedNewLoaded() {
