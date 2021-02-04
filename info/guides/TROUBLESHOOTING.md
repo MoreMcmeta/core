@@ -2,13 +2,13 @@
 This guide aims to help you resolve common issues without needing to file a bug report.
 
 ## Nothing Happens When I Install the Mod / My Textures Look Strange
-1. Make sure you've [animated a texture](MCMETA-FORMAT.md). MoreMcmeta doesn't change the game until you animate a texture. See the default pack in the next bullet.
+1. Make sure you've [animated a texture](ANIMATION-FORMAT.md). MoreMcmeta doesn't change the game until you animate a texture. See the default pack in the next bullet.
 
 2. Try using the trial resource pack. If the trial textures work, there may be an issue with your textures.
-   * Use a [JSON validator](https://jsonlint.com/) to detect syntax issues in your `.mcmeta` files.
-   * Make sure your animation data is under a `"moremcmeta"` heading, **not** an `"animation"` heading.
-   * Check the [`.mcmeta` format guide](MCMETA-FORMAT.md). In particular, make sure you defined a width and height for non-square frames.
-   * Please [report](https://github.com/soir20/MoreMcmeta/issues) the issue if you can't determine the cause. Include the textures/`.mcmeta` files you are using.
+   * Use a [JSON validator](https://jsonlint.com/) to detect syntax issues in your `.moremcmeta` files.
+   * Make sure your animation data has a `.moremcmeta` extension, **not** an `.mcmeta` extension.
+   * Check the [Animation Format Guide](ANIMATION-FORMAT.md). In particular, make sure you defined a width and height for non-square frames.
+   * Please [report](https://github.com/soir20/MoreMcmeta/issues) the issue if you can't determine the cause. Include the textures/`.moremcmeta` files you are using.
     
 3. Make sure you downloaded the mod from an [official site](../../README.md#download).
 
@@ -19,7 +19,7 @@ This guide aims to help you resolve common issues without needing to file a bug 
 6. Try removing all other mods. If MoreMcmeta works alone, there may be a compatibility issue. Add mods back to determine which one is causing the problem.
    * Please [report](https://github.com/soir20/MoreMcmeta/issues) the issue. However, compatibility issues with coremods or mods that alter Minecraft's texturing process will likely not be resolved.
     
-7. If all else fails, [report](https://github.com/soir20/MoreMcmeta/issues) the problem. Include any textures/`.mcmeta` files that are not working.
+7. If all else fails, [report](https://github.com/soir20/MoreMcmeta/issues) the problem. Include any textures/`.moremcmeta` files that are not working.
 
 ## Low FPS/Client Lag
 Although you can install MoreMcmeta on a server without errors, it only does client-side work. Therefore, MoreMcmeta probably isn't the culprit if you're experiencing tick lag (block breaking delays, etc.).
@@ -42,4 +42,4 @@ MoreMcmeta also only ticks (updates) the textures it controls when they are rend
 ## Other Issues
 Please ensure that you downloaded MoreMcmeta from an [official site](../../README.md#download) and are using the latest `.jar` file for your Minecraft version.
 
-If that does not resolve the problem, [report a bug](https://github.com/soir20/MoreMcmeta/issues). Include screenshots of the issue and example texture/`.mcmeta` files.
+If that does not resolve the problem, [report a bug](https://github.com/soir20/MoreMcmeta/issues). Include screenshots of the issue and example texture/`.moremcmeta` files.

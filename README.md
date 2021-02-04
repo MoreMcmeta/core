@@ -5,7 +5,7 @@ With **MoreMcmeta**, animate Minecraft mob, environment, GUI and more textures w
 
 This means:
 * more possibilities for resource packs
-* [a familiar animation format](#the-mcmeta-format)
+* [a familiar animation format](#animation-format)
 * not a coremod—better compatibility with other mods
 
 ![Mob, GUI, shadow, moon, and enchantment glint examples](https://github.com/soir20/MoreMcmeta/blob/main/info/img/demo.gif?raw=true)
@@ -13,7 +13,7 @@ This means:
 ## Table of Contents
 * [Download](#download)
 * [Install](#install)
-* [The `.mcmeta` Format](#the-mcmeta-format)
+* [Animation Format](#animation-format)
 * [Troubleshooting](#troubleshooting)
 * [Suggestions and Bug Reports](#suggestions-and-bug-reports)
 
@@ -31,13 +31,13 @@ Please help [StopModReposts](https://stopmodreposts.org/). Avoid reposting sites
 3. [Download](#download) MoreMcmeta.
 4. Place the MoreMcmeta `.jar` file in your Forge installation's `mods` folder. There are no dependencies besides Forge.
 
-## The `.mcmeta` Format
-See the [`.mcmeta` Format Guide](info/guides/MCMETA-FORMAT.md).
+## Animation Format
+See the [Animation Format Guide](info/guides/ANIMATION-FORMAT.md).
 
 ## Troubleshooting
 See the [Troubleshooting Guide](info/guides/TROUBLESHOOTING.md).
 
 ## Suggestions and Bug Reports
-Use the [issue tracker](https://github.com/soir20/MoreMcmeta/issues) for all suggestions and bug reports. Please include applicable screenshots and example textures/`.mcmeta` files.
+Use the [issue tracker](https://github.com/soir20/MoreMcmeta/issues) for all suggestions and bug reports. Please include applicable screenshots and example textures/`.moremcmeta` files.
 
-Suggestions that break compatibility with the default `.mcmeta` format will not be accepted. However, suggestions that improve the `.mcmeta` format with backwards-compatibility will be considered.
+Suggestions that break compatibility with the default animation format will not be accepted. However, suggestions that improve the default format with backwards-compatibility will be considered.

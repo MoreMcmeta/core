@@ -1,27 +1,9 @@
-# The `.mcmeta` Format
-This guide aims to show you how to use the `.mcmeta` format to animate Minecraft textures with MoreMcmeta.
+# Animation Format
+This guide aims to show you how to use Minecraft's default animation format to animate Minecraft textures with MoreMcmeta.
 
 ## Vanilla's Format vs. MoreMcmeta's Format
-Presently, the only change MoreMcmeta makes to the default `.mcmeta` format is using `"moremcmeta"` as the animation section name instead of `"animation"`.
+Presently, the only change MoreMcmeta makes to the default animation format is using `.moremcmeta` as the file extension instead of `.mcmeta`.
 
-An example vanilla animation file:
-```
-{
-    "animation": {
-        "interpolate": true,
-        "frametime": 10
-    }
-}
-```
-The equivalent MoreMcmeta animation file:
-```
-{
-    "moremcmeta": {
-        "interpolate": true,
-        "frametime": 10
-    }
-}
-```
 MoreMcmeta also supports additional, non-animation parameters: `blur` and `clamp`. Vanilla supports these extra parameters for non-animated textures only.
 
 ### Vanilla-Animated vs. MoreMcmeta-Animated Textures List
@@ -45,13 +27,13 @@ You cannot animate colormaps because they are only used when a chunk reloads.
 
 ## Animation Properties
 ### Structure
-See [Examples](#mcmeta-examples) for examples of correct syntax. This chart merely describes how properties are nested.
+See [Examples](#moremcmeta-examples) for examples of correct syntax. This chart merely describes how properties are nested.
 ```
 .
 +-- "texture"
 |   +-- "blur"
 |   +-- "clamp"
-+-- "moremcmeta"
++-- "animation"
 |   +-- "interpolate"
 |   +-- "width"
 |   +-- "height"
@@ -82,20 +64,20 @@ All of these properties are optional. The default value will be used if you do n
 It is recommended that you explicitly define a frame width and height for non-square frames. When you do not provide a width and a height, the mod tries to guess what those values are. It is more difficult to guess the dimensions of non-square frames, which may cause MoreMcmeta to not animate some textures.
 
 ### File Names
-The file name of the `.mcmeta` file must match the original texture's name **exactly** with the `.mcmeta` suffix appended.
+The file name of the `.moremcmeta` file must match the original texture's name **exactly** with the `.moremcmeta` suffix appended.
 
 For example:
-* `bat.png` > `bat.png.mcmeta`
-* `moon_phases.png` > `moon_phases.png.mcmeta`
-* `inventory.png` > `inventory.png.mcmeta`
+* `bat.png` > `bat.png.moremcmeta`
+* `moon_phases.png` > `moon_phases.png.moremcmeta`
+* `inventory.png` > `inventory.png.moremcmeta`
 
-Note that `.mcmeta` is the file extension; a file called `inventory.png.mcmeta.txt` is incorrect. You may need to enable file extension visibility in your file explorer to change the extension.
+Note that `.moremcmeta` is the file extension; a file called `inventory.png.moremcmeta.txt` is incorrect. You may need to enable file extension visibility in your file explorer to change the extension.
 
-### `.mcmeta` Examples
+### `.moremcmeta` Examples
 #### Bare Minimum
 ```
 {
-  "moremcmeta": {}
+  "animation": {}
 }
 ```
 
@@ -106,7 +88,7 @@ Note that `.mcmeta` is the file extension; a file called `inventory.png.mcmeta.t
         "blur": true,
         "clamp": true
     },
-    "moremcmeta": {
+    "animation": {
         "interpolate": true,
         "width": 64,
         "height": 64,
@@ -130,7 +112,7 @@ Note that `.mcmeta` is the file extension; a file called `inventory.png.mcmeta.t
 #### Frame Time and Interpolation
 ```
 {
-    "moremcmeta": {
+    "animation": {
         "interpolate": true,
         "frametime": 10
     }
@@ -140,7 +122,7 @@ Note that `.mcmeta` is the file extension; a file called `inventory.png.mcmeta.t
 #### Non-Square Frames
 ```
 {
-    "moremcmeta": {
+    "animation": {
         "width": 128,
         "height": 64
     }
@@ -148,10 +130,10 @@ Note that `.mcmeta` is the file extension; a file called `inventory.png.mcmeta.t
 ```
 
 ## Image Layout
-Animated textures should be `.png` files with the exact same name as their `.mcmeta` files, minus the `.mcmeta` suffix.
-* `bat.png.mcmeta` > `bat.png`
-* `moon_phases.png.mcmeta` > `moon_phases.png`
-* `inventory.png.mcmeta` > `inventory.png`
+Animated textures should be `.png` files with the exact same name as their `.moremcmeta` files, minus the `.moremcmeta` suffix.
+* `bat.png.moremcmeta` > `bat.png`
+* `moon_phases.png.moremcmeta` > `moon_phases.png`
+* `inventory.png.moremcmeta` > `inventory.png`
 
 All frames must have identical dimensions and be in the same image. You cannot separate frames into individual files.
 
@@ -179,7 +161,7 @@ Placing frames in a rectangular format is possible but not recommended:
 ...
 ```
 
-You should specify frame width and height in the `.mcmeta` file if you do not place frames in a single row or column. This format only works well when all of your frames fit the rectangle perfectly. Otherwise, you have to explicitly skip the indices of blank frames at the end in the `.mcmeta` file.
+You should specify frame width and height in the `.moremcmeta` file if you do not place frames in a single row or column. This format only works well when all of your frames fit the rectangle perfectly. Otherwise, you have to explicitly skip the indices of blank frames at the end in the `.moremcmeta` file.
 
 ### Image Example
 An animated inventory texture with the column format:
