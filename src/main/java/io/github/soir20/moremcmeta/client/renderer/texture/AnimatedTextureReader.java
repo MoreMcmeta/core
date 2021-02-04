@@ -40,6 +40,7 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
      * @param textureStream           input stream with image data
      * @param metadataStream          input stream with texture and animation properties
      * @return  an animated texture based on the provided data
+     * @throws IOException  failure reading from either input stream
      */
     public AnimatedTexture<NativeImageFrame> read(InputStream textureStream, InputStream metadataStream)
             throws IOException {
