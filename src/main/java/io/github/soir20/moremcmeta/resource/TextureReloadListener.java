@@ -89,6 +89,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
 
                 // Clean up any previously loaded textures because they may no longer be animated
                 LAST_TEXTURES_ADDED.forEach(TEXTURE_MANAGER::deleteTexture);
+                LAST_TEXTURES_ADDED.clear();
 
             }
 
