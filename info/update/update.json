@@ -1,7 +1,7 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/moremcmeta",
   "1.16.4": {
-    "1.16.4-2.0.0": "Use .moremcmeta format to avoid invalid name errors\nCleanup old textures on reload",
+    "1.16.4-2.0.0": "Use .moremcmeta format to avoid invalid name errors\nClean up old textures on reload",
     "1.16.4-1.0.0": "Initial release"
   },
   "promos": {
