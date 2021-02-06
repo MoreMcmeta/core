@@ -1,6 +1,18 @@
 # Animation Format
 This guide aims to show you how to use Minecraft's default animation format to animate Minecraft textures with MoreMcmeta.
 
+## Table of Contents
+* [Vanilla's Format vs. MoreMcmeta's Format](#vanillas-format-vs-moremcmetas-format)
+    * [Vanilla-Animated vs. MoreMcmeta-Animated Textures List](#vanilla-animated-vs-moremcmeta-animated-textures-list)
+* [Animation Properties](#animation-properties)
+    * [Structure](#structure)
+    * [Property Definitions](#property-definitions)
+    * [Rectangular Frames](#rectangular-frames)
+    * [File Names](#file-names)
+    * [`.moremcmeta` Examples](#moremcmeta-examples)
+* [Image Layout](#image-layout)
+    * [Image Example](#image-example)
+
 ## Vanilla's Format vs. MoreMcmeta's Format
 Presently, the only change MoreMcmeta makes to the default animation format is using `.moremcmeta` as the file extension instead of `.mcmeta`.
 
@@ -60,8 +72,8 @@ All of these properties are optional. The default value will be used if you do n
 | `"index"` | the index of an individual frame (0 for first frame) | integer | determined from order of frames in image
 | `"time"` | length of a specific frame | integer | value of `frametime`
 
-### Non-Square Frames
-It is recommended that you explicitly define a frame width and height for non-square frames. When you do not provide a width and a height, the mod tries to guess what those values are. It is more difficult to guess the dimensions of non-square frames, which may cause MoreMcmeta to not animate some textures.
+### Rectangular Frames
+It is recommended that you explicitly define a frame width and height for rectangular frames. When you do not provide a width and a height, the mod tries to guess what those values are. It is more difficult to guess the dimensions of rectangular frames, which may cause MoreMcmeta to not animate some textures.
 
 ### File Names
 The file name of the `.moremcmeta` file must match the original texture's name **exactly** with the `.moremcmeta` suffix appended.
@@ -119,7 +131,7 @@ Note that `.moremcmeta` is the file extension; a file called `inventory.png.more
 }
 ```
 
-#### Non-Square Frames
+#### Rectangular Frames
 ```
 {
     "animation": {
