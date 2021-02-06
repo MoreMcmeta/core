@@ -11,11 +11,22 @@ This means:
 ![Mob, GUI, shadow, moon, and enchantment glint examples](https://github.com/soir20/MoreMcmeta/blob/main/info/img/demo.gif?raw=true)
 
 ## Table of Contents
+* [What Can I Animated With MoreMcmeta?](#what-can-i-animate-with-moremcmeta)
 * [Download](#download)
 * [Install](#install)
 * [Animation Format](#animation-format)
 * [Troubleshooting](#troubleshooting)
 * [Suggestions and Bug Reports](#suggestions-and-bug-reports)
+
+## What Can I Animate With MoreMcmeta?
+* mobs
+* other entities (such as the fishing rod's bobber)
+* armor
+* environmental textures (such as the sun and moon)
+* GUIs
+* map backgrounds
+* "miscellaneous" textures (such as the enchantment glint and the shadow)
+* any textures from other mods that use Minecraft's default texturing process
 
 ## Download
 * [CurseForge](https://www.curseforge.com/minecraft/mc-mods/moremcmeta)
