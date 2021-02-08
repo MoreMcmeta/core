@@ -7,7 +7,7 @@ This guide aims to help you resolve common issues without needing to file a bug 
 2. Try using the trial resource pack. If the trial textures work, there may be an issue with your textures.
    * Use a [JSON validator](https://jsonlint.com/) to detect syntax issues in your `.moremcmeta` files.
    * Make sure your animation data has a `.moremcmeta` extension, **not** an `.mcmeta` extension.
-   * Check the [Animation Format Guide](ANIMATION-FORMAT.md). In particular, make sure you defined a width and height for non-square frames.
+   * Check the [Animation Format Guide](ANIMATION-FORMAT.md). In particular, make sure you defined a width and height for rectangular frames.
    * Please [report](https://github.com/soir20/MoreMcmeta/issues) the issue if you can't determine the cause. Include the textures/`.moremcmeta` files you are using.
     
 3. Make sure you downloaded the mod from an [official site](../../README.md#download).
