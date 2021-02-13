@@ -41,7 +41,7 @@ Please help [StopModReposts](https://stopmodreposts.org/). Avoid reposting sites
 2. Create an installation and select the Forge version in the Minecraft launcher.
 3. [Download](#download) MoreMcmeta.
 4. Place the MoreMcmeta `.jar` file in your Forge installation's `mods` folder. There are no dependencies besides Forge.
-5. Use the trial resource pack to see examples of animated textures.
+5. Use the [trial resource pack](https://www.curseforge.com/minecraft/texture-packs/moremcmeta-demo) to see examples of animated textures.
 6. If you're making your own textures, it's recommended you read the [Animation Format Guide](info/guides/ANIMATION-FORMAT.md). In particular, you need to use the `.moremcmeta` extension instead of the `.mcmeta` extension.
 
 ## Animation Format
