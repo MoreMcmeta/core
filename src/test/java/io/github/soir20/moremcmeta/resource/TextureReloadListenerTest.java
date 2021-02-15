@@ -177,7 +177,7 @@ public class TextureReloadListenerTest {
     }
 
     @Test
-    public void onResourceManagerReloadTwice_PreviouslyLoadedTextures_OldDeletedNewLoaded() {
+    public void onResourceManagerReload_PreviouslyLoadedTextures_OldDeletedNewLoaded() {
         MockTextureManager mockTextureManager = new MockTextureManager();
         IResourceManager mockResourceManagerFirstReload = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
@@ -201,5 +201,68 @@ public class TextureReloadListenerTest {
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/dolphin.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/ocelot.png")));
+    }
+
+    @Test
+    public void onResourceManagerReload_ThirdReloadNoLongerAnimatedTextures_NonAnimatedNotDeleted() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+        IResourceManager mockResourceManagerFirstReload = new MockResourceManager(
+                ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
+                ImmutableList.of(), false
+        );
+        IResourceManager mockResourceManagerSecondReload = new MockResourceManager(
+                ImmutableList.of("bat.png.moremcmeta", "dolphin.png.moremcmeta", "ocelot.png.moremcmeta"),
+                ImmutableList.of(), false
+        );
+        IResourceManager mockResourceManagerThirdReload = new MockResourceManager(
+                ImmutableList.of("bat.png.moremcmeta", "cat.png.moremcmeta", "bear.png.moremcmeta"),
+                ImmutableList.of(), false
+        );
+
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                mockTextureManager, LOGGER);
+
+        listener.onResourceManagerReload(mockResourceManagerFirstReload,
+                (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManagerSecondReload,
+                (type) -> type.equals(VanillaResourceType.TEXTURES));
+
+        mockTextureManager.loadTexture(new ResourceLocation("textures/creeper.png"),
+                new MockAnimatedTexture(null, null));
+        mockTextureManager.loadTexture(new ResourceLocation("textures/zombie.png"),
+                new MockAnimatedTexture(null, null));
+
+        listener.onResourceManagerReload(mockResourceManagerThirdReload,
+                (type) -> type.equals(VanillaResourceType.TEXTURES));
+
+        List<ResourceLocation> locations = mockTextureManager.getLocations();
+        assertEquals(5, locations.size());
+        assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("textures/cat.png")));
+        assertTrue(locations.contains(new ResourceLocation("textures/bear.png")));
+        assertTrue(locations.contains(new ResourceLocation("textures/creeper.png")));
+        assertTrue(locations.contains(new ResourceLocation("textures/zombie.png")));
+    }
+
+    @Test
+    public void onResourceManagerReload_DiffNamespaces_AllLoaded() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+        IResourceManager mockResourceManager = new MockResourceManager(
+                ImmutableList.of("test:bat.png.moremcmeta", "moremcmeta:creeper.png.moremcmeta",
+                        "zombie.png.moremcmeta"),
+                ImmutableList.of(), false
+        );
+
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                mockTextureManager, LOGGER);
+
+        listener.onResourceManagerReload(mockResourceManager,
+                (type) -> type.equals(VanillaResourceType.TEXTURES));
+
+        List<ResourceLocation> locations = mockTextureManager.getLocations();
+        assertEquals(3, locations.size());
+        assertTrue(locations.contains(new ResourceLocation("test", "textures/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("moremcmeta", "textures/creeper.png")));
+        assertTrue(locations.contains(new ResourceLocation("textures/zombie.png")));
     }
 }

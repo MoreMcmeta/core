@@ -2,6 +2,7 @@ package io.github.soir20.moremcmeta.resource;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.mojang.datafixers.util.Pair;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
@@ -77,13 +78,24 @@ public class MockResourceManager implements IResourceManager {
 
     @Override
     public Collection<ResourceLocation> getAllResourceLocations(String pathIn, Predicate<String> filter) {
-        List<String> paths = new ArrayList<>();
+        List<Pair<String, String>> namespacesAndPaths = new ArrayList<>();
 
-        FILES_TO_ADD.forEach((fileName) -> paths.add(pathIn + "/" + fileName));
-        paths.removeIf(filter.negate());
+        FILES_TO_ADD.forEach((fileName) -> {
+            String[] namespaceAndFile = fileName.split(":", 2);
+
+            if (namespaceAndFile.length == 1) {
+                namespacesAndPaths.add(new Pair<>("minecraft", pathIn + "/" + namespaceAndFile[0]));
+            } else {
+                namespacesAndPaths.add(new Pair<>(namespaceAndFile[0], pathIn + "/" + namespaceAndFile[1]));
+            }
+
+        });
+        namespacesAndPaths.removeIf(namespaceAndPath -> filter.negate().test(namespaceAndPath.getSecond()));
 
         List<ResourceLocation> locations = new ArrayList<>();
-        paths.forEach((path) -> locations.add(new ResourceLocation(path)));
+        namespacesAndPaths.forEach(namespaceAndPath -> locations.add(
+                new ResourceLocation(namespaceAndPath.getFirst(), namespaceAndPath.getSecond())
+        ));
 
         return locations;
     }
