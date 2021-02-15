@@ -11,7 +11,7 @@ This means:
 ![Mob, GUI, shadow, moon, and enchantment glint examples](https://github.com/soir20/MoreMcmeta/blob/main/info/img/demo.gif?raw=true)
 
 ## Table of Contents
-* [What Can I Animated With MoreMcmeta?](#what-can-i-animate-with-moremcmeta)
+* [What Can I Animate With MoreMcmeta?](#what-can-i-animate-with-moremcmeta)
 * [Download](#download)
 * [Install](#install)
 * [Animation Format](#animation-format)
