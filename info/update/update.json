@@ -1,10 +1,11 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/moremcmeta",
   "1.16.4": {
+    "1.16.4-2.0.1": "Prevent no-longer-animated textures from being cleared on third reload and after",
     "1.16.4-2.0.0": "Use .moremcmeta format to avoid invalid name errors\nClean up old textures on reload",
     "1.16.4-1.0.0": "Initial release"
   },
   "promos": {
-    "1.16.4-recommended": "1.16.4-2.0.0"
+    "1.16.4-recommended": "1.16.4-2.0.1"
   }
 }
