@@ -1,7 +1,7 @@
 # MoreMcmeta
 ![MoreMcmeta logo](https://github.com/soir20/MoreMcmeta/blob/main/info/img/moremcmeta-logo-black.png?raw=true)
 
-With **MoreMcmeta**, animate Minecraft mob, environment, GUI and more textures with the `.mcmeta` format—just like block and item textures.
+With **MoreMcmeta**, animate Minecraft mob, armor, GUI and more textures with the `.mcmeta` format—just like block and item textures.
 
 This means:
 * more possibilities for resource packs
