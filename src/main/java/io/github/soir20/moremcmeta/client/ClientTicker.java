@@ -9,9 +9,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import java.util.function.BooleanSupplier;
 
 /**
- * Updates items at the start of each client tick when the player is not in a world.
+ * Updates items each client tick. Automatically handles forge event registration.
  */
-public class ClientTicker {
+public class ClientTicker implements IClientTicker {
     private final ImmutableCollection<? extends ITickable> TICKABLES;
     private final TickEvent.Phase PHASE;
     private final BooleanSupplier CONDITION;
@@ -37,8 +37,9 @@ public class ClientTicker {
      * Updates all the items associated with this ticker.
      * @param event     tick event on the client side
      */
+    @Override
     @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
+    public void tick(TickEvent.ClientTickEvent event) {
         if (event.phase == PHASE && CONDITION.getAsBoolean()) {
             TICKABLES.forEach(ITickable::tick);
         }
@@ -47,6 +48,7 @@ public class ClientTicker {
     /**
      * Stops ticking the current items. Does nothing if ticking has already stopped.
      */
+    @Override
     public void stopTicking() {
         if (isTicking) {
             MinecraftForge.EVENT_BUS.unregister(this);
