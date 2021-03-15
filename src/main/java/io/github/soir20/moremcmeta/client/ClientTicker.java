@@ -12,7 +12,7 @@ import java.util.function.BooleanSupplier;
  * Updates items at the start of each client tick when the player is not in a world.
  */
 public class ClientTicker {
-    private final ImmutableCollection<ITickable> TICKABLES;
+    private final ImmutableCollection<? extends ITickable> TICKABLES;
     private final TickEvent.Phase PHASE;
     private final BooleanSupplier CONDITION;
     private boolean isTicking;
@@ -23,7 +23,7 @@ public class ClientTicker {
      * @param phase      the phase to update
      * @param condition  any additional conditions for updating the items
      */
-    public ClientTicker(ImmutableCollection<ITickable> items,
+    public ClientTicker(ImmutableCollection<? extends ITickable> items,
                         TickEvent.Phase phase, BooleanSupplier condition) {
         TICKABLES = items;
         PHASE = phase;
