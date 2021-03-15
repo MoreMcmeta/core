@@ -1,0 +1,55 @@
+package io.github.soir20.moremcmeta.client;
+
+import com.google.common.collect.ImmutableCollection;
+import net.minecraft.client.renderer.texture.ITickable;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import java.util.function.BooleanSupplier;
+
+/**
+ * Updates items at the start of each client tick when the player is not in a world.
+ */
+public class ClientTicker {
+    private final ImmutableCollection<ITickable> TICKABLES;
+    private final BooleanSupplier CONDITION;
+    private boolean isTicking;
+
+    /**
+     * Creates and starts a ticker that will update the given items.
+     * @param items      the items to update on each tick
+     * @param phase      the phase to update
+     * @param condition  any additional conditions for updating the items
+     */
+    public ClientTicker(ImmutableCollection<ITickable> items,
+                        TickEvent.Phase phase, BooleanSupplier condition) {
+        TICKABLES = items;
+        CONDITION = condition;
+        isTicking = false;
+
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    /**
+     * Updates all the items associated with this ticker.
+     * @param event     tick event on the client side
+     */
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.START && CONDITION.getAsBoolean()) {
+            TICKABLES.forEach(ITickable::tick);
+        }
+    }
+
+    /**
+     * Stops ticking the current items. Does nothing if ticking has already stopped.
+     */
+    public void stopTicking() {
+        if (isTicking) {
+            MinecraftForge.EVENT_BUS.unregister(this);
+            isTicking = false;
+        }
+    }
+
+}
