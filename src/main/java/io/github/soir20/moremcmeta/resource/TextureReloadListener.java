@@ -1,5 +1,8 @@
 package io.github.soir20.moremcmeta.resource;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
+import io.github.soir20.moremcmeta.client.ClientTicker;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureManager;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureReader;
 import net.minecraft.client.renderer.texture.ITickable;
@@ -13,13 +16,14 @@ import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -33,18 +37,25 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
 
     private final ITextureManager TEXTURE_MANAGER;
     private final ITextureReader<T> TEXTURE_READER;
+    private final Function<ImmutableCollection<T>, ClientTicker> TICKER_FACTORY;
     private final Logger LOGGER;
     private final Set<ResourceLocation> LAST_TEXTURES_ADDED;
+
+    private ClientTicker lastTicker;
 
     /**
      * Creates a TextureReloadListener.
      * @param texReader             reads animated textures
      * @param texManager            uploads animated textures to the game's texture manager
+     * @param tickerFactory         creates tickers to update the animated textures
      * @param logger                logs listener-related messages to the game's output
      */
-    public TextureReloadListener(ITextureReader<T> texReader, ITextureManager texManager, Logger logger) {
+    public TextureReloadListener(ITextureReader<T> texReader, ITextureManager texManager,
+                                 Function<ImmutableCollection<T>, ClientTicker> tickerFactory,
+                                 Logger logger) {
         TEXTURE_READER = texReader;
         TEXTURE_MANAGER = texManager;
+        TICKER_FACTORY = tickerFactory;
         LOGGER = logger;
         LAST_TEXTURES_ADDED = new HashSet<>();
     }
@@ -93,20 +104,47 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
 
             }
 
-            // Load all animated textures into the tex manager so they are used for rendering
-            (new HashSet<>(animationCandidates)).forEach((metadataLocation) -> {
-                ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
-                        metadataLocation.getPath().replace(METADATA_EXTENSION, ""));
+            ImmutableSet<T> uploadedTextures = uploadTextures(animationCandidates, resourceManager);
 
-                T animatedTexture = getAnimatedTexture(resourceManager, textureLocation, metadataLocation);
-
-                if (animatedTexture != null) {
-                    LAST_TEXTURES_ADDED.add(textureLocation);
-                    TEXTURE_MANAGER.loadTexture(textureLocation, animatedTexture);
-                }
-            });
+            // Start updating the textures and stop updating the old ones
+            if (lastTicker != null) {
+                lastTicker.stopTicking();
+            }
+            lastTicker = TICKER_FACTORY.apply(uploadedTextures);
 
         }
+    }
+
+    /**
+     * Creates and uploads textures to the texture manager based on their locations.
+     * @param candidates        possible locations of animated textures
+     * @param resourceManager   the resource manager for the current reload
+     * @return  all the animated textures that were uploaded
+     */
+    private ImmutableSet<T> uploadTextures(Collection<ResourceLocation> candidates,
+                                           IResourceManager resourceManager) {
+        ImmutableSet.Builder<T> uploadedTextures = ImmutableSet.builder();
+
+        // Load all animated textures into the tex manager so they are used for rendering
+        (new HashSet<>(candidates)).forEach((metadataLocation) -> {
+            ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
+                    metadataLocation.getPath().replace(METADATA_EXTENSION, ""));
+
+            Optional<T> animatedTexture = getAnimatedTexture(resourceManager, textureLocation, metadataLocation);
+
+            if (animatedTexture.isPresent()) {
+
+                // Keep track of which textures are added
+                LAST_TEXTURES_ADDED.add(textureLocation);
+                uploadedTextures.add(animatedTexture.get());
+
+                // Actually upload the texture
+                TEXTURE_MANAGER.loadTexture(textureLocation, animatedTexture.get());
+
+            }
+        });
+
+        return uploadedTextures.build();
     }
 
     /**
@@ -114,10 +152,9 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      * @param resourceManager   resource manager to get textures/metadata from
      * @param textureLocation   location of the image/.png texture
      * @param metadataLocation  file location of texture's metadata for this mod (not .mcmeta)
-     * @return the animated texture, or null if the file is not animated/not found
+     * @return the animated texture, or empty if the file is not animated/not found
      */
-    @Nullable
-    private T getAnimatedTexture(IResourceManager resourceManager,
+    private Optional<T> getAnimatedTexture(IResourceManager resourceManager,
                                  ResourceLocation textureLocation, ResourceLocation metadataLocation) {
         try (IResource originalResource = resourceManager.getResource(textureLocation);
                 IResource metadataResource = resourceManager.getResource(metadataLocation)) {
@@ -127,14 +164,14 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
                 InputStream textureStream = originalResource.getInputStream();
                 InputStream metadataStream = metadataResource.getInputStream();
 
-                return TEXTURE_READER.read(textureStream, metadataStream);
+                return Optional.of(TEXTURE_READER.read(textureStream, metadataStream));
             }
         } catch (IOException ioException) {
             LOGGER.error("Using missing texture, unable to load {}: {}",
                     textureLocation, ioException);
         }
 
-        return null;
+        return Optional.empty();
     }
 
 }
