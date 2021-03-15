@@ -47,7 +47,7 @@ public class ClientModEventSubscriber {
 
         // Texture tickers
         BooleanSupplier areTexturesNotUpdating = () -> minecraft.world == null;
-        Function<ImmutableCollection<AnimatedTexture<NativeImageFrame>>, ClientTicker> tickerFactory
+        Function<ImmutableCollection<AnimatedTexture<NativeImageFrame>>, IClientTicker> tickerFactory
                 = (textures) -> new ClientTicker(textures, TickEvent.Phase.START, areTexturesNotUpdating);
 
         AnimatedTextureReader texReader = new AnimatedTextureReader(0, logger);
