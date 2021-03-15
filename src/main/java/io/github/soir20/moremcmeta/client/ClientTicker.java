@@ -13,6 +13,7 @@ import java.util.function.BooleanSupplier;
  */
 public class ClientTicker {
     private final ImmutableCollection<ITickable> TICKABLES;
+    private final TickEvent.Phase PHASE;
     private final BooleanSupplier CONDITION;
     private boolean isTicking;
 
@@ -25,6 +26,7 @@ public class ClientTicker {
     public ClientTicker(ImmutableCollection<ITickable> items,
                         TickEvent.Phase phase, BooleanSupplier condition) {
         TICKABLES = items;
+        PHASE = phase;
         CONDITION = condition;
         isTicking = false;
 
@@ -37,7 +39,7 @@ public class ClientTicker {
      */
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.START && CONDITION.getAsBoolean()) {
+        if (event.phase == PHASE && CONDITION.getAsBoolean()) {
             TICKABLES.forEach(ITickable::tick);
         }
     }
