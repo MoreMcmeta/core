@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 /**
  * A fake event bus that tracks the addition and removal of listeners. Only the register() and unregister()
  * methods are implemented; the rest simply fulfill {@link IEventBus}.
+ * @author soir20
  */
 public class MockEventBus implements IEventBus {
     private final ArrayList<Object> LISTENERS;

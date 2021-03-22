@@ -10,6 +10,7 @@ import java.util.function.BooleanSupplier;
 
 /**
  * Updates items each client tick. Automatically handles Forge event registration.
+ * @author soir20
  */
 public class ClientTicker {
     private final ImmutableCollection<? extends ITickable> TICKABLES;
