@@ -10,7 +10,7 @@
       <env name="MOD_CLASSES" value="moremcmeta%%$PROJECT_DIR$\build\resources\main;moremcmeta%%$PROJECT_DIR$\build\classes\java\main"/>
       <env name="MCP_MAPPINGS" value="snapshot_20201028-1.16.3"/>
       <env name="MCP_VERSION" value="20201102.104115"/>
-      <env name="FORGE_VERSION" value="35.1.0"/>
+      <env name="FORGE_VERSION" value="35.1.4"/>
       <env name="FORGE_GROUP" value="net.minecraftforge"/>
       <env name="target" value="fmluserdevdata"/>
       <env name="MC_VERSION" value="1.16.4"/>
