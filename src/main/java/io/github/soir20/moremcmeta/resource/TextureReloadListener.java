@@ -102,15 +102,19 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
                 LAST_TEXTURES_ADDED.forEach(TEXTURE_MANAGER::deleteTexture);
                 LAST_TEXTURES_ADDED.clear();
 
+                // Always stop updating old textures
+                if (lastTicker != null) {
+                    lastTicker.stopTicking();
+                }
+
             }
 
             ImmutableSet<T> uploadedTextures = uploadTextures(animationCandidates, resourceManager);
 
-            // Start updating the textures and stop updating the old ones
-            if (lastTicker != null) {
-                lastTicker.stopTicking();
+            // Only start ticking new textures if there are any
+            if (LAST_TEXTURES_ADDED.size() > 0) {
+                lastTicker = TICKER_FACTORY.apply(uploadedTextures);
             }
-            lastTicker = TICKER_FACTORY.apply(uploadedTextures);
 
         }
     }

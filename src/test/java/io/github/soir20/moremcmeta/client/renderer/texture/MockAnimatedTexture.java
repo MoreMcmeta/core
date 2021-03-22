@@ -13,11 +13,20 @@ import java.io.InputStream;
  */
 @ParametersAreNonnullByDefault
 public class MockAnimatedTexture extends Texture implements ITickable {
+    private int ticks;
 
-    public MockAnimatedTexture(InputStream textureStream, InputStream metadataStream) {}
+    public MockAnimatedTexture(InputStream textureStream, InputStream metadataStream) {
+        ticks = 0;
+    }
 
     @Override
-    public void tick() {}
+    public void tick() {
+        ticks++;
+    }
+
+    public int getTicks() {
+        return ticks;
+    }
 
     @Override
     public void loadTexture(IResourceManager manager) {}

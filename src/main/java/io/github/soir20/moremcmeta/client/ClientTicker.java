@@ -31,7 +31,7 @@ public class ClientTicker {
         EVENT_BUS = eventBus;
         PHASE = phase;
         CONDITION = condition;
-        isTicking = false;
+        isTicking = true;
 
         EVENT_BUS.register(this);
     }
