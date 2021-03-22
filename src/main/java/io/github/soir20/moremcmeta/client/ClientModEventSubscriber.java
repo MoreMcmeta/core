@@ -10,6 +10,7 @@ import io.github.soir20.moremcmeta.resource.TextureReloadListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -47,8 +48,9 @@ public class ClientModEventSubscriber {
 
         // Texture tickers
         BooleanSupplier areTexturesNotUpdating = () -> minecraft.world == null;
-        Function<ImmutableCollection<AnimatedTexture<NativeImageFrame>>, IClientTicker> tickerFactory
-                = (textures) -> new ClientTicker(textures, TickEvent.Phase.START, areTexturesNotUpdating);
+        Function<ImmutableCollection<AnimatedTexture<NativeImageFrame>>, ClientTicker> tickerFactory;
+        tickerFactory = (textures) -> new ClientTicker(textures, MinecraftForge.EVENT_BUS,
+                TickEvent.Phase.START, areTexturesNotUpdating);
 
         AnimatedTextureReader texReader = new AnimatedTextureReader(0, logger);
 

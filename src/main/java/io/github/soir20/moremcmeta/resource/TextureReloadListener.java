@@ -2,7 +2,7 @@ package io.github.soir20.moremcmeta.resource;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
-import io.github.soir20.moremcmeta.client.IClientTicker;
+import io.github.soir20.moremcmeta.client.ClientTicker;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureManager;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureReader;
 import net.minecraft.client.renderer.texture.ITickable;
@@ -37,11 +37,11 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
 
     private final ITextureManager TEXTURE_MANAGER;
     private final ITextureReader<T> TEXTURE_READER;
-    private final Function<ImmutableCollection<T>, IClientTicker> TICKER_FACTORY;
+    private final Function<ImmutableCollection<T>, ClientTicker> TICKER_FACTORY;
     private final Logger LOGGER;
     private final Set<ResourceLocation> LAST_TEXTURES_ADDED;
 
-    private IClientTicker lastTicker;
+    private ClientTicker lastTicker;
 
     /**
      * Creates a TextureReloadListener.
@@ -51,7 +51,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      * @param logger                logs listener-related messages to the game's output
      */
     public TextureReloadListener(ITextureReader<T> texReader, ITextureManager texManager,
-                                 Function<ImmutableCollection<T>, IClientTicker> tickerFactory,
+                                 Function<ImmutableCollection<T>, ClientTicker> tickerFactory,
                                  Logger logger) {
         TEXTURE_READER = texReader;
         TEXTURE_MANAGER = texManager;
