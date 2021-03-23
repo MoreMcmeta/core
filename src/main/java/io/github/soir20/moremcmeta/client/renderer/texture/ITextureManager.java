@@ -1,12 +1,17 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * A container for textures that can be added and removed. It represents what textures Minecraft is aware of.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public interface ITextureManager {
 
     /**

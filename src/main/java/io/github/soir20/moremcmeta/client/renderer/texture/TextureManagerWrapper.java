@@ -8,6 +8,8 @@ import net.minecraft.util.ResourceLocation;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Wraps the {@link TextureManager} because it is not immediately available during mod construction.
  * @author soir20
@@ -23,6 +25,7 @@ public class TextureManagerWrapper implements ITextureManager {
      *                              mod loading, but it will when resources are reloaded.
      */
     public TextureManagerWrapper(Supplier<TextureManager> texManagerGetter) {
+        requireNonNull(texManagerGetter, "Texture manager getter cannot be null");
         TEXTURE_MANAGER_GETTER = texManagerGetter;
     }
 
@@ -32,7 +35,13 @@ public class TextureManagerWrapper implements ITextureManager {
      * @param textureObj        the actual texture that should be used (atlas or otherwise)
      */
     public void loadTexture(ResourceLocation textureLocation, Texture textureObj) {
-        TEXTURE_MANAGER_GETTER.get().loadTexture(textureLocation, textureObj);
+        requireNonNull(textureLocation, "Texture location cannot be null");
+        requireNonNull(textureObj, "Texture cannot be null");
+
+        TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
+        requireNonNull(textureManager, "Supplied texture manager cannot be null");
+
+        textureManager.loadTexture(textureLocation, textureObj);
     }
 
     /**
@@ -41,6 +50,7 @@ public class TextureManagerWrapper implements ITextureManager {
      */
     @Override
     public void deleteTexture(ResourceLocation textureLocation) {
+        requireNonNull(textureLocation, "Texture location cannot be null");
         TEXTURE_MANAGER_GETTER.get().deleteTexture(textureLocation);
     }
 

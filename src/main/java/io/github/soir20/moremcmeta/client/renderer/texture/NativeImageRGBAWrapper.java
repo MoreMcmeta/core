@@ -1,12 +1,19 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.NativeImage;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Wraps a {@link NativeImage} so it is compatible with the {@link IRGBAImage} interface and
  * the {@link RGBAInterpolator}.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class NativeImageRGBAWrapper implements IRGBAImage {
     private final NativeImage IMAGE;
     private final int X_OFFSET;
@@ -21,12 +28,12 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
      */
     public NativeImageRGBAWrapper(NativeImage image, int xOffset, int yOffset, int width, int height,
                                   VisibleArea visibleArea) {
-        IMAGE = image;
+        IMAGE = requireNonNull(image, "Image cannot be null");
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
         WIDTH = width;
         HEIGHT = height;
-        VISIBLE_AREA = visibleArea;
+        VISIBLE_AREA = requireNonNull(visibleArea, "Visible area cannot be null");
     }
 
     /**

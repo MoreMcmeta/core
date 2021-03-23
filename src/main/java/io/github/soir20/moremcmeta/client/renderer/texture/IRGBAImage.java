@@ -1,8 +1,10 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.datafixers.util.Pair;
+import mcp.MethodsReturnNonnullByDefault;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public interface IRGBAImage {
 
     /**
@@ -59,6 +63,8 @@ public interface IRGBAImage {
      * the color and opacity of added pixels are not enforced.
      * @author soir20
      */
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     class VisibleArea implements Iterable<Pair<Integer, Integer>> {
         private final Set<VisibleRow> VISIBLE_ROWS;
 
@@ -75,6 +81,8 @@ public interface IRGBAImage {
         /**
          * Builds a new, immutable visible area.
          */
+        @ParametersAreNonnullByDefault
+        @MethodsReturnNonnullByDefault
         public static class Builder {
 
             // Keys are y (row) coordinates. Values are x (column) coordinates.
@@ -144,6 +152,8 @@ public interface IRGBAImage {
          * Represents continuous, one-pixel-high horizontal strips in an image.
          * @author soir20
          */
+        @ParametersAreNonnullByDefault
+        @MethodsReturnNonnullByDefault
         private static class VisibleRow {
             private final int X;
             private final int Y;
@@ -191,6 +201,8 @@ public interface IRGBAImage {
          * Iterates over all the points in a {@link VisibleArea}.
          * @author soir20
          */
+        @ParametersAreNonnullByDefault
+        @MethodsReturnNonnullByDefault
         private static class VisiblePointIterator implements Iterator<Pair<Integer, Integer>> {
             private final Iterator<VisibleRow> rowIterator;
             private VisibleRow currentRow;

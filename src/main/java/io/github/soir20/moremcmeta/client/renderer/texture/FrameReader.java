@@ -1,26 +1,32 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.datafixers.util.Pair;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Creates all the frames in an animated texture. It is is reusable for all images with the given type of frame.
  * @param <F>   tickable texture type
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class FrameReader<F extends IAnimationFrame> {
     private final Function<FrameData, F> FRAME_FACTORY;
 
     /**
      * Creates a new reader.
-     * @param frameFactory      creates frames based on frame data
+     * @param frameFactory      creates frames based on frame data. Cannot return null.
      */
     public FrameReader(Function<FrameData, F> frameFactory) {
-        FRAME_FACTORY = frameFactory;
+        FRAME_FACTORY = requireNonNull(frameFactory, "Frame factory cannot be null");
     }
 
     /**
@@ -31,6 +37,8 @@ public class FrameReader<F extends IAnimationFrame> {
      * @return frames that can be used in an animated texture
      */
     public List<F> read(int imageWidth, int imageHeight, AnimationMetadataSection metadata) {
+        requireNonNull(metadata, "Animation metadata cannot be null");
+
         if (imageWidth <= 0 || imageHeight <= 0) {
             throw new IllegalArgumentException("Image must not be empty");
         }
@@ -91,7 +99,11 @@ public class FrameReader<F extends IAnimationFrame> {
             int yOffset = framePos.getSecond() * frameHeight;
 
             FrameData data = new FrameData(frameWidth, frameHeight, xOffset, yOffset, time);
-            frames.add(FRAME_FACTORY.apply(data));
+
+            F nextFrame = FRAME_FACTORY.apply(data);
+            requireNonNull(nextFrame, "Predetermined frame was created as null");
+
+            frames.add(nextFrame);
         }
 
         return frames;
@@ -114,7 +126,11 @@ public class FrameReader<F extends IAnimationFrame> {
             for (int column = 0; column < numFramesX; column++) {
                 FrameData data = new FrameData(frameWidth, frameHeight,
                         column * frameWidth, row * frameHeight, metadata.getFrameTime());
-                frames.add(FRAME_FACTORY.apply(data));
+
+                F nextFrame = FRAME_FACTORY.apply(data);
+                requireNonNull(nextFrame, "Found frame was created as null");
+
+                frames.add(nextFrame);
             }
         }
 
@@ -125,6 +141,8 @@ public class FrameReader<F extends IAnimationFrame> {
      * Encapsulates data about a single frame.
      * @author soir20
      */
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     public static class FrameData {
         public static final int EMPTY_TIME = -1;
 

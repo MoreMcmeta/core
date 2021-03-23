@@ -1,8 +1,12 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.datafixers.util.Pair;
+import mcp.MethodsReturnNonnullByDefault;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiFunction;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Generates interpolated images in between two other images.
@@ -10,6 +14,8 @@ import java.util.function.BiFunction;
  * @param <I>   type of image to mix
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> {
     private final BiFunction<Integer, Integer, I> IMAGE_GETTER;
 
@@ -20,7 +26,7 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
      *                         are selected between the start and end images.
      */
     public RGBAInterpolator(BiFunction<Integer, Integer, I> imageGetter) {
-        IMAGE_GETTER = imageGetter;
+        IMAGE_GETTER = requireNonNull(imageGetter, "Image getter cannot be null");
     }
 
     /**
@@ -36,6 +42,9 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
             throw new IllegalArgumentException("Step must be between 1 and steps - 1 (inclusive)");
         }
 
+        requireNonNull(start, "Start frame cannot be null");
+        requireNonNull(end, "End frame cannot be null");
+
         double ratio = 1.0 - (step / (double) steps);
         return mixImage(ratio, start, end);
     }
@@ -50,7 +59,9 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
     private I mixImage(double startProportion, I start, I end) {
         int maxWidth = Math.max(start.getWidth(), end.getWidth());
         int maxHeight = Math.max(start.getHeight(), end.getHeight());
+
         I output = IMAGE_GETTER.apply(maxWidth, maxHeight);
+        requireNonNull(output, "Interpolated image was created as null");
 
         IRGBAImage.VisibleArea points = output.getVisibleArea();
         for (Pair<Integer, Integer> point : points) {

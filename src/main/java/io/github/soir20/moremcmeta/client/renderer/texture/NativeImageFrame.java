@@ -1,11 +1,18 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.NativeImage;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * An animation frame based on a {@link NativeImage}.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class NativeImageFrame implements IAnimationFrame {
     private final NativeImage[] MIPMAPS;
     private final int WIDTH;
@@ -27,7 +34,8 @@ public class NativeImageFrame implements IAnimationFrame {
      */
     public NativeImageFrame(FrameReader.FrameData frameData, NativeImage[] mipmaps,
                             boolean blur, boolean clamp, boolean autoClose) {
-        MIPMAPS = mipmaps;
+        requireNonNull(frameData, "Frame data cannot be null");
+        MIPMAPS = requireNonNull(mipmaps, "Mipmaps cannot be null");
         WIDTH = frameData.getWidth();
         HEIGHT = frameData.getHeight();
         X_OFFSET = frameData.getXOffset();

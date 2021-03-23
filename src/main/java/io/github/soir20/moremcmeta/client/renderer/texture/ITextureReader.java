@@ -1,8 +1,10 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,6 +13,8 @@ import java.io.InputStream;
  * @param <T>   the type of animated texture to create
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public interface ITextureReader<T extends Texture & ITickable> {
 
     /**

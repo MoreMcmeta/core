@@ -1,17 +1,23 @@
 package io.github.soir20.moremcmeta.client;
 
 import com.google.common.collect.ImmutableCollection;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BooleanSupplier;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Updates items each client tick. Automatically handles Forge event registration.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ClientTicker {
     private final ImmutableCollection<? extends ITickable> TICKABLES;
     private final IEventBus EVENT_BUS;
@@ -28,10 +34,11 @@ public class ClientTicker {
      */
     public ClientTicker(ImmutableCollection<? extends ITickable> items, IEventBus eventBus,
                         TickEvent.Phase phase, BooleanSupplier condition) {
-        TICKABLES = items;
-        EVENT_BUS = eventBus;
-        PHASE = phase;
-        CONDITION = condition;
+
+        TICKABLES = requireNonNull(items, "Tickable items container cannot be null");
+        EVENT_BUS = requireNonNull(eventBus, "Event bus cannot be null");
+        PHASE = requireNonNull(phase, "Tick phase cannot be null");
+        CONDITION = requireNonNull(condition, "Tick condition cannot be null");
         isTicking = true;
 
         EVENT_BUS.register(this);

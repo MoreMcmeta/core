@@ -1,6 +1,7 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.renderer.texture.TextureUtil;
@@ -8,12 +9,15 @@ import net.minecraft.resources.IResourceManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An animated texture that updates on each tick.
  * @param <F>   animation frame type
  * @author soir20
  */
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class AnimatedTexture<F extends IAnimationFrame> extends Texture implements ITickable, AutoCloseable {
     private final AnimationFrameManager<F> FRAME_MANAGER;
     private final int FRAME_WIDTH;
@@ -30,11 +34,11 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      */
     public AnimatedTexture(AnimationFrameManager<F> frameManager,
                            int frameWidth, int frameHeight, int mipmap, Runnable closeAction) {
-        FRAME_MANAGER = frameManager;
+        FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
         MIPMAP = mipmap;
-        CLOSE_ACTION = closeAction;
+        CLOSE_ACTION = requireNonNull(closeAction, "Close action cannot be null");
     }
 
     /**
@@ -52,6 +56,8 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      */
     @Override
     public void loadTexture(IResourceManager manager) {
+        requireNonNull(manager, "Resource manager cannot be null");
+
         if (!RenderSystem.isOnRenderThreadOrInit()) {
             RenderSystem.recordRenderCall(this::loadImage);
         } else {

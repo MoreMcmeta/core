@@ -2,6 +2,7 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
@@ -10,17 +11,22 @@ import net.minecraft.resources.SimpleResource;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Reads an {@link AnimatedTexture} from file data. It is reusable for all animated textures with the same
  * mipmap level.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<NativeImageFrame>> {
     private final int MIPMAP;
     private final Logger LOGGER;
@@ -32,7 +38,7 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
      */
     public AnimatedTextureReader(int mipmap, Logger logger) {
         MIPMAP = mipmap;
-        LOGGER = logger;
+        LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
 
     /**
@@ -44,6 +50,9 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
      */
     public AnimatedTexture<NativeImageFrame> read(InputStream textureStream, InputStream metadataStream)
             throws IOException {
+        requireNonNull(textureStream, "Texture input stream cannot be null");
+        requireNonNull(metadataStream, "Metadata input stream cannot be null");
+
         NativeImage image = NativeImage.read(textureStream);
         LOGGER.debug("Successfully read image from input");
 
@@ -156,6 +165,8 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
      * which has its pixels replaced when interpolation occurs.
      * @author soir20
      */
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     private class NativeImageFrameInterpolator implements IInterpolator<NativeImageFrame>, AutoCloseable {
         private final int FRAME_WIDTH;
         private final int FRAME_HEIGHT;

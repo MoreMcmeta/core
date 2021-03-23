@@ -1,10 +1,11 @@
 package io.github.soir20.moremcmeta.resource;
 
 import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import io.github.soir20.moremcmeta.client.ClientTicker;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureManager;
 import io.github.soir20.moremcmeta.client.renderer.texture.ITextureReader;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.resources.IResource;
@@ -20,11 +21,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Uploads animated textures to the texture manager on texture reloading so they will always be used for
@@ -32,6 +36,8 @@ import java.util.function.Predicate;
  * @param <T>   tickable texture type
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TextureReloadListener<T extends Texture & ITickable> implements ISelectiveResourceReloadListener {
     private static final String METADATA_EXTENSION = ".moremcmeta";
 
@@ -39,7 +45,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
     private final ITextureReader<T> TEXTURE_READER;
     private final Function<ImmutableCollection<T>, ClientTicker> TICKER_FACTORY;
     private final Logger LOGGER;
-    private final Set<ResourceLocation> LAST_TEXTURES_ADDED;
+    private final Map<ResourceLocation, T> LAST_TEXTURES_ADDED;
 
     private ClientTicker lastTicker;
 
@@ -47,17 +53,18 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      * Creates a TextureReloadListener.
      * @param texReader             reads animated textures
      * @param texManager            uploads animated textures to the game's texture manager
-     * @param tickerFactory         creates tickers to update the animated textures
+     * @param tickerFactory         creates tickers to update the animated textures. Tickers will not
+     *                              be created if no textures are animated. Cannot return null.
      * @param logger                logs listener-related messages to the game's output
      */
     public TextureReloadListener(ITextureReader<T> texReader, ITextureManager texManager,
                                  Function<ImmutableCollection<T>, ClientTicker> tickerFactory,
                                  Logger logger) {
-        TEXTURE_READER = texReader;
-        TEXTURE_MANAGER = texManager;
-        TICKER_FACTORY = tickerFactory;
-        LOGGER = logger;
-        LAST_TEXTURES_ADDED = new HashSet<>();
+        TEXTURE_READER = requireNonNull(texReader, "Texture reader cannot be null");
+        TEXTURE_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
+        TICKER_FACTORY = requireNonNull(tickerFactory, "Ticker factory cannot be null");
+        LOGGER = requireNonNull(logger, "Logger cannot be null");
+        LAST_TEXTURES_ADDED = new HashMap<>();
     }
 
     /**
@@ -77,9 +84,11 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
      * @param resourcePredicate     tests whether the listener should reload for this resource type
      */
     @Override
-    @ParametersAreNonnullByDefault
     public void onResourceManagerReload(IResourceManager resourceManager,
                                         Predicate<IResourceType> resourcePredicate) {
+        requireNonNull(resourceManager, "Resource manager cannot be null");
+        requireNonNull(resourcePredicate, "Resource predicate cannot be null");
+
         if (resourcePredicate.test(getResourceType())) {
             Collection<ResourceLocation> animationCandidates;
 
@@ -99,7 +108,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
             } finally {
 
                 // Clean up any previously loaded textures because they may no longer be animated
-                LAST_TEXTURES_ADDED.forEach(TEXTURE_MANAGER::deleteTexture);
+                LAST_TEXTURES_ADDED.keySet().forEach(TEXTURE_MANAGER::deleteTexture);
                 LAST_TEXTURES_ADDED.clear();
 
                 // Always stop updating old textures
@@ -109,46 +118,42 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
 
             }
 
-            ImmutableSet<T> uploadedTextures = uploadTextures(animationCandidates, resourceManager);
+            ImmutableMap<ResourceLocation, T> textures = getTextures(animationCandidates, resourceManager);
 
             // Only start ticking new textures if there are any
-            if (LAST_TEXTURES_ADDED.size() > 0) {
-                lastTicker = TICKER_FACTORY.apply(uploadedTextures);
+            if (textures.size() > 0) {
+                lastTicker = TICKER_FACTORY.apply(textures.values());
+                requireNonNull(lastTicker, "Ticker was created as null");
             }
+
+            // Load the textures after ticker successfully created
+            LAST_TEXTURES_ADDED.putAll(textures);
+            textures.forEach(TEXTURE_MANAGER::loadTexture);
 
         }
     }
 
     /**
-     * Creates and uploads textures to the texture manager based on their locations.
+     * Creates all valid animated textures from candidates.
      * @param candidates        possible locations of animated textures
      * @param resourceManager   the resource manager for the current reload
-     * @return  all the animated textures that were uploaded
      */
-    private ImmutableSet<T> uploadTextures(Collection<ResourceLocation> candidates,
-                                           IResourceManager resourceManager) {
-        ImmutableSet.Builder<T> uploadedTextures = ImmutableSet.builder();
+    private ImmutableMap<ResourceLocation, T> getTextures(Collection<ResourceLocation> candidates,
+                                                         IResourceManager resourceManager) {
+        ImmutableMap.Builder<ResourceLocation, T> animatedTextures = new ImmutableMap.Builder<>();
 
-        // Load all animated textures into the tex manager so they are used for rendering
+        // Create textures from unique candidates
         (new HashSet<>(candidates)).forEach((metadataLocation) -> {
             ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(METADATA_EXTENSION, ""));
 
             Optional<T> animatedTexture = getAnimatedTexture(resourceManager, textureLocation, metadataLocation);
 
-            if (animatedTexture.isPresent()) {
-
-                // Keep track of which textures are added
-                LAST_TEXTURES_ADDED.add(textureLocation);
-                uploadedTextures.add(animatedTexture.get());
-
-                // Actually upload the texture
-                TEXTURE_MANAGER.loadTexture(textureLocation, animatedTexture.get());
-
-            }
+            // Keep track of which textures are created
+            animatedTexture.ifPresent(texture -> animatedTextures.put(textureLocation, texture));
         });
 
-        return uploadedTextures.build();
+        return animatedTextures.build();
     }
 
     /**
