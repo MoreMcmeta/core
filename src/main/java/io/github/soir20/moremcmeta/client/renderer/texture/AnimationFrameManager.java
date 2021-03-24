@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.texture.ITickable;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -40,12 +39,14 @@ public class AnimationFrameManager<F> implements ITickable {
      *                              time from the frame or returns a default value.
      */
     public AnimationFrameManager(ImmutableList<F> frames, Function<F, Integer> frameTimeCalculator) {
-        requireNonNull(frames, "Frames cannot be null");
-        FRAMES = frames;
-
-        requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
-        FRAME_TIME_CALCULATOR = frameTimeCalculator;
+        FRAMES = requireNonNull(frames, "Frames cannot be null");
+        FRAME_TIME_CALCULATOR = requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
         INTERPOLATOR = null;
+
+        if (frames.size() == 0) {
+            throw new IllegalArgumentException("Frames must have at least one frame");
+        }
+
         currentFrame = FRAMES.get(0);
     }
 
@@ -59,14 +60,15 @@ public class AnimationFrameManager<F> implements ITickable {
      * @param interpolator          interpolates between frames of the animation
      */
     public AnimationFrameManager(ImmutableList<F> frames, Function<F, Integer> frameTimeCalculator,
-                                 @Nullable IInterpolator<F> interpolator) {
-        requireNonNull(frames, "Frames cannot be null");
-        FRAMES = new ArrayList<>();
-        FRAMES.addAll(frames);
+                                 IInterpolator<F> interpolator) {
+        FRAMES = requireNonNull(frames, "Frames cannot be null");
+        FRAME_TIME_CALCULATOR = requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
+        INTERPOLATOR = requireNonNull(interpolator, "Interpolator cannot be null");
 
-        requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
-        FRAME_TIME_CALCULATOR = frameTimeCalculator;
-        INTERPOLATOR = interpolator;
+        if (frames.size() == 0) {
+            throw new IllegalArgumentException("Frames must have at least one frame");
+        }
+
         currentFrame = FRAMES.get(0);
     }
 

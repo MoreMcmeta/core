@@ -1,7 +1,9 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.google.common.collect.ImmutableList;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
 
@@ -10,6 +12,56 @@ import static org.junit.Assert.*;
  * @author soir20
  */
 public class AnimationFrameManagerTest {
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void constructWithoutInterpolator_NoFrames_NullPointerException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new AnimationFrameManager<Integer>(ImmutableList.of(), (frame) -> 10);
+    }
+
+    @Test
+    public void constructWithInterpolator_NoFrames_NullPointerException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new AnimationFrameManager<Integer>(ImmutableList.of(), (frame) -> 10, (steps, step, start, end) -> 10);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void constructWithoutInterpolator_NullFrames_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationFrameManager<Integer>(null, (frame) -> 10);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void constructWithInterpolator_NullFrames_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationFrameManager<Integer>(null, (frame) -> 10, (steps, step, start, end) -> 10);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void constructWithoutInterpolator_NullTimeCalculator_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationFrameManager<>(ImmutableList.of(1, 2, 3), null);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void constructWithInterpolator_NullTimeCalculator_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationFrameManager<>(ImmutableList.of(1, 2, 3), null,
+                (steps, step, start, end) -> 10);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void constructWithInterpolator_NullInterpolator_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationFrameManager<>(ImmutableList.of(1, 2, 3), (frame) -> 10, null);
+    }
 
     @Test
     public void tickAnimation_NoTicks_FirstFrame() {
