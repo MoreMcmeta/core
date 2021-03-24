@@ -64,6 +64,20 @@ public class AnimationFrameManagerTest {
     }
 
     @Test
+    public void tickAnimation_NullFrameTime_NullPointerException() {
+        ImmutableList.Builder<Integer> mockFramesBuilder = ImmutableList.builder();
+        for (int frame = 0; frame < 5; frame++) {
+            mockFramesBuilder.add(frame);
+        }
+
+        ImmutableList<Integer> mockFrames = mockFramesBuilder.build();
+
+        AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames, (frame) -> null);
+        expectedException.expect(NullPointerException.class);
+        manager.tick();
+    }
+
+    @Test
     public void tickAnimation_NoTicks_FirstFrame() {
         ImmutableList.Builder<Integer> mockFramesBuilder = ImmutableList.builder();
         for (int frame = 0; frame < 5; frame++) {
