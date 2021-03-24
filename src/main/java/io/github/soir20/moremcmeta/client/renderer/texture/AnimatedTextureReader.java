@@ -1,5 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
 import mcp.MethodsReturnNonnullByDefault;
@@ -91,7 +92,8 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
         // Frames
         FrameReader<NativeImageFrame> frameReader = new FrameReader<>((frameData ->
                 new NativeImageFrame(frameData, mipmaps, blur, clamp, false)));
-        List<NativeImageFrame> frames = frameReader.read(image.getWidth(), image.getHeight(), animationMetadata);
+        ImmutableList<NativeImageFrame> frames = frameReader.read(image.getWidth(),
+                image.getHeight(), animationMetadata);
         int frameWidth = frames.get(0).getWidth();
         int frameHeight = frames.get(0).getHeight();
 

@@ -1,12 +1,11 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -36,7 +35,7 @@ public class FrameReader<F extends IAnimationFrame> {
      * @param metadata          image animation info
      * @return frames that can be used in an animated texture
      */
-    public List<F> read(int imageWidth, int imageHeight, AnimationMetadataSection metadata) {
+    public ImmutableList<F> read(int imageWidth, int imageHeight, AnimationMetadataSection metadata) {
         requireNonNull(metadata, "Animation metadata cannot be null");
 
         if (imageWidth <= 0 || imageHeight <= 0) {
@@ -82,9 +81,9 @@ public class FrameReader<F extends IAnimationFrame> {
      * @param numFramesY    number of frames per column
      * @return  the list of predefined frames
      */
-    private List<F> getPredefinedFrames(AnimationMetadataSection metadata, int frameWidth, int frameHeight,
+    private ImmutableList<F> getPredefinedFrames(AnimationMetadataSection metadata, int frameWidth, int frameHeight,
                                         int numFramesX, int numFramesY) {
-        List<F> frames = new ArrayList<>();
+        ImmutableList.Builder<F> frames = ImmutableList.builder();
 
         for (int frame = 0; frame < metadata.getFrameCount(); frame++) {
             int index = metadata.getFrameIndex(frame);
@@ -106,7 +105,7 @@ public class FrameReader<F extends IAnimationFrame> {
             frames.add(nextFrame);
         }
 
-        return frames;
+        return frames.build();
     }
 
     /**
@@ -118,9 +117,9 @@ public class FrameReader<F extends IAnimationFrame> {
      * @param numFramesY    number of frames per column
      * @return  the list of discovered frames
      */
-    private List<F> findFrames(AnimationMetadataSection metadata, int frameWidth, int frameHeight,
+    private ImmutableList<F> findFrames(AnimationMetadataSection metadata, int frameWidth, int frameHeight,
                                int numFramesX, int numFramesY) {
-        List<F> frames = new ArrayList<>();
+        ImmutableList.Builder<F> frames = ImmutableList.builder();
 
         for (int row = 0; row < numFramesY; row++) {
             for (int column = 0; column < numFramesX; column++) {
@@ -134,7 +133,7 @@ public class FrameReader<F extends IAnimationFrame> {
             }
         }
 
-        return frames;
+        return frames.build();
     }
 
     /**

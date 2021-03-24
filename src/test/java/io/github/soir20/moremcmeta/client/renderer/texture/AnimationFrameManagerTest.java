@@ -1,9 +1,7 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -15,10 +13,12 @@ public class AnimationFrameManagerTest {
 
     @Test
     public void tickAnimation_NoTicks_FirstFrame() {
-        List<Integer> mockFrames = new ArrayList<>();
+        ImmutableList.Builder<Integer> mockFramesBuilder = ImmutableList.builder();
         for (int frame = 0; frame < 5; frame++) {
-            mockFrames.add(frame);
+            mockFramesBuilder.add(frame);
         }
+
+        ImmutableList<Integer> mockFrames = mockFramesBuilder.build();
 
         AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames, (frame) -> 10);
         assertEquals(new Integer(0), manager.getCurrentFrame());
@@ -26,10 +26,12 @@ public class AnimationFrameManagerTest {
 
     @Test
     public void tickAnimation_MaxTicksInEachFrame_FrameChanges() {
-        List<Integer> mockFrames = new ArrayList<>();
+        ImmutableList.Builder<Integer> mockFramesBuilder = ImmutableList.builder();
         for (int frame = 0; frame < 5; frame++) {
-            mockFrames.add(frame);
+            mockFramesBuilder.add(frame);
         }
+
+        ImmutableList<Integer> mockFrames = mockFramesBuilder.build();
 
         int frameLength = 10;
         AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames, (frame) -> frameLength);
@@ -44,10 +46,12 @@ public class AnimationFrameManagerTest {
 
     @Test
     public void tickAnimation_FrameTimeVaries_SecondFrameLastsCorrectTime() {
-        List<Integer> mockFrames = new ArrayList<>();
+        ImmutableList.Builder<Integer> mockFramesBuilder = ImmutableList.builder();
         for (int frame = 1; frame < 6; frame++) {
-            mockFrames.add(frame);
+            mockFramesBuilder.add(frame);
         }
+
+        ImmutableList<Integer> mockFrames = mockFramesBuilder.build();
 
         int frameLength = 10;
         AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames,
@@ -61,10 +65,12 @@ public class AnimationFrameManagerTest {
 
     @Test
     public void tickAnimation_MaxTicksInAnimation_AnimationResetsAtBeginning() {
-        List<Integer> mockFrames = new ArrayList<>();
+        ImmutableList.Builder<Integer> mockFramesBuilder = ImmutableList.builder();
         for (int frame = 1; frame < 6; frame++) {
-            mockFrames.add(frame);
+            mockFramesBuilder.add(frame);
         }
+
+        ImmutableList<Integer> mockFrames = mockFramesBuilder.build();
 
         int frameLength = 10;
         AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames, (frame) -> 10);
@@ -77,10 +83,12 @@ public class AnimationFrameManagerTest {
 
     @Test
     public void tickAnimation_NoInterpolator_NoInterpolatedFrames() {
-        List<Integer> mockFrames = new ArrayList<>();
+        ImmutableList.Builder<Integer> mockFramesBuilder = ImmutableList.builder();
         for (int frame = 1; frame < 6; frame++) {
-            mockFrames.add(frame);
+            mockFramesBuilder.add(frame);
         }
+
+        ImmutableList<Integer> mockFrames = mockFramesBuilder.build();
 
         int frameLength = 10;
         AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames, (frame) -> 10);
@@ -91,10 +99,12 @@ public class AnimationFrameManagerTest {
 
     @Test
     public void tickAnimation_WithInterpolator_InterpolatedFrames() {
-        List<String> mockFrames = new ArrayList<>();
+        ImmutableList.Builder<String> mockFramesBuilder = ImmutableList.builder();
         for (int frame = 0; frame < 5; frame++) {
-            mockFrames.add(String.valueOf(frame));
+            mockFramesBuilder.add(String.valueOf(frame));
         }
+
+        ImmutableList<String> mockFrames = mockFramesBuilder.build();
 
         IInterpolator<String> interpolator = ((steps, step, start, end) ->
                 String.format("steps: %s, step: %s, start: %s, end: %s", steps, step, start, end)

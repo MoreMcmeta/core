@@ -1,5 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.google.common.collect.ImmutableList;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.ITickable;
 
@@ -38,10 +39,9 @@ public class AnimationFrameManager<F> implements ITickable {
      *                              In most cases, pass a function that gets the
      *                              time from the frame or returns a default value.
      */
-    public AnimationFrameManager(List<F> frames, Function<F, Integer> frameTimeCalculator) {
+    public AnimationFrameManager(ImmutableList<F> frames, Function<F, Integer> frameTimeCalculator) {
         requireNonNull(frames, "Frames cannot be null");
-        FRAMES = new ArrayList<>();
-        FRAMES.addAll(frames);
+        FRAMES = frames;
 
         requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
         FRAME_TIME_CALCULATOR = frameTimeCalculator;
@@ -55,9 +55,10 @@ public class AnimationFrameManager<F> implements ITickable {
      * @param frameTimeCalculator   calculates the frame time for a given frame.
      *                              In most cases, pass a function that gets the
      *                              time from the frame or returns a default value.
+     *                              Cannot return null.
      * @param interpolator          interpolates between frames of the animation
      */
-    public AnimationFrameManager(List<F> frames, Function<F, Integer> frameTimeCalculator,
+    public AnimationFrameManager(ImmutableList<F> frames, Function<F, Integer> frameTimeCalculator,
                                  @Nullable IInterpolator<F> interpolator) {
         requireNonNull(frames, "Frames cannot be null");
         FRAMES = new ArrayList<>();
