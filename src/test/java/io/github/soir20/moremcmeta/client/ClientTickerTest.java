@@ -24,7 +24,7 @@ public class ClientTickerTest {
 
     @Test
     public void tick_HasItems_RegisteredInEventBus() {
-        ClientTicker ticker = new ClientTicker(
+        new ClientTicker(
                 ImmutableSet.of(() -> {}, () -> {}, () -> {}, () -> {}),
                 EVENT_BUS,
                 TickEvent.Phase.START,
@@ -36,7 +36,7 @@ public class ClientTickerTest {
 
     @Test
     public void tick_NoItems_RegisteredInEventBus() {
-        ClientTicker ticker = new ClientTicker(
+        new ClientTicker(
                 ImmutableSet.of(),
                 EVENT_BUS,
                 TickEvent.Phase.START,

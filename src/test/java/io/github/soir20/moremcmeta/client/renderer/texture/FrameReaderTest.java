@@ -24,6 +24,41 @@ public class FrameReaderTest {
             -1, -1, 1, false);
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void findFrames_FrameFactoryNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new FrameReader<>(null);
+    }
+
+    @Test
+    public void findFrames_CreatedFrameNull_NullPointerException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>((data) -> null);
+        int frameWidth = 100;
+        int frameHeight = 100;
+
+        expectedException.expect(NullPointerException.class);
+        frameReader.read(frameWidth * 5, frameHeight, EMPTY_ANIM_DATA);
+    }
+
+    @Test
+    public void getDefinedFrames_CreatedFrameNull_NullPointerException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>((data) -> null);
+        int frameWidth = 100;
+        int frameHeight = 100;
+        List<AnimationFrame> predefinedFrames = new ArrayList<>();
+        predefinedFrames.add(new AnimationFrame(0, 1));
+        predefinedFrames.add(new AnimationFrame(1, 2));
+        predefinedFrames.add(new AnimationFrame(2, 3));
+        predefinedFrames.add(new AnimationFrame(3, 4));
+        predefinedFrames.add(new AnimationFrame(4, 5));
+
+        AnimationMetadataSection metadata = new AnimationMetadataSection(predefinedFrames, frameWidth, frameHeight, 1, false);
+
+        expectedException.expect(NullPointerException.class);
+        frameReader.read(frameWidth * 5, frameHeight, metadata);
+    }
+
+    @Test
     public void findFrames_EmptyWidth_IllegalArgException() {
         FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
 
@@ -668,7 +703,7 @@ public class FrameReaderTest {
     }
 
     @Test
-    public void getDefinedFrames_IndividualTimeDefined_FrameTimesDefault() {
+    public void getDefinedFrames_IndividualTimeDefined_FrameTimesAsDefined() {
         FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
         int frameWidth = 100;
         int frameHeight = 100;
