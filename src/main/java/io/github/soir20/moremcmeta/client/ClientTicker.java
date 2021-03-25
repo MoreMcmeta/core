@@ -50,6 +50,8 @@ public class ClientTicker {
      */
     @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent event) {
+        requireNonNull(event, "Tick event cannot be null");
+
         if (event.phase == PHASE && CONDITION.getAsBoolean()) {
             TICKABLES.forEach(ITickable::tick);
         }
