@@ -59,6 +59,17 @@ public class FrameReaderTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void findFrames_MetadataNull_NullPointerException() {
+        FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
+        int frameWidth = 100;
+        int frameHeight = 100;
+
+        expectedException.expect(NullPointerException.class);
+        frameReader.read(frameWidth * 5, frameHeight, null);
+    }
+
+    @Test
     public void findFrames_EmptyWidth_IllegalArgException() {
         FrameReader<MockAnimationFrame> frameReader = new FrameReader<>(MockAnimationFrame::new);
 
