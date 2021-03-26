@@ -31,7 +31,7 @@ Use the **MoreMcmeta format** for these types of textures:
 * other entities (such as the fishing rod's bobber)
 * armor
 * environmental textures (such as the sun and moon)
-* GUIs
+* GUIs (including main menu textures besides the Mojang logo)
 * map backgrounds
 * "miscellaneous" textures (such as the enchantment glint and the shadow)
 
