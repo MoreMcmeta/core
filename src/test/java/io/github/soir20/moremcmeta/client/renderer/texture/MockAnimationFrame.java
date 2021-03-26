@@ -1,9 +1,15 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import mcp.MethodsReturnNonnullByDefault;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Mocks an {@link IAnimationFrame}. Essentially a wrapper for frame data that can be validated.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class MockAnimationFrame implements IAnimationFrame {
     private final int WIDTH;
     private final int HEIGHT;

@@ -1,10 +1,12 @@
 package io.github.soir20.moremcmeta.eventbus;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.GenericEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -14,6 +16,8 @@ import java.util.function.Consumer;
  * methods are implemented; the rest simply fulfill {@link IEventBus}.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class MockEventBus implements IEventBus {
     private final ArrayList<Object> LISTENERS;
 

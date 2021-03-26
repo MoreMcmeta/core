@@ -1,9 +1,15 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import mcp.MethodsReturnNonnullByDefault;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Mocks an {@link IRGBAImage}. Keeps track of set pixel colors.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class MockRGBAImage implements IRGBAImage {
     private final int[][] PIXELS;
     private final int WIDTH;

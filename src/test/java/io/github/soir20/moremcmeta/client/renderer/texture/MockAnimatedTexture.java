@@ -1,5 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.resources.IResourceManager;
@@ -12,6 +13,7 @@ import java.io.InputStream;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class MockAnimatedTexture extends Texture implements ITickable {
     private int ticks;
 
