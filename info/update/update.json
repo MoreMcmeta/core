@@ -1,11 +1,13 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/moremcmeta",
   "1.16.4": {
+    "1.16.4-2.1.0": "This update adds support for animating main menu textures (except the Mojang logo, which is hard-coded to use the vanilla image).\nThis version is labeled 1.16.4 because I used a 1.16.4 version for development. However, I have tested that the mod loads on the recommended 1.16.5 version of Forge.\nInternally, constructor and method object parameters are now treated more strictly. Unit tests have been expanded to check that errors are thrown early in case of nulls. This should provide for easier debugging in the event of any bugs related to null values.",
     "1.16.4-2.0.1": "Prevent no-longer-animated textures from being cleared on third reload and after",
     "1.16.4-2.0.0": "Use .moremcmeta format to avoid invalid name errors\nClean up old textures on reload",
     "1.16.4-1.0.0": "Initial release"
   },
   "promos": {
-    "1.16.4-recommended": "1.16.4-2.0.1"
+    "1.16.5-recommended": "1.16.4-2.1.0",
+    "1.16.4-recommended": "1.16.4-2.1.0"
   }
 }
