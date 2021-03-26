@@ -16,7 +16,9 @@ import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +40,96 @@ public class TextureReloadListenerTest {
     private final Function<ImmutableCollection<MockAnimatedTexture>, ClientTicker> TICKER_FACTORY
             = (textures) -> new ClientTicker(textures, EVENT_BUS, TICK_PHASE, () -> true);
 
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
     @After
     public void tearDown() {
         EVENT_BUS.clear();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void construct_TextureFactoryNull_NullPointerException() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+
+        expectedException.expect(NullPointerException.class);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(null,
+                mockTextureManager, TICKER_FACTORY, LOGGER);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void construct_TextureManagerNull_NullPointerException() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+
+        expectedException.expect(NullPointerException.class);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                null, TICKER_FACTORY, LOGGER);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void construct_TickerFactoryNull_NullPointerException() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+
+        expectedException.expect(NullPointerException.class);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                mockTextureManager, null, LOGGER);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void construct_LoggerNull_NullPointerException() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+
+        expectedException.expect(NullPointerException.class);
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                mockTextureManager, TICKER_FACTORY, null);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void onResourceManagerReload_ResourceManagerNull_NullPointerException() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                mockTextureManager, TICKER_FACTORY, LOGGER);
+
+        expectedException.expect(NullPointerException.class);
+        listener.onResourceManagerReload(null, (type) -> type.equals(VanillaResourceType.TEXTURES));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void onResourceManagerReload_PredicateNull_NullPointerException() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+        IResourceManager mockResourceManager = new MockResourceManager(
+                ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
+                ImmutableList.of(), false
+        );
+
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                mockTextureManager, TICKER_FACTORY, LOGGER);
+
+        expectedException.expect(NullPointerException.class);
+        listener.onResourceManagerReload(mockResourceManager, null);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void onResourceManagerReload_TickerFactoryGivesNull_NullPointerException() {
+        MockTextureManager mockTextureManager = new MockTextureManager();
+        IResourceManager mockResourceManager = new MockResourceManager(
+                ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
+                ImmutableList.of(), false
+        );
+
+        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
+                mockTextureManager, (items) -> null, LOGGER);
+
+        expectedException.expect(NullPointerException.class);
+        listener.onResourceManagerReload(mockResourceManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
     }
 
     @Test

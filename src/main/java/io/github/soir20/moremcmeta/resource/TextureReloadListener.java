@@ -166,7 +166,7 @@ public class TextureReloadListener<T extends Texture & ITickable> implements ISe
     private Optional<T> getAnimatedTexture(IResourceManager resourceManager,
                                  ResourceLocation textureLocation, ResourceLocation metadataLocation) {
         try (IResource originalResource = resourceManager.getResource(textureLocation);
-                IResource metadataResource = resourceManager.getResource(metadataLocation)) {
+             IResource metadataResource = resourceManager.getResource(metadataLocation)) {
 
             // We don't want to get metadata from a lower pack than the texture
             if (originalResource.getPackName().equals(metadataResource.getPackName())) {
