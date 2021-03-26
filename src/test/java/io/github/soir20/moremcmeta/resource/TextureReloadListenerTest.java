@@ -54,18 +54,14 @@ public class TextureReloadListenerTest {
         MockTextureManager mockTextureManager = new MockTextureManager();
 
         expectedException.expect(NullPointerException.class);
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(null,
-                mockTextureManager, TICKER_FACTORY, LOGGER);
+        new TextureReloadListener<>(null, mockTextureManager, TICKER_FACTORY, LOGGER);
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
     public void construct_TextureManagerNull_NullPointerException() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
-
         expectedException.expect(NullPointerException.class);
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
-                null, TICKER_FACTORY, LOGGER);
+        new TextureReloadListener<>(MockAnimatedTexture::new, null, TICKER_FACTORY, LOGGER);
     }
 
     @Test
@@ -74,8 +70,7 @@ public class TextureReloadListenerTest {
         MockTextureManager mockTextureManager = new MockTextureManager();
 
         expectedException.expect(NullPointerException.class);
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
-                mockTextureManager, null, LOGGER);
+        new TextureReloadListener<>(MockAnimatedTexture::new, mockTextureManager, null, LOGGER);
     }
 
     @Test
@@ -84,8 +79,7 @@ public class TextureReloadListenerTest {
         MockTextureManager mockTextureManager = new MockTextureManager();
 
         expectedException.expect(NullPointerException.class);
-        TextureReloadListener<MockAnimatedTexture> listener = new TextureReloadListener<>(MockAnimatedTexture::new,
-                mockTextureManager, TICKER_FACTORY, null);
+        new TextureReloadListener<>(MockAnimatedTexture::new, mockTextureManager, TICKER_FACTORY, null);
     }
 
     @Test
