@@ -6,7 +6,9 @@ import io.github.soir20.moremcmeta.client.renderer.texture.MockTickable;
 import io.github.soir20.moremcmeta.eventbus.MockEventBus;
 import net.minecraftforge.event.TickEvent;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
 
@@ -17,13 +19,64 @@ import static org.junit.Assert.*;
 public class ClientTickerTest {
     private final MockEventBus EVENT_BUS = new MockEventBus();
 
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
     @After
     public void tearDown() {
         EVENT_BUS.clear();
     }
 
     @Test
-    public void tick_HasItems_RegisteredInEventBus() {
+    @SuppressWarnings("ConstantConditions")
+    public void construct_ItemsNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new ClientTicker(
+                null,
+                EVENT_BUS,
+                TickEvent.Phase.START,
+                () -> true
+        );
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void construct_BusNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new ClientTicker(
+                ImmutableSet.of(() -> {}, () -> {}, () -> {}, () -> {}),
+                null,
+                TickEvent.Phase.START,
+                () -> true
+        );
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void construct_PhaseNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new ClientTicker(
+                ImmutableSet.of(() -> {}, () -> {}, () -> {}, () -> {}),
+                EVENT_BUS,
+                null,
+                () -> true
+        );
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void construct_ConditionNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new ClientTicker(
+                ImmutableSet.of(() -> {}, () -> {}, () -> {}, () -> {}),
+                EVENT_BUS,
+                TickEvent.Phase.START,
+                null
+        );
+    }
+
+    @Test
+    public void construct_HasItems_RegisteredInEventBus() {
         new ClientTicker(
                 ImmutableSet.of(() -> {}, () -> {}, () -> {}, () -> {}),
                 EVENT_BUS,
@@ -35,7 +88,7 @@ public class ClientTickerTest {
     }
 
     @Test
-    public void tick_NoItems_RegisteredInEventBus() {
+    public void construct_NoItems_RegisteredInEventBus() {
         new ClientTicker(
                 ImmutableSet.of(),
                 EVENT_BUS,
@@ -44,6 +97,24 @@ public class ClientTickerTest {
         );
 
         assertEquals(1, EVENT_BUS.getListeners().size());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void tick_EventNull_NullPointerException() {
+        MockTickable firstTickable = new MockTickable();
+        MockTickable secondTickable = new MockTickable();
+        MockTickable thirdTickable = new MockTickable();
+
+        ClientTicker ticker = new ClientTicker(
+                ImmutableList.of(firstTickable, firstTickable, secondTickable, thirdTickable),
+                EVENT_BUS,
+                TickEvent.Phase.START,
+                () -> true
+        );
+
+        expectedException.expect(NullPointerException.class);
+        ticker.tick(null);
     }
 
     @Test
