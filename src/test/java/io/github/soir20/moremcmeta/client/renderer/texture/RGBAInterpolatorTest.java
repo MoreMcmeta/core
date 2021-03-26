@@ -16,6 +16,99 @@ public class RGBAInterpolatorTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void construct_ImageGetterNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new RGBAInterpolator<>(null);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void interpolate_StartFrameNull_NullPointerException() {
+        int width = 5;
+        int height = 5;
+
+        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        builder.addPixel(1, 2);
+        builder.addPixel(4, 0);
+        builder.addPixel(2, 3);
+        builder.addPixel(0, 4);
+        IRGBAImage.VisibleArea area = builder.build();
+
+        int[][] endPixels = new int[width][height];
+        endPixels[1][2] = toBinary(25, 181, 119, 37);
+        endPixels[4][0] = toBinary(106, 126, 174, 11);
+        endPixels[2][3] = toBinary(0, 238, 24, 122);
+        endPixels[0][4] = toBinary(93, 209, 60, 223);
+        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+
+        RGBAInterpolator<MockRGBAImage> interpolator = new RGBAInterpolator<>((w, h) ->
+                new MockRGBAImage(new int[w][h], area));
+
+        expectedException.expect(NullPointerException.class);
+        interpolator.interpolate(10, 5, null, end);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void interpolate_EndFrameNull_NullPointerException() {
+        int width = 5;
+        int height = 5;
+
+        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        builder.addPixel(1, 2);
+        builder.addPixel(4, 0);
+        builder.addPixel(2, 3);
+        builder.addPixel(0, 4);
+        IRGBAImage.VisibleArea area = builder.build();
+
+        int[][] startPixels = new int[width][height];
+        startPixels[1][2] = toBinary(184, 143, 65, 197);
+        startPixels[4][0] = toBinary(41, 248, 80, 100);
+        startPixels[2][3] = toBinary(19, 159, 70, 226);
+        startPixels[0][4] = toBinary(216, 101, 41, 195);
+        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+
+        RGBAInterpolator<MockRGBAImage> interpolator = new RGBAInterpolator<>((w, h) ->
+                new MockRGBAImage(new int[w][h], area));
+
+        expectedException.expect(NullPointerException.class);
+        interpolator.interpolate(10, 5, start, null);
+    }
+
+    @Test
+    public void interpolate_InterpolatedFrameNull_NullPointerException() {
+        int width = 5;
+        int height = 5;
+
+        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        builder.addPixel(1, 2);
+        builder.addPixel(4, 0);
+        builder.addPixel(2, 3);
+        builder.addPixel(0, 4);
+        IRGBAImage.VisibleArea area = builder.build();
+
+        int[][] startPixels = new int[width][height];
+        startPixels[1][2] = toBinary(184, 143, 65, 197);
+        startPixels[4][0] = toBinary(41, 248, 80, 100);
+        startPixels[2][3] = toBinary(19, 159, 70, 226);
+        startPixels[0][4] = toBinary(216, 101, 41, 195);
+        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+
+        int[][] endPixels = new int[width][height];
+        endPixels[1][2] = toBinary(25, 181, 119, 37);
+        endPixels[4][0] = toBinary(106, 126, 174, 11);
+        endPixels[2][3] = toBinary(0, 238, 24, 122);
+        endPixels[0][4] = toBinary(93, 209, 60, 223);
+        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+
+        RGBAInterpolator<MockRGBAImage> interpolator = new RGBAInterpolator<>((w, h) -> null);
+
+        expectedException.expect(NullPointerException.class);
+        interpolator.interpolate(10, 5, start, end);
+    }
+
+    @Test
     public void interpolate_StepLessThanOne_IllegalArgException() {
         int width = 5;
         int height = 5;
