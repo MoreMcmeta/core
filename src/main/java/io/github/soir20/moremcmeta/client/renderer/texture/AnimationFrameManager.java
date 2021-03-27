@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.texture.ITickable;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 import static java.util.Objects.requireNonNull;
 
@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
 @MethodsReturnNonnullByDefault
 public class AnimationFrameManager<F> implements ITickable {
     private final List<F> FRAMES;
-    private final Function<F, Integer> FRAME_TIME_CALCULATOR;
+    private final ToIntFunction<F> FRAME_TIME_CALCULATOR;
 
     @Nullable
     private final IInterpolator<F> INTERPOLATOR;
@@ -38,7 +38,7 @@ public class AnimationFrameManager<F> implements ITickable {
      *                              In most cases, pass a function that gets the
      *                              time from the frame or returns a default value.
      */
-    public AnimationFrameManager(ImmutableList<F> frames, Function<F, Integer> frameTimeCalculator) {
+    public AnimationFrameManager(ImmutableList<F> frames, ToIntFunction<F> frameTimeCalculator) {
         FRAMES = requireNonNull(frames, "Frames cannot be null");
         FRAME_TIME_CALCULATOR = requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
         INTERPOLATOR = null;
@@ -59,7 +59,7 @@ public class AnimationFrameManager<F> implements ITickable {
      *                              Cannot return null.
      * @param interpolator          interpolates between frames of the animation
      */
-    public AnimationFrameManager(ImmutableList<F> frames, Function<F, Integer> frameTimeCalculator,
+    public AnimationFrameManager(ImmutableList<F> frames, ToIntFunction<F> frameTimeCalculator,
                                  IInterpolator<F> interpolator) {
         FRAMES = requireNonNull(frames, "Frames cannot be null");
         FRAME_TIME_CALCULATOR = requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
@@ -82,9 +82,7 @@ public class AnimationFrameManager<F> implements ITickable {
         if (doInterpolation && INTERPOLATOR != null) {
             F currentPredefinedFrame = FRAMES.get(currentFrameIndex);
 
-            Integer maxTime = FRAME_TIME_CALCULATOR.apply(currentPredefinedFrame);
-            requireNonNull(maxTime, "Time for a frame cannot be null");
-
+            int maxTime = FRAME_TIME_CALCULATOR.applyAsInt(currentPredefinedFrame);
             int nextFrameIndex = (currentFrameIndex + 1) % FRAMES.size();
 
             currentFrame = INTERPOLATOR.interpolate(maxTime, ticksInThisFrame, currentPredefinedFrame,
@@ -104,9 +102,7 @@ public class AnimationFrameManager<F> implements ITickable {
 
         F currentPredefinedFrame = FRAMES.get(currentFrameIndex);
 
-        Integer maxTime = FRAME_TIME_CALCULATOR.apply(currentPredefinedFrame);
-        requireNonNull(maxTime, "Time for a frame cannot be null");
-
+        int maxTime = FRAME_TIME_CALCULATOR.applyAsInt(currentPredefinedFrame);
         int nextFrameIndex = (currentFrameIndex + 1) % FRAMES.size();
 
         if (ticksInThisFrame >= maxTime) {
