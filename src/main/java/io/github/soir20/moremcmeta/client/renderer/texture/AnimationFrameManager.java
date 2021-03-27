@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.texture.ITickable;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 import java.util.function.ToIntFunction;
 
 import static java.util.Objects.requireNonNull;
@@ -20,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AnimationFrameManager<F> implements ITickable {
-    private final List<F> FRAMES;
+    private final ImmutableList<F> FRAMES;
     private final ToIntFunction<F> FRAME_TIME_CALCULATOR;
 
     @Nullable
@@ -28,8 +27,6 @@ public class AnimationFrameManager<F> implements ITickable {
 
     private int ticksInThisFrame;
     private int currentFrameIndex;
-    private F currentFrame;
-    private boolean doInterpolation;
 
     /**
      * Creates an animation frame manager that does not interpolate between frames.
@@ -44,10 +41,12 @@ public class AnimationFrameManager<F> implements ITickable {
         INTERPOLATOR = null;
 
         if (frames.size() == 0) {
-            throw new IllegalArgumentException("Frames must have at least one frame");
+            throw new IllegalArgumentException("Frames cannot have no frames");
         }
 
-        currentFrame = FRAMES.get(0);
+        if (frames.stream().anyMatch((frame) -> frameTimeCalculator.applyAsInt(frame) <= 0)) {
+            throw new IllegalArgumentException("Each frame must be at least one tick long");
+        }
     }
 
     /**
@@ -66,10 +65,12 @@ public class AnimationFrameManager<F> implements ITickable {
         INTERPOLATOR = requireNonNull(interpolator, "Interpolator cannot be null");
 
         if (frames.size() == 0) {
-            throw new IllegalArgumentException("Frames must have at least one frame");
+            throw new IllegalArgumentException("Frames cannot have no frames");
         }
 
-        currentFrame = FRAMES.get(0);
+        if (frames.stream().anyMatch((frame) -> frameTimeCalculator.applyAsInt(frame) <= 0)) {
+            throw new IllegalArgumentException("Each frame must be at least one tick long");
+        }
     }
 
     /**
@@ -77,24 +78,25 @@ public class AnimationFrameManager<F> implements ITickable {
      * @return  the current frame of the animation
      */
     public F getCurrentFrame() {
+        F currentPredefinedFrame = FRAMES.get(currentFrameIndex);
+        F currentFrame = currentPredefinedFrame;
 
         // Doing interpolation when the frame is retrieved ensures we don't interpolate when the frame isn't used
-        if (doInterpolation && INTERPOLATOR != null) {
-            F currentPredefinedFrame = FRAMES.get(currentFrameIndex);
+        if (ticksInThisFrame > 0 && INTERPOLATOR != null) {
 
             int maxTime = FRAME_TIME_CALCULATOR.applyAsInt(currentPredefinedFrame);
             int nextFrameIndex = (currentFrameIndex + 1) % FRAMES.size();
 
             currentFrame = INTERPOLATOR.interpolate(maxTime, ticksInThisFrame, currentPredefinedFrame,
                     FRAMES.get(nextFrameIndex));
-            doInterpolation = false;
         }
 
         return currentFrame;
     }
 
     /**
-     * Moves the animation forward by one tick.
+     * Moves the animation forward by one tick. Does not perform interpolation. Interpolation happens
+     * when {@link #getCurrentFrame()} is used to retrieve the current animation frame.
      */
     @Override
     public void tick() {
@@ -107,11 +109,7 @@ public class AnimationFrameManager<F> implements ITickable {
 
         if (ticksInThisFrame >= maxTime) {
             currentFrameIndex = nextFrameIndex;
-            currentFrame = FRAMES.get(nextFrameIndex);
             ticksInThisFrame = 0;
-            doInterpolation = false;
-        } else {
-            doInterpolation = true;
         }
     }
 
