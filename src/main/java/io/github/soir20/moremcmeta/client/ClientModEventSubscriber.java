@@ -40,6 +40,7 @@ public class ClientModEventSubscriber {
 
         if (!(minecraft.getResourceManager() instanceof IReloadableResourceManager)) {
             logger.error("Reload listener was not added because resource manager is not reloadable");
+            return;
         }
 
         // Resource managers
