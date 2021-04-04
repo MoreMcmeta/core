@@ -6,6 +6,8 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -85,8 +87,19 @@ public class FrameReader<F extends IAnimationFrame> {
                                         int numFramesX, int numFramesY) {
         ImmutableList.Builder<F> frames = ImmutableList.builder();
 
+        // Cache frames so we can reuse them if they repeat
+        Map<Integer, F> createdFramesByIndex = new HashMap<>();
+
         for (int frame = 0; frame < metadata.getFrameCount(); frame++) {
             int index = metadata.getFrameIndex(frame);
+
+            // Use cached frames
+            if (createdFramesByIndex.containsKey(index)) {
+                frames.add(createdFramesByIndex.get(index));
+                continue;
+            }
+
+            // If not already created, generate new frame
             if (index >= numFramesX * numFramesY) {
                 throw new IllegalArgumentException("Index " + index + " would put frame out of image bounds");
             }
@@ -103,6 +116,7 @@ public class FrameReader<F extends IAnimationFrame> {
             requireNonNull(nextFrame, "Predetermined frame was created as null");
 
             frames.add(nextFrame);
+            createdFramesByIndex.put(index, nextFrame);
         }
 
         return frames.build();
