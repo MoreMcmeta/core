@@ -2,9 +2,11 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.resources.IResourceManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,21 +21,53 @@ import static java.util.Objects.requireNonNull;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AnimatedTexture<F extends IAnimationFrame> extends Texture implements ITickable, AutoCloseable {
+    private final boolean DO_TIME_SYNC;
+    private final int SYNC_TICKS;
     private final AnimationFrameManager<F> FRAME_MANAGER;
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final int MIPMAP;
     private final Runnable CLOSE_ACTION;
 
+    private int ticks;
+
     /**
-     * Creates a new animated texture.
+     * Creates a new animated texture that syncs to the game time of the current world.
+     * @param syncTicks                 number of in-game ticks to sync the animation to
      * @param frameManager              manages the frames of the texture's animation
      * @param frameWidth                width of a single frame (same for all frames)
      * @param frameHeight               height of a single frame (same for all frames)
      * @param mipmap                    mipmap levels for all frames
+     * @param closeAction               cleans up the texture when it is closed
+     */
+    public AnimatedTexture(int syncTicks, AnimationFrameManager<F> frameManager,
+                           int frameWidth, int frameHeight, int mipmap, Runnable closeAction) {
+        if (syncTicks <= 0) {
+            throw new IllegalArgumentException("Animation cannot sync to zero or fewer ticks");
+        }
+        DO_TIME_SYNC = true;
+        SYNC_TICKS = syncTicks;
+
+        FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
+        FRAME_WIDTH = frameWidth;
+        FRAME_HEIGHT = frameHeight;
+        MIPMAP = mipmap;
+        CLOSE_ACTION = requireNonNull(closeAction, "Close action cannot be null");
+    }
+
+    /**
+     * Creates a new animated texture that does not sync to the game time of the current world.
+     * @param frameManager              manages the frames of the texture's animation
+     * @param frameWidth                width of a single frame (same for all frames)
+     * @param frameHeight               height of a single frame (same for all frames)
+     * @param mipmap                    mipmap levels for all frames
+     * @param closeAction               cleans up the texture when it is closed
      */
     public AnimatedTexture(AnimationFrameManager<F> frameManager,
                            int frameWidth, int frameHeight, int mipmap, Runnable closeAction) {
+        DO_TIME_SYNC = false;
+        SYNC_TICKS = -1;
+
         FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
@@ -79,7 +113,16 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      */
     @Override
     public void tick() {
-        FRAME_MANAGER.tick();
+        ClientWorld currentWorld = Minecraft.getInstance().world;
+
+        if (DO_TIME_SYNC && currentWorld != null) {
+            int ticksToAdd = (int) ((currentWorld.getDayTime() - ticks) % SYNC_TICKS + SYNC_TICKS) % SYNC_TICKS;
+            ticks += ticksToAdd;
+            FRAME_MANAGER.tick(ticksToAdd);
+        } else {
+            ticks++;
+            FRAME_MANAGER.tick();
+        }
     }
 
     /**

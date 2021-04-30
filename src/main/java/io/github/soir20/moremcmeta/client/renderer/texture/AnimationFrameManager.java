@@ -27,11 +27,14 @@ public class AnimationFrameManager<F> implements ITickable {
 
     private int ticksInThisFrame;
     private int currentFrameIndex;
+    private int currentFrameMaxTime;
 
     /**
      * Creates an animation frame manager that does not interpolate between frames.
-     * @param frames                frames of the animation
+     * @param frames                frames of the animation. Must not be empty.
      * @param frameTimeCalculator   calculates the frame time for a given frame.
+     *                              Only called once per frame per loop of the animation.
+     *                              Must return values greater than 0 for all frames.
      *                              In most cases, pass a function that gets the
      *                              time from the frame or returns a default value.
      */
@@ -44,18 +47,17 @@ public class AnimationFrameManager<F> implements ITickable {
             throw new IllegalArgumentException("Frames cannot have no frames");
         }
 
-        if (frames.stream().anyMatch((frame) -> frameTimeCalculator.applyAsInt(frame) <= 0)) {
-            throw new IllegalArgumentException("Each frame must be at least one tick long");
-        }
+        currentFrameMaxTime = calcMaxFrameTime(0);
     }
 
     /**
      * Creates an animation frame manager that interpolates between frames.
-     * @param frames                frames of the animation
+     * @param frames                frames of the animation. Must not be empty.
      * @param frameTimeCalculator   calculates the frame time for a given frame.
+     *                              Only called once per frame per loop of the animation.
+     *                              Must return values greater than 0 for all frames.
      *                              In most cases, pass a function that gets the
      *                              time from the frame or returns a default value.
-     *                              Cannot return null.
      * @param interpolator          interpolates between frames of the animation
      */
     public AnimationFrameManager(ImmutableList<F> frames, ToIntFunction<F> frameTimeCalculator,
@@ -68,9 +70,7 @@ public class AnimationFrameManager<F> implements ITickable {
             throw new IllegalArgumentException("Frames cannot have no frames");
         }
 
-        if (frames.stream().anyMatch((frame) -> frameTimeCalculator.applyAsInt(frame) <= 0)) {
-            throw new IllegalArgumentException("Each frame must be at least one tick long");
-        }
+        currentFrameMaxTime = calcMaxFrameTime(0);
     }
 
     /**
@@ -83,11 +83,8 @@ public class AnimationFrameManager<F> implements ITickable {
 
         // Doing interpolation when the frame is retrieved ensures we don't interpolate when the frame isn't used
         if (ticksInThisFrame > 0 && INTERPOLATOR != null) {
-
-            int maxTime = FRAME_TIME_CALCULATOR.applyAsInt(currentPredefinedFrame);
             int nextFrameIndex = (currentFrameIndex + 1) % FRAMES.size();
-
-            currentFrame = INTERPOLATOR.interpolate(maxTime, ticksInThisFrame, currentPredefinedFrame,
+            currentFrame = INTERPOLATOR.interpolate(currentFrameMaxTime, ticksInThisFrame, currentPredefinedFrame,
                     FRAMES.get(nextFrameIndex));
         }
 
@@ -101,16 +98,53 @@ public class AnimationFrameManager<F> implements ITickable {
     @Override
     public void tick() {
         ticksInThisFrame++;
-
-        F currentPredefinedFrame = FRAMES.get(currentFrameIndex);
-
-        int maxTime = FRAME_TIME_CALCULATOR.applyAsInt(currentPredefinedFrame);
         int nextFrameIndex = (currentFrameIndex + 1) % FRAMES.size();
 
-        if (ticksInThisFrame >= maxTime) {
+        if (ticksInThisFrame >= currentFrameMaxTime) {
             currentFrameIndex = nextFrameIndex;
             ticksInThisFrame = 0;
+            currentFrameMaxTime = calcMaxFrameTime(currentFrameIndex);
         }
+    }
+
+    /**
+     * Ticks the current animation by several ticks. Identical to {@link #tick()} for single-tick
+     * animation updates. Like {@link #tick()}, this method does not perform interpolation.
+     * Interpolation happens when {@link #getCurrentFrame()} is used to retrieve the current
+     * animation frame.
+     * @param ticks      how many ticks ahead to put the animation
+     */
+    public void tick(int ticks) {
+
+        // Calculate the predefined frame in the animation at the given tick
+        int timeLeftUntilTick = ticksInThisFrame + ticks;
+        int frameIndex = currentFrameIndex;
+        int frameTime = currentFrameMaxTime;
+
+        // When the frame time is equal to the time left, the tick is at the start of the next frame
+        while (frameTime <= timeLeftUntilTick) {
+            timeLeftUntilTick -= frameTime;
+            frameIndex = (frameIndex + 1) % FRAMES.size();
+            frameTime = calcMaxFrameTime(frameIndex);
+        }
+
+        currentFrameIndex = frameIndex;
+        ticksInThisFrame = timeLeftUntilTick;
+    }
+
+    /**
+     * Calculates the maximum time for a frame at a certain index.
+     * @param frameIndex    the index of the frame
+     * @return  the maximum time of this frame
+     */
+    private int calcMaxFrameTime(int frameIndex) {
+        int maxTime = FRAME_TIME_CALCULATOR.applyAsInt(FRAMES.get(frameIndex));
+
+        if (maxTime <= 0) {
+            throw new UnsupportedOperationException("Frame times must be greater than 0");
+        }
+
+        return maxTime;
     }
 
 }

@@ -119,7 +119,7 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
             interpolator.close();
         };
 
-        return new AnimatedTexture<>(frameManager, frameWidth, frameHeight, MIPMAP, closeMipmaps);
+        return new AnimatedTexture<>(24000, frameManager, frameWidth, frameHeight, MIPMAP, closeMipmaps);
     }
 
     /**
