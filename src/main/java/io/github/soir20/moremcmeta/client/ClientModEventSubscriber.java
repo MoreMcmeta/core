@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 
 /**
  * Handles client-relevant events on the mod event bus.
