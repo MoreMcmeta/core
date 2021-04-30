@@ -68,26 +68,27 @@ public class AnimatedTextureReader implements ITextureReader<Texture> {
         SimpleResource metadataParser = new SimpleResource("dummy", new ResourceLocation(""),
                 textureStream, metadataStream);
 
-        AnimationMetadataSection animationMetadata = null;
-        TextureMetadataSection textureMetadata = null;
+        AnimationMetadataSection animationMetadata;
+        TextureMetadataSection textureMetadata;
         try {
             animationMetadata = metadataParser.getMetadata(AnimationMetadataSection.SERIALIZER);
             textureMetadata = metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
         } catch (JsonParseException jsonError) {
             LOGGER.error("Unable to read texture metadata: {}", jsonError.toString());
+            return MissingTextureSprite.getDynamicTexture();
         } catch (IllegalArgumentException metadataError) {
             LOGGER.error("Found invalid metadata parameter: {}", metadataError.toString());
-        } finally {
+            return MissingTextureSprite.getDynamicTexture();
+        }
 
-            /* Use defaults if no metadata was read.
-               The metadata parser can set these to null even if there was no error. */
-            if (animationMetadata == null) {
-                animationMetadata = AnimationMetadataSection.EMPTY;
-            }
+        /* Use defaults if no metadata was read.
+           The metadata parser can set these to null even if there was no error. */
+        if (animationMetadata == null) {
+            animationMetadata = AnimationMetadataSection.EMPTY;
+        }
 
-            if (textureMetadata == null) {
-                textureMetadata = new TextureMetadataSection(false, false);
-            }
+        if (textureMetadata == null) {
+            textureMetadata = new TextureMetadataSection(false, false);
         }
 
         boolean blur = textureMetadata.getTextureBlur();
