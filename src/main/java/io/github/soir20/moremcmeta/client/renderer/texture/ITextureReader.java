@@ -10,12 +10,12 @@ import java.io.InputStream;
 
 /**
  * Reads an animated texture.
- * @param <T>   the type of animated texture to create
+ * @param <T>   the type of texture to create
  * @author soir20
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface ITextureReader<T extends Texture & ITickable> {
+public interface ITextureReader<T> {
 
     /**
      * Reads an animated texture from file data.

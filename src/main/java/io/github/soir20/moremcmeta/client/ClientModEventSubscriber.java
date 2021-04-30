@@ -1,10 +1,8 @@
 package io.github.soir20.moremcmeta.client;
 
-import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.MoreMcmeta;
-import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTextureReader;
-import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper;
 import io.github.soir20.moremcmeta.resource.TextureReloadListener;
 import net.minecraft.client.Minecraft;
@@ -47,15 +45,14 @@ public class ClientModEventSubscriber {
         IReloadableResourceManager rscManager = (IReloadableResourceManager) minecraft.getResourceManager();
         TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft::getTextureManager);
 
-        // Texture tickers
+        // Texture ticker
         BooleanSupplier areTexturesNotUpdating = () -> minecraft.world == null;
-        Function<ImmutableCollection<AnimatedTexture<NativeImageFrame>>, ClientTicker> tickerFactory;
-        tickerFactory = (textures) -> new ClientTicker(textures, MinecraftForge.EVENT_BUS,
+        new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS,
                 TickEvent.Phase.START, areTexturesNotUpdating);
 
         AnimatedTextureReader texReader = new AnimatedTextureReader(0, logger);
 
-        rscManager.addReloadListener(new TextureReloadListener<>(texReader, texManager, tickerFactory, logger));
+        rscManager.addReloadListener(new TextureReloadListener(texReader, texManager, logger));
         logger.debug("Added texture reload listener");
     }
 

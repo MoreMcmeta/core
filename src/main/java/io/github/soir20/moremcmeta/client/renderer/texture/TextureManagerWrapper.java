@@ -1,11 +1,16 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -18,6 +23,7 @@ import static java.util.Objects.requireNonNull;
 @MethodsReturnNonnullByDefault
 public class TextureManagerWrapper implements ITextureManager {
     private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
+    private final Map<ResourceLocation, ITickable> ANIMATED_TEXTURES;
 
     /**
      * Creates the TextureManagerWrapper.
@@ -27,6 +33,7 @@ public class TextureManagerWrapper implements ITextureManager {
     public TextureManagerWrapper(Supplier<TextureManager> texManagerGetter) {
         requireNonNull(texManagerGetter, "Texture manager getter cannot be null");
         TEXTURE_MANAGER_GETTER = texManagerGetter;
+        ANIMATED_TEXTURES = new HashMap<>();
     }
 
     /**
@@ -42,6 +49,13 @@ public class TextureManagerWrapper implements ITextureManager {
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
 
         textureManager.loadTexture(textureLocation, textureObj);
+
+        // Update tickables list
+        ANIMATED_TEXTURES.remove(textureLocation);
+        if (textureObj instanceof ITickable) {
+            ANIMATED_TEXTURES.put(textureLocation, (ITickable) textureObj);
+        }
+
     }
 
     /**
@@ -52,6 +66,14 @@ public class TextureManagerWrapper implements ITextureManager {
     public void deleteTexture(ResourceLocation textureLocation) {
         requireNonNull(textureLocation, "Texture location cannot be null");
         TEXTURE_MANAGER_GETTER.get().deleteTexture(textureLocation);
+    }
+
+    /**
+     * Updates all animated textures that were loaded through this manager.
+     */
+    @Override
+    public void tick() {
+        ANIMATED_TEXTURES.values().forEach(ITickable::tick);
     }
 
 }

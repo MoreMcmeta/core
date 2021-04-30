@@ -1,11 +1,13 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,14 +19,19 @@ import java.util.Set;
 @MethodsReturnNonnullByDefault
 public class MockTextureManager implements ITextureManager {
     private final Map<ResourceLocation, Texture> TEXTURES;
+    private final Map<ResourceLocation, ITickable> ANIMATED_TEXTURES;
 
     public MockTextureManager() {
         TEXTURES = new HashMap<>();
+        ANIMATED_TEXTURES = new HashMap<>();
     }
 
     @Override
     public void loadTexture(ResourceLocation textureLocation, Texture textureObj) {
         TEXTURES.put(textureLocation, textureObj);
+        if (textureObj instanceof ITickable) {
+            ANIMATED_TEXTURES.put(textureLocation, (ITickable) textureObj);
+        }
     }
 
     @Override
@@ -38,5 +45,9 @@ public class MockTextureManager implements ITextureManager {
 
     public Set<ResourceLocation> getLocations() {
         return TEXTURES.keySet();
+    }
+
+    public void tick() {
+        ANIMATED_TEXTURES.values().forEach(ITickable::tick);
     }
 }

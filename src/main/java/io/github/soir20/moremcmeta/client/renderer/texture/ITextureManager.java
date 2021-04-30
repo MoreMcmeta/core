@@ -1,6 +1,7 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.util.ResourceLocation;
 
@@ -12,7 +13,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface ITextureManager {
+public interface ITextureManager extends ITickable {
 
     /**
      * Prepares a texture and makes Minecraft aware of it.
@@ -26,5 +27,10 @@ public interface ITextureManager {
      * @param textureLocation   file location of texture to delete
      */
     void deleteTexture(ResourceLocation textureLocation);
+
+    /**
+     * Updates all animated textures that were loaded through this manager.
+     */
+    void tick();
 
 }

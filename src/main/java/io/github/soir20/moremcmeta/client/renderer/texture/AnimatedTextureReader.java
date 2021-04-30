@@ -7,6 +7,7 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.client.resources.data.TextureMetadataSection;
 import net.minecraft.resources.SimpleResource;
@@ -29,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<NativeImageFrame>> {
+public class AnimatedTextureReader implements ITextureReader<Texture> {
     private final int MIPMAP;
     private final Logger LOGGER;
 
@@ -50,7 +51,7 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
      * @return  an animated texture based on the provided data
      * @throws IOException  failure reading from either input stream
      */
-    public AnimatedTexture<NativeImageFrame> read(InputStream textureStream, InputStream metadataStream)
+    public Texture read(InputStream textureStream, InputStream metadataStream)
             throws IOException {
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
