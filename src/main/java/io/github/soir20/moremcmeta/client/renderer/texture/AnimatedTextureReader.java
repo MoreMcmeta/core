@@ -5,6 +5,7 @@ import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
+import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.client.resources.data.TextureMetadataSection;
@@ -73,6 +74,8 @@ public class AnimatedTextureReader implements ITextureReader<AnimatedTexture<Nat
             textureMetadata = metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
         } catch (JsonParseException jsonError) {
             LOGGER.error("Unable to read texture metadata: {}", jsonError.toString());
+        } catch (IllegalArgumentException metadataError) {
+            LOGGER.error("Found invalid metadata parameter: {}", metadataError.toString());
         } finally {
 
             /* Use defaults if no metadata was read.
