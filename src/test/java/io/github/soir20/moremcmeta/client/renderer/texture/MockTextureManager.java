@@ -29,6 +29,7 @@ public class MockTextureManager implements ITextureManager {
     @Override
     public void loadTexture(ResourceLocation textureLocation, Texture textureObj) {
         TEXTURES.put(textureLocation, textureObj);
+        ANIMATED_TEXTURES.remove(textureLocation);
         if (textureObj instanceof ITickable) {
             ANIMATED_TEXTURES.put(textureLocation, (ITickable) textureObj);
         }
@@ -37,10 +38,6 @@ public class MockTextureManager implements ITextureManager {
     @Override
     public void deleteTexture(ResourceLocation textureLocation) {
         TEXTURES.remove(textureLocation);
-    }
-
-    public Texture getTexture(ResourceLocation textureLocation) {
-        return TEXTURES.get(textureLocation);
     }
 
     public Set<ResourceLocation> getLocations() {
