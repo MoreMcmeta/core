@@ -46,7 +46,7 @@ public class TextureManagerWrapper implements ITextureManager {
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
 
-        textureManager.loadTexture(textureLocation, textureObj);
+        textureManager.register(textureLocation, textureObj);
 
         // Update tickables list
         ANIMATED_TEXTURES.remove(textureLocation);
@@ -63,7 +63,7 @@ public class TextureManagerWrapper implements ITextureManager {
     @Override
     public void deleteTexture(ResourceLocation textureLocation) {
         requireNonNull(textureLocation, "Texture location cannot be null");
-        TEXTURE_MANAGER_GETTER.get().deleteTexture(textureLocation);
+        TEXTURE_MANAGER_GETTER.get().release(textureLocation);
     }
 
     /**

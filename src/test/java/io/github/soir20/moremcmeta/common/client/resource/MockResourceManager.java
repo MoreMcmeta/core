@@ -44,7 +44,7 @@ public class MockResourceManager implements IResourceManager {
     }
 
     @Override
-    public Set<String> getResourceNamespaces() {
+    public Set<String> getNamespaces() {
         return ImmutableSet.of();
     }
 
@@ -72,12 +72,12 @@ public class MockResourceManager implements IResourceManager {
     }
 
     @Override
-    public List<IResource> getAllResources(ResourceLocation resourceLocationIn) {
+    public List<IResource> getResources(ResourceLocation resourceLocationIn) {
         return ImmutableList.of();
     }
 
     @Override
-    public Collection<ResourceLocation> getAllResourceLocations(String pathIn, Predicate<String> filter) {
+    public Collection<ResourceLocation> listResources(String pathIn, Predicate<String> filter) {
         List<Pair<String, String>> namespacesAndPaths = new ArrayList<>();
 
         FILES_TO_ADD.forEach((fileName) -> {
@@ -101,7 +101,7 @@ public class MockResourceManager implements IResourceManager {
     }
 
     @Override
-    public Stream<IResourcePack> getResourcePackStream() {
+    public Stream<IResourcePack> listPacks() {
         return Stream.of();
     }
 

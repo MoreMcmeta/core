@@ -88,7 +88,7 @@ public class TextureReloadListener implements ISelectiveResourceReloadListener {
            invalid texture names for consistency.
            NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
         try {
-             textureCandidates = resourceManager.getAllResourceLocations(
+             textureCandidates = resourceManager.listResources(
                     "textures",
                     fileName -> fileName.endsWith(METADATA_EXTENSION)
              );
@@ -148,7 +148,7 @@ public class TextureReloadListener implements ISelectiveResourceReloadListener {
              IResource metadataResource = resourceManager.getResource(metadataLocation)) {
 
             // We don't want to get metadata from a lower pack than the texture
-            if (originalResource.getPackName().equals(metadataResource.getPackName())) {
+            if (originalResource.getSourceName().equals(metadataResource.getSourceName())) {
                 InputStream textureStream = originalResource.getInputStream();
                 InputStream metadataStream = metadataResource.getInputStream();
 

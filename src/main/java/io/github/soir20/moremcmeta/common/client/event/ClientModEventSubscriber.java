@@ -45,13 +45,13 @@ public class ClientModEventSubscriber {
         TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft::getTextureManager);
 
         // Texture ticker
-        BooleanSupplier areTexturesNotUpdating = () -> minecraft.world == null;
+        BooleanSupplier areTexturesNotUpdating = () -> minecraft.level == null;
         new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS,
                 TickEvent.Phase.START, areTexturesNotUpdating);
 
         AnimatedTextureReader texReader = new AnimatedTextureReader(0, logger);
 
-        rscManager.addReloadListener(new TextureReloadListener(texReader, texManager, logger));
+        rscManager.registerReloadListener(new TextureReloadListener(texReader, texManager, logger));
         logger.debug("Added texture reload listener");
     }
 

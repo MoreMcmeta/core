@@ -66,7 +66,7 @@ public class AnimatedTextureReader implements ITextureReader<Texture> {
         NativeImage image = NativeImage.read(textureStream);
         LOGGER.debug("Successfully read image from input");
 
-        NativeImage[] mipmaps = MipmapGenerator.generateMipmaps(image, MIPMAP);
+        NativeImage[] mipmaps = MipmapGenerator.generateMipLevels(image, MIPMAP);
 
         /* The SimpleResource class would normally handle metadata parsing when we originally
            got the resource. However, the ResourceManager only looks for .mcmeta metadata, and its
@@ -82,10 +82,10 @@ public class AnimatedTextureReader implements ITextureReader<Texture> {
             textureMetadata = metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
         } catch (JsonParseException jsonError) {
             LOGGER.error("Unable to read texture metadata: {}", jsonError.toString());
-            return MissingTextureSprite.getDynamicTexture();
+            return MissingTextureSprite.getTexture();
         } catch (IllegalArgumentException metadataError) {
             LOGGER.error("Found invalid metadata parameter: {}", metadataError.toString());
-            return MissingTextureSprite.getDynamicTexture();
+            return MissingTextureSprite.getTexture();
         }
 
         /* Use defaults if no metadata was read.
@@ -98,8 +98,8 @@ public class AnimatedTextureReader implements ITextureReader<Texture> {
             textureMetadata = new TextureMetadataSection(false, false);
         }
 
-        boolean blur = textureMetadata.getTextureBlur();
-        boolean clamp = textureMetadata.getTextureClamp();
+        boolean blur = textureMetadata.isBlur();
+        boolean clamp = textureMetadata.isClamp();
 
         // Frames
         FrameReader<NativeImageFrame> frameReader = new FrameReader<>((frameData ->
@@ -116,7 +116,7 @@ public class AnimatedTextureReader implements ITextureReader<Texture> {
 
         // Frame management
         AnimationFrameManager<NativeImageFrame> frameManager;
-        if (animationMetadata.isInterpolate()) {
+        if (animationMetadata.isInterpolatedFrames()) {
              frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime, interpolator);
         } else {
             frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime);
@@ -215,7 +215,7 @@ public class AnimatedTextureReader implements ITextureReader<Texture> {
                 int mipmappedHeight = FRAME_HEIGHT >> level;
 
                 NativeImage mipmappedImage = new NativeImage(mipmappedWidth, mipmappedHeight, true);
-                mipmappedImage.copyImageData(originalMipmaps[MIPMAP]);
+                mipmappedImage.copyFrom(originalMipmaps[MIPMAP]);
                 MIPMAPS[level] = mipmappedImage;
 
                 widthsToImage.put(mipmappedWidth, new Pair<>(mipmappedImage, visibleAreas.get(level)));

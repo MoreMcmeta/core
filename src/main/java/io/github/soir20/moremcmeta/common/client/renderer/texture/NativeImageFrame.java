@@ -71,7 +71,7 @@ public class NativeImageFrame implements IAnimationFrame {
             int mipmappedHeight = HEIGHT >> level;
 
             if (mipmappedWidth > 0 && mipmappedHeight > 0) {
-                MIPMAPS[level].uploadTextureSub(level, mipmappedX, mipmappedY, mipmappedSkipX, mipmappedSkipY,
+                MIPMAPS[level].upload(level, mipmappedX, mipmappedY, mipmappedSkipX, mipmappedSkipY,
                         mipmappedWidth, mipmappedHeight, BLUR, CLAMP, MIPMAPS.length > 1, AUTO_CLOSE);
             }
         }

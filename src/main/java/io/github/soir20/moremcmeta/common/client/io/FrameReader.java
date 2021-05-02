@@ -49,7 +49,7 @@ public class FrameReader<F extends IAnimationFrame> {
             throw new IllegalArgumentException("Frame width and height must not be empty");
         }
 
-        Pair<Integer, Integer> frameSize = metadata.getSpriteSize(imageWidth, imageHeight);
+        Pair<Integer, Integer> frameSize = metadata.getFrameSize(imageWidth, imageHeight);
         int frameWidth = frameSize.getFirst();
         int frameHeight = frameSize.getSecond();
 
@@ -105,7 +105,7 @@ public class FrameReader<F extends IAnimationFrame> {
                 throw new IllegalArgumentException("Index " + index + " would put frame out of image bounds");
             }
 
-            int time = metadata.getFrameTimeSingle(frame);
+            int time = metadata.getFrameTime(frame);
 
             Pair<Integer, Integer> framePos = frameIndexToPosition(index, numFramesX);
             int xOffset = framePos.getFirst() * frameWidth;
@@ -139,7 +139,7 @@ public class FrameReader<F extends IAnimationFrame> {
         for (int row = 0; row < numFramesY; row++) {
             for (int column = 0; column < numFramesX; column++) {
                 FrameData data = new FrameData(frameWidth, frameHeight,
-                        column * frameWidth, row * frameHeight, metadata.getFrameTime());
+                        column * frameWidth, row * frameHeight, metadata.getDefaultFrameTime());
 
                 F nextFrame = FRAME_FACTORY.apply(data);
                 requireNonNull(nextFrame, "Found frame was created as null");

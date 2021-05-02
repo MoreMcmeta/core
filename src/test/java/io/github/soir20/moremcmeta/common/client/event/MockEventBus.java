@@ -5,6 +5,7 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.GenericEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.IEventBusInvokeDispatcher;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -89,6 +90,11 @@ public class MockEventBus implements IEventBus {
 
     @Override
     public boolean post(Event event) {
+        return false;
+    }
+
+    @Override
+    public boolean post(Event event, IEventBusInvokeDispatcher wrapper) {
         return false;
     }
 

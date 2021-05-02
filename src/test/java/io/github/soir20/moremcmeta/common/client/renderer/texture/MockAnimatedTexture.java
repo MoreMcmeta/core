@@ -22,5 +22,5 @@ public class MockAnimatedTexture extends Texture implements ITickable {
     public void tick() {}
 
     @Override
-    public void loadTexture(IResourceManager manager) {}
+    public void load(IResourceManager manager) {}
 }

@@ -81,8 +81,8 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      * Binds this texture to OpenGL for rendering. Interpolation (if used) occurs at this point as well.
      */
     @Override
-    public void bindTexture() {
-        super.bindTexture();
+    public void bind() {
+        super.bind();
         uploadCurrentFrame();
     }
 
@@ -91,7 +91,7 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      * @param manager   resource manager
      */
     @Override
-    public void loadTexture(IResourceManager manager) {
+    public void load(IResourceManager manager) {
         requireNonNull(manager, "Resource manager cannot be null");
 
         if (!RenderSystem.isOnRenderThreadOrInit()) {
@@ -105,17 +105,17 @@ public class AnimatedTexture<F extends IAnimationFrame> extends Texture implemen
      * Uploads this image to OpenGL immediately.
      */
     private void loadImage() {
-        TextureUtil.prepareImage(getGlTextureId(), MIPMAP, FRAME_WIDTH, FRAME_HEIGHT);
+        TextureUtil.prepareImage(getId(), MIPMAP, FRAME_WIDTH, FRAME_HEIGHT);
         uploadCurrentFrame();
     }
 
     /**
      * Updates this texture's animation each tick. The frames are not uploaded until they are used
-     * in {@link #bindTexture()}.
+     * in {@link #bind()}.
      */
     @Override
     public void tick() {
-        ClientWorld currentWorld = Minecraft.getInstance().world;
+        ClientWorld currentWorld = Minecraft.getInstance().level;
 
         if (DO_TIME_SYNC && currentWorld != null) {
             int ticksToAdd = (int) ((currentWorld.getDayTime() - ticks) % SYNC_TICKS + SYNC_TICKS) % SYNC_TICKS;
