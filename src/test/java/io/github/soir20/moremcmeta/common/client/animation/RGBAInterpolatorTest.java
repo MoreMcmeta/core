@@ -1,13 +1,12 @@
 package io.github.soir20.moremcmeta.common.client.animation;
 
-import io.github.soir20.moremcmeta.common.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.common.client.renderer.texture.IRGBAImage;
 import io.github.soir20.moremcmeta.common.client.renderer.texture.MockRGBAImage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link RGBAInterpolator}. Use an online random number generator for
