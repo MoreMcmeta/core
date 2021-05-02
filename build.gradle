@@ -3,7 +3,6 @@ import net.minecraftforge.gradle.common.task.SignJar
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
