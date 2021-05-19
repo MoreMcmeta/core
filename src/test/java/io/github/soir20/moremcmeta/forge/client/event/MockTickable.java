@@ -1,4 +1,4 @@
-package io.github.soir20.moremcmeta.common.client.event;
+package io.github.soir20.moremcmeta.forge.client.event;
 
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.ITickable;

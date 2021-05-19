@@ -1,10 +1,11 @@
-package io.github.soir20.moremcmeta.common.client.event;
+package io.github.soir20.moremcmeta.forge.client.event;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.MoreMcmeta;
 import io.github.soir20.moremcmeta.common.client.io.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.common.client.renderer.texture.TextureManagerWrapper;
 import io.github.soir20.moremcmeta.common.client.resource.TextureReloadListener;
+import io.github.soir20.moremcmeta.forge.MoreMcmeta;
+import io.github.soir20.moremcmeta.forge.client.resource.SelectiveReloadListenerWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
@@ -13,6 +14,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,7 +53,12 @@ public class ClientModEventSubscriber {
 
         AnimatedTextureReader texReader = new AnimatedTextureReader(0, logger);
 
-        rscManager.registerReloadListener(new TextureReloadListener(texReader, texManager, logger));
+        TextureReloadListener commonListener = new TextureReloadListener(texReader, texManager, logger);
+        SelectiveReloadListenerWrapper wrapper = new SelectiveReloadListenerWrapper(
+                VanillaResourceType.TEXTURES,
+                commonListener
+        );
+        rscManager.registerReloadListener(wrapper);
         logger.debug("Added texture reload listener");
     }
 

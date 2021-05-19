@@ -7,11 +7,9 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
+import net.minecraft.resources.IResourceManagerReloadListener;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
-import net.minecraftforge.resource.IResourceType;
-import net.minecraftforge.resource.ISelectiveResourceReloadListener;
-import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -22,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,7 +30,8 @@ import static java.util.Objects.requireNonNull;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TextureReloadListener implements ISelectiveResourceReloadListener {
+@SuppressWarnings("deprecation") // This will be wrapped with the selective listener for Forge.
+public class TextureReloadListener implements IResourceManagerReloadListener {
     private static final String METADATA_EXTENSION = ".moremcmeta";
 
     private final ITextureManager TEXTURE_MANAGER;
@@ -56,30 +54,13 @@ public class TextureReloadListener implements ISelectiveResourceReloadListener {
     }
 
     /**
-     * Gets the resource type whose reloading will trigger this listener.
-     * @return the resource type for this listener
-     */
-    @Override
-    public IResourceType getResourceType()
-    {
-        return VanillaResourceType.TEXTURES;
-    }
-
-    /**
      * Uploads textures to the texture manager when the game's textures reload. This event only
      * fires for client-side resources, not data packs.
      * @param resourceManager       the game's central resource manager
-     * @param resourcePredicate     tests whether the listener should reload for this resource type
      */
     @Override
-    public void onResourceManagerReload(IResourceManager resourceManager,
-                                        Predicate<IResourceType> resourcePredicate) {
+    public void onResourceManagerReload(IResourceManager resourceManager) {
         requireNonNull(resourceManager, "Resource manager cannot be null");
-        requireNonNull(resourcePredicate, "Resource predicate cannot be null");
-
-        if (!resourcePredicate.test(getResourceType())) {
-            return;
-        }
 
         Collection<ResourceLocation> textureCandidates;
 

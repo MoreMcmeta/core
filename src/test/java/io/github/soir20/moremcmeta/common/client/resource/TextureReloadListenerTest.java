@@ -61,40 +61,7 @@ public class TextureReloadListenerTest {
                 mockTextureManager, LOGGER);
 
         expectedException.expect(NullPointerException.class);
-        listener.onResourceManagerReload(null, (type) -> type.equals(VanillaResourceType.TEXTURES));
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void onResourceManagerReload_PredicateNull_NullPointerException() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
-        IResourceManager mockResourceManager = new MockResourceManager(
-                ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
-                ImmutableList.of(), false
-        );
-
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
-
-        expectedException.expect(NullPointerException.class);
-        listener.onResourceManagerReload(mockResourceManager, null);
-    }
-
-    @Test
-    public void onResourceManagerReload_DifferentResourceType_Nothing() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
-        IResourceManager mockResourceManager = new MockResourceManager(
-                ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
-                ImmutableList.of(), false
-        );
-
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
-
-        listener.onResourceManagerReload(mockResourceManager, (type) -> type.equals(VanillaResourceType.MODELS));
-
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
-        assertTrue(locations.isEmpty());
+        listener.onResourceManagerReload(null);
     }
 
     @Test
@@ -108,7 +75,7 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(3, locations.size());
@@ -129,7 +96,7 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(3, locations.size());
@@ -149,7 +116,7 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(1, locations.size());
@@ -167,7 +134,7 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(1, locations.size());
@@ -185,7 +152,7 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(1, locations.size());
@@ -203,7 +170,7 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManager, (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(0, locations.size());
@@ -225,10 +192,8 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManagerFirstReload,
-                (type) -> type.equals(VanillaResourceType.TEXTURES));
-        listener.onResourceManagerReload(mockResourceManagerSecondReload,
-                (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManagerFirstReload);
+        listener.onResourceManagerReload(mockResourceManagerSecondReload);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(0, locations.size());
@@ -249,10 +214,8 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManagerFirstReload,
-                (type) -> type.equals(VanillaResourceType.TEXTURES));
-        listener.onResourceManagerReload(mockResourceManagerSecondReload,
-                (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManagerFirstReload);
+        listener.onResourceManagerReload(mockResourceManagerSecondReload);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(3, locations.size());
@@ -281,18 +244,15 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManagerFirstReload,
-                (type) -> type.equals(VanillaResourceType.TEXTURES));
-        listener.onResourceManagerReload(mockResourceManagerSecondReload,
-                (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManagerFirstReload);
+        listener.onResourceManagerReload(mockResourceManagerSecondReload);
 
         mockTextureManager.loadTexture(new ResourceLocation("textures/creeper.png"),
                 new MockAnimatedTexture(null, null));
         mockTextureManager.loadTexture(new ResourceLocation("textures/zombie.png"),
                 new MockAnimatedTexture(null, null));
 
-        listener.onResourceManagerReload(mockResourceManagerThirdReload,
-                (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManagerThirdReload);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(5, locations.size());
@@ -315,8 +275,7 @@ public class TextureReloadListenerTest {
         TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
-        listener.onResourceManagerReload(mockResourceManager,
-                (type) -> type.equals(VanillaResourceType.TEXTURES));
+        listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockTextureManager.getLocations();
         assertEquals(3, locations.size());
