@@ -26,3 +26,4 @@ forge*changelog.txt
 
 # Crash logs
 logs
+/.vscode/launch.json

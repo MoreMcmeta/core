@@ -1,0 +1,78 @@
+//import net.minecraftforge.gradle.common.task.SignJar
+
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+}
+
+configurations {
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+loom {
+    useFabricMixin = true
+}
+
+dependencies {
+    forge "net.minecraftforge:forge:1.16.5-36.1.18"
+
+    implementation(project(path: ":common")) {
+        transitive = false
+    }
+    developmentForge(project(path: ":common")) {
+        transitive = false
+    }
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
+        transitive = false
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    /*filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }*/
+}
+
+shadowJar {
+    exclude "fabric.mod.json"
+
+    configurations = [project.configurations.shadowCommon]
+    classifier "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    classifier "forge"
+}
+
+jar {
+    classifier "dev"
+}
+
+java {
+    withSourcesJar()
+}
+
+sourcesJar {
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+/*task signJar(type: SignJar, dependsOn: jar) {
+    keyStore = project.findProperty('keyStore')
+    alias = project.findProperty('keyStoreAlias')
+    storePass = project.findProperty('keyStorePass')
+    keyPass = project.findProperty('keyStoreKeyPass')
+    inputFile = jar.archiveFile
+    outputFile = jar.archiveFile
+}
+
+build.dependsOn signJar*/
