@@ -1,9 +1,12 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -17,6 +20,7 @@ import static java.util.Objects.requireNonNull;
 public class TextureManagerWrapper implements ITextureManager {
     private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
     private final Map<ResourceLocation, Tickable> ANIMATED_TEXTURES;
+    private final ArrayDeque<Pair<ResourceLocation, Supplier<AbstractTexture>>> QUEUED_TEXTURES;
 
     /**
      * Creates the TextureManagerWrapper.
@@ -27,6 +31,7 @@ public class TextureManagerWrapper implements ITextureManager {
         requireNonNull(texManagerGetter, "Texture manager getter cannot be null");
         TEXTURE_MANAGER_GETTER = texManagerGetter;
         ANIMATED_TEXTURES = new HashMap<>();
+        QUEUED_TEXTURES = new ArrayDeque<>();
     }
 
     /**
@@ -49,6 +54,16 @@ public class TextureManagerWrapper implements ITextureManager {
             ANIMATED_TEXTURES.put(textureLocation, (Tickable) textureObj);
         }
 
+    }
+
+    /**
+     * Queues a texture to be created on the next tick.
+     * @param textureLocation       location of the texture after it is loaded
+     * @param textureGetter         retrieves the texture
+     */
+    @Override
+    public void queueTexture(ResourceLocation textureLocation, Supplier<AbstractTexture> textureGetter) {
+        QUEUED_TEXTURES.add(new Pair<>(textureLocation, textureGetter));
     }
 
     /**
@@ -76,6 +91,11 @@ public class TextureManagerWrapper implements ITextureManager {
      */
     @Override
     public void tick() {
+        while (!QUEUED_TEXTURES.isEmpty()) {
+            Pair<ResourceLocation, Supplier<AbstractTexture>> queueEntry = QUEUED_TEXTURES.pop();
+            loadTexture(queueEntry.getFirst(), queueEntry.getSecond().get());
+        }
+
         ANIMATED_TEXTURES.values().forEach(Tickable::tick);
     }
 

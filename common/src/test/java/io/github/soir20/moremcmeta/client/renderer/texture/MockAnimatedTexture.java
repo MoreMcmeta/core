@@ -12,7 +12,7 @@ import java.io.InputStream;
  */
 public class MockAnimatedTexture extends AbstractTexture implements Tickable {
 
-    public MockAnimatedTexture(InputStream textureStream, InputStream metadataStream) {}
+    public MockAnimatedTexture() {}
 
     @Override
     public void tick() {}

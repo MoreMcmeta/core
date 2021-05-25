@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -55,7 +56,7 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
      * @return  an animated texture based on the provided data
      * @throws IOException  failure reading from either input stream
      */
-    public AbstractTexture read(InputStream textureStream, InputStream metadataStream)
+    public Supplier<AbstractTexture> read(InputStream textureStream, InputStream metadataStream)
             throws IOException {
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
@@ -79,10 +80,10 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
             textureMetadata = metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
         } catch (JsonParseException jsonError) {
             LOGGER.error("Unable to read texture metadata: {}", jsonError.toString());
-            return MissingTextureAtlasSprite.getTexture();
+            return MissingTextureAtlasSprite::getTexture;
         } catch (IllegalArgumentException metadataError) {
             LOGGER.error("Found invalid metadata parameter: {}", metadataError.toString());
-            return MissingTextureAtlasSprite.getTexture();
+            return MissingTextureAtlasSprite::getTexture;
         }
 
         /* Use defaults if no metadata was read.
@@ -128,8 +129,8 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
             interpolator.close();
         };
 
-        return new SingleAnimatedTexture<>(new AnimatedTextureData<>(24000, frameManager, frameWidth,
-                frameHeight, MIPMAP), closeMipmaps);
+        return () -> new SingleAnimatedTexture<>(new AnimatedTextureData<>(24000, frameManager, frameWidth,
+                frameHeight, MIPMAP, closeMipmaps));
     }
 
     /**
@@ -139,7 +140,8 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
      * @param frameHeight   the height of a frame
      * @return  pixels that change for every mipmap (starting with the default image)
      */
-    private List<IRGBAImage.VisibleArea> getInterpolatablePoints(NativeImage image, int frameWidth, int frameHeight) {
+    private List<IRGBAImage.VisibleArea> getInterpolatablePoints(NativeImage image, int frameWidth,
+                                                                 int frameHeight) {
         List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
 
         // Find points in original image

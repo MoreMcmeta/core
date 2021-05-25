@@ -66,7 +66,9 @@ public abstract class AnimatedTexture<F extends IAnimationFrame> extends Abstrac
     /**
      * Closes all resources that this texture uses.
      */
-    public abstract void close();
+    public void close() {
+        getData().getCloseAction().run();
+    }
 
     /**
      * Gets the data for the animated texture.

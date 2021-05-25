@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -26,14 +27,13 @@ import static java.util.Objects.requireNonNull;
  * so that they will always be used for rendering.
  * @author soir20
  */
-// This will be wrapped with the selective listener for Forge.
 public class TextureReloadListener implements ResourceManagerReloadListener {
     private static final String METADATA_EXTENSION = ".moremcmeta";
 
     private final ITextureManager TEXTURE_MANAGER;
     private final ITextureReader<AbstractTexture> TEXTURE_READER;
     private final Logger LOGGER;
-    private final Map<ResourceLocation, AbstractTexture> LAST_TEXTURES_ADDED;
+    private final Map<ResourceLocation, Supplier<AbstractTexture>> LAST_TEXTURES_ADDED;
 
     /**
      * Creates a TextureReloadListener.
@@ -81,11 +81,12 @@ public class TextureReloadListener implements ResourceManagerReloadListener {
 
         }
 
-        ImmutableMap<ResourceLocation, AbstractTexture> textures = getTextures(textureCandidates, resourceManager);
+        ImmutableMap<ResourceLocation, Supplier<AbstractTexture>> textures = getTextures(textureCandidates,
+                resourceManager);
 
         // Load the textures after ticker successfully created
         LAST_TEXTURES_ADDED.putAll(textures);
-        textures.forEach(TEXTURE_MANAGER::loadTexture);
+        textures.forEach(TEXTURE_MANAGER::queueTexture);
 
     }
 
@@ -94,16 +95,18 @@ public class TextureReloadListener implements ResourceManagerReloadListener {
      * @param candidates        possible locations of textures
      * @param resourceManager   the resource manager for the current reload
      */
-    private ImmutableMap<ResourceLocation, AbstractTexture> getTextures(Collection<ResourceLocation> candidates,
-                                                                ResourceManager resourceManager) {
-        ImmutableMap.Builder<ResourceLocation, AbstractTexture> textures = new ImmutableMap.Builder<>();
+    private ImmutableMap<ResourceLocation, Supplier<AbstractTexture>> getTextures(
+            Collection<ResourceLocation> candidates,
+            ResourceManager resourceManager) {
+        ImmutableMap.Builder<ResourceLocation, Supplier<AbstractTexture>> textures = new ImmutableMap.Builder<>();
 
         // Create textures from unique candidates
         (new HashSet<>(candidates)).forEach((metadataLocation) -> {
             ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(METADATA_EXTENSION, ""));
 
-            Optional<AbstractTexture> texture = getTexture(resourceManager, textureLocation, metadataLocation);
+            Optional<Supplier<AbstractTexture>> texture = getTexture(resourceManager, textureLocation,
+                    metadataLocation);
 
             // Keep track of which textures are created
             texture.ifPresent(tex -> textures.put(textureLocation, tex));
@@ -119,8 +122,9 @@ public class TextureReloadListener implements ResourceManagerReloadListener {
      * @param metadataLocation  file location of texture's metadata for this mod (not .mcmeta)
      * @return the texture, or empty if the file is not found
      */
-    private Optional<AbstractTexture> getTexture(ResourceManager resourceManager,
-                                         ResourceLocation textureLocation, ResourceLocation metadataLocation) {
+    private Optional<Supplier<AbstractTexture>> getTexture(ResourceManager resourceManager,
+                                                           ResourceLocation textureLocation,
+                                                           ResourceLocation metadataLocation) {
         try (Resource originalResource = resourceManager.getResource(textureLocation);
              Resource metadataResource = resourceManager.getResource(metadataLocation)) {
 

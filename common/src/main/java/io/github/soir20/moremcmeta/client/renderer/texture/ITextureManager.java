@@ -4,6 +4,8 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.function.Supplier;
+
 /**
  * A container for textures that can be added and removed. It represents what textures Minecraft is aware of.
  * @author soir20
@@ -16,6 +18,13 @@ public interface ITextureManager extends Tickable {
      * @param textureObj        the actual texture that should be used (atlas or otherwise)
      */
     void loadTexture(ResourceLocation textureLocation, AbstractTexture textureObj);
+
+    /**
+     * Queues a texture to be added after the manager is ticked for the first time.
+     * @param textureLocation       location of the texture after it is loaded
+     * @param textureGetter         retrieves the texture
+     */
+    void queueTexture(ResourceLocation textureLocation, Supplier<AbstractTexture> textureGetter);
 
     /**
      * Gets a texture that is already loaded into this texture manager.

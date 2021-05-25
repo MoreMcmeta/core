@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Keeps track of the {@link ResourceLocation}s of textures that would have been added to a real texture manager.
@@ -28,6 +29,11 @@ public class MockTextureManager implements ITextureManager {
         if (textureObj instanceof Tickable) {
             ANIMATED_TEXTURES.put(textureLocation, (Tickable) textureObj);
         }
+    }
+
+    @Override
+    public void queueTexture(ResourceLocation textureLocation, Supplier<AbstractTexture> textureGetter) {
+        loadTexture(textureLocation, textureGetter.get());
     }
 
     @Override

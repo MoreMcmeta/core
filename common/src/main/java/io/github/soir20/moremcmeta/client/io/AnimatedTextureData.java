@@ -20,6 +20,7 @@ public class AnimatedTextureData<F extends IAnimationFrame> {
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final int MIPMAP;
+    private final Runnable CLOSE_ACTION;
 
     /**
      * Creates a container for data about an animated texture that syncs to game time.
@@ -28,9 +29,10 @@ public class AnimatedTextureData<F extends IAnimationFrame> {
      * @param frameWidth                width of a single frame (same for all frames)
      * @param frameHeight               height of a single frame (same for all frames)
      * @param mipmapLevel               mipmap levels for all frames
+     * @param closeAction               closes the frames in the animated texture
      */
     public AnimatedTextureData(int syncTicks, AnimationFrameManager<F> frameManager, int frameWidth,
-                               int frameHeight, int mipmapLevel) {
+                               int frameHeight, int mipmapLevel, Runnable closeAction) {
         if (syncTicks <= 0) {
             throw new IllegalArgumentException("Animation cannot sync to zero or fewer ticks");
         }
@@ -41,6 +43,7 @@ public class AnimatedTextureData<F extends IAnimationFrame> {
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
         MIPMAP = mipmapLevel;
+        CLOSE_ACTION = requireNonNull(closeAction, "Close action cannot be null");
     }
 
     /**
@@ -49,9 +52,10 @@ public class AnimatedTextureData<F extends IAnimationFrame> {
      * @param frameWidth                width of a single frame (same for all frames)
      * @param frameHeight               height of a single frame (same for all frames)
      * @param mipmapLevel               mipmap levels for all frames
+     * @param closeAction               closes the frames in the animated texture
      */
     public AnimatedTextureData(AnimationFrameManager<F> frameManager, int frameWidth,
-                               int frameHeight, int mipmapLevel) {
+                               int frameHeight, int mipmapLevel, Runnable closeAction) {
         DO_TIME_SYNC = false;
         SYNC_TICKS = EMPTY_SYNC_TICKS;
 
@@ -59,6 +63,7 @@ public class AnimatedTextureData<F extends IAnimationFrame> {
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
         MIPMAP = mipmapLevel;
+        CLOSE_ACTION = closeAction;
     }
 
     /**
@@ -109,6 +114,14 @@ public class AnimatedTextureData<F extends IAnimationFrame> {
      */
     public int getMipmapLevel() {
         return MIPMAP;
+    }
+
+    /**
+     * Gets the close action for this animated texture.
+     * @return the close action for this texture
+     */
+    public Runnable getCloseAction() {
+        return CLOSE_ACTION;
     }
 
 }
