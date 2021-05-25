@@ -18,6 +18,13 @@ public interface ITextureManager extends Tickable {
     void loadTexture(ResourceLocation textureLocation, AbstractTexture textureObj);
 
     /**
+     * Gets a texture that is already loaded into this texture manager.
+     * @param textureLocation           the location of the texture
+     * @return the texture at that location or an exception if not found
+     */
+    AbstractTexture getTexture(ResourceLocation textureLocation);
+
+    /**
      * Deletes a texture so Minecraft is no longer aware of it. This also allows the texture to be replaced.
      * @param textureLocation   file location of texture to delete
      */

@@ -148,7 +148,7 @@ public class FrameReader<F extends IAnimationFrame> {
     }
 
     /**
-     * Encapsulates data about a single frame.
+     * Holds data about a single frame.
      * @author soir20
      */
     public static class FrameData {

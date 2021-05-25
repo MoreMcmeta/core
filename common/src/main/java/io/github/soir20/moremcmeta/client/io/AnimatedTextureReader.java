@@ -11,6 +11,7 @@ import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrapper;
 import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTexture;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
+import io.github.soir20.moremcmeta.client.renderer.texture.SingleAnimatedTexture;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -113,7 +114,7 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
         // Frame management
         AnimationFrameManager<NativeImageFrame> frameManager;
         if (animationMetadata.isInterpolatedFrames()) {
-             frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime, interpolator);
+            frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime, interpolator);
         } else {
             frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime);
         }
@@ -127,7 +128,8 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
             interpolator.close();
         };
 
-        return new AnimatedTexture<>(24000, frameManager, frameWidth, frameHeight, MIPMAP, closeMipmaps);
+        return new SingleAnimatedTexture<>(new AnimatedTextureData<>(24000, frameManager, frameWidth,
+                frameHeight, MIPMAP), closeMipmaps);
     }
 
     /**

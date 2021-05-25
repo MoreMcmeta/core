@@ -52,6 +52,16 @@ public class TextureManagerWrapper implements ITextureManager {
     }
 
     /**
+     * Gets a texture that is already loaded into this texture manager.
+     * @param textureLocation           the location of the texture
+     * @return the texture at that location or an exception if not found
+     */
+    @Override
+    public AbstractTexture getTexture(ResourceLocation textureLocation) {
+        return TEXTURE_MANAGER_GETTER.get().getTexture(textureLocation);
+    }
+
+    /**
      * Deletes a texture so Minecraft is no longer aware of it. This also allows the texture to be replaced.
      * @param textureLocation   file location of texture to delete
      */

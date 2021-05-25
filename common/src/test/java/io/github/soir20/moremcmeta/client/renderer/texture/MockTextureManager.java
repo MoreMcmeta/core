@@ -31,6 +31,11 @@ public class MockTextureManager implements ITextureManager {
     }
 
     @Override
+    public AbstractTexture getTexture(ResourceLocation textureLocation) {
+        return TEXTURES.get(textureLocation);
+    }
+
+    @Override
     public void deleteTexture(ResourceLocation textureLocation) {
         TEXTURES.remove(textureLocation);
     }
