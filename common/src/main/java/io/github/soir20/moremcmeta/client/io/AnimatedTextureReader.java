@@ -6,15 +6,17 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.client.animation.IInterpolator;
 import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
+import io.github.soir20.moremcmeta.client.renderer.texture.AnimationComponent;
+import io.github.soir20.moremcmeta.client.renderer.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.IRGBAImage;
+import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageCleanupComponent;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrapper;
-import io.github.soir20.moremcmeta.client.renderer.texture.AnimatedTexture;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
-import io.github.soir20.moremcmeta.client.renderer.texture.SingleAnimatedTexture;
+import io.github.soir20.moremcmeta.client.renderer.texture.SingleTextureComponent;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 import net.minecraft.resources.ResourceLocation;
@@ -26,16 +28,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Reads an {@link AnimatedTexture} from file data. It is reusable for all animated textures with the same
- * mipmap level.
+ * Reads an {@link EventDrivenTexture} from file data.
+ * It is reusable for all animated textures with the same mipmap level.
  * @author soir20
  */
-public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
+public class AnimatedTextureReader implements ITextureReader {
     private final int MIPMAP;
     private final Logger LOGGER;
 
@@ -50,13 +51,13 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
     }
 
     /**
-     * Reads an {@link AnimatedTexture}.
+     * Reads an {@link EventDrivenTexture}.
      * @param textureStream           input stream with image data
      * @param metadataStream          input stream with texture and animation properties
      * @return  an animated texture based on the provided data
      * @throws IOException  failure reading from either input stream
      */
-    public Supplier<AbstractTexture> read(InputStream textureStream, InputStream metadataStream)
+    public AbstractTexture read(InputStream textureStream, InputStream metadataStream)
             throws IOException {
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
@@ -80,10 +81,10 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
             textureMetadata = metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
         } catch (JsonParseException jsonError) {
             LOGGER.error("Unable to read texture metadata: {}", jsonError.toString());
-            return MissingTextureAtlasSprite::getTexture;
+            return MissingTextureAtlasSprite.getTexture();
         } catch (IllegalArgumentException metadataError) {
             LOGGER.error("Found invalid metadata parameter: {}", metadataError.toString());
-            return MissingTextureAtlasSprite::getTexture;
+            return MissingTextureAtlasSprite.getTexture();
         }
 
         /* Use defaults if no metadata was read.
@@ -129,8 +130,13 @@ public class AnimatedTextureReader implements ITextureReader<AbstractTexture> {
             interpolator.close();
         };
 
-        return () -> new SingleAnimatedTexture<>(new AnimatedTextureData<>(24000, frameManager, frameWidth,
-                frameHeight, MIPMAP, closeMipmaps));
+        EventDrivenTexture.Builder<NativeImageFrame> builder = new EventDrivenTexture.Builder<>();
+        builder.setImage(frameManager.getCurrentFrame())
+                .add(new NativeImageCleanupComponent(closeMipmaps))
+                .add(new AnimationComponent(24000, frameManager))
+                .add(new SingleTextureComponent());
+
+        return builder.build();
     }
 
     /**

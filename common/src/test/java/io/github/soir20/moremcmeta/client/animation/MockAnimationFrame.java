@@ -1,6 +1,7 @@
 package io.github.soir20.moremcmeta.client.animation;
 
 import io.github.soir20.moremcmeta.client.io.FrameReader;
+import io.github.soir20.moremcmeta.math.Point;
 
 /**
  * Mocks an {@link IAnimationFrame}. Essentially a wrapper for frame data that can be validated.
@@ -43,5 +44,5 @@ public class MockAnimationFrame implements IAnimationFrame {
     }
 
     @Override
-    public void uploadAt(int x, int y) {}
+    public void uploadAt(Point point) {}
 }

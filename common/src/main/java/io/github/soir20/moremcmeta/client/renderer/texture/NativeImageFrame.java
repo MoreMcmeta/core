@@ -3,6 +3,7 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.animation.IAnimationFrame;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
+import io.github.soir20.moremcmeta.math.Point;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,13 +54,12 @@ public class NativeImageFrame implements IAnimationFrame {
 
     /**
      * Uploads this frame at a given position in the active texture.
-     * @param x     x-coordinate to upload the upper-left corner of this frame at
-     * @param y     y-coordinate to upload the upper-left corner of this frame at
+     * @param point     point to upload the top-left corner of this frame at
      */
-    public void uploadAt(int x, int y) {
+    public void uploadAt(Point point) {
         for (int level = 0; level < MIPMAPS.length; level++) {
-            int mipmappedX = x >> level;
-            int mipmappedY = y >> level;
+            int mipmappedX = point.getX() >> level;
+            int mipmappedY = point.getY() >> level;
             int mipmappedSkipX = X_OFFSET >> level;
             int mipmappedSkipY = Y_OFFSET >> level;
             int mipmappedWidth = WIDTH >> level;
@@ -102,6 +102,14 @@ public class NativeImageFrame implements IAnimationFrame {
      */
     public int getYOffset() {
         return Y_OFFSET;
+    }
+
+    /**
+     * Gets the mipmap level of this frame.
+     * @return the mipmap level of this frame
+     */
+    public int getMipmapLevel() {
+        return MIPMAPS.length;
     }
 
     /**

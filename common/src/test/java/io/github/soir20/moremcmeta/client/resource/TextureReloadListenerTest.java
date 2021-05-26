@@ -3,7 +3,6 @@ package io.github.soir20.moremcmeta.client.resource;
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.client.renderer.texture.MockAnimatedTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.MockTextureManager;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +12,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
 
@@ -39,7 +37,7 @@ public class TextureReloadListenerTest {
     @Test
     public void construct_TextureManagerNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new, null, LOGGER);
+        new TextureReloadListener(MockAnimatedTexture::new, null, LOGGER);
     }
 
     @Test
@@ -47,14 +45,14 @@ public class TextureReloadListenerTest {
         MockTextureManager mockTextureManager = new MockTextureManager();
 
         expectedException.expect(NullPointerException.class);
-        new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new, mockTextureManager, null);
+        new TextureReloadListener(MockAnimatedTexture::new, mockTextureManager, null);
     }
 
     @Test
     public void onResourceManagerReload_ResourceManagerNull_NullPointerException() {
         MockTextureManager mockTextureManager = new MockTextureManager();
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         expectedException.expect(NullPointerException.class);
@@ -69,7 +67,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
@@ -90,7 +88,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
@@ -110,7 +108,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
@@ -128,7 +126,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of("creeper.png", "zombie.png"), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
@@ -146,7 +144,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of("creeper.png.moremcmeta", "zombie.png.moremcmeta"), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
@@ -164,7 +162,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), true
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
@@ -186,7 +184,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManagerFirstReload);
@@ -208,7 +206,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManagerFirstReload);
@@ -237,16 +235,16 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManagerFirstReload);
         listener.onResourceManagerReload(mockResourceManagerSecondReload);
 
         mockTextureManager.loadTexture(new ResourceLocation("textures/creeper.png"),
-                new MockAnimatedTexture());
+                new MockAnimatedTexture(null, null));
         mockTextureManager.loadTexture(new ResourceLocation("textures/zombie.png"),
-                new MockAnimatedTexture());
+                new MockAnimatedTexture(null, null));
 
         listener.onResourceManagerReload(mockResourceManagerThirdReload);
 
@@ -268,7 +266,7 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener((texStream, metadataStream) -> MockAnimatedTexture::new,
+        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
                 mockTextureManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);

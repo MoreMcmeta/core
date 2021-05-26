@@ -1,5 +1,7 @@
 package io.github.soir20.moremcmeta.client.animation;
 
+import io.github.soir20.moremcmeta.math.Point;
+
 /**
  * A single frame in an animation.
  * @author soir20
@@ -14,9 +16,8 @@ public interface IAnimationFrame {
 
     /**
      * Uploads this frame at a given position in the active texture.
-     * @param x     x-coordinate to upload the upper-left corner of this frame at
-     * @param y     y-coordinate to upload the upper-left corner of this frame at
+     * @param point     point to upload the top-left corner of this frame at
      */
-    void uploadAt(int x, int y);
+    void uploadAt(Point point);
 
 }

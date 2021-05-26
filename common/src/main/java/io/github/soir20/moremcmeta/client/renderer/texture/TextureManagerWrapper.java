@@ -20,7 +20,8 @@ import static java.util.Objects.requireNonNull;
 public class TextureManagerWrapper implements ITextureManager {
     private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
     private final Map<ResourceLocation, Tickable> ANIMATED_TEXTURES;
-    private final ArrayDeque<Pair<ResourceLocation, Supplier<AbstractTexture>>> QUEUED_TEXTURES;
+    private final ArrayDeque<Pair<ResourceLocation, EventDrivenTexture.Builder<NativeImageFrame>>>
+            QUEUED_TEXTURES;
 
     /**
      * Creates the TextureManagerWrapper.
@@ -59,11 +60,12 @@ public class TextureManagerWrapper implements ITextureManager {
     /**
      * Queues a texture to be created on the next tick.
      * @param textureLocation       location of the texture after it is loaded
-     * @param textureGetter         retrieves the texture
+     * @param textureBuilder        builder to generate the texture
      */
     @Override
-    public void queueTexture(ResourceLocation textureLocation, Supplier<AbstractTexture> textureGetter) {
-        QUEUED_TEXTURES.add(new Pair<>(textureLocation, textureGetter));
+    public void queueTexture(ResourceLocation textureLocation,
+                             EventDrivenTexture.Builder<NativeImageFrame> textureBuilder) {
+        QUEUED_TEXTURES.add(new Pair<>(textureLocation, textureBuilder));
     }
 
     /**
@@ -92,8 +94,10 @@ public class TextureManagerWrapper implements ITextureManager {
     @Override
     public void tick() {
         while (!QUEUED_TEXTURES.isEmpty()) {
-            Pair<ResourceLocation, Supplier<AbstractTexture>> queueEntry = QUEUED_TEXTURES.pop();
-            loadTexture(queueEntry.getFirst(), queueEntry.getSecond().get());
+            Pair<ResourceLocation, EventDrivenTexture.Builder<NativeImageFrame>> queueEntry =
+                    QUEUED_TEXTURES.pop();
+            ResourceLocation location = queueEntry.getFirst();
+            loadTexture(location, queueEntry.getSecond().build());
         }
 
         ANIMATED_TEXTURES.values().forEach(Tickable::tick);
