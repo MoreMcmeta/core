@@ -13,6 +13,7 @@ public class TextureListener<I> {
      */
     public enum Type {
         REGISTRATION,
+        BIND,
         UPLOAD,
         TICK,
         CLOSE,
@@ -46,4 +47,5 @@ public class TextureListener<I> {
     public void run(EventDrivenTexture.TextureState<I> state) {
         ACTION.accept(state);
     }
+
 }

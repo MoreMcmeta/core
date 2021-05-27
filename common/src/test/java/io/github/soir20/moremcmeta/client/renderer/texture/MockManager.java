@@ -1,6 +1,5 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.resources.ResourceLocation;
 
@@ -10,19 +9,20 @@ import java.util.Set;
 
 /**
  * Keeps track of the {@link ResourceLocation}s of textures that would have been added to a real texture manager.
+ * @param <R> resource type
  * @author soir20
  */
-public class MockTextureManager implements ITextureManager {
-    private final Map<ResourceLocation, AbstractTexture> TEXTURES;
+public class MockManager<R> implements IManager<R> {
+    private final Map<ResourceLocation, R> TEXTURES;
     private final Map<ResourceLocation, Tickable> ANIMATED_TEXTURES;
 
-    public MockTextureManager() {
+    public MockManager() {
         TEXTURES = new HashMap<>();
         ANIMATED_TEXTURES = new HashMap<>();
     }
 
     @Override
-    public void loadTexture(ResourceLocation textureLocation, AbstractTexture textureObj) {
+    public void register(ResourceLocation textureLocation, R textureObj) {
         TEXTURES.put(textureLocation, textureObj);
         ANIMATED_TEXTURES.remove(textureLocation);
         if (textureObj instanceof Tickable) {
@@ -31,12 +31,7 @@ public class MockTextureManager implements ITextureManager {
     }
 
     @Override
-    public AbstractTexture getTexture(ResourceLocation textureLocation) {
-        return TEXTURES.get(textureLocation);
-    }
-
-    @Override
-    public void deleteTexture(ResourceLocation textureLocation) {
+    public void unregister(ResourceLocation textureLocation) {
         TEXTURES.remove(textureLocation);
     }
 

@@ -1,10 +1,10 @@
 package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonParseException;
 import io.github.soir20.moremcmeta.client.io.ITextureReader;
-import io.github.soir20.moremcmeta.client.renderer.texture.ITextureManager;
+import io.github.soir20.moremcmeta.client.renderer.texture.IManager;
 import net.minecraft.ResourceLocationException;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -24,15 +24,16 @@ import static java.util.Objects.requireNonNull;
 /**
  * Uploads textures to the texture manager on texture reloading 
  * so that they will always be used for rendering.
+ * @param <R> resource type
  * @author soir20
  */
-public class TextureReloadListener implements ResourceManagerReloadListener {
+public class TextureReloadListener<R> implements ResourceManagerReloadListener {
     private static final String METADATA_EXTENSION = ".moremcmeta";
 
-    private final ITextureManager TEXTURE_MANAGER;
-    private final ITextureReader TEXTURE_READER;
+    private final IManager<R> TEXTURE_MANAGER;
+    private final ITextureReader<R> TEXTURE_READER;
     private final Logger LOGGER;
-    private final Map<ResourceLocation, AbstractTexture> LAST_TEXTURES_ADDED;
+    private final Map<ResourceLocation, R> LAST_TEXTURES_ADDED;
 
     /**
      * Creates a TextureReloadListener.
@@ -40,7 +41,7 @@ public class TextureReloadListener implements ResourceManagerReloadListener {
      * @param texManager            uploads textures to the game's texture manager
      * @param logger                logs listener-related messages to the game's output
      */
-    public TextureReloadListener(ITextureReader texReader, ITextureManager texManager,
+    public TextureReloadListener(ITextureReader<R> texReader, IManager<R> texManager,
                                  Logger logger) {
         TEXTURE_READER = requireNonNull(texReader, "Texture reader cannot be null");
         TEXTURE_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
@@ -75,16 +76,16 @@ public class TextureReloadListener implements ResourceManagerReloadListener {
         } finally {
 
             // Clean up any previously loaded textures
-            LAST_TEXTURES_ADDED.keySet().forEach(TEXTURE_MANAGER::deleteTexture);
+            LAST_TEXTURES_ADDED.keySet().forEach(TEXTURE_MANAGER::unregister);
             LAST_TEXTURES_ADDED.clear();
 
         }
 
-        ImmutableMap<ResourceLocation, AbstractTexture> textures = getTextures(textureCandidates, resourceManager);
+        ImmutableMap<ResourceLocation, R> textures = getTextures(textureCandidates, resourceManager);
 
         // Load the textures after ticker successfully created
         LAST_TEXTURES_ADDED.putAll(textures);
-        textures.forEach(TEXTURE_MANAGER::loadTexture);
+        textures.forEach(TEXTURE_MANAGER::register);
 
     }
 
@@ -93,16 +94,16 @@ public class TextureReloadListener implements ResourceManagerReloadListener {
      * @param candidates        possible locations of textures
      * @param resourceManager   the resource manager for the current reload
      */
-    private ImmutableMap<ResourceLocation, AbstractTexture> getTextures(Collection<ResourceLocation> candidates,
+    private ImmutableMap<ResourceLocation, R> getTextures(Collection<ResourceLocation> candidates,
                                                                      ResourceManager resourceManager) {
-        ImmutableMap.Builder<ResourceLocation, AbstractTexture> textures = new ImmutableMap.Builder<>();
+        ImmutableMap.Builder<ResourceLocation, R> textures = new ImmutableMap.Builder<>();
 
         // Create textures from unique candidates
         (new HashSet<>(candidates)).forEach((metadataLocation) -> {
             ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(METADATA_EXTENSION, ""));
 
-            Optional<AbstractTexture> texture = getTexture(resourceManager, textureLocation,
+            Optional<R> texture = getTexture(resourceManager, textureLocation,
                     metadataLocation);
 
             // Keep track of which textures are created
@@ -119,7 +120,7 @@ public class TextureReloadListener implements ResourceManagerReloadListener {
      * @param metadataLocation  file location of texture's metadata for this mod (not .mcmeta)
      * @return the texture, or empty if the file is not found
      */
-    private Optional<AbstractTexture> getTexture(ResourceManager resourceManager,
+    private Optional<R> getTexture(ResourceManager resourceManager,
                                               ResourceLocation textureLocation,
                                               ResourceLocation metadataLocation) {
         try (Resource originalResource = resourceManager.getResource(textureLocation);
@@ -135,6 +136,10 @@ public class TextureReloadListener implements ResourceManagerReloadListener {
         } catch (IOException ioException) {
             LOGGER.error("Using missing texture, unable to load {}: {}",
                     textureLocation, ioException);
+        } catch (JsonParseException jsonError) {
+            LOGGER.error("Unable to read texture metadata: {}", jsonError.toString());
+        } catch (IllegalArgumentException metadataError) {
+            LOGGER.error("Found invalid metadata parameter: {}", metadataError.toString());
         }
 
         return Optional.empty();

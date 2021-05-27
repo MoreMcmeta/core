@@ -1,7 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import io.github.soir20.moremcmeta.client.animation.IAnimationFrame;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
 
@@ -11,7 +10,7 @@ import static java.util.Objects.requireNonNull;
  * An animation frame based on a {@link NativeImage}.
  * @author soir20
  */
-public class NativeImageFrame implements IAnimationFrame {
+public class NativeImageFrame {
     private final NativeImage[] MIPMAPS;
     private final int WIDTH;
     private final int HEIGHT;

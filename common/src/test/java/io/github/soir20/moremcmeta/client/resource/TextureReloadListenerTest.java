@@ -1,8 +1,7 @@
 package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.renderer.texture.MockAnimatedTexture;
-import io.github.soir20.moremcmeta.client.renderer.texture.MockTextureManager;
+import io.github.soir20.moremcmeta.client.renderer.texture.MockManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
@@ -28,32 +27,32 @@ public class TextureReloadListenerTest {
 
     @Test
     public void construct_TextureFactoryNull_NullPointerException() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
 
         expectedException.expect(NullPointerException.class);
-        new TextureReloadListener(null, mockTextureManager, LOGGER);
+        new TextureReloadListener<>(null, mockManager, LOGGER);
     }
 
     @Test
     public void construct_TextureManagerNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new TextureReloadListener(MockAnimatedTexture::new, null, LOGGER);
+        new TextureReloadListener<>((texStream, metadataStream) -> 1, null, LOGGER);
     }
 
     @Test
     public void construct_LoggerNull_NullPointerException() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
 
         expectedException.expect(NullPointerException.class);
-        new TextureReloadListener(MockAnimatedTexture::new, mockTextureManager, null);
+        new TextureReloadListener<>((texStream, metadataStream) -> 1, mockManager, null);
     }
 
     @Test
     public void onResourceManagerReload_ResourceManagerNull_NullPointerException() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         expectedException.expect(NullPointerException.class);
         listener.onResourceManagerReload(null);
@@ -61,18 +60,18 @@ public class TextureReloadListenerTest {
 
     @Test
     public void onResourceManagerReload_ValidLocations_ManagerHasAllTextures() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManager = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(3, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/creeper.png")));
@@ -81,19 +80,19 @@ public class TextureReloadListenerTest {
 
     @Test
     public void onResourceManagerReload_ValidLocationsDuplicates_ManagerHasNoDuplicate() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManager = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "bat.png.moremcmeta",
                         "zombie.png.moremcmeta"),
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(3, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/creeper.png")));
@@ -102,78 +101,78 @@ public class TextureReloadListenerTest {
 
     @Test
     public void onResourceManagerReload_FilteredLocations_ManagerHasFilteredTextures() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManager = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper", "zombie.jpg", "ocelot.png"),
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(1, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
     }
 
     @Test
     public void onResourceManagerReload_MissingTextureLocations_ManagerHasNoMissingTextures() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManager = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
                 ImmutableList.of("creeper.png", "zombie.png"), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(1, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
     }
 
     @Test
     public void onResourceManagerReload_MissingMetadataLocations_ManagerHasNoMissingTextures() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManager = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
                 ImmutableList.of("creeper.png.moremcmeta", "zombie.png.moremcmeta"), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(1, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
     }
 
     @Test
     public void onResourceManagerReload_TextureAndMetadataInDifferentPacks_ManagerSkipsSeparatedTextures() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManager = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
                 ImmutableList.of(), true
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(0, locations.size());
     }
 
     @Test
     public void onResourceManagerReload_ResourceLocationException_ManagerCleared() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
 
         ResourceManager mockResourceManagerFirstReload = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
@@ -184,19 +183,19 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManagerFirstReload);
         listener.onResourceManagerReload(mockResourceManagerSecondReload);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(0, locations.size());
     }
 
     @Test
     public void onResourceManagerReload_PreviouslyLoadedTextures_OldDeletedNewLoaded() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManagerFirstReload = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
                 ImmutableList.of(), false
@@ -206,13 +205,13 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManagerFirstReload);
         listener.onResourceManagerReload(mockResourceManagerSecondReload);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(3, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/dolphin.png")));
@@ -221,7 +220,7 @@ public class TextureReloadListenerTest {
 
     @Test
     public void onResourceManagerReload_ThirdReloadNoLongerAnimatedTextures_NonAnimatedNotDeleted() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManagerFirstReload = new MockResourceManager(
                 ImmutableList.of("bat.png.moremcmeta", "creeper.png.moremcmeta", "zombie.png.moremcmeta"),
                 ImmutableList.of(), false
@@ -235,20 +234,20 @@ public class TextureReloadListenerTest {
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManagerFirstReload);
         listener.onResourceManagerReload(mockResourceManagerSecondReload);
 
-        mockTextureManager.loadTexture(new ResourceLocation("textures/creeper.png"),
-                new MockAnimatedTexture(null, null));
-        mockTextureManager.loadTexture(new ResourceLocation("textures/zombie.png"),
-                new MockAnimatedTexture(null, null));
+        mockManager.register(new ResourceLocation("textures/creeper.png"),
+                1);
+        mockManager.register(new ResourceLocation("textures/zombie.png"),
+                1);
 
         listener.onResourceManagerReload(mockResourceManagerThirdReload);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(5, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/cat.png")));
@@ -259,19 +258,19 @@ public class TextureReloadListenerTest {
 
     @Test
     public void onResourceManagerReload_DiffNamespaces_AllLoaded() {
-        MockTextureManager mockTextureManager = new MockTextureManager();
+        MockManager<Integer> mockManager = new MockManager<>();
         ResourceManager mockResourceManager = new MockResourceManager(
                 ImmutableList.of("test:bat.png.moremcmeta", "moremcmeta:creeper.png.moremcmeta",
                         "zombie.png.moremcmeta"),
                 ImmutableList.of(), false
         );
 
-        TextureReloadListener listener = new TextureReloadListener(MockAnimatedTexture::new,
-                mockTextureManager, LOGGER);
+        TextureReloadListener<Integer> listener = new TextureReloadListener<>((texStream, metadataStream) -> 1,
+                mockManager, LOGGER);
 
         listener.onResourceManagerReload(mockResourceManager);
 
-        Set<ResourceLocation> locations = mockTextureManager.getLocations();
+        Set<ResourceLocation> locations = mockManager.getLocations();
         assertEquals(3, locations.size());
         assertTrue(locations.contains(new ResourceLocation("test", "textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("moremcmeta", "textures/creeper.png")));

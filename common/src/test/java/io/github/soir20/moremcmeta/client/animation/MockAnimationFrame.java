@@ -1,13 +1,12 @@
 package io.github.soir20.moremcmeta.client.animation;
 
 import io.github.soir20.moremcmeta.client.io.FrameReader;
-import io.github.soir20.moremcmeta.math.Point;
 
 /**
- * Mocks an {@link IAnimationFrame}. Essentially a wrapper for frame data that can be validated.
+ * Mocks an animation frame. Essentially a wrapper for frame data that can be validated.
  * @author soir20
  */
-public class MockAnimationFrame implements IAnimationFrame {
+public class MockAnimationFrame {
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
@@ -38,11 +37,7 @@ public class MockAnimationFrame implements IAnimationFrame {
         return Y_OFFSET;
     }
 
-    @Override
     public int getFrameTime() {
         return TIME;
     }
-
-    @Override
-    public void uploadAt(Point point) {}
 }

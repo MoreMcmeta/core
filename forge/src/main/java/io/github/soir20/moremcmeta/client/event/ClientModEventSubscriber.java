@@ -2,6 +2,8 @@ package io.github.soir20.moremcmeta.client.event;
 
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
+import io.github.soir20.moremcmeta.client.renderer.texture.EventDrivenTexture;
+import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper;
 import io.github.soir20.moremcmeta.client.resource.TextureReloadListener;
 import io.github.soir20.moremcmeta.MoreMcmeta;
@@ -53,7 +55,8 @@ public class ClientModEventSubscriber {
 
         AnimatedTextureReader texReader = new AnimatedTextureReader(0, logger);
 
-        TextureReloadListener commonListener = new TextureReloadListener(texReader, texManager, logger);
+        TextureReloadListener<EventDrivenTexture.Builder<NativeImageFrame>> commonListener =
+                new TextureReloadListener<>(texReader, texManager, logger);
         SelectiveReloadListenerWrapper wrapper = new SelectiveReloadListenerWrapper(
                 VanillaResourceType.TEXTURES,
                 commonListener

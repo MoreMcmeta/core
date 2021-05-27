@@ -13,10 +13,7 @@ import io.github.soir20.moremcmeta.client.renderer.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrapper;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
-import io.github.soir20.moremcmeta.client.renderer.texture.SingleTextureComponent;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 import net.minecraft.resources.ResourceLocation;
@@ -32,18 +29,20 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Reads an {@link EventDrivenTexture} from file data.
- * It is reusable for all animated textures with the same mipmap level.
+ * Reads an {@link EventDrivenTexture} from file data. It is reusable for all
+ * animated textures with the same mipmap level. It leaves textures in an pre-built
+ * state to allow for the {@link io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper}
+ * to add components related to texture registration and binding.
  * @author soir20
  */
-public class AnimatedTextureReader implements ITextureReader {
+public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder<NativeImageFrame>> {
     private final int MIPMAP;
     private final Logger LOGGER;
 
     /**
      * Creates a new reader for animated textures.
-     * @param mipmap    number of mipmap levels to use
-     * @param logger    logger for reading-related messages
+     * @param mipmap        number of mipmap levels to use
+     * @param logger        logger for reading-related messages
      */
     public AnimatedTextureReader(int mipmap, Logger logger) {
         MIPMAP = mipmap;
@@ -57,8 +56,10 @@ public class AnimatedTextureReader implements ITextureReader {
      * @return  an animated texture based on the provided data
      * @throws IOException  failure reading from either input stream
      */
-    public AbstractTexture read(InputStream textureStream, InputStream metadataStream)
-            throws IOException {
+    public EventDrivenTexture.Builder<NativeImageFrame>
+    read(InputStream textureStream, InputStream metadataStream) throws IOException,
+            JsonParseException, IllegalArgumentException {
+
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
 
@@ -74,18 +75,10 @@ public class AnimatedTextureReader implements ITextureReader {
         SimpleResource metadataParser = new SimpleResource("dummy", new ResourceLocation(""),
                 textureStream, metadataStream);
 
-        AnimationMetadataSection animationMetadata;
-        TextureMetadataSection textureMetadata;
-        try {
-            animationMetadata = metadataParser.getMetadata(AnimationMetadataSection.SERIALIZER);
-            textureMetadata = metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
-        } catch (JsonParseException jsonError) {
-            LOGGER.error("Unable to read texture metadata: {}", jsonError.toString());
-            return MissingTextureAtlasSprite.getTexture();
-        } catch (IllegalArgumentException metadataError) {
-            LOGGER.error("Found invalid metadata parameter: {}", metadataError.toString());
-            return MissingTextureAtlasSprite.getTexture();
-        }
+        AnimationMetadataSection animationMetadata =
+                metadataParser.getMetadata(AnimationMetadataSection.SERIALIZER);
+        TextureMetadataSection textureMetadata =
+                metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
 
         /* Use defaults if no metadata was read.
            The metadata parser can set these to null even if there was no error. */
@@ -133,10 +126,9 @@ public class AnimatedTextureReader implements ITextureReader {
         EventDrivenTexture.Builder<NativeImageFrame> builder = new EventDrivenTexture.Builder<>();
         builder.setImage(frameManager.getCurrentFrame())
                 .add(new CleanupComponent<>(closeMipmaps))
-                .add(new AnimationComponent<>(24000, frameManager))
-                .add(new SingleTextureComponent());
+                .add(new AnimationComponent<>(24000, frameManager));
 
-        return builder.build();
+        return builder;
     }
 
     /**

@@ -2,7 +2,6 @@ package io.github.soir20.moremcmeta.client.io;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.client.animation.IAnimationFrame;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 
 import java.util.HashMap;
@@ -16,7 +15,7 @@ import static java.util.Objects.requireNonNull;
  * @param <F>   tickable texture type
  * @author soir20
  */
-public class FrameReader<F extends IAnimationFrame> {
+public class FrameReader<F> {
     private final Function<FrameData, F> FRAME_FACTORY;
 
     /**
@@ -80,8 +79,8 @@ public class FrameReader<F extends IAnimationFrame> {
      * @param numFramesY    number of frames per column
      * @return  the list of predefined frames
      */
-    private ImmutableList<F> getPredefinedFrames(AnimationMetadataSection metadata, int frameWidth, int frameHeight,
-                                        int numFramesX, int numFramesY) {
+    private ImmutableList<F> getPredefinedFrames(AnimationMetadataSection metadata, int frameWidth,
+                                                 int frameHeight, int numFramesX, int numFramesY) {
         ImmutableList.Builder<F> frames = ImmutableList.builder();
 
         // Cache frames so we can reuse them if they repeat
