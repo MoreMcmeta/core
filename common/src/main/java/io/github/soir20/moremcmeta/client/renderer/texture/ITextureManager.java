@@ -18,14 +18,6 @@ public interface ITextureManager extends Tickable {
     void loadTexture(ResourceLocation textureLocation, AbstractTexture textureObj);
 
     /**
-     * Queues a texture to be added after the manager is ticked for the first time.
-     * @param textureLocation       location of the texture after it is loaded
-     * @param textureBuilder        builder to generate the texture
-     */
-    void queueTexture(ResourceLocation textureLocation,
-                      EventDrivenTexture.Builder<NativeImageFrame> textureBuilder);
-
-    /**
      * Gets a texture that is already loaded into this texture manager.
      * @param textureLocation           the location of the texture
      * @return the texture at that location or an exception if not found

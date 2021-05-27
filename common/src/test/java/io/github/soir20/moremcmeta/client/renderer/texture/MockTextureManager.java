@@ -31,12 +31,6 @@ public class MockTextureManager implements ITextureManager {
     }
 
     @Override
-    public void queueTexture(ResourceLocation textureLocation,
-                             EventDrivenTexture.Builder<NativeImageFrame> textureBuilder) {
-        loadTexture(textureLocation, textureBuilder.build());
-    }
-
-    @Override
     public AbstractTexture getTexture(ResourceLocation textureLocation) {
         return TEXTURES.get(textureLocation);
     }

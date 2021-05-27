@@ -8,11 +8,12 @@ import java.util.stream.Stream;
 
 /**
  * Manages an animation for an {@link EventDrivenTexture}.
+ * @param <I> image type
  */
-public class AnimationComponent implements ITextureComponent<NativeImageFrame> {
+public class AnimationComponent<I> implements ITextureComponent<I> {
     private final boolean DO_DAYTIME_SYNC;
     private final int SYNC_TICKS;
-    private final AnimationFrameManager<NativeImageFrame> FRAME_MANAGER;
+    private final AnimationFrameManager<I> FRAME_MANAGER;
 
     private int ticks;
 
@@ -21,7 +22,7 @@ public class AnimationComponent implements ITextureComponent<NativeImageFrame> {
      * @param syncTicks         number of ticks to sync to
      * @param frameManager      frame manager for the animation
      */
-    public AnimationComponent(int syncTicks, AnimationFrameManager<NativeImageFrame> frameManager) {
+    public AnimationComponent(int syncTicks, AnimationFrameManager<I> frameManager) {
         DO_DAYTIME_SYNC = true;
         SYNC_TICKS = syncTicks;
         FRAME_MANAGER = frameManager;
@@ -31,7 +32,7 @@ public class AnimationComponent implements ITextureComponent<NativeImageFrame> {
      * Creates an animation component that does not sync to the current game time.
      * @param frameManager      frame manager for the animation
      */
-    public AnimationComponent(AnimationFrameManager<NativeImageFrame> frameManager) {
+    public AnimationComponent(AnimationFrameManager<I> frameManager) {
         DO_DAYTIME_SYNC = false;
         SYNC_TICKS = -1;
         FRAME_MANAGER = frameManager;
@@ -42,8 +43,8 @@ public class AnimationComponent implements ITextureComponent<NativeImageFrame> {
      * @return the listeners for this component
      */
     @Override
-    public Stream<TextureListener<NativeImageFrame>> getListeners() {
-        TextureListener<NativeImageFrame> tickListener =
+    public Stream<TextureListener<I>> getListeners() {
+        TextureListener<I> tickListener =
                 new TextureListener<>(TextureListener.Type.TICK, (state) -> {
                     ClientLevel currentWorld = Minecraft.getInstance().level;
 
@@ -61,7 +62,7 @@ public class AnimationComponent implements ITextureComponent<NativeImageFrame> {
                     state.markNeedsUpload();
                 });
 
-        TextureListener<NativeImageFrame> uploadListener =
+        TextureListener<I> uploadListener =
                 new TextureListener<>(TextureListener.Type.UPLOAD, (state) ->
                         state.replaceImage(FRAME_MANAGER.getCurrentFrame()));
 

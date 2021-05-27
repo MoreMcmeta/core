@@ -58,17 +58,6 @@ public class TextureManagerWrapper implements ITextureManager {
     }
 
     /**
-     * Queues a texture to be created on the next tick.
-     * @param textureLocation       location of the texture after it is loaded
-     * @param textureBuilder        builder to generate the texture
-     */
-    @Override
-    public void queueTexture(ResourceLocation textureLocation,
-                             EventDrivenTexture.Builder<NativeImageFrame> textureBuilder) {
-        QUEUED_TEXTURES.add(new Pair<>(textureLocation, textureBuilder));
-    }
-
-    /**
      * Gets a texture that is already loaded into this texture manager.
      * @param textureLocation           the location of the texture
      * @return the texture at that location or an exception if not found

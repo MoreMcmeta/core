@@ -9,7 +9,7 @@ import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.client.renderer.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.client.renderer.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.IRGBAImage;
-import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageCleanupComponent;
+import io.github.soir20.moremcmeta.client.renderer.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrapper;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
@@ -132,8 +132,8 @@ public class AnimatedTextureReader implements ITextureReader {
 
         EventDrivenTexture.Builder<NativeImageFrame> builder = new EventDrivenTexture.Builder<>();
         builder.setImage(frameManager.getCurrentFrame())
-                .add(new NativeImageCleanupComponent(closeMipmaps))
-                .add(new AnimationComponent(24000, frameManager))
+                .add(new CleanupComponent<>(closeMipmaps))
+                .add(new AnimationComponent<>(24000, frameManager))
                 .add(new SingleTextureComponent());
 
         return builder.build();
