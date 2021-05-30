@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 /**
  * Cleans up images when an {@link EventDrivenTexture} closes.
  * @param <I> image type
+ * @author soir20
  */
 public class CleanupComponent<I> implements ITextureComponent<I> {
     private final Runnable CLOSE_ACTION;

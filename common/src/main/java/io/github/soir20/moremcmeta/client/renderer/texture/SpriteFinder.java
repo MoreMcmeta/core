@@ -13,6 +13,7 @@ import java.util.Optional;
 
 /**
  * Searches atlas textures for sprites.
+ * @author soir20
  */
 public class SpriteFinder {
     private static final ImmutableSet<ResourceLocation> ATLAS_LOCATIONS = ImmutableSet.of(

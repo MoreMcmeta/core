@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 /**
  * Determines if a texture is a sprite and uploads it to the appropriate location.
+ * @author soir20
  */
 public class UploadComponent implements ITextureComponent<NativeImageFrame> {
     private final ResourceLocation TEXTURE_LOCATION;

@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 
 /**
  * A container for resources that can be added and removed. It represents what textures Minecraft is aware of.
+ * @param <R> resource type
  * @author soir20
  */
 public interface IManager<R> extends Tickable {

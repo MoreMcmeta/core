@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  * No listeners are fired on the render thread. Wrap listener code with calls to
  * {@link RenderSystem} if it must be executed on the render thread.
  * @param <I> image type
+ * @author soir20
  */
 public class EventDrivenTexture<I> extends AbstractTexture implements Tickable {
     private final Map<TextureListener.Type, List<TextureListener<I>>> LISTENERS;

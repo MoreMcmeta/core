@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 /**
  * A listener for an {@link EventDrivenTexture}'s events.
  * @param <I> image type
+ * @author soir20
  */
 public class TextureListener<I> {
 

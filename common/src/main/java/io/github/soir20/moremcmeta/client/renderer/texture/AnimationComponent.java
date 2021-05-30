@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 /**
  * Manages an animation for an {@link EventDrivenTexture}.
  * @param <I> image type
+ * @author soir20
  */
 public class AnimationComponent<I> implements ITextureComponent<I> {
     private final boolean DO_DAYTIME_SYNC;

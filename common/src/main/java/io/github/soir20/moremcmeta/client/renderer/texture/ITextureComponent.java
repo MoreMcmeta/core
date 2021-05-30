@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 /**
  * A container for related {@link TextureListener}s.
  * @param <I>
+ * @author soir20
  */
 public interface ITextureComponent<I> {
 
