@@ -211,7 +211,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 int mipmappedHeight = FRAME_HEIGHT >> level;
 
                 NativeImage mipmappedImage = new NativeImage(mipmappedWidth, mipmappedHeight, true);
-                mipmappedImage.copyFrom(originalMipmaps[MIPMAP]);
+                copyTopLeftRect(FRAME_WIDTH, FRAME_HEIGHT, originalMipmaps[MIPMAP], mipmappedImage);
                 MIPMAPS[level] = mipmappedImage;
 
                 widthsToImage.put(mipmappedWidth, new Pair<>(mipmappedImage, visibleAreas.get(level)));
@@ -276,6 +276,22 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 mipmap.close();
             }
         }
+
+        /**
+         * Copies a rectangle in the top left from one image to another.
+         * @param width     width of the rectangle to copy
+         * @param height    height of the rectangle to copy
+         * @param from      image to copy from (unchanged)
+         * @param to        image to copy to (changed)
+         */
+        private void copyTopLeftRect(int width, int height, NativeImage from, NativeImage to) {
+            for (int xPos = 0; xPos < width; xPos++) {
+                for (int yPos = 0; yPos < height; yPos++) {
+                    to.setPixelRGBA(xPos, yPos, from.getPixelRGBA(xPos, yPos));
+                }
+            }
+        }
+
     }
 
 }
