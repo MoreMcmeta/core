@@ -1,7 +1,8 @@
 package io.github.soir20.moremcmeta.client.animation;
 
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.client.renderer.texture.IRGBAImage;
+import io.github.soir20.moremcmeta.math.Point;
+
 import java.util.function.BiFunction;
 
 import static java.util.Objects.requireNonNull;
@@ -60,9 +61,9 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
         requireNonNull(output, "Interpolated image was created as null");
 
         IRGBAImage.VisibleArea points = output.getVisibleArea();
-        for (Pair<Integer, Integer> point : points) {
-            int xPos = point.getFirst();
-            int yPos = point.getSecond();
+        for (Point point : points) {
+            int xPos = point.getX();
+            int yPos = point.getY();
 
             int startColor = getPixel(start, xPos, yPos);
             int endColor = getPixel(end, xPos, yPos);

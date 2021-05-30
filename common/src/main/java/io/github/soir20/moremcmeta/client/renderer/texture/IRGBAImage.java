@@ -1,6 +1,7 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import com.mojang.datafixers.util.Pair;
+import io.github.soir20.moremcmeta.math.Point;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -57,7 +58,7 @@ public interface IRGBAImage {
      * the color and opacity of added pixels are not enforced.
      * @author soir20
      */
-    class VisibleArea implements Iterable<Pair<Integer, Integer>> {
+    class VisibleArea implements Iterable<Point> {
         private final Set<VisibleRow> VISIBLE_ROWS;
 
         /**
@@ -65,7 +66,7 @@ public interface IRGBAImage {
          * @return  the iterator for all points in this area
          */
         @Override
-        public Iterator<Pair<Integer, Integer>> iterator() {
+        public Iterator<Point> iterator() {
             return new VisiblePointIterator(VISIBLE_ROWS);
         }
 
@@ -188,7 +189,7 @@ public interface IRGBAImage {
          * Iterates over all the points in a {@link VisibleArea}.
          * @author soir20
          */
-        private static class VisiblePointIterator implements Iterator<Pair<Integer, Integer>> {
+        private static class VisiblePointIterator implements Iterator<Point> {
             private final Iterator<VisibleRow> rowIterator;
             private VisibleRow currentRow;
             private int pixelCount;
@@ -215,14 +216,14 @@ public interface IRGBAImage {
              * @return  the next point in a visible area
              */
             @Override
-            public Pair<Integer, Integer> next() {
+            public Point next() {
                 if (currentRow == null || pixelCount == currentRow.WIDTH) {
                     currentRow = rowIterator.next();
                     pixelCount = 0;
                 }
 
                 pixelCount++;
-                return new Pair<>(currentRow.X + pixelCount - 1, currentRow.Y);
+                return new Point(currentRow.X + pixelCount - 1, currentRow.Y);
             }
 
         }

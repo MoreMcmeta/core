@@ -13,6 +13,7 @@ import io.github.soir20.moremcmeta.client.renderer.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrapper;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
+import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
@@ -162,8 +163,8 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         for (int level = 1; level <= MIPMAP; level++) {
             IRGBAImage.VisibleArea.Builder mipmapBuilder = new IRGBAImage.VisibleArea.Builder();
 
-            for (Pair<Integer, Integer> point : visibleAreas.get(0)) {
-                mipmapBuilder.addPixel(point.getFirst() >> level, point.getSecond() >> level);
+            for (Point point : visibleAreas.get(0)) {
+                mipmapBuilder.addPixel(point.getX() >> level, point.getY() >> level);
             }
 
             visibleAreas.add(mipmapBuilder.build());
