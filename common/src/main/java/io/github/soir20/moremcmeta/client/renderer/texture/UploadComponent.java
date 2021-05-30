@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Determines if a texture is a sprite and uploads it to the appropriate location.
  * @author soir20
@@ -28,7 +30,7 @@ public class UploadComponent implements ITextureComponent<NativeImageFrame> {
      * @param textureLocation       location of texture being uploaded
      */
     public UploadComponent(ResourceLocation textureLocation) {
-        TEXTURE_LOCATION = textureLocation;
+        TEXTURE_LOCATION = requireNonNull(textureLocation, "Location cannot be null");
         SPRITE_FINDER = new SpriteFinder();
         uploadPoint = new Point(0, 0);
     }

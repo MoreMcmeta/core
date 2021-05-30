@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Replaces {@link AnimationMetadataSection#EMPTY} with a metadata section that calculates
  * frame size as if the texture was animated. This prevents
@@ -33,8 +35,8 @@ public class SizeSwappingResource implements Resource {
      * @param original          the original resource
      * @param metadataStream    input stream for .moremcmeta metadata
      */
-    public SizeSwappingResource(Resource original, InputStream metadataStream) {
-        ORIGINAL = original;
+    public SizeSwappingResource(Resource original, @Nullable InputStream metadataStream) {
+        ORIGINAL = requireNonNull(original, "Original resource cannot be null");
         METADATA_STREAM = metadataStream;
     }
 
@@ -65,6 +67,8 @@ public class SizeSwappingResource implements Resource {
     @Nullable
     @Override
     public <T> T getMetadata(MetadataSectionSerializer<T> serializer) {
+        requireNonNull(serializer, "Serializer cannot be null");
+
         T originalMetadata = ORIGINAL.getMetadata(serializer);
 
         // .mcmeta files take precedence over .moremcmeta files

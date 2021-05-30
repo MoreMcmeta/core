@@ -2,6 +2,8 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import java.util.function.Consumer;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A listener for an {@link EventDrivenTexture}'s events.
  * @param <I> image type
@@ -29,8 +31,8 @@ public class TextureListener<I> {
      * @param action    callback to execute when the event occurs
      */
     public TextureListener(Type type, Consumer<EventDrivenTexture.TextureState<I>> action) {
-        TYPE = type;
-        ACTION = action;
+        TYPE = requireNonNull(type, "Type cannot be null");
+        ACTION = requireNonNull(action, "Action cannot be null");
     }
 
     /**
@@ -46,6 +48,7 @@ public class TextureListener<I> {
      * @param state     the state of the event-driven texture
      */
     public void run(EventDrivenTexture.TextureState<I> state) {
+        requireNonNull(state, "State cannot be null");
         ACTION.accept(state);
     }
 

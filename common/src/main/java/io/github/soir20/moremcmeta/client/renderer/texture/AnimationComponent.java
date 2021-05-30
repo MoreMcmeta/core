@@ -6,6 +6,8 @@ import net.minecraft.client.multiplayer.ClientLevel;
 
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Manages an animation for an {@link EventDrivenTexture}.
  * @param <I> image type
@@ -26,7 +28,7 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
     public AnimationComponent(int syncTicks, AnimationFrameManager<I> frameManager) {
         DO_DAYTIME_SYNC = true;
         SYNC_TICKS = syncTicks;
-        FRAME_MANAGER = frameManager;
+        FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
     }
 
     /**
@@ -36,7 +38,7 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
     public AnimationComponent(AnimationFrameManager<I> frameManager) {
         DO_DAYTIME_SYNC = false;
         SYNC_TICKS = -1;
-        FRAME_MANAGER = frameManager;
+        FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
     }
 
     /**

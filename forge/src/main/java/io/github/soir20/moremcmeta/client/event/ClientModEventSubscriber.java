@@ -80,8 +80,8 @@ public class ClientModEventSubscriber {
            2. replace AnimationMetadataSection.EMPTY (requires reflection and affects non-MoreMcmeta textures)
            3. Mixin/ASM/bytecode manipulation (obviously more prone to compatibility issues)
 
-            The resource manager wrapper mostly calls the original, so it should be the solution
-            most compatible with other mods. */
+           The resource manager wrapper mostly calls the original, so it should be the solution
+           most compatible with other mods. */
         event.enqueueWork(() -> {
             try {
                 ObfuscationReflectionHelper.setPrivateValue(

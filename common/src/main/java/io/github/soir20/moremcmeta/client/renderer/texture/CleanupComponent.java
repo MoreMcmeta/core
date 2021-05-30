@@ -2,6 +2,8 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Cleans up images when an {@link EventDrivenTexture} closes.
  * @param <I> image type
@@ -15,7 +17,7 @@ public class CleanupComponent<I> implements ITextureComponent<I> {
      * @param closeAction       action to clean up all native image resources
      */
     public CleanupComponent(Runnable closeAction) {
-        CLOSE_ACTION = closeAction;
+        CLOSE_ACTION = requireNonNull(closeAction, "Close action cannot be null");
     }
 
     /**

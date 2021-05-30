@@ -11,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Searches atlas textures for sprites.
  * @author soir20
@@ -34,6 +36,8 @@ public class SpriteFinder {
      * @return the atlas or null if the given location is not an atlas sprite
      */
     public Optional<TextureAtlasSprite> findSprite(ResourceLocation location) {
+        requireNonNull(location, "Location cannot be null");
+
         TextureAtlasSprite sprite = findNew(location);
         return sprite == null ? Optional.empty() : Optional.of(sprite);
     }

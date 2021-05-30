@@ -21,6 +21,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Swaps resources with {@link SizeSwappingResource}s if they have .moremcmeta metadata.
  * Otherwise, it performs identically to the {@link SimpleReloadableResourceManager> it
@@ -41,7 +43,7 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
         // We only use the client-side resource manager
         super(PackType.CLIENT_RESOURCES);
 
-        ORIGINAL = original;
+        ORIGINAL = requireNonNull(original, "Original resource manager cannot be null");
     }
 
     /**
@@ -50,6 +52,7 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
      */
     @Override
     public void add(PackResources packResources) {
+        requireNonNull(packResources, "Pack resources cannot be null");
         ORIGINAL.add(packResources);
     }
 
@@ -71,6 +74,8 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
      */
     @Override
     public Resource getResource(ResourceLocation resourceLocation) throws IOException {
+        requireNonNull(resourceLocation, "Location cannot be null");
+
         Resource resource = ORIGINAL.getResource(resourceLocation);
         ResourceLocation metadataLoc = getModMetadataLocation(resourceLocation);
         if (resourceLocation.getPath().endsWith(".png") && ORIGINAL.hasResource(metadataLoc)) {
@@ -88,6 +93,7 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
      */
     @Override
     public boolean hasResource(ResourceLocation resourceLocation) {
+        requireNonNull(resourceLocation, "Location cannot be null");
         return ORIGINAL.hasResource(resourceLocation);
     }
 
@@ -100,6 +106,8 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
      */
     @Override
     public List<Resource> getResources(ResourceLocation resourceLocation) throws IOException {
+        requireNonNull(resourceLocation, "Location cannot be null");
+
         ResourceLocation metadataLoc = getModMetadataLocation(resourceLocation);
 
         List<Resource> resources = ORIGINAL.getResources(resourceLocation);
@@ -121,6 +129,8 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
      */
     @Override
     public Collection<ResourceLocation> listResources(String path, Predicate<String> predicate) {
+        requireNonNull(path, "Path cannot be null");
+        requireNonNull(predicate, "File name predicate cannot be null");
         return ORIGINAL.listResources(path, predicate);
     }
 
@@ -140,6 +150,8 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
      */
     @Override
     public void registerReloadListener(PreparableReloadListener preparableReloadListener) {
+        requireNonNull(preparableReloadListener, "Reload listener cannot be null");
+        
         ResourceManager thisManager = this;
 
         ORIGINAL.registerReloadListener(
@@ -162,6 +174,11 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     @Override
     public ReloadInstance createFullReload(Executor loadingExec, Executor appExec,
                                            CompletableFuture<Unit> completableFuture, List<PackResources> packs) {
+        requireNonNull(loadingExec, "Loading executor cannot be null");
+        requireNonNull(appExec, "Application executor cannot be null");
+        requireNonNull(completableFuture, "Completable future must not be null");
+        requireNonNull(packs, "List of resource packs must not be null");
+        
         return ORIGINAL.createFullReload(loadingExec, appExec, completableFuture, packs);
     }
 

@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A flexible texture "shell" for mixing {@link ITextureComponent}s. Listeners in each
  * component provide texture implementation.
@@ -123,6 +125,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements Tickable {
          * @return this builder for chaining
          */
         public Builder<I> setImage(I image) {
+            requireNonNull(image, "Image cannot be null");
             firstImage = image;
             return this;
         }
@@ -133,6 +136,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements Tickable {
          * @return this builder for chaining
          */
         public Builder<I> add(ITextureComponent<I> component) {
+            requireNonNull(component, "Component cannot be null");
             COMPONENTS.add(component);
             return this;
         }
@@ -164,15 +168,6 @@ public class EventDrivenTexture<I> extends AbstractTexture implements Tickable {
         private final EventDrivenTexture<I> TEXTURE;
         private I image;
         private boolean hasUpdatedSinceUpload;
-
-        /**
-         * Creates a new texture state. Automatically flags the texture
-         * for upload on the first binding.
-         * @param texture     the event-driven texture
-         */
-        public TextureState(EventDrivenTexture<I> texture) {
-            TEXTURE = texture;
-        }
 
         /**
          * Gets the event-driven texture.
@@ -216,8 +211,18 @@ public class EventDrivenTexture<I> extends AbstractTexture implements Tickable {
          * @param newImage      the texture's new image
          */
         public void replaceImage(I newImage) {
+            requireNonNull(newImage, "New image cannot be null");
             markNeedsUpload();
             image = newImage;
+        }
+
+        /**
+         * Creates a new texture state. Automatically flags the texture
+         * for upload on the first binding.
+         * @param texture     the event-driven texture
+         */
+        private TextureState(EventDrivenTexture<I> texture) {
+            TEXTURE = texture;
         }
 
     }

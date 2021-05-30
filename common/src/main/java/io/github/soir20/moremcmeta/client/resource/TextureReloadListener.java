@@ -121,8 +121,8 @@ public class TextureReloadListener<R> implements ResourceManagerReloadListener {
      * @return the texture, or empty if the file is not found
      */
     private Optional<R> getTexture(ResourceManager resourceManager,
-                                              ResourceLocation textureLocation,
-                                              ResourceLocation metadataLocation) {
+                                   ResourceLocation textureLocation,
+                                   ResourceLocation metadataLocation) {
         try (Resource originalResource = resourceManager.getResource(textureLocation);
              Resource metadataResource = resourceManager.getResource(metadataLocation)) {
 
