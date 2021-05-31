@@ -8,7 +8,6 @@ import io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureReloadListener;
 import io.github.soir20.moremcmeta.MoreMcmeta;
-import io.github.soir20.moremcmeta.client.resource.SelectiveReloadListenerWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,6 +17,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,19 +52,22 @@ public class ClientModEventSubscriber {
         TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft::getTextureManager);
 
         // Texture ticker
-        BooleanSupplier areTexturesNotUpdating = () -> minecraft.level == null;
+        BooleanSupplier areTexturesNotUpdating = () -> true;
         new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS,
                 TickEvent.Phase.START, areTexturesNotUpdating);
 
-        AnimatedTextureReader texReader = new AnimatedTextureReader(0, logger);
+        AnimatedTextureReader texReader = new AnimatedTextureReader(logger);
 
         TextureReloadListener<EventDrivenTexture.Builder<NativeImageFrame>> commonListener =
                 new TextureReloadListener<>(texReader, texManager, logger);
-        SelectiveReloadListenerWrapper wrapper = new SelectiveReloadListenerWrapper(
-                VanillaResourceType.TEXTURES,
-                commonListener
-        );
-        rscManager.registerReloadListener(wrapper);
+
+        // Use Forge's selective variant of the reload listener
+        rscManager.registerReloadListener((ISelectiveResourceReloadListener) (manager, predicate) -> {
+            if (predicate.test(VanillaResourceType.TEXTURES)) {
+                commonListener.onResourceManagerReload(manager);
+            }
+        });
+
         logger.debug("Added texture reload listener");
 
         /* enqueueWork() will run after all mods have added their listeners but before Minecraft

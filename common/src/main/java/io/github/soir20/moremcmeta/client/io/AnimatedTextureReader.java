@@ -14,6 +14,7 @@ import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrapper;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import io.github.soir20.moremcmeta.math.Point;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
@@ -37,16 +38,13 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder<NativeImageFrame>> {
-    private final int MIPMAP;
     private final Logger LOGGER;
 
     /**
      * Creates a new reader for animated textures.
-     * @param mipmap        number of mipmap levels to use
      * @param logger        logger for reading-related messages
      */
-    public AnimatedTextureReader(int mipmap, Logger logger) {
-        MIPMAP = mipmap;
+    public AnimatedTextureReader(Logger logger) {
         LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
 
@@ -63,6 +61,8 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
 
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
+
+        final int MIPMAP = Minecraft.getInstance().options.mipmapLevels;
 
         NativeImage image = NativeImage.read(textureStream);
         LOGGER.debug("Successfully read image from input");
@@ -103,7 +103,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         int frameHeight = frames.get(0).getHeight();
 
         // Interpolation
-        List<IRGBAImage.VisibleArea> visibleAreas = getInterpolatablePoints(image, frameWidth, frameHeight);
+        List<IRGBAImage.VisibleArea> visibleAreas = getChangingPoints(image, frameWidth, frameHeight, MIPMAP);
         NativeImageFrameInterpolator interpolator = new NativeImageFrameInterpolator(mipmaps, visibleAreas,
                 frameWidth, frameHeight, blur, clamp);
 
@@ -137,10 +137,11 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
      * @param image         the original image to analyze
      * @param frameWidth    the width of a frame
      * @param frameHeight   the height of a frame
+     * @param mipmap        number of mipmap levels to use
      * @return  pixels that change for every mipmap (starting with the default image)
      */
-    private List<IRGBAImage.VisibleArea> getInterpolatablePoints(NativeImage image, int frameWidth,
-                                                                 int frameHeight) {
+    private List<IRGBAImage.VisibleArea> getChangingPoints(NativeImage image, int frameWidth,
+                                                           int frameHeight, int mipmap) {
         List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
 
         // Find points in original image
@@ -160,7 +161,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         visibleAreas.add(noMipmapBuilder.build());
 
         // Point coordinates will be different for all mipmap levels
-        for (int level = 1; level <= MIPMAP; level++) {
+        for (int level = 1; level <= mipmap; level++) {
             IRGBAImage.VisibleArea.Builder mipmapBuilder = new IRGBAImage.VisibleArea.Builder();
 
             for (Point point : visibleAreas.get(0)) {
@@ -178,9 +179,10 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
      * which has its pixels replaced when interpolation occurs.
      * @author soir20
      */
-    private class NativeImageFrameInterpolator implements IInterpolator<NativeImageFrame>, AutoCloseable {
+    private static class NativeImageFrameInterpolator implements IInterpolator<NativeImageFrame>, AutoCloseable {
         private final int FRAME_WIDTH;
         private final int FRAME_HEIGHT;
+        private final int MIPMAP;
         private final boolean BLUR;
         private final boolean CLAMP;
         private final List<IRGBAImage.VisibleArea> VISIBLE_AREAS;
@@ -201,6 +203,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                                             int frameWidth, int frameHeight, boolean blur, boolean clamp) {
             FRAME_WIDTH = frameWidth;
             FRAME_HEIGHT = frameHeight;
+            MIPMAP = originalMipmaps.length - 1;
             BLUR = blur;
             CLAMP = clamp;
             MIPMAPS = new NativeImage[originalMipmaps.length];
@@ -212,7 +215,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 int mipmappedHeight = FRAME_HEIGHT >> level;
 
                 NativeImage mipmappedImage = new NativeImage(mipmappedWidth, mipmappedHeight, true);
-                copyTopLeftRect(FRAME_WIDTH, FRAME_HEIGHT, originalMipmaps[MIPMAP], mipmappedImage);
+                copyTopLeftRect(mipmappedWidth, mipmappedHeight, originalMipmaps[level], mipmappedImage);
                 MIPMAPS[level] = mipmappedImage;
 
                 widthsToImage.put(mipmappedWidth, new Pair<>(mipmappedImage, visibleAreas.get(level)));

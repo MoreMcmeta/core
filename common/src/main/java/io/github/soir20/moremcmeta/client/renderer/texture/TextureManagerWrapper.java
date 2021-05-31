@@ -16,7 +16,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builder<NativeImageFrame>> {
     private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
-    private final Map<ResourceLocation, Tickable> ANIMATED_TEXTURES;
+    private final Map<ResourceLocation, CustomTickable> ANIMATED_TEXTURES;
 
     /**
      * Creates the TextureManagerWrapper.
@@ -66,7 +66,7 @@ public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builde
      */
     @Override
     public void tick() {
-        ANIMATED_TEXTURES.values().forEach(Tickable::tick);
+        ANIMATED_TEXTURES.values().forEach(CustomTickable::tick);
     }
 
 }

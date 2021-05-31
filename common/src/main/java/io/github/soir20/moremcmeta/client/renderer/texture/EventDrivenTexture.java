@@ -2,7 +2,6 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import static java.util.Objects.requireNonNull;
  * @param <I> image type
  * @author soir20
  */
-public class EventDrivenTexture<I> extends AbstractTexture implements Tickable {
+public class EventDrivenTexture<I> extends AbstractTexture implements CustomTickable {
     private final Map<TextureListener.Type, List<TextureListener<I>>> LISTENERS;
     private final TextureState<I> CURRENT_STATE;
 

@@ -1,7 +1,7 @@
 package io.github.soir20.moremcmeta.client.animation;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.texture.Tickable;
+import io.github.soir20.moremcmeta.client.renderer.texture.CustomTickable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.ToIntFunction;
@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
  * @param <F>   animation frame type
  * @author soir20
  */
-public class AnimationFrameManager<F> implements Tickable {
+public class AnimationFrameManager<F> implements CustomTickable {
     private final ImmutableList<F> FRAMES;
     private final ToIntFunction<F> FRAME_TIME_CALCULATOR;
 

@@ -1,12 +1,12 @@
 package client.event;
 
-import net.minecraft.client.renderer.texture.Tickable;
+import io.github.soir20.moremcmeta.client.renderer.texture.CustomTickable;
 
 /**
  * A tick counter that represents a tickable item.
  * @author soir20
  */
-public class MockTickable implements Tickable {
+public class MockTickable implements CustomTickable {
     private int ticks;
 
     @Override
