@@ -13,10 +13,6 @@ architectury {
     forge()
 }
 
-loom {
-    useFabricMixin = true
-}
-
 dependencies {
     forge "net.minecraftforge:forge:1.16.5-36.1.18"
 
