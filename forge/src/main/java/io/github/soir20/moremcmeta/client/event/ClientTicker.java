@@ -1,7 +1,7 @@
 package io.github.soir20.moremcmeta.client.event;
 
 import com.google.common.collect.ImmutableCollection;
-import net.minecraft.client.renderer.texture.Tickable;
+import io.github.soir20.moremcmeta.client.renderer.texture.CustomTickable;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,7 +17,7 @@ import static java.util.Objects.requireNonNull;
  */
 @ParametersAreNonnullByDefault
 public class ClientTicker {
-    private final ImmutableCollection<? extends Tickable> TICKABLES;
+    private final ImmutableCollection<? extends CustomTickable> TICKABLES;
     private final IEventBus EVENT_BUS;
     private final TickEvent.Phase PHASE;
     private final BooleanSupplier CONDITION;
@@ -30,7 +30,7 @@ public class ClientTicker {
      * @param phase      the phase to update
      * @param condition  any additional conditions for updating the items
      */
-    public ClientTicker(ImmutableCollection<? extends Tickable> items, IEventBus eventBus,
+    public ClientTicker(ImmutableCollection<? extends CustomTickable> items, IEventBus eventBus,
                         TickEvent.Phase phase, BooleanSupplier condition) {
 
         TICKABLES = requireNonNull(items, "Tickable items container cannot be null");
@@ -51,7 +51,7 @@ public class ClientTicker {
         requireNonNull(event, "Tick event cannot be null");
 
         if (event.phase == PHASE && CONDITION.getAsBoolean()) {
-            TICKABLES.forEach(Tickable::tick);
+            TICKABLES.forEach(CustomTickable::tick);
         }
     }
 

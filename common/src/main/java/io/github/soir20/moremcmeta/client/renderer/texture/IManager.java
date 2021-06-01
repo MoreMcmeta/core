@@ -1,6 +1,5 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -8,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
  * @param <R> resource type
  * @author soir20
  */
-public interface IManager<R> extends Tickable {
+public interface IManager<R> extends CustomTickable {
 
     /**
      * Prepares a texture and makes Minecraft aware of it.

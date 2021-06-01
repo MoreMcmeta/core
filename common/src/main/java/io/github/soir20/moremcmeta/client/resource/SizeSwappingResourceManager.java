@@ -33,17 +33,21 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     private static final String EXTENSION = ".moremcmeta";
 
     private final SimpleReloadableResourceManager ORIGINAL;
+    private final Runnable RELOAD_CALLBACK;
 
     /**
      * Creates a new size swapping resource manager wrapper.
-     * @param original      original resource manager to wrap
+     * @param original          original resource manager to wrap
+     * @param reloadCallback    callback to run once all resource reloading has finished and
+     *                          all listeners have executed
      */
-    public SizeSwappingResourceManager(SimpleReloadableResourceManager original) {
+    public SizeSwappingResourceManager(SimpleReloadableResourceManager original, Runnable reloadCallback) {
 
         // We only use the client-side resource manager
         super(PackType.CLIENT_RESOURCES);
 
         ORIGINAL = requireNonNull(original, "Original resource manager cannot be null");
+        RELOAD_CALLBACK = requireNonNull(reloadCallback, "Callback cannot be null");
     }
 
     /**
@@ -179,7 +183,9 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
         requireNonNull(completableFuture, "Completable future must not be null");
         requireNonNull(packs, "List of resource packs must not be null");
         
-        return ORIGINAL.createFullReload(loadingExec, appExec, completableFuture, packs);
+        ReloadInstance reload = ORIGINAL.createFullReload(loadingExec, appExec, completableFuture, packs);
+        reload.done().thenRun(RELOAD_CALLBACK);
+        return reload;
     }
 
     /**

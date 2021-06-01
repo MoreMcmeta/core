@@ -1,7 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import static java.util.Objects.requireNonNull;
 public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builder<NativeImageFrame>> {
     private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
     private final Map<ResourceLocation, CustomTickable> ANIMATED_TEXTURES;
+    private final TextureFinisher FINISHER;
 
     /**
      * Creates the TextureManagerWrapper.
@@ -27,6 +27,7 @@ public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builde
         requireNonNull(texManagerGetter, "Texture manager getter cannot be null");
         TEXTURE_MANAGER_GETTER = texManagerGetter;
         ANIMATED_TEXTURES = new HashMap<>();
+        FINISHER = new TextureFinisher();
     }
 
     /**
@@ -38,16 +39,32 @@ public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builde
     public void register(ResourceLocation textureLocation,
                          EventDrivenTexture.Builder<NativeImageFrame> builder) {
         requireNonNull(textureLocation, "Texture location cannot be null");
-        requireNonNull(builder, "Texture cannot be null");
+        requireNonNull(builder, "Texture builder cannot be null");
 
+        /* Clear any existing texture immediately to prevent PreloadedTextures
+           from re-adding themselves. The texture manager will reload before the
+           EventDrivenTextures are added, causing a race condition with the
+           registration CompletableFuture inside PreloadedTexture's reset method. */
+        TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
+        requireNonNull(textureManager, "Supplied texture manager cannot be null");
+        textureManager.release(textureLocation);
+
+        FINISHER.queue(textureLocation, builder);
+    }
+
+    /**
+     * Finishes all queued textures by adding them to Minecraft's texture manager.
+     */
+    public void finishQueued() {
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
 
-        builder.add(new UploadComponent(textureLocation));
-        EventDrivenTexture<NativeImageFrame> texture = builder.build();
+        Map<ResourceLocation, EventDrivenTexture<NativeImageFrame>> textures = FINISHER.finish();
 
-        textureManager.register(textureLocation, texture);
-        ANIMATED_TEXTURES.put(textureLocation, texture);
+        textures.forEach((location, texture) -> {
+            textureManager.register(location, texture);
+            ANIMATED_TEXTURES.put(location, texture);
+        });
     }
 
     /**
@@ -57,7 +74,11 @@ public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builde
     @Override
     public void unregister(ResourceLocation textureLocation) {
         requireNonNull(textureLocation, "Texture location cannot be null");
-        TEXTURE_MANAGER_GETTER.get().release(textureLocation);
+
+        TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
+        requireNonNull(textureManager, "Supplied texture manager cannot be null");
+
+        textureManager.release(textureLocation);
         ANIMATED_TEXTURES.remove(textureLocation);
     }
 

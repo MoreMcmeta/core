@@ -88,7 +88,8 @@ public class ClientModEventSubscriber {
         event.enqueueWork(() -> {
             try {
                 ObfuscationReflectionHelper.setPrivateValue(
-                        Minecraft.class, minecraft, new SizeSwappingResourceManager(rscManager),
+                        Minecraft.class, minecraft,
+                        new SizeSwappingResourceManager(rscManager, texManager::finishQueued),
                         "resourceManager"
                 );
             } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
