@@ -14,7 +14,7 @@ architectury {
 }
 
 dependencies {
-    forge "net.minecraftforge:forge:1.16.5-36.1.18"
+    forge "net.minecraftforge:forge:${rootProject.minecraftVersion}-${rootProject.forgeVersion}"
 
     implementation(project(path: ":common")) {
         transitive = false
@@ -30,9 +30,9 @@ dependencies {
 processResources {
     inputs.property "version", project.version
 
-    /*filesMatching("META-INF/mods.toml") {
+    filesMatching("META-INF/mods.toml") {
         expand "version": project.version
-    }*/
+    }
 }
 
 shadowJar {
