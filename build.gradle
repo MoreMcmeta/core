@@ -14,6 +14,22 @@ subprojects {
         silentMojangMappingsLicense()
     }
 
+    task signJar() {
+        doLast {
+            if (project.hasProperty("keyStore")) {
+                ant.signjar(
+                        jar: remapJar.getArchiveFile().get().getAsFile().path,
+                        keystore: project.keyStore,
+                        alias: project.keyStoreAlias,
+                        storepass: project.keyStorePass,
+                        keypass: project.keyStoreKeyPass
+                )
+            }
+        }
+    }
+
+    build.dependsOn(signJar)
+
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraftVersion}"
         mappings loom.officialMojangMappings()
@@ -35,7 +51,7 @@ allprojects {
 
         def targetVersion = 8
         if (JavaVersion.current().isJava9Compatible()) {
-            options.release = targetVersion
+            options.release.set(targetVersion)
         }
     }
 
