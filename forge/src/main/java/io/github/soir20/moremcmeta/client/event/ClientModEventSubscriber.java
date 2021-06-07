@@ -90,7 +90,7 @@ public class ClientModEventSubscriber {
                 ObfuscationReflectionHelper.setPrivateValue(
                         Minecraft.class, minecraft,
                         new SizeSwappingResourceManager(rscManager, texManager::finishQueued),
-                        "resourceManager"
+                        "field_110451_am"
                 );
             } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
                 logger.error("Unable to access Minecraft's resource manager field. " +
