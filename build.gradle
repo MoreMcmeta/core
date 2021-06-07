@@ -42,9 +42,9 @@ allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
 
-    version = "${rootProject.minecraftVersion}-${rootProject.version}"
-    group = rootProject.group
-    archivesBaseName = rootProject.archivesBaseName
+    version = "${rootProject.minecraftVersion}-${rootProject.modVersion}"
+    group = rootProject.mavenGroup
+    archivesBaseName = rootProject.modArchivesBaseName
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
