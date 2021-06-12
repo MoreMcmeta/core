@@ -188,15 +188,6 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
         }
 
         /**
-         * Gets whether the texture needs to be uploaded because it was
-         * changed.
-         * @return whether the texture needs to be uploaded
-         */
-        public boolean needsUpload() {
-            return hasUpdatedSinceUpload;
-        }
-
-        /**
          * Flags the texture has needing an upload.
          */
         public void markNeedsUpload() {
