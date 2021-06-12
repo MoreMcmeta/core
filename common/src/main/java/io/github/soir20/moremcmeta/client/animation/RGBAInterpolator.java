@@ -99,11 +99,11 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
      */
     private int mixPixel(double startProportion, int startColor, int endColor) {
         int red = mixComponent(startProportion,
-                extractComponent(startColor, Component.RED), extractComponent(endColor, Component.RED));
+                extractRed(startColor), extractRed(endColor));
         int green = mixComponent(startProportion,
-                extractComponent(startColor, Component.GREEN), extractComponent(endColor, Component.GREEN));
+                extractGreen(startColor), extractGreen(endColor));
         int blue = mixComponent(startProportion,
-                extractComponent(startColor, Component.BLUE), extractComponent(endColor, Component.BLUE));
+                extractBlue(startColor), extractBlue(endColor));
 
         return startColor & 0b11111111000000000000000000000000 | red << 16 | green << 8 | blue;
     }
@@ -120,32 +120,30 @@ public class RGBAInterpolator<I extends IRGBAImage> implements IInterpolator<I> 
     }
 
     /**
-     * Extracts the value of one component from an RGB color.
+     * Extracts the value of the red component from an RGB color.
      * @param color         the RGB color to extract from
-     * @param component     the component to extract
-     * @return  the value of the component in this color
+     * @return  the value of the red component in this color
      */
-    private int extractComponent(int color, Component component) {
-        switch (component) {
-            case RED:
-                return color >> 16 & 255;
-            case GREEN:
-                return color >> 8 & 255;
-            case BLUE:
-                return color & 255;
-        }
-
-        throw new IllegalArgumentException("Must specify a valid RGB component");
+    private int extractRed(int color) {
+        return color >> 16 & 255;
     }
 
     /**
-     * Represents a red, blue, or green component in an RGB color.
-     * @author soir20
+     * Extracts the value of the green component from an RGB color.
+     * @param color         the RGB color to extract from
+     * @return  the value of the green component in this color
      */
-    private enum Component {
-        RED,
-        GREEN,
-        BLUE
+    private int extractGreen(int color) {
+        return color >> 8 & 255;
+    }
+
+    /**
+     * Extracts the value of the blue component from an RGB color.
+     * @param color         the RGB color to extract from
+     * @return  the value of the blue component in this color
+     */
+    private int extractBlue(int color) {
+        return color & 255;
     }
 
 }
