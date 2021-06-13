@@ -72,6 +72,7 @@ public interface IRGBAImage {
 
         /**
          * Builds a new, immutable visible area.
+         * @author soir20
          */
         public static class Builder {
 
