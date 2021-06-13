@@ -3,6 +3,7 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -45,7 +46,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
      *                          already be retrieved by the time this is called)
      */
     @Override
-    public void load(ResourceManager resourceManager) {
+    public void load(@Nullable ResourceManager resourceManager) {
         runListeners(TextureListener.Type.REGISTRATION);
     }
 
@@ -188,7 +189,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
         }
 
         /**
-         * Flags the texture has needing an upload.
+         * Flags the texture as needing an upload.
          */
         public void markNeedsUpload() {
             hasUpdatedSinceUpload = true;
