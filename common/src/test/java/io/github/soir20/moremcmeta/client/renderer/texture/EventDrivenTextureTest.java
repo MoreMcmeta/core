@@ -21,6 +21,14 @@ public class EventDrivenTextureTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
+    public void build_NullImage_NullPointerException() {
+        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
+
+        expectedException.expect(NullPointerException.class);
+        builder.setImage(null);
+    }
+
+    @Test
     public void build_NoImage_IllegalStateException() {
         EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION, (state) -> {})));
@@ -38,6 +46,15 @@ public class EventDrivenTextureTest {
                 (state) -> assertEquals(new Integer(2), state.getImage())
         )));
         builder.build().load(null);
+    }
+
+    @Test
+    public void build_NullComponent_NullPointerException() {
+        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
+        builder.setImage(1);
+
+        expectedException.expect(NullPointerException.class);
+        builder.add(null);
     }
 
     @Test
@@ -109,6 +126,20 @@ public class EventDrivenTextureTest {
         texture.bind();
 
         assertEquals(2, timesUploaded.get());
+    }
+
+    @Test
+    public void runListeners_SetImageNull_NullPointerException() {
+
+        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
+                (state) -> state.replaceImage(null)
+        )));
+        builder.setImage(1);
+        EventDrivenTexture<Integer> texture = builder.build();
+
+        expectedException.expect(NullPointerException.class);
+        texture.tick();
     }
 
     @Test
