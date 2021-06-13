@@ -111,6 +111,9 @@ public class AnimationFrameManager<F> implements CustomTickable {
      * @param ticks      how many ticks ahead to put the animation
      */
     public void tick(int ticks) {
+        if (ticks < 0) {
+            throw new IllegalArgumentException("Ticks cannot be less than zero");
+        }
 
         // Calculate the predefined frame in the animation at the given tick
         int timeLeftUntilTick = ticksInThisFrame + ticks;
@@ -125,6 +128,7 @@ public class AnimationFrameManager<F> implements CustomTickable {
         }
 
         currentFrameIndex = frameIndex;
+        currentFrameMaxTime = frameTime;
         ticksInThisFrame = timeLeftUntilTick;
     }
 
