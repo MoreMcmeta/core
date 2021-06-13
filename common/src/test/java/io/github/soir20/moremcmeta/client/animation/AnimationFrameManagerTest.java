@@ -328,7 +328,6 @@ public class AnimationFrameManagerTest {
 
         for (int tick = 0; tick < (frameLength * 3) / 5; tick++) {
             manager.tick(5);
-            System.out.println(manager.getCurrentFrame());
         }
         assertEquals(new Integer(3), manager.getCurrentFrame());
     }
