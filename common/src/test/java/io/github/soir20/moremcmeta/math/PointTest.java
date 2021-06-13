@@ -1,5 +1,7 @@
 package io.github.soir20.moremcmeta.math;
 
+import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -8,21 +10,25 @@ import static org.junit.Assert.*;
  */
 public class PointTest {
 
+    @Test
     public void getX_SomePoint_CorrectCoordinate() {
         Point point = new Point(1, 2);
         assertEquals(1, point.getX());
     }
 
+    @Test
     public void getY_SomePoint_CorrectCoordinate() {
         Point point = new Point(1, 2);
         assertEquals(2, point.getY());
     }
 
+    @Test
     public void equals_SamePoints_Reflexive() {
         Point first = new Point(1, 2);
         assertEquals(first, first);
     }
 
+    @Test
     public void equals_SamePoints_Symmetric() {
         Point first = new Point(1, 2);
         Point second = new Point(1, 2);
@@ -30,6 +36,7 @@ public class PointTest {
         assertEquals(second, first);
     }
 
+    @Test
     public void equals_SamePoints_Transitive() {
         Point first = new Point(1, 2);
         Point second = new Point(1, 2);
@@ -39,6 +46,7 @@ public class PointTest {
         assertEquals(first, third);
     }
 
+    @Test
     public void equals_DiffPoints_Symmetric() {
         Point first = new Point(1, 2);
         Point second = new Point(3, 4);
@@ -46,6 +54,7 @@ public class PointTest {
         assertNotEquals(second, first);
     }
 
+    @Test
     public void equals_DiffTypes_Symmetric() {
         Point first = new Point(1, 2);
         Object second = new Object();
@@ -53,11 +62,13 @@ public class PointTest {
         assertNotEquals(second, first);
     }
 
+    @Test
     public void hashCode_SamePoints_Reflexive() {
         Point first = new Point(1, 2);
         assertEquals(first.hashCode(), first.hashCode());
     }
 
+    @Test
     public void hashCode_SamePoints_Symmetric() {
         Point first = new Point(1, 2);
         Point second = new Point(1, 2);
@@ -65,6 +76,7 @@ public class PointTest {
         assertEquals(second.hashCode(), first.hashCode());
     }
 
+    @Test
     public void hashCode_SamePoints_Transitive() {
         Point first = new Point(1, 2);
         Point second = new Point(1, 2);
@@ -74,6 +86,7 @@ public class PointTest {
         assertEquals(first.hashCode(), third.hashCode());
     }
 
+    @Test
     public void hashCode_DiffPoints_Symmetric() {
         Point first = new Point(1, 2);
         Point second = new Point(3, 4);
@@ -81,6 +94,7 @@ public class PointTest {
         assertNotEquals(second.hashCode(), first.hashCode());
     }
 
+    @Test
     public void hashCode_DiffTypes_Symmetric() {
         Point first = new Point(1, 2);
         Object second = new Object();
