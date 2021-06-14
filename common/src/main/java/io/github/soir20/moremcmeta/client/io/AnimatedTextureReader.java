@@ -15,6 +15,7 @@ import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrappe
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
@@ -27,6 +28,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -62,7 +65,8 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
 
-        final int MIPMAP = Minecraft.getInstance().options.mipmapLevels;
+        Minecraft minecraft = Minecraft.getInstance();
+        final int MIPMAP = minecraft.options.mipmapLevels;
 
         NativeImage image = NativeImage.read(textureStream);
         LOGGER.debug("Successfully read image from input");
@@ -124,10 +128,14 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
             interpolator.close();
         };
 
+        // Time retrieval
+        Supplier<Optional<Long>> timeGetter =
+                () -> minecraft.level == null ? Optional.empty() : Optional.of(minecraft.level.getDayTime());
+
         EventDrivenTexture.Builder<NativeImageFrame> builder = new EventDrivenTexture.Builder<>();
         builder.setImage(frameManager.getCurrentFrame())
                 .add(new CleanupComponent<>(closeMipmaps))
-                .add(new AnimationComponent<>(24000, frameManager));
+                .add(new AnimationComponent<>(24000, timeGetter, frameManager));
 
         return builder;
     }

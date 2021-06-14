@@ -1,9 +1,9 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 
+import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -14,8 +14,8 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class AnimationComponent<I> implements ITextureComponent<I> {
-    private final boolean DO_DAYTIME_SYNC;
     private final int SYNC_TICKS;
+    private final Supplier<Optional<Long>> TIME_GETTER;
     private final AnimationFrameManager<I> FRAME_MANAGER;
 
     private int ticks;
@@ -23,11 +23,13 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
     /**
      * Creates an animation component that syncs to the current game time.
      * @param syncTicks         number of ticks to sync to
+     * @param timeGetter        gets the client's current time if it has a time
      * @param frameManager      frame manager for the animation
      */
-    public AnimationComponent(int syncTicks, AnimationFrameManager<I> frameManager) {
-        DO_DAYTIME_SYNC = true;
+    public AnimationComponent(int syncTicks, Supplier<Optional<Long>> timeGetter,
+                              AnimationFrameManager<I> frameManager) {
         SYNC_TICKS = syncTicks;
+        TIME_GETTER = timeGetter;
         FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
     }
 
@@ -36,8 +38,8 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
      * @param frameManager      frame manager for the animation
      */
     public AnimationComponent(AnimationFrameManager<I> frameManager) {
-        DO_DAYTIME_SYNC = false;
         SYNC_TICKS = -1;
+        TIME_GETTER = Optional::empty;
         FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
     }
 
@@ -49,10 +51,11 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
     public Stream<TextureListener<I>> getListeners() {
         TextureListener<I> tickListener =
                 new TextureListener<>(TextureListener.Type.TICK, (state) -> {
-                    ClientLevel currentWorld = Minecraft.getInstance().level;
+                    Optional<Long> timeOptional = TIME_GETTER.get();
 
-                    if (DO_DAYTIME_SYNC && currentWorld != null) {
-                        int ticksToAdd = (int) (currentWorld.getDayTime() - ticks) % SYNC_TICKS + SYNC_TICKS;
+                    if (timeOptional.isPresent()) {
+                        long currentTime = timeOptional.get();
+                        int ticksToAdd = (int) ((currentTime - ticks) % SYNC_TICKS) + SYNC_TICKS;
                         ticksToAdd %= SYNC_TICKS;
 
                         ticks += ticksToAdd;
