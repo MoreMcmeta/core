@@ -129,6 +129,28 @@ public class EventDrivenTextureTest {
     }
 
     @Test
+    public void runListeners_GetImageInUpload_MarkedForUpload() {
+        AtomicInteger timesUploaded = new AtomicInteger(0);
+
+        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
+                EventDrivenTexture.TextureState::getImage
+        ), new TextureListener<>(TextureListener.Type.UPLOAD,
+                (state) -> timesUploaded.incrementAndGet()
+        )));
+
+        builder.setImage(1);
+        EventDrivenTexture<Integer> texture = builder.build();
+
+        // We have to bind once first because the texture is always uploaded on the first bind
+        texture.bind();
+
+        texture.bind();
+
+        assertEquals(1, timesUploaded.get());
+    }
+
+    @Test
     public void runListeners_SetImageNull_NullPointerException() {
 
         EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
