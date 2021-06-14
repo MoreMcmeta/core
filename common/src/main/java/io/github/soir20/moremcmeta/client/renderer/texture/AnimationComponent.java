@@ -28,8 +28,12 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
      */
     public AnimationComponent(int syncTicks, Supplier<Optional<Long>> timeGetter,
                               AnimationFrameManager<I> frameManager) {
+        if (syncTicks <= 0) {
+            throw new IllegalArgumentException("Sync ticks cannot be zero or negative");
+        }
+
         SYNC_TICKS = syncTicks;
-        TIME_GETTER = timeGetter;
+        TIME_GETTER = requireNonNull(timeGetter, "Time getter cannot be null");
         FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
     }
 
@@ -52,6 +56,7 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
         TextureListener<I> tickListener =
                 new TextureListener<>(TextureListener.Type.TICK, (state) -> {
                     Optional<Long> timeOptional = TIME_GETTER.get();
+                    requireNonNull(timeOptional, "Timer getter cannot supply null");
 
                     if (timeOptional.isPresent()) {
                         long currentTime = timeOptional.get();
