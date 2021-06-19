@@ -33,6 +33,10 @@ public class NativeImageFrame {
                             boolean blur, boolean clamp, boolean autoClose) {
         requireNonNull(frameData, "Frame data cannot be null");
         MIPMAPS = requireNonNull(mipmaps, "Mipmaps cannot be null");
+        if (mipmaps.length == 0) {
+            throw new IllegalArgumentException("At least one mipmap must be provided");
+        }
+
         WIDTH = frameData.getWidth();
         HEIGHT = frameData.getHeight();
         X_OFFSET = frameData.getXOffset();
@@ -56,6 +60,8 @@ public class NativeImageFrame {
      * @param point     point to upload the top-left corner of this frame at
      */
     public void uploadAt(Point point) {
+        requireNonNull(point, "Point cannot be null");
+
         for (int level = 0; level < MIPMAPS.length; level++) {
             int mipmappedX = point.getX() >> level;
             int mipmappedY = point.getY() >> level;
@@ -108,7 +114,7 @@ public class NativeImageFrame {
      * @return the mipmap level of this frame
      */
     public int getMipmapLevel() {
-        return MIPMAPS.length;
+        return MIPMAPS.length - 1;
     }
 
     /**
@@ -117,6 +123,10 @@ public class NativeImageFrame {
      * @return  the image at the given mipmap level
      */
     public NativeImage getImage(int level) {
+        if (level >= MIPMAPS.length) {
+            throw new IllegalArgumentException("There is no mipmap of level " + level);
+        }
+
         return MIPMAPS[level];
     }
 
