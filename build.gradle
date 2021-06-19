@@ -34,7 +34,7 @@ subprojects {
         minecraft "com.mojang:minecraft:${rootProject.minecraftVersion}"
         mappings loom.officialMojangMappings()
 
-        testCompile "junit:junit:${rootProject.junitVersion}"
+        testImplementation "junit:junit:${rootProject.junitVersion}"
     }
 }
 
