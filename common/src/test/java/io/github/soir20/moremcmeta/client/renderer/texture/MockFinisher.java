@@ -7,18 +7,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * A fake {@link IFinisher} that turns integers to textures.
+ * A fake {@link IFinisher} that turns items to textures.
+ * @param <I> input type
  * @author soir20
  */
-public class MockFinisher implements IFinisher<Integer, MockAnimatedTexture> {
-    private final Map<ResourceLocation, Integer> ITEMS;
+public class MockFinisher<I> implements IFinisher<I, MockAnimatedTexture> {
+    private final Map<ResourceLocation, I> ITEMS;
 
     public MockFinisher() {
         ITEMS = new HashMap<>();
     }
 
     @Override
-    public void queue(ResourceLocation location, Integer input) {
+    public void queue(ResourceLocation location, I input) {
         ITEMS.put(location, input);
     }
 
