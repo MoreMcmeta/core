@@ -50,7 +50,7 @@ public class SpriteFinder {
         requireNonNull(location, "Location cannot be null");
 
         TextureAtlasSprite sprite = findNew(location);
-        return sprite == null ? Optional.empty() : Optional.of(sprite);
+        return Optional.ofNullable(sprite);
     }
 
     /**
