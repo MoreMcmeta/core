@@ -6,10 +6,12 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,6 +32,16 @@ public class SpriteFinder {
             new ResourceLocation("textures/atlas/mob_effects.png")
     );
 
+    private final Supplier<TextureManager> MANAGER_GETTER;
+
+    /**
+     * Creates a new sprite finder.
+     * @param textureManagerGetter  provides a texture manager
+     */
+    public SpriteFinder(Supplier<TextureManager> textureManagerGetter) {
+        MANAGER_GETTER = requireNonNull(textureManagerGetter, "Texture manager getter cannot be null");
+    }
+
     /**
      * Finds an atlas associated with a texture location.
      * @param location          the location of the texture
@@ -49,12 +61,13 @@ public class SpriteFinder {
      */
     @Nullable
     private TextureAtlasSprite findNew(ResourceLocation location) {
+        TextureManager manager = requireNonNull(MANAGER_GETTER.get(), "Null was supplied as a texture manager");
 
         // Atlases store sprites without their extension
         ResourceLocation pathWithoutExtension = makeSpritePath(location);
 
         for (ResourceLocation atlasLocation : ATLAS_LOCATIONS) {
-            AbstractTexture atlas = Minecraft.getInstance().getTextureManager().getTexture(atlasLocation);
+            AbstractTexture atlas = manager.getTexture(atlasLocation);
 
             // We should never have to skip here, unless another mod has modified the atlases
             if (!(atlas instanceof TextureAtlas)) {

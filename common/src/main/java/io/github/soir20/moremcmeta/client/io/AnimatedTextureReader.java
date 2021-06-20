@@ -10,12 +10,12 @@ import io.github.soir20.moremcmeta.client.renderer.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.client.renderer.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.IRGBAImage;
 import io.github.soir20.moremcmeta.client.renderer.texture.CleanupComponent;
+import io.github.soir20.moremcmeta.client.renderer.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrapper;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Reads an {@link EventDrivenTexture} from file data. It is reusable for all
  * animated textures with the same mipmap level. It leaves textures in an pre-built
- * state to allow for the {@link io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper}
+ * state to allow for the {@link LazyTextureManager}
  * to add components related to texture registration and binding.
  * @author soir20
  */

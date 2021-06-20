@@ -1,5 +1,7 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 
@@ -11,33 +13,37 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Wraps the {@link TextureManager} because it is not immediately available during mod construction.
+ * Finishes loaded textures lazily with upload components according to the provided {@link IFinisher}.
+ * @param <I> type of texture builders (input)
+ * @param <O> type of textures (output)
  * @author soir20
  */
-public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builder<NativeImageFrame>> {
+public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> implements IManager<I> {
     private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
     private final Map<ResourceLocation, CustomTickable> ANIMATED_TEXTURES;
-    private final TextureFinisher FINISHER;
+    private final IFinisher<I, O> FINISHER;
 
     /**
      * Creates the TextureManagerWrapper.
      * @param texManagerGetter      getter for the texture manager. The manager may not exist during parallel
      *                              mod loading, but it will when resources are reloaded.
+     * @param finisher              lazily finishes textures once resource loading is complete
      */
-    public TextureManagerWrapper(Supplier<TextureManager> texManagerGetter) {
+    public LazyTextureManager(Supplier<TextureManager> texManagerGetter, IFinisher<I, O> finisher) {
         requireNonNull(texManagerGetter, "Texture manager getter cannot be null");
         TEXTURE_MANAGER_GETTER = texManagerGetter;
         ANIMATED_TEXTURES = new HashMap<>();
-        FINISHER = new TextureFinisher();
+        FINISHER = requireNonNull(finisher, "Finisher cannot be null");
     }
 
     /**
-     * Finishes building a texture and makes Minecraft aware of it.
+     * Registers a texture that needs to be finished. What happens when duplicate locations are added
+     * depends on the provided {@link IFinisher}.
      * @param textureLocation   file location of texture identical to how it is used in a entity/gui/map
-     * @param builder           the actual texture that should be used (atlas or otherwise)
+     * @param builder           unfinished texture
      */
     @Override
-    public void register(ResourceLocation textureLocation,
-                         EventDrivenTexture.Builder<NativeImageFrame> builder) {
+    public void register(ResourceLocation textureLocation, I builder) {
         requireNonNull(textureLocation, "Texture location cannot be null");
         requireNonNull(builder, "Texture builder cannot be null");
 
@@ -53,13 +59,14 @@ public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builde
     }
 
     /**
-     * Finishes all queued textures by adding them to Minecraft's texture manager.
+     * Finishes all queued textures by adding them to Minecraft's texture manager
+     * according to the provided {@link IFinisher}.
      */
     public void finishQueued() {
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
 
-        Map<ResourceLocation, EventDrivenTexture<NativeImageFrame>> textures = FINISHER.finish();
+        Map<ResourceLocation, O> textures = FINISHER.finish();
 
         textures.forEach((location, texture) -> {
             textureManager.register(location, texture);
@@ -78,7 +85,12 @@ public class TextureManagerWrapper implements IManager<EventDrivenTexture.Builde
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
 
-        textureManager.release(textureLocation);
+        if (!RenderSystem.isOnRenderThread()) {
+            RenderSystem.recordRenderCall(() -> textureManager.release(textureLocation));
+        } else {
+            textureManager.release(textureLocation);
+        }
+
         ANIMATED_TEXTURES.remove(textureLocation);
     }
 

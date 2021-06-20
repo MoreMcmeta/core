@@ -2,12 +2,14 @@ package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,16 +18,18 @@ import static java.util.Objects.requireNonNull;
  * all atlas stitching has completed.
  * @author soir20
  */
-public class TextureFinisher {
+public class TextureFinisher
+        implements IFinisher<EventDrivenTexture.Builder<NativeImageFrame>, EventDrivenTexture<NativeImageFrame>> {
     private final ArrayDeque<Pair<ResourceLocation, EventDrivenTexture.Builder<NativeImageFrame>>> QUEUED_BUILDERS;
     private final SpriteFinder SPRITE_FINDER;
 
     /**
      * Creates a new finisher for event-driven textures.
+     * @param spriteFinder      finder for atlas sprites
      */
-    public TextureFinisher() {
+    public TextureFinisher(SpriteFinder spriteFinder) {
         QUEUED_BUILDERS = new ArrayDeque<>();
-        SPRITE_FINDER = new SpriteFinder();
+        SPRITE_FINDER = requireNonNull(spriteFinder);
     }
 
     /**
@@ -33,6 +37,7 @@ public class TextureFinisher {
      * @param location      texture location
      * @param builder       texture builder
      */
+    @Override
     public void queue(ResourceLocation location, EventDrivenTexture.Builder<NativeImageFrame> builder) {
         requireNonNull(location, "Location cannot be null");
         requireNonNull(builder, "Texture builder cannot be null");
@@ -44,6 +49,7 @@ public class TextureFinisher {
      * Finishes all currently-queued textures.
      * @return a map of all textures
      */
+    @Override
     public Map<ResourceLocation, EventDrivenTexture<NativeImageFrame>> finish() {
         Map<ResourceLocation, EventDrivenTexture<NativeImageFrame>> builtTextures = new HashMap<>();
 

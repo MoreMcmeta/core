@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.client.renderer.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
-import io.github.soir20.moremcmeta.client.renderer.texture.TextureManagerWrapper;
+import io.github.soir20.moremcmeta.client.renderer.texture.SpriteFinder;
+import io.github.soir20.moremcmeta.client.renderer.texture.TextureFinisher;
+import io.github.soir20.moremcmeta.client.renderer.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureReloadListener;
 import io.github.soir20.moremcmeta.MoreMcmeta;
@@ -49,7 +51,9 @@ public class ClientModEventSubscriber {
         // Resource managers
         SimpleReloadableResourceManager rscManager =
                 (SimpleReloadableResourceManager) minecraft.getResourceManager();
-        TextureManagerWrapper texManager = new TextureManagerWrapper(minecraft::getTextureManager);
+        TextureFinisher finisher = new TextureFinisher(new SpriteFinder(minecraft::getTextureManager));
+        LazyTextureManager<EventDrivenTexture.Builder<NativeImageFrame>, EventDrivenTexture<NativeImageFrame>>
+                texManager = new LazyTextureManager<>(minecraft::getTextureManager, finisher);
 
         // Texture ticker
         BooleanSupplier areTexturesNotUpdating = () -> true;
