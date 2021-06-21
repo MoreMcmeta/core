@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * An adapter for {@link net.minecraft.client.renderer.texture.TextureAtlasSprite}
  * to provide a cleaner interface and make it easier to instantiate in test code.
+ * @author soir20
  */
 public interface ISprite {
 

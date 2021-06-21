@@ -7,6 +7,7 @@ import java.util.Optional;
 /**
  * An adapter for {@link net.minecraft.client.renderer.texture.TextureAtlas}
  * because it is difficult to instantiate in tests.
+ * @author soir20
  */
 public interface IAtlas {
 
