@@ -1,7 +1,6 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayDeque;
@@ -69,7 +68,7 @@ public class TextureFinisher
      */
     private EventDrivenTexture<NativeImageFrame> finishOne(ResourceLocation location,
                                                            EventDrivenTexture.Builder<NativeImageFrame> builder) {
-        Optional<TextureAtlasSprite> sprite = SPRITE_FINDER.findSprite(location);
+        Optional<ISprite> sprite = SPRITE_FINDER.findSprite(location);
         if (sprite.isPresent()) {
             builder.add(new SpriteUploadComponent(sprite.get()));
         } else {

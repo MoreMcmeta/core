@@ -1,16 +1,11 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,56 +26,51 @@ public class SpriteFinder {
             new ResourceLocation("textures/atlas/mob_effects.png")
     );
 
-    private final Supplier<TextureManager> MANAGER_GETTER;
+    private final Function<ResourceLocation, IAtlas> ATLAS_GETTER;
 
     /**
      * Creates a new sprite finder.
-     * @param textureManagerGetter  provides a texture manager
+     * @param atlasGetter  provides an atlas from a location
      */
-    public SpriteFinder(Supplier<TextureManager> textureManagerGetter) {
-        MANAGER_GETTER = requireNonNull(textureManagerGetter, "Texture manager getter cannot be null");
+    public SpriteFinder(Function<ResourceLocation, IAtlas> atlasGetter) {
+        ATLAS_GETTER = requireNonNull(atlasGetter, "Atlas getter cannot be null");
     }
 
     /**
      * Finds an atlas associated with a texture location.
      * @param location          the location of the texture
-     * @return the atlas or null if the given location is not an atlas sprite
+     * @return an {@link Optional} containing the atlas sprite
      */
-    public Optional<TextureAtlasSprite> findSprite(ResourceLocation location) {
+    public Optional<ISprite> findSprite(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
 
-        TextureAtlasSprite sprite = findNew(location);
-        return Optional.ofNullable(sprite);
+        return findNew(location);
     }
 
     /**
      * Finds an atlas associated with a texture location not yet cached.
      * @param location      the location of the texture to look for (with extension)
-     * @return the atlas or null if the given location is not an atlas sprite
+     * @return an {@link Optional} containing the atlas sprite
      */
-    @Nullable
-    private TextureAtlasSprite findNew(ResourceLocation location) {
-        TextureManager manager = requireNonNull(MANAGER_GETTER.get(), "Null was supplied as a texture manager");
+    private Optional<ISprite> findNew(ResourceLocation location) {
 
         // Atlases store sprites without their extension
         ResourceLocation pathWithoutExtension = makeSpritePath(location);
 
         for (ResourceLocation atlasLocation : ATLAS_LOCATIONS) {
-            AbstractTexture atlas = manager.getTexture(atlasLocation);
+            IAtlas atlas = ATLAS_GETTER.apply(atlasLocation);
+            requireNonNull(atlas, "Atlas getter cannot supply null");
 
-            // We should never have to skip here, unless another mod has modified the atlases
-            if (!(atlas instanceof TextureAtlas)) {
-                continue;
-            }
-
-            TextureAtlas typedAtlas = (TextureAtlas) atlas;
-            TextureAtlasSprite sprite = typedAtlas.getSprite(pathWithoutExtension);
-            if (sprite != null && sprite.getName() != MissingTextureAtlasSprite.getLocation()) {
+            Optional<ISprite> sprite = atlas.getSprite(pathWithoutExtension);
+            if (sprite.isPresent() && sprite.get().getName() == MissingTextureAtlasSprite.getLocation()) {
+                return Optional.empty();
+            } else if (sprite.isPresent()) {
                 return sprite;
             }
+
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -90,8 +80,13 @@ public class SpriteFinder {
      */
     private ResourceLocation makeSpritePath(ResourceLocation location) {
         String originalPath = location.getPath();
-        String cutPath = originalPath.substring(originalPath.indexOf('/') + 1,
-                originalPath.lastIndexOf('.'));
+        String cutPath = originalPath.substring(originalPath.indexOf('/') + 1);
+
+        int extensionIndex = cutPath.lastIndexOf('.');
+        if (extensionIndex >= 0) {
+            cutPath = cutPath.substring(0, extensionIndex + 1);
+        }
+
         return new ResourceLocation(location.getNamespace(), cutPath);
     }
 
