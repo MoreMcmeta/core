@@ -25,13 +25,14 @@ import java.util.stream.Stream;
  */
 @SuppressWarnings("unused")
 public class MockResourceManager implements ResourceManager {
+    public static final String DEFAULT_PACK_NAME = "test";
     private static final InputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
 
     private final List<String> FILES_TO_ADD;
     private final List<String> MISSING_FILES;
     private final boolean USE_UNIQUE_PACK_NAMES;
 
-    private String lastPackName = "test";
+    private String lastPackName = DEFAULT_PACK_NAME;
 
     public MockResourceManager(List<String> filesToAdd, List<String> missingFiles, boolean useUniquePackNames) {
         FILES_TO_ADD = filesToAdd;
@@ -106,7 +107,7 @@ public class MockResourceManager implements ResourceManager {
      * in the future.
      * @author soir20
      */
-    private static class MockSimpleResource extends SimpleResource {
+    public static class MockSimpleResource extends SimpleResource {
         public MockSimpleResource(ResourceLocation locationIn, String packName) {
             super(packName, locationIn, EMPTY_STREAM, null);
         }
