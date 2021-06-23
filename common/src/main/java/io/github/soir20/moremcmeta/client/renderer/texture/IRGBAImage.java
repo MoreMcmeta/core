@@ -53,6 +53,13 @@ public interface IRGBAImage {
     VisibleArea getVisibleArea();
 
     /**
+     * Uploads the top-left corner of this image at the given coordinates.
+     * @param uploadX       horizontal position to upload at
+     * @param uploadY       vertical position to upload at
+     */
+    void upload(int uploadX, int uploadY);
+
+    /**
      * Represents a collection of unordered visible points in an image. Use this to ignore parts of an image
      * in speed-sensitive areas like rendering. Colored points can be ignored by not adding them, as well;
      * the color and opacity of added pixels are not enforced.

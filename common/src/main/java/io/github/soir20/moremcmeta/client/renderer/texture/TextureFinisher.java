@@ -16,8 +16,8 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureFinisher
-        implements IFinisher<EventDrivenTexture.Builder<NativeImageFrame>, EventDrivenTexture<NativeImageFrame>> {
-    private final ArrayDeque<Pair<ResourceLocation, EventDrivenTexture.Builder<NativeImageFrame>>> QUEUED_BUILDERS;
+        implements IFinisher<EventDrivenTexture.Builder<RGBAImageFrame>, EventDrivenTexture<RGBAImageFrame>> {
+    private final ArrayDeque<Pair<ResourceLocation, EventDrivenTexture.Builder<RGBAImageFrame>>> QUEUED_BUILDERS;
     private final SpriteFinder SPRITE_FINDER;
 
     /**
@@ -35,7 +35,7 @@ public class TextureFinisher
      * @param builder       texture builder
      */
     @Override
-    public void queue(ResourceLocation location, EventDrivenTexture.Builder<NativeImageFrame> builder) {
+    public void queue(ResourceLocation location, EventDrivenTexture.Builder<RGBAImageFrame> builder) {
         requireNonNull(location, "Location cannot be null");
         requireNonNull(builder, "Texture builder cannot be null");
 
@@ -47,13 +47,13 @@ public class TextureFinisher
      * @return a map of all textures
      */
     @Override
-    public Map<ResourceLocation, EventDrivenTexture<NativeImageFrame>> finish() {
-        Map<ResourceLocation, EventDrivenTexture<NativeImageFrame>> builtTextures = new HashMap<>();
+    public Map<ResourceLocation, EventDrivenTexture<RGBAImageFrame>> finish() {
+        Map<ResourceLocation, EventDrivenTexture<RGBAImageFrame>> builtTextures = new HashMap<>();
 
         while (!QUEUED_BUILDERS.isEmpty()) {
-            Pair<ResourceLocation, EventDrivenTexture.Builder<NativeImageFrame>> pair = QUEUED_BUILDERS.remove();
+            Pair<ResourceLocation, EventDrivenTexture.Builder<RGBAImageFrame>> pair = QUEUED_BUILDERS.remove();
             ResourceLocation location = pair.getFirst();
-            EventDrivenTexture<NativeImageFrame> texture = finishOne(location, pair.getSecond());
+            EventDrivenTexture<RGBAImageFrame> texture = finishOne(location, pair.getSecond());
             builtTextures.put(location, texture);
         }
 
@@ -66,8 +66,8 @@ public class TextureFinisher
      * @param builder       texture builder
      * @return the finished texture
      */
-    private EventDrivenTexture<NativeImageFrame> finishOne(ResourceLocation location,
-                                                           EventDrivenTexture.Builder<NativeImageFrame> builder) {
+    private EventDrivenTexture<RGBAImageFrame> finishOne(ResourceLocation location,
+                                                         EventDrivenTexture.Builder<RGBAImageFrame> builder) {
         Optional<ISprite> sprite = SPRITE_FINDER.findSprite(location);
         if (sprite.isPresent()) {
             builder.add(new SpriteUploadComponent(sprite.get()));

@@ -1,39 +1,33 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
+
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * An animation frame based on a {@link NativeImage}.
+ * An animation frame based on a {@link IRGBAImage}.
  * @author soir20
  */
-public class NativeImageFrame {
-    private final NativeImage[] MIPMAPS;
+public class RGBAImageFrame {
+    private final List<IRGBAImage> MIPMAPS;
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
     private final int Y_OFFSET;
     private final int FRAME_TIME;
-    private final boolean BLUR;
-    private final boolean CLAMP;
-    private final boolean AUTO_CLOSE;
 
     /**
      * Creates a new frame based on frame data.
      * @param frameData     general data associated with the frame
      * @param mipmaps       mipmapped images for this frame (starting with the original image)
-     * @param blur          whether to blur the frame when it is uploaded
-     * @param clamp         whether to clamp the frame when it is uploaded
-     * @param autoClose     whether to close the image automatically when it is uploaded
      */
-    public NativeImageFrame(FrameReader.FrameData frameData, NativeImage[] mipmaps,
-                            boolean blur, boolean clamp, boolean autoClose) {
+    public RGBAImageFrame(FrameReader.FrameData frameData, List<IRGBAImage> mipmaps) {
         requireNonNull(frameData, "Frame data cannot be null");
         MIPMAPS = requireNonNull(mipmaps, "Mipmaps cannot be null");
-        if (mipmaps.length == 0) {
+        if (mipmaps.size() == 0) {
             throw new IllegalArgumentException("At least one mipmap must be provided");
         }
 
@@ -42,9 +36,6 @@ public class NativeImageFrame {
         X_OFFSET = frameData.getXOffset();
         Y_OFFSET = frameData.getYOffset();
         FRAME_TIME = frameData.getTime();
-        BLUR = blur;
-        CLAMP = clamp;
-        AUTO_CLOSE = autoClose;
     }
 
     /**
@@ -62,17 +53,16 @@ public class NativeImageFrame {
     public void uploadAt(Point point) {
         requireNonNull(point, "Point cannot be null");
 
-        for (int level = 0; level < MIPMAPS.length; level++) {
+        for (int level = 0; level < MIPMAPS.size(); level++) {
             int mipmappedX = point.getX() >> level;
             int mipmappedY = point.getY() >> level;
-            int mipmappedSkipX = X_OFFSET >> level;
-            int mipmappedSkipY = Y_OFFSET >> level;
-            int mipmappedWidth = WIDTH >> level;
-            int mipmappedHeight = HEIGHT >> level;
+
+            IRGBAImage mipmap = MIPMAPS.get(level);
+            int mipmappedWidth = mipmap.getWidth();
+            int mipmappedHeight = mipmap.getHeight();
 
             if (mipmappedWidth > 0 && mipmappedHeight > 0) {
-                MIPMAPS[level].upload(level, mipmappedX, mipmappedY, mipmappedSkipX, mipmappedSkipY,
-                        mipmappedWidth, mipmappedHeight, BLUR, CLAMP, MIPMAPS.length > 1, AUTO_CLOSE);
+                mipmap.upload(mipmappedX, mipmappedY);
             }
         }
     }
@@ -114,7 +104,7 @@ public class NativeImageFrame {
      * @return the mipmap level of this frame
      */
     public int getMipmapLevel() {
-        return MIPMAPS.length - 1;
+        return MIPMAPS.size() - 1;
     }
 
     /**
@@ -122,12 +112,12 @@ public class NativeImageFrame {
      * @param level     the mipmap level
      * @return  the image at the given mipmap level
      */
-    public NativeImage getImage(int level) {
-        if (level >= MIPMAPS.length) {
+    public IRGBAImage getImage(int level) {
+        if (level >= MIPMAPS.size()) {
             throw new IllegalArgumentException("There is no mipmap of level " + level);
         }
 
-        return MIPMAPS[level];
+        return MIPMAPS.get(level);
     }
 
 }

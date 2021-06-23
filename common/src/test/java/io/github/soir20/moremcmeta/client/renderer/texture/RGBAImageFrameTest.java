@@ -1,48 +1,58 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
- * Tests the {@link NativeImageFrame}.
+ * Tests the {@link RGBAImageFrame}.
  * @author soir20
  */
-public class NativeImageFrameTest {
+public class RGBAImageFrameTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void construct_FrameDataNull_NullPointerException() {
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+
         expectedException.expect(NullPointerException.class);
-        new NativeImageFrame(null, new NativeImage[1], false, false, false);
+        new RGBAImageFrame(null, mipmaps);
     }
 
     @Test
     public void construct_MipmapsNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new NativeImageFrame(new FrameReader.FrameData(100, 100, 0, 0, 10),
-                null, false, false, false);
+        new RGBAImageFrame(new FrameReader.FrameData(100, 100, 0, 0, 10),
+                null);
     }
 
     @Test
     public void getMipmapLevel_NoMipmapsProvided_IllegalArgException() {
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+
         expectedException.expect(IllegalArgumentException.class);
-        new NativeImageFrame(
+        new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                new NativeImage[0], false, false, false
+                mipmaps
         );
     }
 
     @Test
     public void getFrameTime_NotEmptyTime_SameTimeReturned() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 100, 0, 0, 10),
-                new NativeImage[1], false, false, false
+                mipmaps
         );
 
         assertEquals(10, frame.getFrameTime());
@@ -50,9 +60,12 @@ public class NativeImageFrameTest {
 
     @Test
     public void getFrameTime_EmptyTime_SameTimeReturned() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 100, 0, 0, FrameReader.FrameData.EMPTY_TIME),
-                new NativeImage[1], false, false, false
+                mipmaps
         );
 
         assertEquals(FrameReader.FrameData.EMPTY_TIME, frame.getFrameTime());
@@ -60,9 +73,12 @@ public class NativeImageFrameTest {
 
     @Test
     public void getWidth_WidthProvided_SameWidthReturned() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0, 10),
-                new NativeImage[1], false, false, false
+                mipmaps
         );
 
         assertEquals(100, frame.getWidth());
@@ -70,9 +86,12 @@ public class NativeImageFrameTest {
 
     @Test
     public void getHeight_HeightProvided_SameHeightReturned() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0, 10),
-                new NativeImage[1], false, false, false
+                mipmaps
         );
 
         assertEquals(200, frame.getHeight());
@@ -80,9 +99,12 @@ public class NativeImageFrameTest {
 
     @Test
     public void getXOffset_XOffsetProvided_SameXOffsetReturned() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                new NativeImage[1], false, false, false
+                mipmaps
         );
 
         assertEquals(30, frame.getXOffset());
@@ -90,9 +112,12 @@ public class NativeImageFrameTest {
 
     @Test
     public void getYOffset_YOffsetProvided_SameYOffsetReturned() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                new NativeImage[1], false, false, false
+                mipmaps
         );
 
         assertEquals(40, frame.getYOffset());
@@ -100,9 +125,16 @@ public class NativeImageFrameTest {
 
     @Test
     public void getMipmapLevel_MipmapsProvided_MipmapLevelReturned() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                new NativeImage[5], false, false, false
+                mipmaps
         );
 
         assertEquals(4, frame.getMipmapLevel());
@@ -110,9 +142,16 @@ public class NativeImageFrameTest {
 
     @Test
     public void getMipmap_MipmapAtArrayLength_IllegalArgException() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                new NativeImage[5], false, false, false
+                mipmaps
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -121,9 +160,16 @@ public class NativeImageFrameTest {
 
     @Test
     public void getMipmap_MipmapBeyondArrayLength_IllegalArgException() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                new NativeImage[5], false, false, false
+                mipmaps
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -132,9 +178,16 @@ public class NativeImageFrameTest {
 
     @Test
     public void getMipmap_MipmapNull_Null() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(null);
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                new NativeImage[5], false, false, false
+                mipmaps
         );
 
         assertNull(frame.getImage(2));
@@ -142,9 +195,16 @@ public class NativeImageFrameTest {
 
     @Test
     public void upload_NullPoint_NullPointerException() {
-        NativeImageFrame frame = new NativeImageFrame(
+        List<IRGBAImage> mipmaps = new ArrayList<>();
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+        mipmaps.add(new MockRGBAImage());
+
+        RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                new NativeImage[5], false, false, false
+                mipmaps
         );
 
         expectedException.expect(NullPointerException.class);

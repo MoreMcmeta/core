@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture to an atlas sprite.
  * @author soir20
  */
-public class SpriteUploadComponent implements ITextureComponent<NativeImageFrame> {
+public class SpriteUploadComponent implements ITextureComponent<RGBAImageFrame> {
     private final ISprite SPRITE;
 
     /**
@@ -27,10 +27,10 @@ public class SpriteUploadComponent implements ITextureComponent<NativeImageFrame
      * @return all of the listeners for this component
      */
     @Override
-    public Stream<TextureListener<NativeImageFrame>> getListeners() {
+    public Stream<TextureListener<RGBAImageFrame>> getListeners() {
         Point uploadPoint = SPRITE.getUploadPoint();
 
-        TextureListener<NativeImageFrame> uploadListener = new TextureListener<>(TextureListener.Type.UPLOAD,
+        TextureListener<RGBAImageFrame> uploadListener = new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> {
                     if (!RenderSystem.isOnRenderThreadOrInit()) {
                         RenderSystem.recordRenderCall(() -> state.getImage().uploadAt(uploadPoint));
@@ -40,7 +40,7 @@ public class SpriteUploadComponent implements ITextureComponent<NativeImageFrame
                 });
 
         // We need this listener because atlas sprites will never be bound
-        TextureListener<NativeImageFrame> tickListener = new TextureListener<>(TextureListener.Type.TICK,
+        TextureListener<RGBAImageFrame> tickListener = new TextureListener<>(TextureListener.Type.TICK,
                 (state) -> {
                     SPRITE.bind();
                     state.getTexture().upload();

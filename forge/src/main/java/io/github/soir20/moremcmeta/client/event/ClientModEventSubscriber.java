@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.client.renderer.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.ISprite;
-import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
+import io.github.soir20.moremcmeta.client.renderer.texture.RGBAImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.client.renderer.texture.TextureFinisher;
 import io.github.soir20.moremcmeta.client.renderer.texture.LazyTextureManager;
@@ -73,7 +73,7 @@ public class ClientModEventSubscriber {
             };
         });
         TextureFinisher finisher = new TextureFinisher(spriteFinder);
-        LazyTextureManager<EventDrivenTexture.Builder<NativeImageFrame>, EventDrivenTexture<NativeImageFrame>>
+        LazyTextureManager<EventDrivenTexture.Builder<RGBAImageFrame>, EventDrivenTexture<RGBAImageFrame>>
                 texManager = new LazyTextureManager<>(minecraft::getTextureManager, finisher);
 
         // Texture ticker
@@ -83,7 +83,7 @@ public class ClientModEventSubscriber {
 
         AnimatedTextureReader texReader = new AnimatedTextureReader(logger);
 
-        TextureReloadListener<EventDrivenTexture.Builder<NativeImageFrame>> commonListener =
+        TextureReloadListener<EventDrivenTexture.Builder<RGBAImageFrame>> commonListener =
                 new TextureReloadListener<>(texReader, texManager, logger);
 
         // Use Forge's selective variant of the reload listener

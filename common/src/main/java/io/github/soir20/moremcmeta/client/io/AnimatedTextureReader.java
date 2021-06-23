@@ -3,7 +3,6 @@ package io.github.soir20.moremcmeta.client.io;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.client.animation.IInterpolator;
 import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.client.renderer.texture.AnimationComponent;
@@ -11,7 +10,7 @@ import io.github.soir20.moremcmeta.client.renderer.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.renderer.texture.IRGBAImage;
 import io.github.soir20.moremcmeta.client.renderer.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.client.renderer.texture.LazyTextureManager;
-import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageFrame;
+import io.github.soir20.moremcmeta.client.renderer.texture.RGBAImageFrame;
 import io.github.soir20.moremcmeta.client.renderer.texture.NativeImageRGBAWrapper;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import io.github.soir20.moremcmeta.math.Point;
@@ -30,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,7 +41,7 @@ import static java.util.Objects.requireNonNull;
  * to add components related to texture registration and binding.
  * @author soir20
  */
-public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder<NativeImageFrame>> {
+public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder<RGBAImageFrame>> {
     private final Logger LOGGER;
 
     /**
@@ -58,7 +59,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
      * @return  an animated texture based on the provided data
      * @throws IOException  failure reading from either input stream
      */
-    public EventDrivenTexture.Builder<NativeImageFrame>
+    public EventDrivenTexture.Builder<RGBAImageFrame>
     read(InputStream textureStream, InputStream metadataStream) throws IOException,
             JsonParseException, IllegalArgumentException {
 
@@ -99,24 +100,47 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         boolean clamp = textureMetadata.isClamp();
 
         // Frames
-        FrameReader<NativeImageFrame> frameReader = new FrameReader<>((frameData ->
-                new NativeImageFrame(frameData, mipmaps, blur, clamp, false)));
-        ImmutableList<NativeImageFrame> frames = frameReader.read(image.getWidth(),
+        List<IRGBAImage.VisibleArea> widthToArea = new ArrayList<>();
+        FrameReader<RGBAImageFrame> frameReader = new FrameReader<>(frameData -> {
+            List<IRGBAImage> wrappedMipmaps = IntStream.range(0, mipmaps.length).mapToObj((level) -> {
+                int width = frameData.getWidth() >> level;
+                int height = frameData.getHeight() >> level;
+
+                if (widthToArea.isEmpty()) {
+                    widthToArea.addAll(getChangingPoints(mipmaps[level], width, height, MIPMAP));
+                }
+
+                return new NativeImageRGBAWrapper(
+                        mipmaps[level],
+                        frameData.getXOffset() >> level, frameData.getYOffset() >> level,
+                        width, height,
+                        level, blur, clamp, false,
+                        widthToArea.get(level)
+                );
+            }).collect(Collectors.toList());
+
+            return new RGBAImageFrame(frameData, wrappedMipmaps);
+        });
+
+        ImmutableList<RGBAImageFrame> frames = frameReader.read(image.getWidth(),
                 image.getHeight(), animationMetadata);
-        int frameWidth = frames.get(0).getWidth();
-        int frameHeight = frames.get(0).getHeight();
+        RGBAImageFrame firstFrame = frames.get(0);
+        int frameWidth = firstFrame.getWidth();
+        int frameHeight = firstFrame.getHeight();
 
         // Interpolation
-        List<IRGBAImage.VisibleArea> visibleAreas = getChangingPoints(image, frameWidth, frameHeight, MIPMAP);
+        List<IRGBAImage.VisibleArea> visibleAreas = IntStream.range(0, MIPMAP + 1).mapToObj(
+                (level) -> firstFrame.getImage(level).getVisibleArea()
+        ).collect(Collectors.toList());
         NativeImageFrameInterpolator interpolator = new NativeImageFrameInterpolator(mipmaps, visibleAreas,
                 frameWidth, frameHeight, blur, clamp);
 
         // Frame management
-        AnimationFrameManager<NativeImageFrame> frameManager;
+        AnimationFrameManager<RGBAImageFrame> frameManager;
         if (animationMetadata.isInterpolatedFrames()) {
-            frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime, interpolator);
+            frameManager = new AnimationFrameManager<>(frames, RGBAImageFrame::getFrameTime, interpolator);
         } else {
-            frameManager = new AnimationFrameManager<>(frames, NativeImageFrame::getFrameTime);
+            frameManager = new AnimationFrameManager<>(frames, RGBAImageFrame::getFrameTime);
         }
 
         // Resource cleanup
@@ -132,7 +156,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         Supplier<Optional<Long>> timeGetter =
                 () -> minecraft.level == null ? Optional.empty() : Optional.of(minecraft.level.getDayTime());
 
-        EventDrivenTexture.Builder<NativeImageFrame> builder = new EventDrivenTexture.Builder<>();
+        EventDrivenTexture.Builder<RGBAImageFrame> builder = new EventDrivenTexture.Builder<>();
         builder.setImage(frameManager.getCurrentFrame())
                 .add(new CleanupComponent<>(closeMipmaps))
                 .add(new AnimationComponent<>(24000, timeGetter, frameManager));
@@ -183,18 +207,13 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
     }
 
     /**
-     * Interpolates between {@link NativeImageFrame}s. All interpolated frames share a {@link NativeImage},
+     * Interpolates between {@link RGBAImageFrame}s. All interpolated frames share a {@link NativeImage},
      * which has its pixels replaced when interpolation occurs.
      * @author soir20
      */
-    private static class NativeImageFrameInterpolator implements IInterpolator<NativeImageFrame>, AutoCloseable {
-        private final int FRAME_WIDTH;
-        private final int FRAME_HEIGHT;
+    private static class NativeImageFrameInterpolator implements IInterpolator<RGBAImageFrame>, AutoCloseable {
         private final int MIPMAP;
-        private final boolean BLUR;
-        private final boolean CLAMP;
-        private final List<IRGBAImage.VisibleArea> VISIBLE_AREAS;
-        private final RGBAInterpolator<NativeImageRGBAWrapper> INTERPOLATOR;
+        private final RGBAInterpolator<IRGBAImage> INTERPOLATOR;
         private final NativeImage[] MIPMAPS;
 
         /**
@@ -209,34 +228,31 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         public NativeImageFrameInterpolator(NativeImage[] originalMipmaps,
                                             List<IRGBAImage.VisibleArea> visibleAreas,
                                             int frameWidth, int frameHeight, boolean blur, boolean clamp) {
-            FRAME_WIDTH = frameWidth;
-            FRAME_HEIGHT = frameHeight;
             MIPMAP = originalMipmaps.length - 1;
-            BLUR = blur;
-            CLAMP = clamp;
             MIPMAPS = new NativeImage[originalMipmaps.length];
 
             // Directly convert mipmapped widths to their associated image
-            HashMap<Integer, Pair<NativeImage, IRGBAImage.VisibleArea>> widthsToImage = new HashMap<>();
+            HashMap<Integer, NativeImageRGBAWrapper> widthsToImage = new HashMap<>();
             for (int level = 0; level <= MIPMAP; level++) {
-                int mipmappedWidth = FRAME_WIDTH >> level;
-                int mipmappedHeight = FRAME_HEIGHT >> level;
+                int mipmappedWidth = frameWidth >> level;
+                int mipmappedHeight = frameHeight >> level;
 
                 NativeImage mipmappedImage = new NativeImage(mipmappedWidth, mipmappedHeight, true);
                 copyTopLeftRect(mipmappedWidth, mipmappedHeight, originalMipmaps[level], mipmappedImage);
                 MIPMAPS[level] = mipmappedImage;
 
-                widthsToImage.put(mipmappedWidth, new Pair<>(mipmappedImage, visibleAreas.get(level)));
+                NativeImageRGBAWrapper rgbaWrapper = new NativeImageRGBAWrapper(
+                        mipmappedImage,
+                        0, 0,
+                        mipmappedWidth, mipmappedHeight,
+                        level,
+                        blur, clamp, false,
+                        visibleAreas.get(level)
+                );
+                widthsToImage.put(mipmappedWidth, rgbaWrapper);
             }
 
-            VISIBLE_AREAS = visibleAreas;
-
-            INTERPOLATOR = new RGBAInterpolator<>((width, height) -> {
-                Pair<NativeImage, IRGBAImage.VisibleArea> imageAndPoints = widthsToImage.get(width);
-
-                return new NativeImageRGBAWrapper(imageAndPoints.getFirst(), 0, 0, width, height,
-                        imageAndPoints.getSecond());
-            });
+            INTERPOLATOR = new RGBAInterpolator<>((width, height) -> widthsToImage.get(width));
         }
 
         /**
@@ -248,35 +264,22 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
          * @return  the interpolated frame at the given step
          */
         @Override
-        public NativeImageFrame interpolate(int steps, int step, NativeImageFrame start, NativeImageFrame end) {
-            NativeImage[] mipmaps = new NativeImage[MIPMAP + 1];
+        public RGBAImageFrame interpolate(int steps, int step, RGBAImageFrame start, RGBAImageFrame end) {
+            List<IRGBAImage> mipmaps = new ArrayList<>(MIPMAP + 1);
 
             for (int level = 0; level <= MIPMAP; level++) {
-                NativeImageRGBAWrapper startImage = new NativeImageRGBAWrapper(
-                        start.getImage(level),
-                        start.getXOffset() >> level,
-                        start.getYOffset() >> level,
-                        FRAME_WIDTH >> level,
-                        FRAME_HEIGHT >> level,
-                        VISIBLE_AREAS.get(level)
-                );
-                NativeImageRGBAWrapper endImage = new NativeImageRGBAWrapper(
-                        end.getImage(level),
-                        end.getXOffset() >> level,
-                        end.getYOffset() >> level,
-                        FRAME_WIDTH >> level,
-                        FRAME_HEIGHT >> level,
-                        VISIBLE_AREAS.get(level)
-                );
+                IRGBAImage startImage = start.getImage(level);
+                IRGBAImage endImage = end.getImage(level);
 
-                NativeImageRGBAWrapper interpolated = INTERPOLATOR.interpolate(steps, step, startImage, endImage);
-
-                mipmaps[level] = interpolated.getImage();
+                IRGBAImage interpolated = INTERPOLATOR.interpolate(steps, step, startImage, endImage);
+                mipmaps.add(interpolated);
             }
 
-            FrameReader.FrameData data = new FrameReader.FrameData(mipmaps[0].getWidth(), mipmaps[0].getHeight(),
-                    0, 0, 1);
-            return new NativeImageFrame(data, mipmaps, BLUR, CLAMP, false);
+            FrameReader.FrameData data = new FrameReader.FrameData(
+                    mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(),
+                    0, 0, 1
+            );
+            return new RGBAImageFrame(data, mipmaps);
         }
 
         /**

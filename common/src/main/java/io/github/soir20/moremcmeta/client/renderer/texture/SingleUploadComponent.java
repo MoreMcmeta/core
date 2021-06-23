@@ -10,17 +10,17 @@ import java.util.stream.Stream;
  * Manages uploading a texture that is not associated with an atlas sprite.
  * @author soir20
  */
-public class SingleUploadComponent implements ITextureComponent<NativeImageFrame> {
+public class SingleUploadComponent implements ITextureComponent<RGBAImageFrame> {
 
     /**
      * Gets the listeners for this component.
      * @return all of the listeners for this component
      */
     @Override
-    public Stream<TextureListener<NativeImageFrame>> getListeners() {
-        TextureListener<NativeImageFrame> bindListener = new TextureListener<>(TextureListener.Type.BIND,
+    public Stream<TextureListener<RGBAImageFrame>> getListeners() {
+        TextureListener<RGBAImageFrame> bindListener = new TextureListener<>(TextureListener.Type.BIND,
                 (state) -> {
-                    NativeImageFrame image = state.getImage();
+                    RGBAImageFrame image = state.getImage();
 
                     if (!RenderSystem.isOnRenderThreadOrInit()) {
                         RenderSystem.recordRenderCall(() ->
@@ -33,7 +33,7 @@ public class SingleUploadComponent implements ITextureComponent<NativeImageFrame
                 });
 
         Point uploadPoint = new Point(0, 0);
-        TextureListener<NativeImageFrame> uploadListener = new TextureListener<>(TextureListener.Type.UPLOAD,
+        TextureListener<RGBAImageFrame> uploadListener = new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> {
 
                     if (!RenderSystem.isOnRenderThreadOrInit()) {

@@ -16,19 +16,37 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
     private final int Y_OFFSET;
     private final int WIDTH;
     private final int HEIGHT;
+    private final int MIPMAP_LEVEL;
+    private final boolean BLUR;
+    private final boolean CLAMP;
+    private final boolean AUTO_CLOSE;
     private final VisibleArea VISIBLE_AREA;
 
     /**
      * Creates a new {@link NativeImage} wrapper.
-     * @param image     the image to wrap
+     * @param image         the image to wrap
+     * @param xOffset       horizontal offset of the image in a texture
+     * @param yOffset       vertical offset of the image in a texture
+     * @param width         width of the image
+     * @param height        height of the image
+     * @param mipmapLevel   mipmap level of the image
+     * @param blur          whether to blur this image
+     * @param clamp         whether to clamp this image
+     * @param autoClose     whether to automatically close this image
+     * @param visibleArea   the visible portions of this image
      */
     public NativeImageRGBAWrapper(NativeImage image, int xOffset, int yOffset, int width, int height,
+                                  int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
                                   VisibleArea visibleArea) {
         IMAGE = requireNonNull(image, "Image cannot be null");
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
         WIDTH = width;
         HEIGHT = height;
+        MIPMAP_LEVEL = mipmapLevel;
+        BLUR = blur;
+        CLAMP = clamp;
+        AUTO_CLOSE = autoClose;
         VISIBLE_AREA = requireNonNull(visibleArea, "Visible area cannot be null");
     }
 
@@ -79,6 +97,17 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
     @Override
     public VisibleArea getVisibleArea() {
         return VISIBLE_AREA;
+    }
+
+    /**
+     * Uploads the top-left corner of this image at the given coordinates.
+     * @param uploadX       horizontal position to upload at
+     * @param uploadY       vertical position to upload at
+     */
+    @Override
+    public void upload(int uploadX, int uploadY) {
+        IMAGE.upload(MIPMAP_LEVEL, uploadX, uploadY, X_OFFSET, Y_OFFSET,
+                WIDTH, HEIGHT, BLUR, CLAMP, MIPMAP_LEVEL > 0, AUTO_CLOSE);
     }
 
     /**
