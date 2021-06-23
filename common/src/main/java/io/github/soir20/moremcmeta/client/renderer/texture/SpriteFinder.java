@@ -84,7 +84,7 @@ public class SpriteFinder {
 
         int extensionIndex = cutPath.lastIndexOf('.');
         if (extensionIndex >= 0) {
-            cutPath = cutPath.substring(0, extensionIndex + 1);
+            cutPath = cutPath.substring(0, extensionIndex);
         }
 
         return new ResourceLocation(location.getNamespace(), cutPath);

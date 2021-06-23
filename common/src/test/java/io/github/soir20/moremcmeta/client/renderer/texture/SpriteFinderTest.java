@@ -40,7 +40,8 @@ public class SpriteFinderTest {
     @Test
     public void find_NullLocation_NullPointerException() {
         SpriteFinder finder = new SpriteFinder(
-                (atlasLocation) -> (spriteLocation) -> Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS))
+                (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(LOCATION_IN_ATLAS) ? 
+                        Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
         expectedException.expect(NullPointerException.class);
@@ -61,7 +62,8 @@ public class SpriteFinderTest {
     @Test
     public void find_NameWithPrefixAndExtension_SpriteFound() {
         SpriteFinder finder = new SpriteFinder(
-                (atlasLocation) -> (spriteLocation) -> Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS))
+                (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(LOCATION_IN_ATLAS) ? 
+                        Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
         Optional<ISprite> result = finder.findSprite(LOCATION_BOTH);
@@ -72,7 +74,8 @@ public class SpriteFinderTest {
     @Test
     public void find_NameWithoutPrefixAndExtension_SpriteFound() {
         SpriteFinder finder = new SpriteFinder(
-                (atlasLocation) -> (spriteLocation) -> Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS))
+                (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(LOCATION_IN_ATLAS) ? 
+                        Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
         Optional<ISprite> result = finder.findSprite(LOCATION_BOTH);
@@ -83,7 +86,8 @@ public class SpriteFinderTest {
     @Test
     public void find_NameWithExtension_SpriteFound() {
         SpriteFinder finder = new SpriteFinder(
-                (atlasLocation) -> (spriteLocation) -> Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS))
+                (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(LOCATION_IN_ATLAS) ? 
+                        Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
         Optional<ISprite> result = finder.findSprite(LOCATION_EXTENSION);
@@ -94,7 +98,8 @@ public class SpriteFinderTest {
     @Test
     public void find_NameWithPrefix_SpriteFound() {
         SpriteFinder finder = new SpriteFinder(
-                (atlasLocation) -> (spriteLocation) -> Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS))
+                (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(LOCATION_IN_ATLAS) ? 
+                        Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
         Optional<ISprite> result = finder.findSprite(LOCATION_PREFIX);
