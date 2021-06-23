@@ -213,7 +213,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
      */
     private static class NativeImageFrameInterpolator implements IInterpolator<RGBAImageFrame>, AutoCloseable {
         private final int MIPMAP;
-        private final RGBAInterpolator<IRGBAImage> INTERPOLATOR;
+        private final RGBAInterpolator INTERPOLATOR;
         private final NativeImage[] MIPMAPS;
 
         /**
@@ -252,7 +252,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 widthsToImage.put(mipmappedWidth, rgbaWrapper);
             }
 
-            INTERPOLATOR = new RGBAInterpolator<>((width, height) -> widthsToImage.get(width));
+            INTERPOLATOR = new RGBAInterpolator((width, height) -> widthsToImage.get(width));
         }
 
         /**
