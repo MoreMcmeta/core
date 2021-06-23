@@ -110,12 +110,4 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
                 WIDTH, HEIGHT, BLUR, CLAMP, MIPMAP_LEVEL > 0, AUTO_CLOSE);
     }
 
-    /**
-     * Gets the wrapped image.
-     * @return  the wrapped image
-     */
-    public NativeImage getImage() {
-        return IMAGE;
-    }
-
 }
