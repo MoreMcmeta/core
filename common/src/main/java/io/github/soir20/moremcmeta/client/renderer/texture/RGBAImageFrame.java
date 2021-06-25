@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class RGBAImageFrame {
-    private final List<IRGBAImage> MIPMAPS;
+    private final List<? extends IRGBAImage> MIPMAPS;
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
@@ -24,7 +24,7 @@ public class RGBAImageFrame {
      * @param frameData     general data associated with the frame
      * @param mipmaps       mipmapped images for this frame (starting with the original image)
      */
-    public RGBAImageFrame(FrameReader.FrameData frameData, List<IRGBAImage> mipmaps) {
+    public RGBAImageFrame(FrameReader.FrameData frameData, List<? extends IRGBAImage> mipmaps) {
         requireNonNull(frameData, "Frame data cannot be null");
         MIPMAPS = requireNonNull(mipmaps, "Mipmaps cannot be null");
         if (mipmaps.size() == 0) {
@@ -53,6 +53,10 @@ public class RGBAImageFrame {
     public void uploadAt(Point point) {
         requireNonNull(point, "Point cannot be null");
 
+        if (point.getX() < 0 || point.getY() < 0) {
+            throw new IllegalArgumentException("Point coordinates must be greater than zero");
+        }
+
         for (int level = 0; level < MIPMAPS.size(); level++) {
             int mipmappedX = point.getX() >> level;
             int mipmappedY = point.getY() >> level;
@@ -61,7 +65,9 @@ public class RGBAImageFrame {
             int mipmappedWidth = mipmap.getWidth();
             int mipmappedHeight = mipmap.getHeight();
 
-            if (mipmappedWidth > 0 && mipmappedHeight > 0) {
+            boolean isMipmapEmpty = mipmappedWidth == 0 || mipmappedHeight == 0;
+            boolean isPointInMipmap = mipmappedX < mipmappedWidth && mipmappedY < mipmappedHeight;
+            if (!isMipmapEmpty && isPointInMipmap) {
                 mipmap.upload(mipmappedX, mipmappedY);
             }
         }
