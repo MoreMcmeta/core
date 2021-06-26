@@ -18,7 +18,7 @@ public class SingleUploadComponent implements ITextureComponent {
      */
     @Override
     public Stream<TextureListener> getListeners() {
-        TextureListener bindListener = new TextureListener(TextureListener.Type.BIND,
+        TextureListener registrationListener = new TextureListener(TextureListener.Type.REGISTRATION,
                 (state) -> {
                     RGBAImageFrame image = state.getImage();
 
@@ -35,7 +35,6 @@ public class SingleUploadComponent implements ITextureComponent {
         Point uploadPoint = new Point(0, 0);
         TextureListener uploadListener = new TextureListener(TextureListener.Type.UPLOAD,
                 (state) -> {
-
                     if (!RenderSystem.isOnRenderThreadOrInit()) {
                         RenderSystem.recordRenderCall(() -> state.getImage().uploadAt(uploadPoint));
                     } else {
@@ -43,7 +42,7 @@ public class SingleUploadComponent implements ITextureComponent {
                     }
                 });
 
-        return Stream.of(bindListener, uploadListener);
+        return Stream.of(registrationListener, uploadListener);
     }
 
 }
