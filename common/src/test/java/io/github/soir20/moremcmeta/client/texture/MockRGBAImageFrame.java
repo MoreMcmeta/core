@@ -2,6 +2,7 @@ package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
+import io.github.soir20.moremcmeta.math.Point;
 
 /**
  * A fake {@link RGBAImageFrame}.
@@ -9,6 +10,7 @@ import io.github.soir20.moremcmeta.client.io.FrameReader;
  */
 public class MockRGBAImageFrame extends RGBAImageFrame {
     private final int FRAME_NUMBER;
+    private int uploads;
 
     public MockRGBAImageFrame() {
         this(0);
@@ -20,8 +22,18 @@ public class MockRGBAImageFrame extends RGBAImageFrame {
         FRAME_NUMBER = frameNumber;
     }
 
+    @Override
+    public void uploadAt(Point point) {
+        super.uploadAt(point);
+        uploads++;
+    }
+
     public int getFrameNumber() {
         return FRAME_NUMBER;
+    }
+
+    public int getUploadCount() {
+        return uploads;
     }
 
 }
