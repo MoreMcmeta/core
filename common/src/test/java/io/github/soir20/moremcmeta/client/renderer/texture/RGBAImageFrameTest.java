@@ -359,7 +359,7 @@ public class RGBAImageFrameTest {
     }
 
     @Test
-    public void upload_PointOnVerticalBorder_NoneUploaded() {
+    public void upload_PointOnVerticalBorder_EmptyNotUploaded() {
         List<MockRGBAImage> mipmaps = new ArrayList<>();
         mipmaps.add(new MockRGBAImage(8, 16));
         mipmaps.add(new MockRGBAImage(4, 8));
@@ -374,15 +374,15 @@ public class RGBAImageFrameTest {
 
         frame.uploadAt(new Point(4, 16));
 
-        assertNull(mipmaps.get(0).getLastUploadPoint());
-        assertNull(mipmaps.get(1).getLastUploadPoint());
-        assertNull(mipmaps.get(2).getLastUploadPoint());
-        assertNull(mipmaps.get(3).getLastUploadPoint());
+        assertEquals(new Point(4, 16), mipmaps.get(0).getLastUploadPoint());
+        assertEquals(new Point(2, 8), mipmaps.get(1).getLastUploadPoint());
+        assertEquals(new Point(1, 4), mipmaps.get(2).getLastUploadPoint());
+        assertEquals(new Point(0, 2), mipmaps.get(3).getLastUploadPoint());
         assertNull(mipmaps.get(4).getLastUploadPoint());
     }
 
     @Test
-    public void upload_PointOnHorizontalBorder_NoneUploaded() {
+    public void upload_PointOnHorizontalBorder_EmptyNotUploaded() {
         List<MockRGBAImage> mipmaps = new ArrayList<>();
         mipmaps.add(new MockRGBAImage(8, 16));
         mipmaps.add(new MockRGBAImage(4, 8));
@@ -397,15 +397,15 @@ public class RGBAImageFrameTest {
 
         frame.uploadAt(new Point(8, 8));
 
-        assertNull(mipmaps.get(0).getLastUploadPoint());
-        assertNull(mipmaps.get(1).getLastUploadPoint());
-        assertNull(mipmaps.get(2).getLastUploadPoint());
-        assertNull(mipmaps.get(3).getLastUploadPoint());
+        assertEquals(new Point(8, 8), mipmaps.get(0).getLastUploadPoint());
+        assertEquals(new Point(4, 4), mipmaps.get(1).getLastUploadPoint());
+        assertEquals(new Point(2, 2), mipmaps.get(2).getLastUploadPoint());
+        assertEquals(new Point(1, 1), mipmaps.get(3).getLastUploadPoint());
         assertNull(mipmaps.get(4).getLastUploadPoint());
     }
 
     @Test
-    public void upload_PointOnCorner_NoneUploaded() {
+    public void upload_PointOnCorner_EmptyNotUploaded() {
         List<MockRGBAImage> mipmaps = new ArrayList<>();
         mipmaps.add(new MockRGBAImage(8, 16));
         mipmaps.add(new MockRGBAImage(4, 8));
@@ -420,11 +420,11 @@ public class RGBAImageFrameTest {
 
         frame.uploadAt(new Point(8, 16));
 
-        assertNull(mipmaps.get(0).getLastUploadPoint());
-        assertNull(mipmaps.get(1).getLastUploadPoint());
-        assertNull(mipmaps.get(2).getLastUploadPoint());
-        assertNull(mipmaps.get(3).getLastUploadPoint());
-        assertNull(mipmaps.get(4).getLastUploadPoint());
+        assertEquals(new Point(8, 16), mipmaps.get(0).getLastUploadPoint());
+        assertEquals(new Point(4, 8), mipmaps.get(1).getLastUploadPoint());
+        assertEquals(new Point(2, 4), mipmaps.get(2).getLastUploadPoint());
+        assertEquals(new Point(1, 2), mipmaps.get(3).getLastUploadPoint());
+        assertNull(null, mipmaps.get(4).getLastUploadPoint());
     }
 
     @Test
@@ -497,7 +497,7 @@ public class RGBAImageFrameTest {
     }
 
     @Test
-    public void upload_PointOutsideMipmap_NotUploaded() {
+    public void upload_PointOutsideMipmap_EmptyNotUploaded() {
         List<MockRGBAImage> mipmaps = new ArrayList<>();
         mipmaps.add(new MockRGBAImage(10, 10));
         mipmaps.add(new MockRGBAImage(5, 5));
@@ -512,10 +512,10 @@ public class RGBAImageFrameTest {
 
         frame.uploadAt(new Point(500, 500));
 
-        assertNull(mipmaps.get(0).getLastUploadPoint());
-        assertNull(mipmaps.get(1).getLastUploadPoint());
-        assertNull(mipmaps.get(2).getLastUploadPoint());
-        assertNull(mipmaps.get(3).getLastUploadPoint());
+        assertEquals(new Point(500, 500), mipmaps.get(0).getLastUploadPoint());
+        assertEquals(new Point(250, 250), mipmaps.get(1).getLastUploadPoint());
+        assertEquals(new Point(125, 125), mipmaps.get(2).getLastUploadPoint());
+        assertEquals(new Point(62, 62), mipmaps.get(3).getLastUploadPoint());
         assertNull(mipmaps.get(4).getLastUploadPoint());
     }
 
@@ -536,8 +536,8 @@ public class RGBAImageFrameTest {
         frame.uploadAt(new Point(5, 5));
 
         assertEquals(new Point(5, 5), mipmaps.get(0).getLastUploadPoint());
-        assertNull(mipmaps.get(1).getLastUploadPoint());
-        assertNull(mipmaps.get(2).getLastUploadPoint());
+        assertEquals(new Point(2, 2), mipmaps.get(1).getLastUploadPoint());
+        assertEquals(new Point(1, 1), mipmaps.get(2).getLastUploadPoint());
         assertNull(mipmaps.get(3).getLastUploadPoint());
         assertNull(mipmaps.get(4).getLastUploadPoint());
     }

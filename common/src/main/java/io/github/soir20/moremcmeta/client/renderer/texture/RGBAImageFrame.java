@@ -65,9 +65,7 @@ public class RGBAImageFrame {
             int mipmappedWidth = mipmap.getWidth();
             int mipmappedHeight = mipmap.getHeight();
 
-            boolean isMipmapEmpty = mipmappedWidth == 0 || mipmappedHeight == 0;
-            boolean isPointInMipmap = mipmappedX < mipmappedWidth && mipmappedY < mipmappedHeight;
-            if (!isMipmapEmpty && isPointInMipmap) {
+            if (mipmappedWidth > 0 && mipmappedHeight > 0) {
                 mipmap.upload(mipmappedX, mipmappedY);
             }
         }
