@@ -73,6 +73,23 @@ public class LazyTextureManagerTest {
     }
 
     @Test
+    public void register_ManagerHasTexture_OldUnregisteredOnRenderThread() {
+        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        ResourceLocation location = new ResourceLocation("bat.png");
+
+        texManager.register(location, new MockAnimatedTexture());
+
+        LazyTextureManager<CustomTickable, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
+                () -> texManager, new MockFinisher<>());
+
+        wrapper.register(location, new MockAnimatedTexture());
+
+        // We aren't on the render thread, so this texture should not null
+        assertNotNull(texManager.getTexture(location));
+
+    }
+
+    @Test
     public void registerAndFinish_MultipleTextures_AllAdded() {
         TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(

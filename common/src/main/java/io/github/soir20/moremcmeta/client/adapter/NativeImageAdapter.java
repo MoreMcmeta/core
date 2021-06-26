@@ -1,6 +1,7 @@
 package io.github.soir20.moremcmeta.client.adapter;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
 
@@ -101,14 +102,30 @@ public class NativeImageAdapter implements IRGBAImage {
     }
 
     /**
-     * Uploads the top-left corner of this image at the given coordinates.
+     * Uploads the top-left corner of this image at the given coordinates on the render thread.
      * @param uploadX       horizontal position to upload at
      * @param uploadY       vertical position to upload at
      */
     @Override
     public void upload(int uploadX, int uploadY) {
-        IMAGE.upload(MIPMAP_LEVEL, uploadX, uploadY, X_OFFSET, Y_OFFSET,
-                WIDTH, HEIGHT, BLUR, CLAMP, MIPMAP_LEVEL > 0, AUTO_CLOSE);
+        if (!RenderSystem.isOnRenderThreadOrInit()) {
+            RenderSystem.recordRenderCall(() -> uploadImmediately(uploadX, uploadY));
+        } else {
+            uploadImmediately(uploadX, uploadY);
+        }
+
+    }
+
+    /**
+     * Uploads this image at the given coordinates immediately.
+     * @param uploadX       horizontal position to upload at
+     * @param uploadY       vertical position to upload at
+     */
+    private void uploadImmediately(int uploadX, int uploadY) {
+        IMAGE.upload(
+                MIPMAP_LEVEL, uploadX, uploadY, X_OFFSET, Y_OFFSET,
+                WIDTH, HEIGHT, BLUR, CLAMP, MIPMAP_LEVEL > 0, AUTO_CLOSE
+        );
     }
 
 }

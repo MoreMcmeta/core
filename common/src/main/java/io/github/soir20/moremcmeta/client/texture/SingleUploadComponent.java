@@ -33,14 +33,10 @@ public class SingleUploadComponent implements ITextureComponent {
                 });
 
         Point uploadPoint = new Point(0, 0);
-        TextureListener uploadListener = new TextureListener(TextureListener.Type.UPLOAD,
-                (state) -> {
-                    if (!RenderSystem.isOnRenderThreadOrInit()) {
-                        RenderSystem.recordRenderCall(() -> state.getImage().uploadAt(uploadPoint));
-                    } else {
-                        state.getImage().uploadAt(uploadPoint);
-                    }
-                });
+        TextureListener uploadListener = new TextureListener(
+                TextureListener.Type.UPLOAD,
+                (state) -> state.getImage().uploadAt(uploadPoint)
+        );
 
         return Stream.of(registrationListener, uploadListener);
     }

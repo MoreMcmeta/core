@@ -53,7 +53,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
            registration CompletableFuture inside PreloadedTexture's reset method. */
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
-        textureManager.release(textureLocation);
+        executeOnRenderThread(() -> textureManager.release(textureLocation));
 
         FINISHER.queue(textureLocation, builder);
     }
@@ -85,12 +85,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
 
-        if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(() -> textureManager.release(textureLocation));
-        } else {
-            textureManager.release(textureLocation);
-        }
-
+        executeOnRenderThread(() -> textureManager.release(textureLocation));
         ANIMATED_TEXTURES.remove(textureLocation);
     }
 
@@ -100,6 +95,18 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
     @Override
     public void tick() {
         ANIMATED_TEXTURES.values().forEach(CustomTickable::tick);
+    }
+
+    /**
+     * Executes code on the render thread.
+     * @param action    the callback to execute
+     */
+    private void executeOnRenderThread(Runnable action) {
+        if (!RenderSystem.isOnRenderThreadOrInit()) {
+            RenderSystem.recordRenderCall(action::run);
+        } else {
+            action.run();
+        }
     }
 
 }

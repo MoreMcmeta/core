@@ -30,14 +30,10 @@ public class SpriteUploadComponent implements ITextureComponent {
     public Stream<TextureListener> getListeners() {
         Point uploadPoint = SPRITE.getUploadPoint();
 
-        TextureListener uploadListener = new TextureListener(TextureListener.Type.UPLOAD,
-                (state) -> {
-                    if (!RenderSystem.isOnRenderThreadOrInit()) {
-                        RenderSystem.recordRenderCall(() -> state.getImage().uploadAt(uploadPoint));
-                    } else {
-                        state.getImage().uploadAt(uploadPoint);
-                    }
-                });
+        TextureListener uploadListener = new TextureListener(
+                TextureListener.Type.UPLOAD,
+                (state) -> state.getImage().uploadAt(uploadPoint)
+        );
 
         // We need this listener because atlas sprites will never be bound
         TextureListener tickListener = new TextureListener(TextureListener.Type.TICK,
