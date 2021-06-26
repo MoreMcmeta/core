@@ -157,7 +157,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(frameManager.getCurrentFrame())
-                .add(new CleanupComponent<>(closeMipmaps))
+                .add(new CleanupComponent(closeMipmaps))
                 .add(new AnimationComponent(24000, timeGetter, frameManager));
 
         return builder;

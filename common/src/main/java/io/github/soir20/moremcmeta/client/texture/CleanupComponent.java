@@ -6,10 +6,9 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Cleans up images when an {@link EventDrivenTexture} closes.
- * @param <I> image type
  * @author soir20
  */
-public class CleanupComponent<I> implements ITextureComponent {
+public class CleanupComponent implements ITextureComponent {
     private final Runnable CLOSE_ACTION;
 
     /**
