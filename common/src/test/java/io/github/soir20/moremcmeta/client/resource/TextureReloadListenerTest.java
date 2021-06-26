@@ -2,7 +2,7 @@ package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
-import io.github.soir20.moremcmeta.client.renderer.texture.MockManager;
+import io.github.soir20.moremcmeta.client.texture.MockManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;

@@ -2,11 +2,12 @@ package io.github.soir20.moremcmeta.client.event;
 
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
-import io.github.soir20.moremcmeta.client.renderer.texture.EventDrivenTexture;
-import io.github.soir20.moremcmeta.client.renderer.texture.ISprite;
-import io.github.soir20.moremcmeta.client.renderer.texture.SpriteFinder;
-import io.github.soir20.moremcmeta.client.renderer.texture.TextureFinisher;
-import io.github.soir20.moremcmeta.client.renderer.texture.LazyTextureManager;
+import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
+import io.github.soir20.moremcmeta.client.texture.IAtlas;
+import io.github.soir20.moremcmeta.client.texture.ISprite;
+import io.github.soir20.moremcmeta.client.texture.SpriteFinder;
+import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
+import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureReloadListener;
 import io.github.soir20.moremcmeta.MoreMcmeta;
@@ -59,29 +60,18 @@ public class ClientModEventSubscriber {
         SimpleReloadableResourceManager rscManager =
                 (SimpleReloadableResourceManager) minecraft.getResourceManager();
 
-        SpriteFinder spriteFinder = new SpriteFinder((atlasLocation) -> {
-            AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(atlasLocation);
-            if (!(texture instanceof TextureAtlas)) {
-                return (spriteLocation) -> Optional.empty();
-            }
-
-            TextureAtlas atlas = (TextureAtlas) texture;
-            return (spriteLocation) -> {
-                TextureAtlasSprite sprite = atlas.getSprite(spriteLocation);
-                return Optional.ofNullable(makeSpriteAdapter(sprite));
-            };
-        });
+        SpriteFinder spriteFinder = new SpriteFinder(ClientModEventSubscriber::getAtlas);
         TextureFinisher finisher = new TextureFinisher(spriteFinder);
-        LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture>
-                texManager = new LazyTextureManager<>(minecraft::getTextureManager, finisher);
+        LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager =
+                new LazyTextureManager<>(minecraft::getTextureManager, finisher);
 
         // Texture ticker
         BooleanSupplier areTexturesNotUpdating = () -> true;
         new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS,
                 TickEvent.Phase.START, areTexturesNotUpdating);
 
+        // Resource loaders
         AnimatedTextureReader texReader = new AnimatedTextureReader(logger);
-
         TextureReloadListener<EventDrivenTexture.Builder> commonListener =
                 new TextureReloadListener<>(texReader, texManager, logger);
 
@@ -155,6 +145,25 @@ public class ClientModEventSubscriber {
             public Point getUploadPoint() {
                 return uploadPoint;
             }
+        };
+    }
+
+    /**
+     * Gets an atlas from Minecraft's texture manager. An empty atlas is provided if
+     * the texture at the given location is not an atlas.
+     * @param atlasLocation     the location of the atlas
+     * @return the atlas, potentially empty
+     */
+    private static IAtlas getAtlas(ResourceLocation atlasLocation) {
+        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(atlasLocation);
+        if (!(texture instanceof TextureAtlas)) {
+            return (spriteLocation) -> Optional.empty();
+        }
+
+        TextureAtlas atlas = (TextureAtlas) texture;
+        return (spriteLocation) -> {
+            TextureAtlasSprite sprite = atlas.getSprite(spriteLocation);
+            return Optional.ofNullable(makeSpriteAdapter(sprite));
         };
     }
 

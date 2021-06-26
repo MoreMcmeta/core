@@ -1,7 +1,7 @@
 package io.github.soir20.moremcmeta.client.animation;
 
-import io.github.soir20.moremcmeta.client.renderer.texture.IRGBAImage;
-import io.github.soir20.moremcmeta.client.renderer.texture.MockRGBAImage;
+import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
+import io.github.soir20.moremcmeta.client.texture.MockRGBAImage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

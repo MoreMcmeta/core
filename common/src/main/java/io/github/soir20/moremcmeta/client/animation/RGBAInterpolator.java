@@ -1,6 +1,6 @@
 package io.github.soir20.moremcmeta.client.animation;
 
-import io.github.soir20.moremcmeta.client.renderer.texture.IRGBAImage;
+import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
 import io.github.soir20.moremcmeta.math.Point;
 
 import java.util.function.BiFunction;
@@ -59,7 +59,7 @@ public class RGBAInterpolator implements IInterpolator<IRGBAImage> {
         IRGBAImage output = IMAGE_GETTER.apply(maxWidth, maxHeight);
         requireNonNull(output, "Interpolated image was created as null");
 
-        io.github.soir20.moremcmeta.client.renderer.texture.IRGBAImage.VisibleArea points = output.getVisibleArea();
+        IRGBAImage.VisibleArea points = output.getVisibleArea();
         for (Point point : points) {
             int xPos = point.getX();
             int yPos = point.getY();

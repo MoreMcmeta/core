@@ -1,7 +1,7 @@
 package io.github.soir20.moremcmeta.client.animation;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.renderer.texture.CustomTickable;
+import io.github.soir20.moremcmeta.client.texture.CustomTickable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.ToIntFunction;

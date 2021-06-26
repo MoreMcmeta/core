@@ -1,7 +1,7 @@
 package io.github.soir20.moremcmeta.client.event;
 
 import com.google.common.collect.ImmutableCollection;
-import io.github.soir20.moremcmeta.client.renderer.texture.CustomTickable;
+import io.github.soir20.moremcmeta.client.texture.CustomTickable;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

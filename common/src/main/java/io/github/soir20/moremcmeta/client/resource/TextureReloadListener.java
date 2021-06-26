@@ -3,7 +3,7 @@ package io.github.soir20.moremcmeta.client.resource;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParseException;
 import io.github.soir20.moremcmeta.client.io.ITextureReader;
-import io.github.soir20.moremcmeta.client.renderer.texture.IManager;
+import io.github.soir20.moremcmeta.client.texture.IManager;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
