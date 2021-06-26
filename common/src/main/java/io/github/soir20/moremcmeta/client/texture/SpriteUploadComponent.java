@@ -1,6 +1,5 @@
 package io.github.soir20.moremcmeta.client.texture;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.math.Point;
 
 import java.util.stream.Stream;
