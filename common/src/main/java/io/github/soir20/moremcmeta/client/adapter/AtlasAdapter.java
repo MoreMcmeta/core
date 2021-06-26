@@ -11,6 +11,8 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Adapts a {@link TextureAtlas} to be a {@link IAtlas}.
  * @author soir20
@@ -25,6 +27,7 @@ public class AtlasAdapter implements IAtlas {
      * @param location      the location to look for an atlas
      */
     public AtlasAdapter(ResourceLocation location) {
+        requireNonNull(location);
         AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(location);
         if (texture instanceof TextureAtlas) {
             ATLAS = (TextureAtlas) texture;
