@@ -1,6 +1,5 @@
 package io.github.soir20.moremcmeta.client.renderer.texture;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +17,8 @@ import static java.util.Objects.requireNonNull;
  * component provide texture implementation.
  *
  * No listeners are fired on the render thread. Wrap listener code with calls to
- * {@link RenderSystem} if it must be executed on the render thread.
+ * {@link com.mojang.blaze3d.systems.RenderSystem} if it must be executed on the
+ * render thread.
  * @author soir20
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
