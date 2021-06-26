@@ -15,7 +15,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class AnimationFrameManager<F> implements CustomTickable {
-    private final ImmutableList<F> FRAMES;
+    private final ImmutableList<? extends F> FRAMES;
     private final ToIntFunction<F> FRAME_TIME_CALCULATOR;
 
     @Nullable
@@ -34,7 +34,7 @@ public class AnimationFrameManager<F> implements CustomTickable {
      *                              In most cases, pass a function that gets the
      *                              time from the frame or returns a default value.
      */
-    public AnimationFrameManager(ImmutableList<F> frames, ToIntFunction<F> frameTimeCalculator) {
+    public AnimationFrameManager(ImmutableList<? extends F> frames, ToIntFunction<F> frameTimeCalculator) {
         FRAMES = requireNonNull(frames, "Frames cannot be null");
         FRAME_TIME_CALCULATOR = requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
         INTERPOLATOR = null;
@@ -56,7 +56,7 @@ public class AnimationFrameManager<F> implements CustomTickable {
      *                              time from the frame or returns a default value.
      * @param interpolator          interpolates between frames of the animation
      */
-    public AnimationFrameManager(ImmutableList<F> frames, ToIntFunction<F> frameTimeCalculator,
+    public AnimationFrameManager(ImmutableList<? extends F> frames, ToIntFunction<F> frameTimeCalculator,
                                  IInterpolator<F> interpolator) {
         FRAMES = requireNonNull(frames, "Frames cannot be null");
         FRAME_TIME_CALCULATOR = requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");

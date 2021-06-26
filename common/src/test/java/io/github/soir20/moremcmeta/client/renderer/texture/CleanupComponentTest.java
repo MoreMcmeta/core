@@ -26,10 +26,10 @@ public class CleanupComponentTest {
     public void runListeners_RunOnce_ListenerRuns() {
         AtomicInteger timesRan = new AtomicInteger(0);
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new CleanupComponent<Integer>(timesRan::incrementAndGet)).getListeners());
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
 
         texture.close();
 
@@ -40,10 +40,10 @@ public class CleanupComponentTest {
     public void runListeners_RunTwice_ListenerRuns() {
         AtomicInteger timesRan = new AtomicInteger(0);
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new CleanupComponent<Integer>(timesRan::incrementAndGet)).getListeners());
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
 
         texture.close();
         texture.close();

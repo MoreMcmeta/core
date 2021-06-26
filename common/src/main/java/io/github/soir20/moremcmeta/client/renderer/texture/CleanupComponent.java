@@ -9,7 +9,7 @@ import static java.util.Objects.requireNonNull;
  * @param <I> image type
  * @author soir20
  */
-public class CleanupComponent<I> implements ITextureComponent<I> {
+public class CleanupComponent<I> implements ITextureComponent {
     private final Runnable CLOSE_ACTION;
 
     /**
@@ -25,8 +25,8 @@ public class CleanupComponent<I> implements ITextureComponent<I> {
      * @return the cleanup listener
      */
     @Override
-    public Stream<TextureListener<I>> getListeners() {
-        return Stream.of(new TextureListener<>(TextureListener.Type.CLOSE, (state) -> CLOSE_ACTION.run()));
+    public Stream<TextureListener> getListeners() {
+        return Stream.of(new TextureListener(TextureListener.Type.CLOSE, (state) -> CLOSE_ACTION.run()));
     }
 
 }

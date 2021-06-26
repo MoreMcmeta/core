@@ -10,13 +10,12 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Manages an animation for an {@link EventDrivenTexture}.
- * @param <I> image type
  * @author soir20
  */
-public class AnimationComponent<I> implements ITextureComponent<I> {
+public class AnimationComponent implements ITextureComponent {
     private final int SYNC_TICKS;
     private final Supplier<Optional<Long>> TIME_GETTER;
-    private final AnimationFrameManager<I> FRAME_MANAGER;
+    private final AnimationFrameManager<? extends RGBAImageFrame> FRAME_MANAGER;
 
     private int ticks;
 
@@ -27,7 +26,7 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
      * @param frameManager      frame manager for the animation
      */
     public AnimationComponent(int syncTicks, Supplier<Optional<Long>> timeGetter,
-                              AnimationFrameManager<I> frameManager) {
+                              AnimationFrameManager<? extends RGBAImageFrame> frameManager) {
         if (syncTicks <= 0) {
             throw new IllegalArgumentException("Sync ticks cannot be zero or negative");
         }
@@ -41,7 +40,7 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
      * Creates an animation component that does not sync to the current game time.
      * @param frameManager      frame manager for the animation
      */
-    public AnimationComponent(AnimationFrameManager<I> frameManager) {
+    public AnimationComponent(AnimationFrameManager<? extends RGBAImageFrame> frameManager) {
         SYNC_TICKS = -1;
         TIME_GETTER = Optional::empty;
         FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");
@@ -52,9 +51,9 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
      * @return the listeners for this component
      */
     @Override
-    public Stream<TextureListener<I>> getListeners() {
-        TextureListener<I> tickListener =
-                new TextureListener<>(TextureListener.Type.TICK, (state) -> {
+    public Stream<TextureListener> getListeners() {
+        TextureListener tickListener =
+                new TextureListener(TextureListener.Type.TICK, (state) -> {
                     Optional<Long> timeOptional = TIME_GETTER.get();
                     requireNonNull(timeOptional, "Timer getter cannot supply null");
 
@@ -73,8 +72,8 @@ public class AnimationComponent<I> implements ITextureComponent<I> {
                     state.markNeedsUpload();
                 });
 
-        TextureListener<I> uploadListener =
-                new TextureListener<>(TextureListener.Type.UPLOAD, (state) ->
+        TextureListener uploadListener =
+                new TextureListener(TextureListener.Type.UPLOAD, (state) ->
                         state.replaceImage(FRAME_MANAGER.getCurrentFrame()));
 
         return Stream.of(tickListener, uploadListener);

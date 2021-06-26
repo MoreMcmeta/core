@@ -22,7 +22,7 @@ public class EventDrivenTextureTest {
 
     @Test
     public void build_NullImage_NullPointerException() {
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
 
         expectedException.expect(NullPointerException.class);
         builder.setImage(null);
@@ -30,8 +30,8 @@ public class EventDrivenTextureTest {
 
     @Test
     public void build_NoImage_IllegalStateException() {
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION, (state) -> {})));
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.REGISTRATION, (state) -> {})));
 
         expectedException.expect(IllegalStateException.class);
         builder.build();
@@ -39,19 +39,19 @@ public class EventDrivenTextureTest {
 
     @Test
     public void build_SetImageTwice_HasLastImage() {
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.setImage(1);
-        builder.setImage(2);
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION,
-                (state) -> assertEquals(new Integer(2), state.getImage())
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setImage(new MockRGBAImageFrame(1));
+        builder.setImage(new MockRGBAImageFrame(2));
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.REGISTRATION,
+                (state) -> assertEquals(2, ((MockRGBAImageFrame) state.getImage()).getFrameNumber())
         )));
         builder.build().load(null);
     }
 
     @Test
     public void build_NullComponent_NullPointerException() {
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.setImage(1);
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setImage(new MockRGBAImageFrame());
 
         expectedException.expect(NullPointerException.class);
         builder.add(null);
@@ -59,8 +59,8 @@ public class EventDrivenTextureTest {
 
     @Test
     public void build_NoListeners_NoException() {
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.setImage(1);
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setImage(new MockRGBAImageFrame());
         builder.build();
     }
 
@@ -71,12 +71,12 @@ public class EventDrivenTextureTest {
            because we have to create listener before texture is built. */
         final Object[] textureGetter = new Object[1];
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
                 (state) -> assertEquals(textureGetter[0], state.getTexture())
         )));
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
         textureGetter[0] = texture;
 
         texture.tick();
@@ -86,15 +86,15 @@ public class EventDrivenTextureTest {
     public void runListeners_MarkForUpload_MarkedForUpload() {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
                 EventDrivenTexture.TextureState::markNeedsUpload
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
+        ), new TextureListener(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
 
         // We have to bind once first because the texture is always uploaded on the first bind
         texture.bind();
@@ -109,15 +109,15 @@ public class EventDrivenTextureTest {
     public void runListeners_GetImage_MarkedForUpload() {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
                 EventDrivenTexture.TextureState::getImage
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
+        ), new TextureListener(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
 
         // We have to bind once first because the texture is always uploaded on the first bind
         texture.bind();
@@ -132,15 +132,15 @@ public class EventDrivenTextureTest {
     public void runListeners_GetImageInUpload_MarkedForUpload() {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
                 EventDrivenTexture.TextureState::getImage
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
+        ), new TextureListener(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
 
         // We have to bind once first because the texture is always uploaded on the first bind
         texture.bind();
@@ -153,12 +153,12 @@ public class EventDrivenTextureTest {
     @Test
     public void runListeners_SetImageNull_NullPointerException() {
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
                 (state) -> state.replaceImage(null)
         )));
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
 
         expectedException.expect(NullPointerException.class);
         texture.tick();
@@ -168,15 +168,15 @@ public class EventDrivenTextureTest {
     public void runListeners_SetImage_MarkedForUpload() {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                (state) -> state.replaceImage(5)
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
+                (state) -> state.replaceImage(new MockRGBAImageFrame(5))
+        ), new TextureListener(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
 
         // We have to bind once first because the texture is always uploaded on the first bind
         texture.bind();
@@ -190,15 +190,15 @@ public class EventDrivenTextureTest {
     @Test
     public void runListeners_SetImage_ImageReplaced() {
 
-        EventDrivenTexture.Builder<Integer> builder = new EventDrivenTexture.Builder<>();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                (state) -> state.replaceImage(5)
-        ), new TextureListener<>(TextureListener.Type.CLOSE,
-                (state) -> assertEquals(new Integer(5), state.getImage())
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
+                (state) -> state.replaceImage(new MockRGBAImageFrame(5))
+        ), new TextureListener(TextureListener.Type.CLOSE,
+                (state) -> assertEquals(5, ((MockRGBAImageFrame) state.getImage()).getFrameNumber())
         )));
 
-        builder.setImage(1);
-        EventDrivenTexture<Integer> texture = builder.build();
+        builder.setImage(new MockRGBAImageFrame());
+        EventDrivenTexture texture = builder.build();
 
         texture.tick();
         texture.close();
@@ -274,10 +274,10 @@ public class EventDrivenTextureTest {
         testExpectedOrder((texture) -> { texture.close(); texture.close(); }, false, expected);
     }
 
-    private void testExpectedOrder(Consumer<EventDrivenTexture<Integer>> action, boolean flagForUpload,
+    private void testExpectedOrder(Consumer<EventDrivenTexture> action, boolean flagForUpload,
                                    Integer[] expected) {
-        EventDrivenTexture.Builder<Integer> texture = new EventDrivenTexture.Builder<>();
-        texture.setImage(1);
+        EventDrivenTexture.Builder texture = new EventDrivenTexture.Builder();
+        texture.setImage(new MockRGBAImageFrame());
 
         int lastId = 0;
         TextureListener.Type[] types = {
@@ -294,7 +294,7 @@ public class EventDrivenTextureTest {
             for (int index = 0; index < 3; index++) {
                 lastId++;
                 final int listenerId = lastId;
-                texture.add(() -> Stream.of(new TextureListener<>(type,
+                texture.add(() -> Stream.of(new TextureListener(type,
                         (state) -> {
                             if (flagForUpload) state.markNeedsUpload();
                             execOrder.add(listenerId);

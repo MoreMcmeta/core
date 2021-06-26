@@ -19,12 +19,11 @@ import static java.util.Objects.requireNonNull;
  *
  * No listeners are fired on the render thread. Wrap listener code with calls to
  * {@link RenderSystem} if it must be executed on the render thread.
- * @param <I> image type
  * @author soir20
  */
-public class EventDrivenTexture<I> extends AbstractTexture implements CustomTickable {
-    private final Map<TextureListener.Type, List<TextureListener<I>>> LISTENERS;
-    private final TextureState<I> CURRENT_STATE;
+public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
+    private final Map<TextureListener.Type, List<TextureListener>> LISTENERS;
+    private final TextureState CURRENT_STATE;
 
     /**
      * Binds this texture or the texture it proxies to OpenGL. Fires upload listeners
@@ -81,7 +80,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
      */
     private void runListeners(TextureListener.Type type) {
         LISTENERS.putIfAbsent(type, new ArrayList<>());
-        LISTENERS.get(type).forEach((listener -> listener.run(CURRENT_STATE)));
+        LISTENERS.get(type).forEach((listener) -> listener.run(CURRENT_STATE));
     }
 
     /**
@@ -90,25 +89,24 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
      *                      in the order given (by type)
      * @param image         initial image for this texture
      */
-    private EventDrivenTexture(List<TextureListener<I>> listeners, I image) {
+    private EventDrivenTexture(List<TextureListener> listeners, RGBAImageFrame image) {
         super();
         LISTENERS = new EnumMap<>(TextureListener.Type.class);
-        for (TextureListener<I> listener : listeners) {
+        for (TextureListener listener : listeners) {
             LISTENERS.putIfAbsent(listener.getType(), new ArrayList<>());
             LISTENERS.get(listener.getType()).add(listener);
         }
 
-        CURRENT_STATE = new TextureState<>(this);
+        CURRENT_STATE = new TextureState(this);
         CURRENT_STATE.replaceImage(image);
     }
 
     /**
      * Builds an event-driven texture from components.
-     * @param <I>   image type
      */
-    public static class Builder<I> {
-        private final List<ITextureComponent<I>> COMPONENTS;
-        private I firstImage;
+    public static class Builder {
+        private final List<ITextureComponent> COMPONENTS;
+        private RGBAImageFrame firstImage;
 
         /**
          * Creates a new event-driven texture builder.
@@ -124,7 +122,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
          * @param image     initial image for this texture
          * @return this builder for chaining
          */
-        public Builder<I> setImage(I image) {
+        public Builder setImage(RGBAImageFrame image) {
             requireNonNull(image, "Image cannot be null");
             firstImage = image;
             return this;
@@ -135,7 +133,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
          * @param component     component to add to the texture
          * @return this builder for chaining
          */
-        public Builder<I> add(ITextureComponent<I> component) {
+        public Builder add(ITextureComponent component) {
             requireNonNull(component, "Component cannot be null");
             COMPONENTS.add(component);
             return this;
@@ -146,34 +144,33 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
          * {@link IllegalStateException} if no initial image has been set.
          * @return the built event-driven texture
          */
-        public EventDrivenTexture<I> build() {
+        public EventDrivenTexture build() {
             if (firstImage == null) {
                 throw new IllegalStateException("Texture must have an image set");
             }
 
-            List<TextureListener<I>> listeners = COMPONENTS.stream().flatMap(
+            List<TextureListener> listeners = COMPONENTS.stream().flatMap(
                     ITextureComponent::getListeners
             ).collect(Collectors.toList());
 
-            return new EventDrivenTexture<>(listeners, firstImage);
+            return new EventDrivenTexture(listeners, firstImage);
         }
 
     }
 
     /**
      * A mutable object to hold an event-driven texture's current state.
-     * @param <I> image type
      */
-    public static class TextureState<I> {
-        private final EventDrivenTexture<I> TEXTURE;
-        private I image;
+    public static class TextureState {
+        private final EventDrivenTexture TEXTURE;
+        private RGBAImageFrame image;
         private boolean hasUpdatedSinceUpload;
 
         /**
          * Gets the event-driven texture.
          * @return the event-driven texture
          */
-        public EventDrivenTexture<I> getTexture() {
+        public EventDrivenTexture getTexture() {
             return TEXTURE;
         }
 
@@ -183,7 +180,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
          * listeners are being fired.)
          * @return the texture's current image
          */
-        public I getImage() {
+        public RGBAImageFrame getImage() {
             markNeedsUpload();
             return image;
         }
@@ -201,7 +198,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
          * will be removed if upload listeners are being fired.)
          * @param newImage      the texture's new image
          */
-        public void replaceImage(I newImage) {
+        public void replaceImage(RGBAImageFrame newImage) {
             requireNonNull(newImage, "New image cannot be null");
             markNeedsUpload();
             image = newImage;
@@ -212,7 +209,7 @@ public class EventDrivenTexture<I> extends AbstractTexture implements CustomTick
          * for upload on the first binding.
          * @param texture     the event-driven texture
          */
-        private TextureState(EventDrivenTexture<I> texture) {
+        private TextureState(EventDrivenTexture texture) {
             TEXTURE = texture;
         }
 

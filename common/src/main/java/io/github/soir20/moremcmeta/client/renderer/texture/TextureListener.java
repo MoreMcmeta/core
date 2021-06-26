@@ -6,10 +6,9 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * A listener for an {@link EventDrivenTexture}'s events.
- * @param <I> image type
  * @author soir20
  */
-public class TextureListener<I> {
+public class TextureListener {
 
     /**
      * The available event types for listeners.
@@ -23,14 +22,14 @@ public class TextureListener<I> {
     }
 
     private final Type TYPE;
-    private final Consumer<EventDrivenTexture.TextureState<I>> ACTION;
+    private final Consumer<EventDrivenTexture.TextureState> ACTION;
 
     /**
      * Creates a listener for a certain type of event.
      * @param type      event type
      * @param action    callback to execute when the event occurs
      */
-    public TextureListener(Type type, Consumer<EventDrivenTexture.TextureState<I>> action) {
+    public TextureListener(Type type, Consumer<EventDrivenTexture.TextureState> action) {
         TYPE = requireNonNull(type, "Type cannot be null");
         ACTION = requireNonNull(action, "Action cannot be null");
     }
@@ -47,7 +46,7 @@ public class TextureListener<I> {
      * Runs this listener's callback.
      * @param state     the state of the event-driven texture
      */
-    public void run(EventDrivenTexture.TextureState<I> state) {
+    public void run(EventDrivenTexture.TextureState state) {
         requireNonNull(state, "State cannot be null");
         ACTION.accept(state);
     }

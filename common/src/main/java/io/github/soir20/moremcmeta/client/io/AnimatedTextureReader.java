@@ -41,7 +41,7 @@ import static java.util.Objects.requireNonNull;
  * to add components related to texture registration and binding.
  * @author soir20
  */
-public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder<RGBAImageFrame>> {
+public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder> {
     private final Logger LOGGER;
 
     /**
@@ -59,8 +59,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
      * @return  an animated texture based on the provided data
      * @throws IOException  failure reading from either input stream
      */
-    public EventDrivenTexture.Builder<RGBAImageFrame>
-    read(InputStream textureStream, InputStream metadataStream) throws IOException,
+    public EventDrivenTexture.Builder read(InputStream textureStream, InputStream metadataStream) throws IOException,
             JsonParseException, IllegalArgumentException {
 
         requireNonNull(textureStream, "Texture input stream cannot be null");
@@ -156,10 +155,10 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         Supplier<Optional<Long>> timeGetter =
                 () -> minecraft.level == null ? Optional.empty() : Optional.of(minecraft.level.getDayTime());
 
-        EventDrivenTexture.Builder<RGBAImageFrame> builder = new EventDrivenTexture.Builder<>();
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(frameManager.getCurrentFrame())
                 .add(new CleanupComponent<>(closeMipmaps))
-                .add(new AnimationComponent<>(24000, timeGetter, frameManager));
+                .add(new AnimationComponent(24000, timeGetter, frameManager));
 
         return builder;
     }

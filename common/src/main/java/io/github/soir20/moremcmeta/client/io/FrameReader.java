@@ -16,13 +16,13 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class FrameReader<F> {
-    private final Function<FrameData, F> FRAME_FACTORY;
+    private final Function<FrameData, ? extends F> FRAME_FACTORY;
 
     /**
      * Creates a new reader.
      * @param frameFactory      creates frames based on frame data. Cannot return null.
      */
-    public FrameReader(Function<FrameData, F> frameFactory) {
+    public FrameReader(Function<FrameData, ? extends F> frameFactory) {
         FRAME_FACTORY = requireNonNull(frameFactory, "Frame factory cannot be null");
     }
 
