@@ -1,22 +1,16 @@
 package io.github.soir20.moremcmeta.client.event;
 
 import com.google.common.collect.ImmutableList;
+import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
-import io.github.soir20.moremcmeta.client.texture.IAtlas;
-import io.github.soir20.moremcmeta.client.texture.ISprite;
 import io.github.soir20.moremcmeta.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureReloadListener;
 import io.github.soir20.moremcmeta.MoreMcmeta;
-import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,10 +23,6 @@ import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.BooleanSupplier;
 
 /**
  * Handles client-relevant events on the mod event bus.
@@ -57,18 +47,15 @@ public class ClientModEventSubscriber {
         }
 
         // Resource managers
-        SimpleReloadableResourceManager rscManager =
-                (SimpleReloadableResourceManager) minecraft.getResourceManager();
+        SimpleReloadableResourceManager rscManager = (SimpleReloadableResourceManager) minecraft.getResourceManager();
 
-        SpriteFinder spriteFinder = new SpriteFinder(ClientModEventSubscriber::getAtlas);
+        SpriteFinder spriteFinder = new SpriteFinder(AtlasAdapter::new);
         TextureFinisher finisher = new TextureFinisher(spriteFinder);
         LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager =
                 new LazyTextureManager<>(minecraft::getTextureManager, finisher);
 
         // Texture ticker
-        BooleanSupplier areTexturesNotUpdating = () -> true;
-        new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS,
-                TickEvent.Phase.START, areTexturesNotUpdating);
+        new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS, TickEvent.Phase.START, () -> true);
 
         // Resource loaders
         AnimatedTextureReader texReader = new AnimatedTextureReader(logger);
@@ -115,76 +102,6 @@ public class ClientModEventSubscriber {
             }
         });
 
-    }
-
-    /**
-     * Makes a {@link TextureAtlasSprite} compatible with {@link ISprite}.
-     * @param unwrappedSprite       the original sprite
-     * @return the wrapped sprite
-     */
-    @Nullable
-    private static ISprite makeSpriteAdapter(TextureAtlasSprite unwrappedSprite) {
-        if (unwrappedSprite == null) {
-            return null;
-        }
-
-        Point uploadPoint = getCoordinatesFromSprite(unwrappedSprite);
-
-        return new ISprite() {
-            @Override
-            public void bind() {
-                unwrappedSprite.atlas().bind();
-            }
-
-            @Override
-            public ResourceLocation getName() {
-                return unwrappedSprite.getName();
-            }
-
-            @Override
-            public Point getUploadPoint() {
-                return uploadPoint;
-            }
-        };
-    }
-
-    /**
-     * Gets an atlas from Minecraft's texture manager. An empty atlas is provided if
-     * the texture at the given location is not an atlas.
-     * @param atlasLocation     the location of the atlas
-     * @return the atlas, potentially empty
-     */
-    private static IAtlas getAtlas(ResourceLocation atlasLocation) {
-        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(atlasLocation);
-        if (!(texture instanceof TextureAtlas)) {
-            return (spriteLocation) -> Optional.empty();
-        }
-
-        TextureAtlas atlas = (TextureAtlas) texture;
-        return (spriteLocation) -> {
-            TextureAtlasSprite sprite = atlas.getSprite(spriteLocation);
-            return Optional.ofNullable(makeSpriteAdapter(sprite));
-        };
-    }
-
-    /**
-     * Gets a sprite's x and y coordinates of its top left corner in its texture atlas.
-     * @param sprite    the sprite to get the coordinates of
-     * @return the x and y coordinates of the sprite's top left corner
-     */
-    private static Point getCoordinatesFromSprite(TextureAtlasSprite sprite) {
-        String spriteStr = sprite.toString();
-        int labelLength = 2;
-
-        int xLabelIndex = spriteStr.indexOf("x=");
-        int xDelimiterIndex = spriteStr.indexOf(',', xLabelIndex);
-        int x = Integer.parseInt(spriteStr.substring(xLabelIndex + labelLength, xDelimiterIndex));
-
-        int yLabelIndex = spriteStr.indexOf("y=");
-        int yDelimiterIndex = spriteStr.indexOf(',', yLabelIndex);
-        int y = Integer.parseInt(spriteStr.substring(yLabelIndex + labelLength, yDelimiterIndex));
-
-        return new Point(x, y);
     }
 
 }

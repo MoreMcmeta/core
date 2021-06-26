@@ -1,7 +1,8 @@
-package io.github.soir20.moremcmeta.client.texture;
+package io.github.soir20.moremcmeta.client.adapter;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
+import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
 
 import static java.util.Objects.requireNonNull;
 
@@ -10,7 +11,7 @@ import static java.util.Objects.requireNonNull;
  * the {@link RGBAInterpolator}.
  * @author soir20
  */
-public class NativeImageRGBAWrapper implements IRGBAImage {
+public class NativeImageAdapter implements IRGBAImage {
     private final NativeImage IMAGE;
     private final int X_OFFSET;
     private final int Y_OFFSET;
@@ -35,9 +36,9 @@ public class NativeImageRGBAWrapper implements IRGBAImage {
      * @param autoClose     whether to automatically close this image
      * @param visibleArea   the visible portions of this image
      */
-    public NativeImageRGBAWrapper(NativeImage image, int xOffset, int yOffset, int width, int height,
-                                  int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
-                                  VisibleArea visibleArea) {
+    public NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
+                              int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
+                              VisibleArea visibleArea) {
         IMAGE = requireNonNull(image, "Image cannot be null");
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;

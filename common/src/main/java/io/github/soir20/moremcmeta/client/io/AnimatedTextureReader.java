@@ -11,7 +11,7 @@ import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
 import io.github.soir20.moremcmeta.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
-import io.github.soir20.moremcmeta.client.texture.NativeImageRGBAWrapper;
+import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.client.Minecraft;
@@ -109,7 +109,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                     widthToArea.addAll(getChangingPoints(mipmaps[level], width, height, MIPMAP));
                 }
 
-                return new NativeImageRGBAWrapper(
+                return new NativeImageAdapter(
                         mipmaps[level],
                         frameData.getXOffset() >> level, frameData.getYOffset() >> level,
                         width, height,
@@ -231,7 +231,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
             MIPMAPS = new NativeImage[originalMipmaps.length];
 
             // Directly convert mipmapped widths to their associated image
-            HashMap<Integer, NativeImageRGBAWrapper> widthsToImage = new HashMap<>();
+            HashMap<Integer, NativeImageAdapter> widthsToImage = new HashMap<>();
             for (int level = 0; level <= MIPMAP; level++) {
                 int mipmappedWidth = frameWidth >> level;
                 int mipmappedHeight = frameHeight >> level;
@@ -240,7 +240,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 copyTopLeftRect(mipmappedWidth, mipmappedHeight, originalMipmaps[level], mipmappedImage);
                 MIPMAPS[level] = mipmappedImage;
 
-                NativeImageRGBAWrapper rgbaWrapper = new NativeImageRGBAWrapper(
+                NativeImageAdapter rgbaWrapper = new NativeImageAdapter(
                         mipmappedImage,
                         0, 0,
                         mipmappedWidth, mipmappedHeight,
