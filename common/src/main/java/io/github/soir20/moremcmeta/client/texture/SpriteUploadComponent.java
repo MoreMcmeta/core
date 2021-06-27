@@ -15,6 +15,8 @@ public class SpriteUploadComponent implements ITextureComponent {
 
     /**
      * Creates a new component for uploading a texture to an atlas sprite.
+     * The upload point of the sprite provided should not change at any
+     * point in the future.
      * @param sprite        the sprite to upload the texture to
      */
     public SpriteUploadComponent(ISprite sprite) {
@@ -22,7 +24,8 @@ public class SpriteUploadComponent implements ITextureComponent {
     }
 
     /**
-     * Gets the listeners for this component.
+     * Gets the listeners for this component. Sprite will be bound and uploaded
+     * on every tick, in addition to regularly-triggered uploads.
      * @return all of the listeners for this component
      */
     @Override
@@ -35,7 +38,8 @@ public class SpriteUploadComponent implements ITextureComponent {
         );
 
         // We need this listener because atlas sprites will never be bound
-        TextureListener tickListener = new TextureListener(TextureListener.Type.TICK,
+        TextureListener tickListener = new TextureListener(
+                TextureListener.Type.TICK,
                 (state) -> {
                     SPRITE.bind();
                     state.getTexture().upload();
