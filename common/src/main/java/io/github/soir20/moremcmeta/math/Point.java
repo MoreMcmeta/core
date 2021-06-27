@@ -60,4 +60,13 @@ public class Point {
         return 31 * X_POS + Y_POS;
     }
 
+    /**
+     * Converts this point to a string in the form (x, y).
+     * @return this point as a string
+     */
+    @Override
+    public String toString() {
+        return "(" + X_POS + ", " + Y_POS + ")";
+    }
+
 }

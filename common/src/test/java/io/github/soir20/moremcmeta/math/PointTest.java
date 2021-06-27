@@ -102,4 +102,14 @@ public class PointTest {
         assertNotEquals(second.hashCode(), first.hashCode());
     }
 
+    @Test
+    public void toString_PositiveValues_PositiveString() {
+        assertEquals("(2, 3)", new Point(2, 3).toString());
+    }
+
+    @Test
+    public void toString_NegativeValues_PositiveString() {
+        assertEquals("(-2, -3)", new Point(-2, -3).toString());
+    }
+
 }
