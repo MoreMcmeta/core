@@ -1,11 +1,21 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import io.github.soir20.moremcmeta.math.Point;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
 
 public class SpriteUploadComponentTest {
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void construct_NullSprite_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new SpriteUploadComponent(null);
+    }
 
     @Test
     public void upload_FirstUpload_FrameUploadedAtMipmappedPoints() {
