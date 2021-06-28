@@ -8,11 +8,17 @@ import net.minecraft.resources.ResourceLocation;
  * @author soir20
  */
 public class MockSprite implements ISprite {
+    private final ResourceLocation NAME;
     private final Point UPLOAD_POINT;
     private int timesBound;
 
-    public MockSprite(Point uploadPoint) {
+    public MockSprite(ResourceLocation name, Point uploadPoint) {
+        NAME = name;
         UPLOAD_POINT = uploadPoint;
+    }
+
+    public MockSprite(Point uploadPoint) {
+        this(new ResourceLocation("dummy"), uploadPoint);
     }
 
     @Override
@@ -22,7 +28,7 @@ public class MockSprite implements ISprite {
 
     @Override
     public ResourceLocation getName() {
-        return new ResourceLocation("dummy");
+        return NAME;
     }
 
     @Override
