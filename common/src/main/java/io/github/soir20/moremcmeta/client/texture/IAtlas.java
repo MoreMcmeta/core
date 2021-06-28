@@ -9,6 +9,7 @@ import java.util.Optional;
  * because it is difficult to instantiate in tests.
  * @author soir20
  */
+@FunctionalInterface
 public interface IAtlas {
 
     /**
