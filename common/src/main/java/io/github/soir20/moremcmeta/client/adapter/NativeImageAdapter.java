@@ -117,6 +117,14 @@ public class NativeImageAdapter implements IRGBAImage {
     }
 
     /**
+     * Gets the original {@link NativeImage} corresponding to this adapter.
+     * @return the original {@link NativeImage}
+     */
+    public NativeImage getImage() {
+        return IMAGE;
+    }
+
+    /**
      * Uploads this image at the given coordinates immediately.
      * @param uploadX       horizontal position to upload at
      * @param uploadY       vertical position to upload at

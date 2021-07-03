@@ -3,8 +3,6 @@ package io.github.soir20.moremcmeta.client.io;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
-import io.github.soir20.moremcmeta.client.animation.IInterpolator;
-import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.client.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
@@ -25,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -71,7 +69,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         NativeImage image = NativeImage.read(textureStream);
         LOGGER.debug("Successfully read image from input");
 
-        NativeImage[] mipmaps = MipmapGenerator.generateMipLevels(image, MIPMAP);
+        List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(image, MIPMAP));
 
         /* The SimpleResource class would normally handle metadata parsing when we originally
            got the resource. However, the ResourceManager only looks for .mcmeta metadata, and its
@@ -99,57 +97,53 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         boolean clamp = textureMetadata.isClamp();
 
         // Frames
-        List<IRGBAImage.VisibleArea> widthToArea = new ArrayList<>();
+        List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
         FrameReader<RGBAImageFrame> frameReader = new FrameReader<>(frameData -> {
-            List<IRGBAImage> wrappedMipmaps = IntStream.range(0, mipmaps.length).mapToObj((level) -> {
+
+            /* The immutable list collector was marked as beta for a while,
+               and the marking was removed in a later version. */
+            @SuppressWarnings("UnstableApiUsage")
+            ImmutableList<IRGBAImage> wrappedMipmaps = IntStream.range(0, mipmaps.size()).mapToObj((level) -> {
                 int width = frameData.getWidth() >> level;
                 int height = frameData.getHeight() >> level;
 
-                if (widthToArea.isEmpty()) {
-                    widthToArea.addAll(getChangingPoints(mipmaps[level], width, height, MIPMAP));
+                if (visibleAreas.isEmpty()) {
+                    visibleAreas.addAll(getChangingPoints(mipmaps.get(level), width, height, MIPMAP));
                 }
 
                 return new NativeImageAdapter(
-                        mipmaps[level],
+                        mipmaps.get(level),
                         frameData.getXOffset() >> level, frameData.getYOffset() >> level,
                         width, height,
                         level, blur, clamp, false,
-                        widthToArea.get(level)
+                        visibleAreas.get(level)
                 );
-            }).collect(Collectors.toList());
+            }).collect(ImmutableList.toImmutableList());
 
             return new RGBAImageFrame(frameData, wrappedMipmaps);
         });
 
-        ImmutableList<RGBAImageFrame> frames = frameReader.read(image.getWidth(),
-                image.getHeight(), animationMetadata);
+        ImmutableList<RGBAImageFrame> frames = frameReader.read(image.getWidth(), image.getHeight(), animationMetadata);
         RGBAImageFrame firstFrame = frames.get(0);
         int frameWidth = firstFrame.getWidth();
         int frameHeight = firstFrame.getHeight();
 
-        // Interpolation
-        List<IRGBAImage.VisibleArea> visibleAreas = IntStream.range(0, MIPMAP + 1).mapToObj(
-                (level) -> firstFrame.getImage(level).getVisibleArea()
-        ).collect(Collectors.toList());
-        NativeImageFrameInterpolator interpolator = new NativeImageFrameInterpolator(mipmaps, visibleAreas,
-                frameWidth, frameHeight, blur, clamp);
-
         // Frame management
         AnimationFrameManager<RGBAImageFrame> frameManager;
         if (animationMetadata.isInterpolatedFrames()) {
+            ImmutableList<NativeImageAdapter> interpolatedMipmaps = getInterpolationMipmaps(
+                    mipmaps, frameWidth, frameHeight, blur, clamp, visibleAreas
+            );
+            mipmaps.addAll(interpolatedMipmaps.stream().map(NativeImageAdapter::getImage).collect(Collectors.toList()));
+            RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(interpolatedMipmaps);
+
             frameManager = new AnimationFrameManager<>(frames, RGBAImageFrame::getFrameTime, interpolator);
         } else {
             frameManager = new AnimationFrameManager<>(frames, RGBAImageFrame::getFrameTime);
         }
 
         // Resource cleanup
-        Runnable closeMipmaps = () -> {
-            for (NativeImage mipmap : mipmaps) {
-                mipmap.close();
-            }
-
-            interpolator.close();
-        };
+        Runnable closeMipmaps = () -> mipmaps.forEach(NativeImage::close);
 
         // Time retrieval
         Supplier<Optional<Long>> timeGetter =
@@ -206,106 +200,56 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
     }
 
     /**
-     * Interpolates between {@link RGBAImageFrame}s. All interpolated frames share a {@link NativeImage},
-     * which has its pixels replaced when interpolation occurs.
-     * @author soir20
+     * Creates mipmapped images for interpolation.
+     * @param originals         the original mipmaps to copy from
+     * @param frameWidth        the width of a single frame
+     * @param frameHeight       the height of a single frame
+     * @param blur              whether the images are blurred
+     * @param clamp             whether the images are clamped
+     * @param visibleAreas      visible areas in ascending order of mipmap level
+     * @return the adapters for the interpolation images
      */
-    private static class NativeImageFrameInterpolator implements IInterpolator<RGBAImageFrame>, AutoCloseable {
-        private final int MIPMAP;
-        private final RGBAInterpolator INTERPOLATOR;
-        private final NativeImage[] MIPMAPS;
+    private ImmutableList<NativeImageAdapter> getInterpolationMipmaps(List<NativeImage> originals, int frameWidth,
+                                                                      int frameHeight, boolean blur, boolean clamp,
+                                                                      List<IRGBAImage.VisibleArea> visibleAreas) {
+        ImmutableList.Builder<NativeImageAdapter> images = new ImmutableList.Builder<>();
 
-        /**
-         * Creates a new interpolator.
-         * @param originalMipmaps   the original mipmaps to base interpolations off of (starting at the original)
-         * @param visibleAreas      the visible areas for each mipmap (starting at the original's area)
-         * @param frameWidth        the width of a frame in the original image
-         * @param frameHeight       the height of a frame in the original image
-         * @param blur              whether to blur the output
-         * @param clamp             whether to clamp the output
-         */
-        public NativeImageFrameInterpolator(NativeImage[] originalMipmaps,
-                                            List<IRGBAImage.VisibleArea> visibleAreas,
-                                            int frameWidth, int frameHeight, boolean blur, boolean clamp) {
-            MIPMAP = originalMipmaps.length - 1;
-            MIPMAPS = new NativeImage[originalMipmaps.length];
+        for (int level = 0; level < originals.size(); level++) {
+            int mipmappedWidth = frameWidth >> level;
+            int mipmappedHeight = frameHeight >> level;
 
-            // Directly convert mipmapped widths to their associated image
-            HashMap<Integer, NativeImageAdapter> widthsToImage = new HashMap<>();
-            for (int level = 0; level <= MIPMAP; level++) {
-                int mipmappedWidth = frameWidth >> level;
-                int mipmappedHeight = frameHeight >> level;
+            NativeImage original = originals.get(level);
 
-                NativeImage mipmappedImage = new NativeImage(mipmappedWidth, mipmappedHeight, true);
-                copyTopLeftRect(mipmappedWidth, mipmappedHeight, originalMipmaps[level], mipmappedImage);
-                MIPMAPS[level] = mipmappedImage;
+            NativeImage mipmappedImage = new NativeImage(mipmappedWidth, mipmappedHeight, true);
+            copyTopLeftRect(mipmappedWidth, mipmappedHeight, original, mipmappedImage);
 
-                NativeImageAdapter rgbaWrapper = new NativeImageAdapter(
-                        mipmappedImage,
-                        0, 0,
-                        mipmappedWidth, mipmappedHeight,
-                        level,
-                        blur, clamp, false,
-                        visibleAreas.get(level)
-                );
-                widthsToImage.put(mipmappedWidth, rgbaWrapper);
-            }
-
-            INTERPOLATOR = new RGBAInterpolator((width, height) -> widthsToImage.get(width));
-        }
-
-        /**
-         * Interpolates between a starting frame and an ending frame for all mipmap levels.
-         * @param steps     total steps between the start and end frame
-         * @param step      current step of the interpolation (between 1 and steps - 1)
-         * @param start     the frame to start interpolation from
-         * @param end       the frame to end interpolation at
-         * @return  the interpolated frame at the given step
-         */
-        @Override
-        public RGBAImageFrame interpolate(int steps, int step, RGBAImageFrame start, RGBAImageFrame end) {
-            List<IRGBAImage> mipmaps = new ArrayList<>(MIPMAP + 1);
-
-            for (int level = 0; level <= MIPMAP; level++) {
-                IRGBAImage startImage = start.getImage(level);
-                IRGBAImage endImage = end.getImage(level);
-
-                IRGBAImage interpolated = INTERPOLATOR.interpolate(steps, step, startImage, endImage);
-                mipmaps.add(interpolated);
-            }
-
-            FrameReader.FrameData data = new FrameReader.FrameData(
-                    mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(),
-                    0, 0, 1
+            NativeImageAdapter adapter = new NativeImageAdapter(
+                    mipmappedImage,
+                    0, 0,
+                    mipmappedWidth, mipmappedHeight,
+                    level,
+                    blur, clamp, false,
+                    visibleAreas.get(level)
             );
-            return new RGBAImageFrame(data, mipmaps);
+            images.add(adapter);
         }
 
-        /**
-         * Closes all mipmapped images where interpolated frames are uploaded.
-         */
-        @Override
-        public void close() {
-            for (NativeImage mipmap : MIPMAPS) {
-                mipmap.close();
+        return images.build();
+    }
+
+    /**
+     * Copies a rectangle in the top left from one image to another.
+     * @param width     width of the rectangle to copy
+     * @param height    height of the rectangle to copy
+     * @param from      image to copy from (unchanged)
+     * @param to        image to copy to (changed)
+     */
+    private void copyTopLeftRect(int width, int height, NativeImage from, NativeImage to) {
+        for (int xPos = 0; xPos < width; xPos++) {
+            for (int yPos = 0; yPos < height; yPos++) {
+                to.setPixelRGBA(xPos, yPos, from.getPixelRGBA(xPos, yPos));
             }
         }
-
-        /**
-         * Copies a rectangle in the top left from one image to another.
-         * @param width     width of the rectangle to copy
-         * @param height    height of the rectangle to copy
-         * @param from      image to copy from (unchanged)
-         * @param to        image to copy to (changed)
-         */
-        private void copyTopLeftRect(int width, int height, NativeImage from, NativeImage to) {
-            for (int xPos = 0; xPos < width; xPos++) {
-                for (int yPos = 0; yPos < height; yPos++) {
-                    to.setPixelRGBA(xPos, yPos, from.getPixelRGBA(xPos, yPos));
-                }
-            }
-        }
-
     }
 
 }

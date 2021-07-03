@@ -22,6 +22,15 @@ public class MockRGBAImageFrame extends RGBAImageFrame {
         FRAME_NUMBER = frameNumber;
     }
 
+    public MockRGBAImageFrame(int width, int height) {
+        this(width, height, 3);
+    }
+
+    public MockRGBAImageFrame(int width, int height, int mipmap) {
+        super(new FrameReader.FrameData(width, height, 0, 0, 1), createMipmaps(mipmap, width, height));
+        FRAME_NUMBER = 0;
+    }
+
     @Override
     public void uploadAt(Point point) {
         super.uploadAt(point);
@@ -34,6 +43,16 @@ public class MockRGBAImageFrame extends RGBAImageFrame {
 
     public int getUploadCount() {
         return uploads;
+    }
+
+    private static ImmutableList<IRGBAImage> createMipmaps(int mipmap, int width, int height) {
+        ImmutableList.Builder<IRGBAImage> builder = new ImmutableList.Builder<>();
+
+        for (int level = 0; level <= mipmap; level++) {
+            builder.add(new MockRGBAImage(width >> level, height >> level));
+        }
+
+        return builder.build();
     }
 
 }
