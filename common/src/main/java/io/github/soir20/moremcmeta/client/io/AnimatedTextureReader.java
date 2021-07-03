@@ -3,6 +3,7 @@ package io.github.soir20.moremcmeta.client.io;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
+import io.github.soir20.moremcmeta.client.adapter.ChangingPointsAdapter;
 import io.github.soir20.moremcmeta.client.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
@@ -11,7 +12,6 @@ import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
-import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
@@ -41,6 +41,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder> {
     private final Logger LOGGER;
+    private final ChangingPointsAdapter POINT_READER;
 
     /**
      * Creates a new reader for animated textures.
@@ -48,6 +49,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
      */
     public AnimatedTextureReader(Logger logger) {
         LOGGER = requireNonNull(logger, "Logger cannot be null");
+        POINT_READER = new ChangingPointsAdapter();
     }
 
     /**
@@ -69,7 +71,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         NativeImage image = NativeImage.read(textureStream);
         LOGGER.debug("Successfully read image from input");
 
-        List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(image, MIPMAP));
+        List<NativeImage> mipmaps = new ArrayList<>(Arrays.asList(MipmapGenerator.generateMipLevels(image, MIPMAP)));
 
         /* The SimpleResource class would normally handle metadata parsing when we originally
            got the resource. However, the ResourceManager only looks for .mcmeta metadata, and its
@@ -107,8 +109,9 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 int width = frameData.getWidth() >> level;
                 int height = frameData.getHeight() >> level;
 
+                // Finding the visible areas is slow, so we want to cache the results
                 if (visibleAreas.isEmpty()) {
-                    visibleAreas.addAll(getChangingPoints(mipmaps.get(level), width, height, MIPMAP));
+                    visibleAreas.addAll(POINT_READER.read(mipmaps.get(level), width, height, MIPMAP));
                 }
 
                 return new NativeImageAdapter(
@@ -155,48 +158,6 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 .add(new AnimationComponent(24000, timeGetter, frameManager));
 
         return builder;
-    }
-
-    /**
-     * Gets the pixels that will change for every mipmap.
-     * @param image         the original image to analyze
-     * @param frameWidth    the width of a frame
-     * @param frameHeight   the height of a frame
-     * @param mipmap        number of mipmap levels to use
-     * @return  pixels that change for every mipmap (starting with the default image)
-     */
-    private List<IRGBAImage.VisibleArea> getChangingPoints(NativeImage image, int frameWidth,
-                                                           int frameHeight, int mipmap) {
-        List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
-
-        // Find points in original image
-        IRGBAImage.VisibleArea.Builder noMipmapBuilder = new IRGBAImage.VisibleArea.Builder();
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                int frameX = x % frameWidth;
-                int frameY = y % frameHeight;
-
-                // We want to detect a point that changes in any frame
-                if (image.getPixelRGBA(x, y) != image.getPixelRGBA(frameX, frameY)) {
-                    noMipmapBuilder.addPixel(frameX, frameY);
-                }
-
-            }
-        }
-        visibleAreas.add(noMipmapBuilder.build());
-
-        // Point coordinates will be different for all mipmap levels
-        for (int level = 1; level <= mipmap; level++) {
-            IRGBAImage.VisibleArea.Builder mipmapBuilder = new IRGBAImage.VisibleArea.Builder();
-
-            for (Point point : visibleAreas.get(0)) {
-                mipmapBuilder.addPixel(point.getX() >> level, point.getY() >> level);
-            }
-
-            visibleAreas.add(mipmapBuilder.build());
-        }
-
-        return visibleAreas;
     }
 
     /**

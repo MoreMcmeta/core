@@ -25,7 +25,7 @@ public class NativeImageAdapter implements IRGBAImage {
     private final VisibleArea VISIBLE_AREA;
 
     /**
-     * Creates a new {@link NativeImage} wrapper.
+     * Creates a new {@link NativeImage} wrapper for part of an image.
      * @param image         the image to wrap
      * @param xOffset       horizontal offset of the image in a texture
      * @param yOffset       vertical offset of the image in a texture
@@ -50,6 +50,25 @@ public class NativeImageAdapter implements IRGBAImage {
         CLAMP = clamp;
         AUTO_CLOSE = autoClose;
         VISIBLE_AREA = requireNonNull(visibleArea, "Visible area cannot be null");
+    }
+
+    /**
+     * Creates a new {@link NativeImage} wrapper for an entire image. The image
+     * is not blurred, clamped, or auto-closed, and it has no visible area.
+     * @param image             the image to wrap
+     * @param mipmapLevel       mipmap level of the image
+     */
+    public NativeImageAdapter(NativeImage image, int mipmapLevel) {
+        IMAGE = requireNonNull(image, "Image cannot be null");
+        X_OFFSET = 0;
+        Y_OFFSET = 0;
+        WIDTH = image.getWidth();
+        HEIGHT = image.getHeight();
+        MIPMAP_LEVEL = mipmapLevel;
+        BLUR = false;
+        CLAMP = false;
+        AUTO_CLOSE = false;
+        VISIBLE_AREA = (new VisibleArea.Builder()).build();
     }
 
     /**
