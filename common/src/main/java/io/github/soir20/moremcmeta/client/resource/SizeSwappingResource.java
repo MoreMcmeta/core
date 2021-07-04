@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -24,16 +27,20 @@ import static java.util.Objects.requireNonNull;
  * frame size as if the texture was animated. This prevents
  * {@link net.minecraft.client.renderer.texture.TextureAtlasSprite}s without a .mcmeta
  * file but with a .moremcmeta file from having their frames condensed together as one frame.
+ * Otherwise, this resource should function identically to the
  * @author soir20
  */
 public class SizeSwappingResource implements Resource {
     private final Resource ORIGINAL;
     private final InputStream METADATA_STREAM;
+    private AnimationMetadataSection animMetadata;
+    private boolean wasMetadataRead;
 
     /**
      * Creates a resource that replaces empty animation metadata sections.
      * @param original          the original resource
-     * @param metadataStream    input stream for .moremcmeta metadata
+     * @param metadataStream    input stream for .moremcmeta metadata. This will be closed
+     *                          when the created resource is closed or after it is read.
      */
     public SizeSwappingResource(Resource original, @Nullable InputStream metadataStream) {
         ORIGINAL = requireNonNull(original, "Original resource cannot be null");
@@ -77,24 +84,26 @@ public class SizeSwappingResource implements Resource {
             return originalMetadata;
         }
 
-        AnimationMetadataSection metadata;
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(METADATA_STREAM, StandardCharsets.UTF_8)
-        )) {
-            JsonObject topLevelJson = GsonHelper.parse(reader);
+        if (!wasMetadataRead) {
+            wasMetadataRead = true;
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(METADATA_STREAM, StandardCharsets.UTF_8)
+            )) {
+                JsonObject topLevelJson = GsonHelper.parse(reader);
 
-            String sectionName = serializer.getMetadataSectionName();
-            if (!topLevelJson.has(sectionName)) {
+                String sectionName = serializer.getMetadataSectionName();
+                if (!topLevelJson.has(sectionName)) {
+                    return null;
+                }
+
+                JsonObject animJson = topLevelJson.getAsJsonObject(sectionName);
+                animMetadata = (AnimationMetadataSection) serializer.fromJson(animJson);
+            } catch (IOException | JsonParseException | IllegalArgumentException err) {
+
+                // The texture reload listener will already log the issue
                 return null;
+
             }
-
-            JsonObject animJson = topLevelJson.getAsJsonObject(sectionName);
-            metadata = (AnimationMetadataSection) serializer.fromJson(animJson);
-        } catch (IOException | JsonParseException | IllegalArgumentException err) {
-
-            // The texture reload listener will already log the issue
-            return null;
-
         }
 
         // Return our own "empty" metadata section; without metadata, the default one squeezes all frames into one
@@ -105,8 +114,8 @@ public class SizeSwappingResource implements Resource {
         emptyAnimJson.add("frames", framesArray);
 
         int emptyDimension = -1;
-        emptyAnimJson.addProperty("width", metadata.getFrameWidth(emptyDimension));
-        emptyAnimJson.addProperty("height", metadata.getFrameHeight(emptyDimension));
+        emptyAnimJson.addProperty("width", animMetadata.getFrameWidth(emptyDimension));
+        emptyAnimJson.addProperty("height", animMetadata.getFrameHeight(emptyDimension));
 
         return serializer.fromJson(emptyAnimJson);
     }
@@ -121,12 +130,53 @@ public class SizeSwappingResource implements Resource {
     }
 
     /**
-     * Closes the original resource.
+     * Closes the original resource and the metadata stream.
      * @throws IOException  I/O exception
      */
     @Override
     public void close() throws IOException {
-        ORIGINAL.close();
+        List<IOException> exceptions = new ArrayList<>();
+        try {
+            ORIGINAL.close();
+        } catch (IOException err) {
+            exceptions.add(err);
+        }
+
+        if (METADATA_STREAM != null) {
+            try {
+                METADATA_STREAM.close();
+            } catch (IOException err) {
+                exceptions.add(err);
+            }
+        }
+
+        if (exceptions.size() > 0) {
+            throw exceptions.get(0);
+        }
+    }
+
+    /**
+     * Determines if an object is the same as this resource.
+     * @param other     the other object to compare
+     * @return whether the wrapped resource and the mod metadata stream are equal in the other object
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof SizeSwappingResource)) {
+            return false;
+        }
+
+        SizeSwappingResource otherResource = (SizeSwappingResource) other;
+        return ORIGINAL.equals(otherResource.ORIGINAL) && Objects.equals(METADATA_STREAM, otherResource.METADATA_STREAM);
+    }
+
+    /**
+     * Gets the hash code of the original resource.
+     * @return the hash code of the original resource
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(ORIGINAL.hashCode(), METADATA_STREAM);
     }
 
 }
