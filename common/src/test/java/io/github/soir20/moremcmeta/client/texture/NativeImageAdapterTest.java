@@ -16,10 +16,16 @@ public class NativeImageAdapterTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void construct_NullImage_NullPointerException() {
+    public void constructFull_NullImage_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new NativeImageAdapter(null, 0, 0, 100, 100, 2,
                 false, false, false, (new IRGBAImage.VisibleArea.Builder()).build());
+    }
+
+    @Test
+    public void constructReduced_NullImage_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new NativeImageAdapter(null, 0);
     }
 
 }
