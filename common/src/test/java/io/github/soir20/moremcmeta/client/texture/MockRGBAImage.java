@@ -36,6 +36,13 @@ public class MockRGBAImage implements IRGBAImage {
         VISIBLE_AREA = visibleArea;
     }
 
+    public MockRGBAImage(int[][] pixels) {
+        PIXELS = pixels;
+        WIDTH = pixels.length;
+        HEIGHT = pixels[0].length;
+        VISIBLE_AREA = (new VisibleArea.Builder()).build();
+    }
+
     @Override
     public int getPixel(int x, int y) {
         return PIXELS[x][y];
