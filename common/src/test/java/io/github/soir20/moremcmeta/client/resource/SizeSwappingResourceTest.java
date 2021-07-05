@@ -419,6 +419,17 @@ public class SizeSwappingResourceTest {
     }
 
     @Test
+    public void getMetadata_NullSerializer_NullPointerException() {
+        Resource original = new SimpleResource("dummy", new ResourceLocation("dummy-location"),
+                EMPTY_STREAM,  new ByteArrayInputStream("{ \"texture\": { \"blur\": true } }".getBytes()));
+        SizeSwappingResource wrapper = new SizeSwappingResource(original,
+                new ByteArrayInputStream("{ \"animation\": { \"width\": 100, \"height\": 200 } }".getBytes()));
+
+        expectedException.expect(NullPointerException.class);
+        wrapper.getMetadata(null);
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void getMetadata_OriginalHasNoAnimMetadata_SingleFrameAnimData() {
         Resource original = new SimpleResource("dummy", new ResourceLocation("dummy-location"),
