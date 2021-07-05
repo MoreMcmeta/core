@@ -14,9 +14,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,7 +53,7 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Adds a resource pack to the wrapped manager.
+     * Adds a resource pack to the original manager.
      * @param packResources     pack to add
      */
     @Override
@@ -61,8 +63,8 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Gets the wrapped manager's namespaces.
-     * @return the wrapped manager's namespaces
+     * Gets the original manager's namespaces.
+     * @return the original manager's namespaces
      */
     @Override
     public Set<String> getNamespaces() {
@@ -70,10 +72,10 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Gets a resource from the wrapped manager. The returned resource will be a
+     * Gets a resource from the original manager. The returned resource will be a
      * {@link SizeSwappingResource} if it has .moremcmeta metadata.
      * @param resourceLocation      location of the resource
-     * @return the resource from the wrapped manager, possibly a {@link SizeSwappingResource}
+     * @return the resource from the original manager, possibly a {@link SizeSwappingResource}
      * @throws IOException I/O error while retrieving the resource
      */
     @Override
@@ -83,17 +85,21 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
         Resource resource = ORIGINAL.getResource(resourceLocation);
         ResourceLocation metadataLoc = getModMetadataLocation(resourceLocation);
         if (resourceLocation.getPath().endsWith(".png") && ORIGINAL.hasResource(metadataLoc)) {
-            InputStream metadataStream = ORIGINAL.getResource(metadataLoc).getInputStream();
-            resource = new SizeSwappingResource(resource, metadataStream);
+            Resource metadataResource = ORIGINAL.getResource(metadataLoc);
+
+            if (metadataResource.getSourceName().equals(resource.getSourceName())) {
+                InputStream metadataStream = metadataResource.getInputStream();
+                resource = new SizeSwappingResource(resource, metadataStream);
+            }
         }
 
         return resource;
     }
 
     /**
-     * Determines whether the wrapped manager has a resource.
+     * Determines whether the original manager has a resource.
      * @param resourceLocation      the location to check
-     * @return whether the wrapped manager has this resource
+     * @return whether the original manager has this resource
      */
     @Override
     public boolean hasResource(ResourceLocation resourceLocation) {
@@ -102,10 +108,10 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Gets all copies of resource from the wrapped manager. The returned resources will be
+     * Gets all copies of resource from the original manager. The returned resources will be
      * {@link SizeSwappingResource}s if they have .moremcmeta metadata.
      * @param resourceLocation      location of the resources
-     * @return the resources from the wrapped manager, possibly {@link SizeSwappingResource}s
+     * @return the resources from the original manager, possibly {@link SizeSwappingResource}s
      * @throws IOException I/O error while retrieving the resources
      */
     @Override
@@ -116,9 +122,15 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
 
         List<Resource> resources = ORIGINAL.getResources(resourceLocation);
         if (resourceLocation.getPath().endsWith(".png") && ORIGINAL.hasResource(metadataLoc)) {
-            InputStream metadataStream = ORIGINAL.getResource(metadataLoc).getInputStream();
-            resources = resources.stream().map(
-                    (resource) -> new SizeSwappingResource(resource, metadataStream)
+            Map<String, Resource> modMetadataPacks = ORIGINAL.getResources(metadataLoc).stream()
+                    .collect(Collectors.toMap(Resource::getSourceName, Function.identity()));
+
+            Predicate<Resource> hasModMetadata = (resource) -> modMetadataPacks.containsKey(resource.getSourceName());
+            Function<Resource, InputStream> getMetadataStream =
+                    (resource) -> modMetadataPacks.get(resource.getSourceName()).getInputStream();
+
+            resources = resources.stream().map((resource) -> hasModMetadata.test(resource) ?
+                    new SizeSwappingResource(resource, getMetadataStream.apply(resource)) : resource
             ).collect(Collectors.toList());
         }
 
@@ -126,10 +138,10 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Gets a list of resource locations from the wrapped manager.
+     * Gets a list of resource locations from the original manager.
      * @param path          the path to look for resources in
      * @param predicate     test for file name
-     * @return all resources in the wrapped manager that meet the given criteria
+     * @return all resources in the original manager that meet the given criteria
      */
     @Override
     public Collection<ResourceLocation> listResources(String path, Predicate<String> predicate) {
@@ -139,7 +151,7 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Closes the wrapped manager.
+     * Closes the original manager.
      */
     @Override
     public void close() {
@@ -148,8 +160,9 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
 
     /**
      * Registers a reload listener. Listeners will execute with this wrapper as their parameter.
-     * Listeners registered directly to the wrapped manager (and not through this method) before
-     * or after it was wrapped will execute with the wrapped manager as their parameter.
+     * Listeners registered directly to the original manager (and not through this method) before
+     * or after it was original will execute with the original manager as their parameter.
+     * The original manager is aware of any listeners registered here.
      * @param preparableReloadListener      listener to add
      */
     @Override
@@ -168,7 +181,8 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Reloads the wrapped resource manager
+     * Reloads the original resource manager, including any listeners that were registered
+     * before or after it was wrapped.
      * @param loadingExec           executor for loading tasks
      * @param appExec               executor for application tasks
      * @param completableFuture     asynchronous reloading task
@@ -189,8 +203,8 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Gets all the packs in the wrapped manager.
-     * @return all the packs in the wrapped manager
+     * Gets all the packs in the original manager.
+     * @return all the packs in the original manager
      */
     @Override
     public Stream<PackResources> listPacks() {
