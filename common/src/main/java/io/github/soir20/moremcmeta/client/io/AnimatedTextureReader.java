@@ -152,10 +152,12 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         Supplier<Optional<Long>> timeGetter =
                 () -> minecraft.level == null ? Optional.empty() : Optional.of(minecraft.level.getDayTime());
 
+        final int TICKS_PER_MC_DAY = 24000;
+        final int MAX_DAYS = 365;
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(frameManager.getCurrentFrame())
                 .add(new CleanupComponent(closeMipmaps))
-                .add(new AnimationComponent(24000, timeGetter, frameManager));
+                .add(new AnimationComponent(MAX_DAYS * TICKS_PER_MC_DAY, timeGetter, frameManager));
 
         return builder;
     }
