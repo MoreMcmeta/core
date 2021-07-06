@@ -85,10 +85,13 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(3, locations.size());
+        assertEquals(6, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/creeper.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/creeper.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/zombie.png")));
     }
 
     @Test
@@ -106,10 +109,13 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(3, locations.size());
+        assertEquals(6, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/creeper.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/creeper.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/zombie.png")));
     }
 
     @Test
@@ -126,8 +132,9 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(1, locations.size());
+        assertEquals(2, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bat.png")));
     }
 
     @Test
@@ -144,8 +151,9 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(1, locations.size());
+        assertEquals(2, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bat.png")));
     }
 
     @Test
@@ -162,8 +170,9 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(1, locations.size());
+        assertEquals(2, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bat.png")));
     }
 
     @Test
@@ -189,7 +198,7 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(1, locations.size());
+        assertEquals(4, locations.size());
     }
 
     @Test
@@ -215,7 +224,7 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(1, locations.size());
+        assertEquals(4, locations.size());
     }
 
     @Test
@@ -340,8 +349,9 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
         Set<ResourceLocation> locations = mockManager.getLocations();
 
-        assertEquals(1, locations.size());
+        assertEquals(2, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bat.png")));
     }
 
     @Test
@@ -432,10 +442,13 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManagerSecondReload);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(3, locations.size());
+        assertEquals(6, locations.size());
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/dolphin.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/ocelot.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/dolphin.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/ocelot.png")));
     }
 
     @Test
@@ -468,12 +481,15 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManagerThirdReload);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(5, locations.size());
+        assertEquals(8, locations.size());
+        assertTrue(locations.contains(new ResourceLocation("textures/creeper.png")));
+        assertTrue(locations.contains(new ResourceLocation("textures/zombie.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/cat.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/bear.png")));
-        assertTrue(locations.contains(new ResourceLocation("textures/creeper.png")));
-        assertTrue(locations.contains(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/cat.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/bear.png")));
     }
 
     @Test
@@ -491,9 +507,13 @@ public class TextureReloadListenerTest {
         listener.onResourceManagerReload(mockResourceManager);
 
         Set<ResourceLocation> locations = mockManager.getLocations();
-        assertEquals(3, locations.size());
+        assertEquals(6, locations.size());
         assertTrue(locations.contains(new ResourceLocation("test", "textures/bat.png")));
         assertTrue(locations.contains(new ResourceLocation("moremcmeta", "textures/creeper.png")));
         assertTrue(locations.contains(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.contains(new ResourceLocation("test", "optifine/bat.png")));
+        assertTrue(locations.contains(new ResourceLocation("moremcmeta", "optifine/creeper.png")));
+        assertTrue(locations.contains(new ResourceLocation("optifine/zombie.png")));
     }
+
 }

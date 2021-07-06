@@ -58,17 +58,24 @@ public class TextureReloadListener<R> implements ResourceManagerReloadListener {
     public void onResourceManagerReload(ResourceManager resourceManager) {
         requireNonNull(resourceManager, "Resource manager cannot be null");
 
-        Collection<ResourceLocation> textureCandidates;
+        Collection<ResourceLocation> textureCandidates = new HashSet<>();
 
         /* We should catch ResourceLocation errors to prevent bad texture names/paths from
            removing all resource packs. We can't filter invalid folder names, so we don't filter
            invalid texture names for consistency.
            NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
         try {
-             textureCandidates = resourceManager.listResources(
+             textureCandidates.addAll(resourceManager.listResources(
                     "textures",
                     fileName -> fileName.endsWith(METADATA_EXTENSION)
-             );
+             ));
+
+             // Compatibility fix since OptiFine stores its textures in a different folder
+             textureCandidates.addAll(resourceManager.listResources(
+                     "optifine",
+                     fileName -> fileName.endsWith(METADATA_EXTENSION)
+             ));
+
         } catch (ResourceLocationException error) {
             LOGGER.error("Found texture with invalid name; no textures will be loaded: {}",
                     error.toString());
