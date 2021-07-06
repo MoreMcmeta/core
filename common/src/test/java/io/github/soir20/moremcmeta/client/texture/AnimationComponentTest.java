@@ -191,7 +191,44 @@ public class AnimationComponentTest {
         builder.add(new AnimationComponent(800, () -> Optional.of(currentTime.incrementAndGet()),
                 frameManager));
         builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
-                (state) -> assertEquals(9, ((MockRGBAImageFrame) state.getImage()).getFrameNumber()))));
+                (state) -> assertEquals(9, ((MockRGBAImageFrame) state.getImage()).getFrameNumber())
+        )));
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+        texture.bind();
+    }
+
+    @Test
+    public void tick_VeryLargeSyncTicks_FrameAtTime() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setImage(new MockRGBAImageFrame());
+
+        AnimationFrameManager<MockRGBAImageFrame> frameManager = makeFrameManager();
+        AtomicLong currentTime = new AtomicLong(375);
+        builder.add(new AnimationComponent(Integer.MAX_VALUE, () -> Optional.of(currentTime.incrementAndGet()),
+                frameManager));
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+                (state) -> assertEquals(9, ((MockRGBAImageFrame) state.getImage()).getFrameNumber())
+        )));
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+        texture.bind();
+    }
+
+    @Test
+    public void tick_VeryLargeTime_FrameAtTime() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setImage(new MockRGBAImageFrame());
+
+        AnimationFrameManager<MockRGBAImageFrame> frameManager = makeFrameManager();
+        AtomicLong currentTime = new AtomicLong(Long.MAX_VALUE);
+        builder.add(new AnimationComponent(800, () -> Optional.of(currentTime.incrementAndGet()),
+                frameManager));
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+                (state) -> assertEquals(6, ((MockRGBAImageFrame) state.getImage()).getFrameNumber())
+        )));
         EventDrivenTexture texture = builder.build();
 
         texture.tick();
