@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.adapter.ChangingPointsAdapter;
+import io.github.soir20.moremcmeta.client.resource.ModAnimationMetadataSection;
 import io.github.soir20.moremcmeta.client.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
@@ -82,6 +83,8 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
 
         AnimationMetadataSection animationMetadata =
                 metadataParser.getMetadata(AnimationMetadataSection.SERIALIZER);
+        ModAnimationMetadataSection modAnimationMetadata =
+                metadataParser.getMetadata(ModAnimationMetadataSection.SERIALIZER);
         TextureMetadataSection textureMetadata =
                 metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
 
@@ -89,6 +92,10 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
            The metadata parser can set these to null even if there was no error. */
         if (animationMetadata == null) {
             animationMetadata = AnimationMetadataSection.EMPTY;
+        }
+
+        if (modAnimationMetadata == null) {
+            modAnimationMetadata = ModAnimationMetadataSection.EMPTY;
         }
 
         if (textureMetadata == null) {
@@ -156,8 +163,13 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         final int MAX_DAYS = 365;
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(frameManager.getCurrentFrame())
-                .add(new CleanupComponent(closeMipmaps))
-                .add(new AnimationComponent(MAX_DAYS * TICKS_PER_MC_DAY, timeGetter, frameManager));
+                .add(new CleanupComponent(closeMipmaps));
+
+        if (modAnimationMetadata.isDaytimeSynced()) {
+            builder.add(new AnimationComponent(MAX_DAYS * TICKS_PER_MC_DAY, timeGetter, frameManager));
+        } else {
+            builder.add(new AnimationComponent(frameManager));
+        }
 
         return builder;
     }
