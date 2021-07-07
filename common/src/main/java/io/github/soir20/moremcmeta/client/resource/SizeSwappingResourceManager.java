@@ -28,7 +28,9 @@ import static java.util.Objects.requireNonNull;
 /**
  * Swaps resources with {@link SizeSwappingResource}s if they have .moremcmeta metadata.
  * Otherwise, it performs identically to the {@link SimpleReloadableResourceManager} it
- * wraps.
+ * wraps. This extends {@link SimpleReloadableResourceManager} instead of implementing
+ * {@link net.minecraft.server.packs.resources.ReloadableResourceManager} for compatibility
+ * with other mods that expect a {@link SimpleReloadableResourceManager}.
  * @author soir20
  */
 public class SizeSwappingResourceManager extends SimpleReloadableResourceManager {
