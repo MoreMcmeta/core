@@ -37,7 +37,7 @@ public class ModAnimationMetadataSectionSerializer implements MetadataSectionSer
     @Override
     public ModAnimationMetadataSection fromJson(JsonObject jsonObject) throws JsonParseException,
             IllegalArgumentException {
-        requireNonNull(jsonObject);
+        requireNonNull(jsonObject, "JSON object cannot be null");
         boolean isSynced = GsonHelper.getAsBoolean(jsonObject, "daytimeSync", false);
         return new ModAnimationMetadataSection(isSynced);
     }
