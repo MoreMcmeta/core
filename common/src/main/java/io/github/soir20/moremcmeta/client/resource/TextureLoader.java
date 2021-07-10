@@ -20,97 +20,69 @@ package io.github.soir20.moremcmeta.client.resource;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParseException;
 import io.github.soir20.moremcmeta.client.io.ITextureReader;
-import io.github.soir20.moremcmeta.client.texture.IManager;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Uploads textures to the texture manager on texture reloading 
- * so that they will always be used for rendering.
+ * Loads and queues animated textures during resource reloading.
  * @param <R> resource type
  * @author soir20
  */
-public class TextureReloadListener<R> implements ResourceManagerReloadListener {
+public class TextureLoader<R> {
     private static final String METADATA_EXTENSION = ".moremcmeta";
 
-    private final IManager<R> TEXTURE_MANAGER;
     private final ITextureReader<R> TEXTURE_READER;
     private final Logger LOGGER;
-    private final Map<ResourceLocation, R> LAST_TEXTURES_ADDED;
 
     /**
-     * Creates a TextureReloadListener.
+     * Creates a TextureLoader.
      * @param texReader             reads textures
-     * @param texManager            uploads textures to the game's texture manager
      * @param logger                logs listener-related messages to the game's output
      */
-    public TextureReloadListener(ITextureReader<R> texReader, IManager<R> texManager,
-                                 Logger logger) {
+    public TextureLoader(ITextureReader<R> texReader, Logger logger) {
         TEXTURE_READER = requireNonNull(texReader, "Texture reader cannot be null");
-        TEXTURE_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
         LOGGER = requireNonNull(logger, "Logger cannot be null");
-        LAST_TEXTURES_ADDED = new HashMap<>();
     }
 
     /**
-     * Uploads textures to the texture manager when the game's textures reload. This event only
-     * fires for client-side resources, not data packs.
+     * Searches for and loads animated textures from a folder throughout all resource packs.
      * @param resourceManager       the game's central resource manager
+     * @param path                  the path to search for textures in
      */
-    @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {
+    public ImmutableMap<ResourceLocation, R> load(ResourceManager resourceManager, String path) {
         requireNonNull(resourceManager, "Resource manager cannot be null");
 
-        Collection<ResourceLocation> textureCandidates = new HashSet<>();
+        Collection<ResourceLocation> textureCandidates;
 
         /* We should catch ResourceLocation errors to prevent bad texture names/paths from
            removing all resource packs. We can't filter invalid folder names, so we don't filter
            invalid texture names for consistency.
            NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
         try {
-             textureCandidates.addAll(resourceManager.listResources(
-                    "textures",
+             textureCandidates = resourceManager.listResources(
+                    path,
                     fileName -> fileName.endsWith(METADATA_EXTENSION)
-             ));
-
-             // Compatibility fix since OptiFine stores its textures in a different folder
-             textureCandidates.addAll(resourceManager.listResources(
-                     "optifine",
-                     fileName -> fileName.endsWith(METADATA_EXTENSION)
-             ));
+             );
 
         } catch (ResourceLocationException error) {
             LOGGER.error("Found texture with invalid name; no textures will be loaded: {}",
                     error.toString());
-            return;
-        } finally {
-
-            // Clean up any previously loaded textures
-            LAST_TEXTURES_ADDED.keySet().forEach(TEXTURE_MANAGER::unregister);
-            LAST_TEXTURES_ADDED.clear();
-
+            return ImmutableMap.of();
         }
 
-        ImmutableMap<ResourceLocation, R> textures = getTextures(textureCandidates, resourceManager);
-
-        // Load the textures after ticker successfully created
-        LAST_TEXTURES_ADDED.putAll(textures);
-        textures.forEach(TEXTURE_MANAGER::register);
-
+        return getTextures(textureCandidates, resourceManager);
     }
 
     /**
@@ -120,21 +92,21 @@ public class TextureReloadListener<R> implements ResourceManagerReloadListener {
      */
     private ImmutableMap<ResourceLocation, R> getTextures(Collection<ResourceLocation> candidates,
                                                                      ResourceManager resourceManager) {
-        ImmutableMap.Builder<ResourceLocation, R> textures = new ImmutableMap.Builder<>();
+        Map<ResourceLocation, R> textures = new ConcurrentHashMap<>();
 
         // Create textures from unique candidates
-        (new HashSet<>(candidates)).forEach((metadataLocation) -> {
+        candidates.stream().distinct().parallel().forEach((metadataLocation) -> {
             ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(METADATA_EXTENSION, ""));
 
-            Optional<R> texture = getTexture(resourceManager, textureLocation,
-                    metadataLocation);
+            Optional<R> texture = getTexture(resourceManager, textureLocation, metadataLocation);
 
             // Keep track of which textures are created
             texture.ifPresent(tex -> textures.put(textureLocation, tex));
+
         });
 
-        return textures.build();
+        return ImmutableMap.copyOf(textures);
     }
 
     /**

@@ -15,15 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta;
+package io.github.soir20.moremcmeta.client.mixin;
 
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
- * The main mod class with public constants for Forge.
+ * Allows the resource manager in {@link Minecraft} to be replaced.
  * @author soir20
  */
-@Mod(MoreMcmeta.MODID)
-public final class MoreMcmeta {
-    public static final String MODID = "moremcmeta";
+@Mixin(Minecraft.class)
+public interface MinecraftAccessor {
+
+    /**
+     * Sets Minecraft's resource manager.
+     * @param manager       the new resource manager to use
+     */
+    @Accessor("resourceManager")
+    void setResourceManager(ReloadableResourceManager manager);
+
 }

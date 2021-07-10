@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "moremcmeta",
+  "version": "${version}",
+  "name": "MoreMcmeta",
+  "description": "Animate Minecraft mob, armor, GUI and more textures with the .mcmeta format—just like block and item textures.",
+  "authors": [
+    "soir20"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/moremcmeta",
+    "sources": "https://github.com/soir20/MoreMcmeta"
+  },
+  "license": "LGPL-3.0",
+  "icon": "moremcmeta-logo-white.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "io.github.soir20.moremcmeta.MoreMcmetaFabric"
+    ]
+  },
+  "mixins": [
+    "moremcmeta.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": ">=1.16.5"
+  }
+}

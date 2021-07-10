@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.soir20.moremcmeta.client.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "MinecraftAccessor",
+    "ManagerInitializationMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

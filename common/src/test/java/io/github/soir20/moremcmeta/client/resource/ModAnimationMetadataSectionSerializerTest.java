@@ -19,8 +19,6 @@ package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
