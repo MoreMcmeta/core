@@ -65,16 +65,16 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
         requireNonNull(textureLocation, "Texture location cannot be null");
         requireNonNull(builder, "Texture builder cannot be null");
 
-        /* Clear any existing texture immediately to prevent PreloadedTextures
-           from re-adding themselves. The texture manager will reload before the
-           EventDrivenTextures are added, causing a race condition with the
-           registration CompletableFuture inside PreloadedTexture's reset method. */
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
 
-        /* There is a bug in with the unregister method fixed only on Forge.
-           Registering an empty texture also stops the manager from preloading
-           a texture if our listener executes first. */
+        /* Clear any existing texture immediately to prevent PreloadedTextures
+           from re-adding themselves. The texture manager will reload before the
+           EventDrivenTextures are added, causing a race condition with the
+           registration CompletableFuture inside PreloadedTexture's reset method.
+           We register an empty texture because there is a bug in with the unregister
+           method fixed only on Forge. Registering an empty texture also stops the
+           manager from preloading a texture if our listener executes first. */
         executeOnRenderThread(() -> textureManager.register(textureLocation, MissingTextureAtlasSprite.getTexture()));
 
         FINISHER.queue(textureLocation, builder);
