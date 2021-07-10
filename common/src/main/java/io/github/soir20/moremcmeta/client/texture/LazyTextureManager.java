@@ -71,6 +71,10 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
            registration CompletableFuture inside PreloadedTexture's reset method. */
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
+
+        /* There is a bug in with the unregister method fixed only on Forge.
+           Registering an empty texture also stops the manager from preloading
+           a texture if our listener executes first. */
         executeOnRenderThread(() -> textureManager.register(textureLocation, MissingTextureAtlasSprite.getTexture()));
 
         FINISHER.queue(textureLocation, builder);
