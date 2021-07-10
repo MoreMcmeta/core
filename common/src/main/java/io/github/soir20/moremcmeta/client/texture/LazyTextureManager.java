@@ -17,8 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 
@@ -70,7 +70,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
            registration CompletableFuture inside PreloadedTexture's reset method. */
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
-        executeOnRenderThread(() -> textureManager.release(textureLocation));
+        textureManager.register(textureLocation, MissingTextureAtlasSprite.getTexture());
 
         FINISHER.queue(textureLocation, builder);
     }
@@ -102,7 +102,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
         TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
         requireNonNull(textureManager, "Supplied texture manager cannot be null");
 
-        executeOnRenderThread(() -> textureManager.release(textureLocation));
+        textureManager.register(textureLocation, MissingTextureAtlasSprite.getTexture());
         ANIMATED_TEXTURES.remove(textureLocation);
     }
 
@@ -112,18 +112,6 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
     @Override
     public void tick() {
         ANIMATED_TEXTURES.values().forEach(CustomTickable::tick);
-    }
-
-    /**
-     * Executes code on the render thread.
-     * @param action    the callback to execute
-     */
-    private void executeOnRenderThread(Runnable action) {
-        if (!RenderSystem.isOnRenderThreadOrInit()) {
-            RenderSystem.recordRenderCall(action::run);
-        } else {
-            action.run();
-        }
     }
 
 }
