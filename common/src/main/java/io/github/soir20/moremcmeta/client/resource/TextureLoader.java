@@ -63,6 +63,10 @@ public class TextureLoader<R> {
      */
     public ImmutableMap<ResourceLocation, R> load(ResourceManager resourceManager, String path) {
         requireNonNull(resourceManager, "Resource manager cannot be null");
+        requireNonNull(path, "Path cannot be null");
+        if (path.isEmpty() || path.startsWith("/")) {
+            throw new IllegalArgumentException("Path cannot be empty or start with a slash");
+        }
 
         Collection<ResourceLocation> textureCandidates;
 
