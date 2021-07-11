@@ -8,6 +8,9 @@ The best way to contribute is to create resource packs using MoreMcmeta. This re
 
 Reporting bugs and suggesting features are also excellent ways to contribute.
 
+### The Code of Conduct
+We ask all contributors to review and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ### I found a bug.
 Before you report a bug, the [troubleshooting guide](https://github.com/soir20/MoreMcmeta/wiki/User-Docs:-Troubleshooting) may help you resolve the issue. This guide provides immediate help for your and creates less work for the mod's maintainers.
 
