@@ -17,39 +17,32 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Wraps the {@link TextureManager} because it is not immediately available during mod construction.
  * Finishes loaded textures lazily with upload components according to the provided {@link IFinisher}.
  * @param <I> type of texture builders (input)
  * @param <O> type of textures (output)
  * @author soir20
  */
 public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> implements IManager<I> {
-    private final Supplier<TextureManager> TEXTURE_MANAGER_GETTER;
+    private final IManager<AbstractTexture> DELEGATE;
     private final Map<ResourceLocation, CustomTickable> ANIMATED_TEXTURES;
     private final IFinisher<I, O> FINISHER;
 
     /**
      * Creates the TextureManagerWrapper.
-     * @param texManagerGetter      getter for the texture manager. The manager may not exist during parallel
-     *                              mod loading, but it will when resources are reloaded.
-     * @param finisher              lazily finishes textures once resource loading is complete
+     * @param delegate      Minecraft's the texture manager
+     * @param finisher      lazily finishes textures once resource loading is complete
      */
-    public LazyTextureManager(Supplier<TextureManager> texManagerGetter, IFinisher<I, O> finisher) {
-        requireNonNull(texManagerGetter, "Texture manager getter cannot be null");
-        TEXTURE_MANAGER_GETTER = texManagerGetter;
+    public LazyTextureManager(IManager<AbstractTexture> delegate, IFinisher<I, O> finisher) {
+        DELEGATE = requireNonNull(delegate, "Delegate manager cannot be null");
         ANIMATED_TEXTURES = new HashMap<>();
         FINISHER = requireNonNull(finisher, "Finisher cannot be null");
     }
@@ -65,17 +58,11 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
         requireNonNull(textureLocation, "Texture location cannot be null");
         requireNonNull(builder, "Texture builder cannot be null");
 
-        TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
-        requireNonNull(textureManager, "Supplied texture manager cannot be null");
-
         /* Clear any existing texture immediately to prevent PreloadedTextures
            from re-adding themselves. The texture manager will reload before the
            EventDrivenTextures are added, causing a race condition with the
-           registration CompletableFuture inside PreloadedTexture's reset method.
-           We register an empty texture because there is a bug in with the unregister
-           method fixed only on Forge. Registering an empty texture also stops the
-           manager from preloading a texture if our listener executes first. */
-        executeOnRenderThread(() -> textureManager.register(textureLocation, MissingTextureAtlasSprite.getTexture()));
+           registration CompletableFuture inside PreloadedTexture's reset method. */
+        DELEGATE.unregister(textureLocation);
 
         FINISHER.queue(textureLocation, builder);
     }
@@ -85,13 +72,10 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
      * according to the provided {@link IFinisher}.
      */
     public void finishQueued() {
-        TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
-        requireNonNull(textureManager, "Supplied texture manager cannot be null");
-
         Map<ResourceLocation, O> textures = FINISHER.finish();
 
         textures.forEach((location, texture) -> {
-            textureManager.register(location, texture);
+            DELEGATE.register(location, texture);
             ANIMATED_TEXTURES.put(location, texture);
         });
     }
@@ -104,10 +88,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
     public void unregister(ResourceLocation textureLocation) {
         requireNonNull(textureLocation, "Texture location cannot be null");
 
-        TextureManager textureManager = TEXTURE_MANAGER_GETTER.get();
-        requireNonNull(textureManager, "Supplied texture manager cannot be null");
-
-        executeOnRenderThread(() -> textureManager.register(textureLocation, MissingTextureAtlasSprite.getTexture()));
+        DELEGATE.unregister(textureLocation);
         ANIMATED_TEXTURES.remove(textureLocation);
     }
 
@@ -117,18 +98,6 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
     @Override
     public void tick() {
         ANIMATED_TEXTURES.values().forEach(CustomTickable::tick);
-    }
-
-    /**
-     * Executes code on the render thread.
-     * @param action    the callback to execute
-     */
-    private void executeOnRenderThread(Runnable action) {
-        if (!RenderSystem.isOnRenderThreadOrInit()) {
-            RenderSystem.recordRenderCall(action::run);
-        } else {
-            action.run();
-        }
     }
 
 }

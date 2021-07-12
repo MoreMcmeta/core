@@ -59,4 +59,8 @@ public class MockManager<R> implements IManager<R> {
     public void tick() {
         ANIMATED_TEXTURES.values().forEach(Tickable::tick);
     }
+
+    public R getTexture(ResourceLocation location) {
+        return TEXTURES.get(location);
+    }
 }

@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta;
 
 import io.github.soir20.moremcmeta.client.event.ResourceManagerInitializedCallback;
 import io.github.soir20.moremcmeta.client.mixin.MinecraftAccessor;
+import io.github.soir20.moremcmeta.client.mixin.TextureManagerAccessor;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
@@ -27,6 +28,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -37,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -52,6 +55,19 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     @Override
     public void onInitializeClient() {
         start();
+    }
+
+    /**
+     * Gets the action that should be executed to unregister a texture on Fabric.
+     * @return the action that will unregister textures
+     */
+    @Override
+    public BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
+        return (manager, location) -> {
+            TextureManagerAccessor accessor = (TextureManagerAccessor) manager;
+            accessor.getByPath().remove(location);
+            manager.release(location);
+        };
     }
 
     /**

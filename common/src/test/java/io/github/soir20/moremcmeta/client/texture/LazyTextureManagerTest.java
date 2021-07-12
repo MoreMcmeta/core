@@ -17,15 +17,11 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.client.resource.MockResourceManager;
-import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Collections;
 
 import static org.junit.Assert.*;
 
@@ -34,9 +30,6 @@ import static org.junit.Assert.*;
  * @author soir20
  */
 public class LazyTextureManagerTest {
-    private static final ResourceManager MOCK_RESOURCE_MANAGER = new MockResourceManager(Collections.emptyList(),
-            Collections.emptyList(), false);
-
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
@@ -48,17 +41,17 @@ public class LazyTextureManagerTest {
 
     @Test
     public void construct_NullFinisher_NullPointerException() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
 
         expectedException.expect(NullPointerException.class);
-        new LazyTextureManager<>(() -> texManager, null);
+        new LazyTextureManager<>(texManager, null);
     }
 
     @Test
     public void register_NullLocation_NullPointerException() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>()
+                texManager, new MockFinisher<>()
         );
 
         expectedException.expect(NullPointerException.class);
@@ -67,9 +60,9 @@ public class LazyTextureManagerTest {
 
     @Test
     public void register_NullBuilder_NullPointerException() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>()
+                texManager, new MockFinisher<>()
         );
 
         expectedException.expect(NullPointerException.class);
@@ -78,9 +71,9 @@ public class LazyTextureManagerTest {
 
     @Test
     public void registerAndTick_TickableInput_UnfinishedNotTicked() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<CustomTickable, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>());
+                texManager, new MockFinisher<>());
 
         MockAnimatedTexture tickable = new MockAnimatedTexture();
         wrapper.register(new ResourceLocation("bat.png"), tickable);
@@ -90,27 +83,24 @@ public class LazyTextureManagerTest {
     }
 
     @Test
-    public void register_ManagerHasTexture_OldUnregisteredOnRenderThread() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+    public void register_ManagerHasTexture_OldUnregistered() {
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         ResourceLocation location = new ResourceLocation("bat.png");
 
         texManager.register(location, new MockAnimatedTexture());
 
         LazyTextureManager<CustomTickable, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>());
+                texManager, new MockFinisher<>());
 
         wrapper.register(location, new MockAnimatedTexture());
-
-        // We aren't on the render thread, so this texture should not null
-        assertNotNull(texManager.getTexture(location));
-
+        assertNull(texManager.getTexture(location));
     }
 
     @Test
     public void registerAndFinish_MultipleTextures_AllAdded() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>()
+                texManager, new MockFinisher<>()
         );
 
         ResourceLocation location1 = new ResourceLocation("bat.png");
@@ -130,9 +120,9 @@ public class LazyTextureManagerTest {
 
     @Test
     public void finish_NoneQueued_NoException() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>()
+                texManager, new MockFinisher<>()
         );
 
         wrapper.finishQueued();
@@ -140,21 +130,20 @@ public class LazyTextureManagerTest {
 
     @Test
     public void unregister_NullLocation_NullPointerException() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>()
+                texManager, new MockFinisher<>()
         );
 
         expectedException.expect(NullPointerException.class);
         wrapper.unregister(null);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Test
     public void unregister_AddedByWrapper_TextureRemoved() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>()
+                texManager, new MockFinisher<>()
         );
 
         ResourceLocation location1 = new ResourceLocation("bat.png");
@@ -169,20 +158,16 @@ public class LazyTextureManagerTest {
         wrapper.finishQueued();
         wrapper.unregister(location1);
 
-        /* Textures can only be removed from Minecraft's manager on the render thread,
-           so we determine if they are removed based on whether they still get ticked. */
-        wrapper.tick();
-
-        assertEquals(0, ((MockAnimatedTexture) texManager.getTexture(location1)).getTicks());
-        assertEquals(1, ((MockAnimatedTexture) texManager.getTexture(location2)).getTicks());
-        assertEquals(1, ((MockAnimatedTexture) texManager.getTexture(location3)).getTicks());
+        assertNull(texManager.getTexture(location1));
+        assertNotNull(texManager.getTexture(location2));
+        assertNotNull(texManager.getTexture(location3));
     }
 
     @Test
     public void tick_SomeQueuedNoneFinished_NoException() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>()
+                texManager, new MockFinisher<>()
         );
 
         ResourceLocation location1 = new ResourceLocation("bat.png");
@@ -199,9 +184,9 @@ public class LazyTextureManagerTest {
 
     @Test
     public void tick_NoneQueuedNoneFinished_NoException() {
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
+        MockManager<AbstractTexture> texManager = new MockManager<>();
         LazyTextureManager<Integer, MockAnimatedTexture> wrapper = new LazyTextureManager<>(
-                () -> texManager, new MockFinisher<>()
+                texManager, new MockFinisher<>()
         );
 
         wrapper.tick();

@@ -7,7 +7,8 @@
   ],
   "client": [
     "MinecraftAccessor",
-    "ManagerInitializationMixin"
+    "ManagerInitializationMixin",
+    "TextureManagerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -24,6 +24,7 @@ import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -42,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -72,6 +74,18 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     public void onPreInit(final FMLConstructModEvent event) {
         lastEvent = event;
         start();
+    }
+
+    /**
+     * Gets the action that should be executed to unregister a texture on Forge.
+     * @return the action that will unregister textures
+     */
+    @Override
+    public BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
+
+        // Forge already fixes the bug that prevents texture removal
+        return TextureManager::release;
+
     }
 
     /**

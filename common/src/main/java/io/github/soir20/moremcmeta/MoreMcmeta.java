@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta;
 
 import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
+import io.github.soir20.moremcmeta.client.adapter.TextureManagerAdapter;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
@@ -26,11 +27,14 @@ import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -51,8 +55,10 @@ public abstract class MoreMcmeta {
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder(AtlasAdapter::new);
         TextureFinisher finisher = new TextureFinisher(spriteFinder);
-        LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager =
-                new LazyTextureManager<>(minecraft::getTextureManager, finisher);
+        LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager = new LazyTextureManager<>(
+                new TextureManagerAdapter(minecraft::getTextureManager, getUnregisterAction()),
+                finisher
+        );
 
         // Resource loaders
         AnimatedTextureReader reader = new AnimatedTextureReader(logger);
@@ -81,6 +87,12 @@ public abstract class MoreMcmeta {
         startTicking(manager);
 
     }
+
+    /**
+     * Gets the action that should be executed to unregister a texture on a specific mod loader.
+     * @return the action that will unregister textures
+     */
+    public abstract BiConsumer<TextureManager, ResourceLocation> getUnregisterAction();
 
     /**
      * Executes a callback when the vanilla resource manager is initialized in a mod loader.
