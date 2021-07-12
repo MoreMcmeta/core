@@ -22,7 +22,7 @@ The [Code of Conduct](CODE_OF_CONDUCT.md) describes acceptable vs. inappropriate
 
 ## For developers
 ### Clone
-**Clone URL**
+**URL**
 
 ```
 https://github.com/soir20/MoreMcmeta.git
