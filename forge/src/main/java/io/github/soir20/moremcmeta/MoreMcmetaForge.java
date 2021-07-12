@@ -28,16 +28,22 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.network.FMLNetworkConstants;
 import net.minecraftforge.resource.IResourceType;
 import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,7 +67,20 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * constructor to be recognized by Forge as the mod entrypoint.
      */
     public MoreMcmetaForge() {
-        FMLJavaModLoadingContext.get().getModEventBus().register(this);
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            FMLJavaModLoadingContext.get().getModEventBus().register(this);
+        }
+
+        /* Make sure the mod being absent on the other network side does not
+           cause the client to display the server as incompatible. */
+        ModLoadingContext.get().registerExtensionPoint(
+                ExtensionPoint.DISPLAYTEST,
+                () -> Pair.of(
+                        () -> FMLNetworkConstants.IGNORESERVERONLY,
+                        (a, b) -> true
+                )
+        );
+
     }
 
     /**
