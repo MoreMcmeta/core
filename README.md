@@ -1,56 +1,61 @@
 # MoreMcmeta
 ![MoreMcmeta logo](https://github.com/soir20/MoreMcmeta/blob/main/info/img/moremcmeta-logo-black.png?raw=true)
 
-With **MoreMcmeta**, animate Minecraft mob, armor, GUI and more textures with the `.mcmeta` format—just like block and item textures.
+Animate almost any texture with more options.
 
 This means:
 * more possibilities for resource packs
-* [a familiar animation format](#animation-format)
-* not a coremod—better compatibility with other mods
+* [a familiar animation format](https://github.com/soir20/MoreMcmeta/wiki/User-Docs:-Animation-Format)
+* not invasive—better compatibility with other mods
 
 ![Mob, GUI, shadow, moon, and enchantment glint examples](https://github.com/soir20/MoreMcmeta/blob/main/info/img/demo.gif?raw=true)
 
-## Table of Contents
-* [What Can I Animate With MoreMcmeta?](#what-can-i-animate-with-moremcmeta)
-* [Download](#download)
-* [Install](#install)
-* [Animation Format](#animation-format)
-* [Troubleshooting](#troubleshooting)
-* [Suggestions and Bug Reports](#suggestions-and-bug-reports)
+## Are you in the right place?
+If you're here to make a suggestion or bug report, find out how MoreMcmeta works, or contribute to its development, you're in the right place!
 
-## What Can I Animate With MoreMcmeta?
-* mobs
-* other entities (such as the fishing rod's bobber)
-* armor
-* environmental textures (such as the sun and moon)
-* GUIs (including main menu textures besides the Mojang logo)
-* map backgrounds
-* "miscellaneous" textures (such as the enchantment glint and the shadow)
-* any textures from other mods that use Minecraft's default texturing process
+If you're looking to download MoreMcmeta or find out more about it, check out the [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/moremcmeta).
 
-## Download
-* [CurseForge](https://www.curseforge.com/minecraft/mc-mods/moremcmeta)
-* [GitHub](https://github.com/soir20/MoreMcmeta/releases)
+## For all contributors
+The [Contributing Guide](CONTRIBUTING.md) explains how to submit a suggestion, file a bug report, or create a pull request. That page includes all types of contributors, not just developers, and may be a helpful starting point.
 
-I am not responsible for any viruses, malware, etc. that may afflict your computer if you download from other sites.
+The [Code of Conduct](CODE_OF_CONDUCT.md) describes acceptable vs. inappropriate behavior in this repository. In short, use common sense.
 
-Please help [StopModReposts](https://stopmodreposts.org/). Avoid reposting sites to protect yourself from malicious downloads, and ensure developers receive proper compensation for their hard work.
+## For developers
+### Clone
+**Clone URL**
 
-## Install
-1. Download and install [Minecraft Forge](http://files.minecraftforge.net/).
-2. Create an installation and select the Forge version in the Minecraft launcher.
-3. [Download](#download) MoreMcmeta.
-4. Place the MoreMcmeta `.jar` file in your Forge installation's `mods` folder. There are no dependencies besides Forge.
-5. Use the [trial resource pack](https://www.curseforge.com/minecraft/texture-packs/moremcmeta-demo) to see examples of animated textures.
-6. If you're making your own textures, it's recommended you read the [Animation Format Guide](info/guides/ANIMATION-FORMAT.md). In particular, you need to use the `.moremcmeta` extension instead of the `.mcmeta` extension.
+```
+https://github.com/soir20/MoreMcmeta.git
+```
 
-## Animation Format
-See the [Animation Format Guide](info/guides/ANIMATION-FORMAT.md) for `.moremcmeta` file guidelines.
+**SSH**
 
-## Troubleshooting
-See the [Troubleshooting Guide](info/guides/TROUBLESHOOTING.md).
+```
+git@github.com:soir20/MoreMcmeta.git
+```
 
-## Suggestions and Bug Reports
-Use the [issue tracker](https://github.com/soir20/MoreMcmeta/issues) for all suggestions and bug reports. Please include applicable screenshots and example textures/`.moremcmeta` files.
+**GitHub CLI**
 
-Suggestions that break compatibility with the default animation format will not be accepted. However, suggestions that improve the default format with backwards-compatibility will be considered.
+```
+gh repo clone soir20/MoreMcmeta
+```
+
+**Fork**
+
+Use the "Fork" button at the top right of this page.
+
+### Build
+MoreMcmeta uses Gradle and the [Architectury Plugin](https://github.com/architectury/architectury-plugin) for cross-mod loader builds. However, it does not use the Architectury API. There simply isn't enough boilerplate code that MoreMcmeta needs to justify another dependency. JUnit is the unit testing framework.
+
+There's a lot of build tasks, but the important ones are the `build` and `test` tasks under `common` (cross-loader), `forge`, and `fabric`. These correspond to MoreMcmeta's three source directories/Gradle subprojects.
+
+* The `build` task generates a finished mod in `fabric/build/libs` or `forge/build/libs`.
+* The `test` task runs unit tests for the given directory. The best way to view code coverage is to run the task for all subprojects and add the results together.
+
+If you've set up a modded Minecraft environment before, MoreMcmeta is not much different. Gradle will do most of the work after you import the project.
+
+### Run
+After you import the Gradle project, the Architectury plugin should automatically generate run configurations for the client and server on Forge and Fabric. MoreMcmeta is a client-sided mod, but the server tasks are important to verify that it does not crash a dedicated server.
+
+### Release
+View built releases at the [Releases](https://github.com/soir20/MoreMcmeta/releases}) page. Generally, this page has exactly the same versions as CurseForge. Stable development builds may be there in the future.
