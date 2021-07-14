@@ -3,7 +3,7 @@
   "id": "moremcmeta",
   "version": "${version}",
   "name": "MoreMcmeta",
-  "description": "Animate Minecraft mob, armor, GUI and more textures with the .mcmeta format—just like block and item textures.",
+  "description": "Animate almost any Minecraft texture with more options.",
   "authors": [
     "soir20"
   ],

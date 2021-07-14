@@ -14,7 +14,7 @@ logoFile="moremcmeta-logo-white.png" #optional
 # credits="" #optional
 authors="Soir" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description='''Animate Minecraft mob, armor, GUI and more textures with the .mcmeta format—just like block and item textures.'''
+description='''Animate almost any Minecraft texture with more options.'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.moremcmeta]] #optional
     # the modid of the dependency
