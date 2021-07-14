@@ -1,9 +1,9 @@
 # Contributing Guidelines
 Thanks for your interest in improving MoreMcmeta! There are several ways to contribute, even if you are not a developer.
 
-## For all users
+## For All Users
 
-### I'm not a developer. How can I contribute?
+### I'm Not a Developer. How Can I Contribute?
 The best way to contribute is to create resource packs using MoreMcmeta. This reveals bugs and areas for improvement, as well as letting more people know about the mod (if you decide to publish your pack).
 
 Reporting bugs and suggesting features are also excellent ways to contribute.
@@ -11,7 +11,7 @@ Reporting bugs and suggesting features are also excellent ways to contribute.
 ### The Code of Conduct
 We ask all contributors to review and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-### I found a bug.
+### I Found a Bug.
 Before you report a bug, the [troubleshooting guide](https://github.com/soir20/MoreMcmeta/wiki/User-Docs:-Troubleshooting) may help you resolve the issue. This guide provides immediate help for your and creates less work for the mod's maintainers.
 
 To report a bug, [create an issue](https://github.com/soir20/MoreMcmeta/issues) with the bug report template. The template will guide you as to which information you should provide.
@@ -20,19 +20,19 @@ It is helpful if you provide screenshots or a video and your resource packs. A `
 
 More detail is always better.
 
-### I want to suggest a feature.
+### I Want to Suggest a Feature.
 To suggest a feature, [create an issue](https://github.com/soir20/MoreMcmeta/issues) with the feature request template. The template will guide you as to which information you should provide.
 
 Please note that suggestions that break compatibility with the vanilla `.mcmeta` format will not be accepted. However, suggestions that improve the format will be considered.
 
-## For developers
+## For Developers
 
-### Before you submit a pull request
+### Before You Submit a Pull Request
 * Please file an issue before implementing a new feature. You don't want to write a new feature and then have it be denied because it doesn't fit with the mod.
 * The [wiki](https://github.com/soir20/MoreMcmeta/wiki) has several pages written for developers that may be helpful.
 * Do not create or change anything that breaks compatibility with the vanilla `.mcmeta` format.
 
-### Pull request requirements and code style guidelines
+### Pull Request Requirements and Code Style Guidelines
 This section is a little long to be specific about how MoreMcmeta's code is formatted, but the most important goal is to make your code readable to your future self and others.
 
 Currently, a specific linter has not been chosen, though one may be in the future.

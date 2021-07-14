@@ -10,17 +10,17 @@ This means:
 
 ![Mob, GUI, shadow, moon, and enchantment glint examples](https://github.com/soir20/MoreMcmeta/blob/main/info/img/demo.gif?raw=true)
 
-## Are you in the right place?
+## Are You in the Right Place?
 If you're here to make a suggestion or bug report, find out how MoreMcmeta works, or contribute to its development, you're in the right place!
 
 If you're looking to download MoreMcmeta or find out more about it, check out the [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/moremcmeta).
 
-## For all contributors
+## For All Contributors
 The [Contributing Guide](CONTRIBUTING.md) explains how to submit a suggestion, file a bug report, or create a pull request. That page includes all types of contributors, not just developers, and may be a helpful starting point.
 
 The [Code of Conduct](CODE_OF_CONDUCT.md) describes acceptable vs. inappropriate behavior in this repository. In short, use common sense.
 
-## For developers
+## For Developers
 ### Clone
 **URL**
 
