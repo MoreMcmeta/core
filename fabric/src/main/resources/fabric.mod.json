@@ -9,10 +9,11 @@
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/moremcmeta",
-    "sources": "https://github.com/soir20/MoreMcmeta"
+    "sources": "https://github.com/soir20/MoreMcmeta",
+    "issues": "https://github.com/soir20/MoreMcmeta/issues"
   },
   "license": "LGPL-3.0",
-  "icon": "moremcmeta-logo-white.png",
+  "icon": "tricolor-zombie.png",
   "environment": "client",
   "entrypoints": {
     "client": [
