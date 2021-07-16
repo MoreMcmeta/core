@@ -31,11 +31,15 @@ import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.SimpleResource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -173,17 +177,25 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         Runnable closeMipmaps = () -> mipmaps.forEach(NativeImage::close);
 
         // Time retrieval
-        Supplier<Optional<Long>> timeGetter =
-                () -> minecraft.level == null ? Optional.empty() : Optional.of(minecraft.level.getDayTime());
-
         final int TICKS_PER_MC_DAY = 24000;
-        final int MAX_DAYS = 365;
+        ItemPropertyFunction wobbleFunction = ItemProperties.getProperty(Items.CLOCK, new ResourceLocation("time"));
+        requireNonNull(wobbleFunction, "The clock time function is missing! Is this the right Minecraft version?");
+
+        Supplier<Optional<Long>> timeGetter = () -> {
+            if (minecraft.level == null) {
+                return Optional.empty();
+            }
+
+            double dayPercentage = wobbleFunction.call(ItemStack.EMPTY, minecraft.level, minecraft.player);
+            return Optional.of(Math.round(dayPercentage * TICKS_PER_MC_DAY));
+        };
+
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(frameManager.getCurrentFrame())
                 .add(new CleanupComponent(closeMipmaps));
 
         if (modAnimationMetadata.isDaytimeSynced()) {
-            builder.add(new AnimationComponent(MAX_DAYS * TICKS_PER_MC_DAY, timeGetter, frameManager));
+            builder.add(new AnimationComponent(TICKS_PER_MC_DAY, timeGetter, frameManager));
         } else {
             builder.add(new AnimationComponent(frameManager));
         }
