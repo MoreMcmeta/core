@@ -186,7 +186,9 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 return Optional.empty();
             }
 
-            double dayPercentage = wobbleFunction.call(ItemStack.EMPTY, minecraft.level, minecraft.player);
+            // Adjust the time forwards since the clock function starts at noon
+            double dayPercentage = wobbleFunction.call(ItemStack.EMPTY, minecraft.level, minecraft.player) + 0.25;
+
             return Optional.of(Math.round(dayPercentage * TICKS_PER_MC_DAY));
         };
 
