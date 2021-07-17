@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.adapter.ChangingPointsAdapter;
+import io.github.soir20.moremcmeta.client.animation.WobbleFunction;
 import io.github.soir20.moremcmeta.client.resource.ModAnimationMetadataSection;
 import io.github.soir20.moremcmeta.client.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
@@ -31,6 +32,7 @@ import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
@@ -62,8 +64,10 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder> {
+    private static final int TICKS_PER_MC_DAY = 24000;
     private final Logger LOGGER;
     private final ChangingPointsAdapter POINT_READER;
+    private final WobbleFunction WOBBLE_FUNCTION;
 
     /**
      * Creates a new reader for animated textures.
@@ -72,6 +76,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
     public AnimatedTextureReader(Logger logger) {
         LOGGER = requireNonNull(logger, "Logger cannot be null");
         POINT_READER = new ChangingPointsAdapter();
+        WOBBLE_FUNCTION = new WobbleFunction();
     }
 
     /**
@@ -177,19 +182,14 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         Runnable closeMipmaps = () -> mipmaps.forEach(NativeImage::close);
 
         // Time retrieval
-        final int TICKS_PER_MC_DAY = 24000;
-        ItemPropertyFunction wobbleFunction = ItemProperties.getProperty(Items.CLOCK, new ResourceLocation("time"));
-        requireNonNull(wobbleFunction, "The clock time function is missing! Is this the right Minecraft version?");
-
         Supplier<Optional<Long>> timeGetter = () -> {
             if (minecraft.level == null) {
                 return Optional.empty();
             }
 
-            // Adjust the time forwards since the clock function starts at noon
-            double dayPercentage = wobbleFunction.call(ItemStack.EMPTY, minecraft.level, minecraft.player) + 0.25;
-
-            return Optional.of(Math.round(dayPercentage * TICKS_PER_MC_DAY));
+            ClientLevel level = minecraft.level;
+            long time = WOBBLE_FUNCTION.calculate(level.dayTime(), level.getGameTime(), level.dimensionType().natural());
+            return Optional.of(time);
         };
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
