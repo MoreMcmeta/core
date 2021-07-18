@@ -22,7 +22,8 @@ import net.minecraft.util.Mth;
 import java.util.Random;
 
 /**
- * Calculates transitions daytime-synced animations to the current time.
+ * Calculates transitions for syncing animations to the current time. Should be reused
+ * for all animated textures.
  * @author soir20
  */
 public class WobbleFunction {
