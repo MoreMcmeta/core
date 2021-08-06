@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.client.mixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
@@ -34,6 +35,7 @@ public interface MinecraftAccessor {
      * @param manager       the new resource manager to use
      */
     @Accessor("resourceManager")
+    @Mutable
     void setResourceManager(ReloadableResourceManager manager);
 
 }
