@@ -16,8 +16,8 @@
  */
 
 plugins {
-    id "architectury-plugin" version "3.1-SNAPSHOT"
-    id "dev.architectury.loom" version "0.7.2-SNAPSHOT" apply false
+    id "architectury-plugin" version "3.3-SNAPSHOT"
+    id "dev.architectury.loom" version "0.7.4-SNAPSHOT" apply false
 }
 
 architectury {
@@ -65,11 +65,7 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-
-        def targetVersion = 8
-        if (JavaVersion.current().isJava9Compatible()) {
-            options.release.set(targetVersion)
-        }
+        options.release = 16
     }
 
     java {
