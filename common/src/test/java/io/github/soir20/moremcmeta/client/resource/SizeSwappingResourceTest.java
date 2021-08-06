@@ -30,6 +30,8 @@ import org.junit.rules.ExpectedException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -455,7 +457,11 @@ public class SizeSwappingResourceTest {
                 new ByteArrayInputStream("{ \"animation\": { \"width\": 100, \"height\": 200 } }".getBytes()));
 
         AnimationMetadataSection metadata = wrapper.getMetadata(AnimationMetadataSection.SERIALIZER);
-        assertEquals(1, metadata.getUniqueFrameIndices().size());
+
+        Set<Integer> uniqueIndices = new HashSet<>();
+        metadata.forEachFrame((index, time) -> uniqueIndices.add(index));
+
+        assertEquals(1, uniqueIndices.size());
         assertEquals(100, metadata.getFrameWidth(-1));
         assertEquals(200, metadata.getFrameHeight(-1));
     }
@@ -470,7 +476,10 @@ public class SizeSwappingResourceTest {
 
         wrapper.getMetadata(AnimationMetadataSection.SERIALIZER);
         AnimationMetadataSection metadata = wrapper.getMetadata(AnimationMetadataSection.SERIALIZER);
-        assertEquals(1, metadata.getUniqueFrameIndices().size());
+        Set<Integer> uniqueIndices = new HashSet<>();
+        metadata.forEachFrame((index, time) -> uniqueIndices.add(index));
+
+        assertEquals(1, uniqueIndices.size());
         assertEquals(100, metadata.getFrameWidth(-1));
         assertEquals(200, metadata.getFrameHeight(-1));
     }

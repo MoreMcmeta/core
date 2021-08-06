@@ -83,6 +83,15 @@ public class SizeSwappingResource implements Resource {
     }
 
     /**
+     * Checks if this resource has any metadata (vanilla or for this mod).
+     * @return whether this resource has metadata
+     */
+    @Override
+    public boolean hasMetadata() {
+        return ORIGINAL.hasMetadata() || METADATA_STREAM != null;
+    }
+
+    /**
      * Gets metadata from the original resource or a custom empty animation metadata section.
      * @param serializer     metadata serializer
      * @param <T>                           metadata type
@@ -179,11 +188,10 @@ public class SizeSwappingResource implements Resource {
      */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof SizeSwappingResource)) {
+        if (!(other instanceof SizeSwappingResource otherResource)) {
             return false;
         }
 
-        SizeSwappingResource otherResource = (SizeSwappingResource) other;
         return ORIGINAL.equals(otherResource.ORIGINAL) && Objects.equals(METADATA_STREAM, otherResource.METADATA_STREAM);
     }
 

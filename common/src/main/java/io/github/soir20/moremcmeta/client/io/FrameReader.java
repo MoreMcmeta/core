@@ -23,6 +23,7 @@ import net.minecraft.client.resources.metadata.animation.AnimationMetadataSectio
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -68,7 +69,10 @@ public class FrameReader<F> {
         int numFramesX = imageWidth / frameWidth;
         int numFramesY = imageHeight / frameHeight;
 
-        if (metadata.getFrameCount() > 0) {
+        AtomicBoolean hasFrames = new AtomicBoolean(false);
+        metadata.forEachFrame((index, time) -> hasFrames.set(true));
+
+        if (hasFrames.get()) {
             return getPredefinedFrames(metadata, frameWidth, frameHeight, numFramesX, numFramesY);
         } else {
             return findFrames(metadata, frameWidth, frameHeight, numFramesX, numFramesY);
@@ -103,21 +107,18 @@ public class FrameReader<F> {
         // Cache frames so we can reuse them if they repeat
         Map<Integer, F> createdFramesByIndex = new HashMap<>();
 
-        for (int frame = 0; frame < metadata.getFrameCount(); frame++) {
-            int index = metadata.getFrameIndex(frame);
+        metadata.forEachFrame((index, time) -> {
 
             // Use cached frames
             if (createdFramesByIndex.containsKey(index)) {
                 frames.add(createdFramesByIndex.get(index));
-                continue;
+                return;
             }
 
             // If not already created, generate new frame
             if (index >= numFramesX * numFramesY) {
                 throw new IllegalArgumentException("Index " + index + " would put frame out of image bounds");
             }
-
-            int time = metadata.getFrameTime(frame);
 
             Pair<Integer, Integer> framePos = frameIndexToPosition(index, numFramesX);
             int xOffset = framePos.getFirst() * frameWidth;
@@ -130,7 +131,7 @@ public class FrameReader<F> {
 
             frames.add(nextFrame);
             createdFramesByIndex.put(index, nextFrame);
-        }
+        });
 
         return frames.build();
     }

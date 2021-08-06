@@ -209,14 +209,14 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
      * @return a reload instance for the current reload
      */
     @Override
-    public ReloadInstance createFullReload(Executor loadingExec, Executor appExec,
-                                           CompletableFuture<Unit> completableFuture, List<PackResources> packs) {
+    public ReloadInstance createReload(Executor loadingExec, Executor appExec,
+                                       CompletableFuture<Unit> completableFuture, List<PackResources> packs) {
         requireNonNull(loadingExec, "Loading executor cannot be null");
         requireNonNull(appExec, "Application executor cannot be null");
         requireNonNull(completableFuture, "Completable future must not be null");
         requireNonNull(packs, "List of resource packs must not be null");
         
-        ReloadInstance reload = ORIGINAL.createFullReload(loadingExec, appExec, completableFuture, packs);
+        ReloadInstance reload = ORIGINAL.createReload(loadingExec, appExec, completableFuture, packs);
         reload.done().thenRun(RELOAD_CALLBACK);
         return reload;
     }

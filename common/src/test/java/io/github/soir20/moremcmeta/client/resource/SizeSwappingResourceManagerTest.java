@@ -752,7 +752,7 @@ public class SizeSwappingResourceManagerTest {
             listenerCallback.complete("done");
             return CompletableFuture.allOf();
         });
-        wrapper.createFullReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
+        wrapper.createReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
 
         assertEquals("done", listenerCallback.get());
     }
@@ -767,7 +767,7 @@ public class SizeSwappingResourceManagerTest {
             listenerCallback.complete("done");
             return CompletableFuture.allOf();
         });
-        original.createFullReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
+        original.createReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
 
         assertEquals("done", listenerCallback.get());
     }
@@ -783,7 +783,7 @@ public class SizeSwappingResourceManagerTest {
 
         SizeSwappingResourceManager wrapper = new SizeSwappingResourceManager(original, () -> {});
 
-        wrapper.createFullReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
+        wrapper.createReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
 
         assertEquals("done", listenerCallback.get());
     }
@@ -798,7 +798,7 @@ public class SizeSwappingResourceManagerTest {
             return CompletableFuture.allOf();
         });
 
-        wrapper.createFullReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
+        wrapper.createReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
 
         assertEquals("done", listenerCallback.get());
     }
@@ -808,7 +808,7 @@ public class SizeSwappingResourceManagerTest {
         MockReloadableResourceManager original = new MockReloadableResourceManager();
         SizeSwappingResourceManager wrapper = new SizeSwappingResourceManager(original, () -> {});
         expectedException.expect(NullPointerException.class);
-        wrapper.createFullReload(null, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
+        wrapper.createReload(null, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
     }
 
     @Test
@@ -816,7 +816,7 @@ public class SizeSwappingResourceManagerTest {
         MockReloadableResourceManager original = new MockReloadableResourceManager();
         SizeSwappingResourceManager wrapper = new SizeSwappingResourceManager(original, () -> {});
         expectedException.expect(NullPointerException.class);
-        wrapper.createFullReload((cmd) -> {}, null, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
+        wrapper.createReload((cmd) -> {}, null, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
     }
 
     @Test
@@ -824,7 +824,7 @@ public class SizeSwappingResourceManagerTest {
         MockReloadableResourceManager original = new MockReloadableResourceManager();
         SizeSwappingResourceManager wrapper = new SizeSwappingResourceManager(original, () -> {});
         expectedException.expect(NullPointerException.class);
-        wrapper.createFullReload((cmd) -> {}, (cmd) -> {}, null, ImmutableList.of());
+        wrapper.createReload((cmd) -> {}, (cmd) -> {}, null, ImmutableList.of());
     }
 
     @Test
@@ -832,14 +832,14 @@ public class SizeSwappingResourceManagerTest {
         MockReloadableResourceManager original = new MockReloadableResourceManager();
         SizeSwappingResourceManager wrapper = new SizeSwappingResourceManager(original, () -> {});
         expectedException.expect(NullPointerException.class);
-        wrapper.createFullReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), null);
+        wrapper.createReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), null);
     }
 
     @Test
     public void reload_NoListeners_NoException() {
         MockReloadableResourceManager original = new MockReloadableResourceManager();
         SizeSwappingResourceManager wrapper = new SizeSwappingResourceManager(original, () -> {});
-        wrapper.createFullReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
+        wrapper.createReload((cmd) -> {}, (cmd) -> {}, CompletableFuture.completedFuture(Unit.INSTANCE), ImmutableList.of());
     }
 
     /**
