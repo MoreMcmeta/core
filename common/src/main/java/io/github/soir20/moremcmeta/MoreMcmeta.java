@@ -66,12 +66,10 @@ public abstract class MoreMcmeta {
 
         // Listener registration and resource manager replacement
         onResourceManagerInitialized((client) -> {
-            if (!(client.getResourceManager() instanceof SimpleReloadableResourceManager)) {
+            if (!(client.getResourceManager() instanceof SimpleReloadableResourceManager rscManager)) {
                 logger.error("Reload listener was not added because resource manager is not reloadable");
                 return;
             }
-
-            SimpleReloadableResourceManager rscManager = (SimpleReloadableResourceManager) client.getResourceManager();
 
             /* Even though this is not the normal way to register reload listeners in Fabric,
                registering our listener like a vanilla listener ensures it is executed

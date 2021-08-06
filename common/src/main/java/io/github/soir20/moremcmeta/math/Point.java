@@ -59,11 +59,9 @@ public class Point {
      */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof Point)) {
+        if (!(other instanceof Point otherPoint)) {
             return false;
         }
-
-        Point otherPoint = (Point) other;
 
         return X_POS == otherPoint.X_POS && Y_POS == otherPoint.Y_POS;
     }

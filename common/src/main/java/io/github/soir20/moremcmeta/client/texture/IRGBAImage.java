@@ -200,11 +200,10 @@ public interface IRGBAImage {
              */
             @Override
             public boolean equals(Object other) {
-                if (!(other instanceof VisibleRow)) {
+                if (!(other instanceof VisibleRow otherRow)) {
                     return false;
                 }
 
-                VisibleRow otherRow = (VisibleRow) other;
                 return X == otherRow.X && Y == otherRow.Y && WIDTH == ((VisibleRow) other).WIDTH;
             }
 
