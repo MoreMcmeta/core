@@ -32,18 +32,16 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.resource.IResourceType;
 import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -74,11 +72,8 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         /* Make sure the mod being absent on the other network side does not
            cause the client to display the server as incompatible. */
         ModLoadingContext.get().registerExtensionPoint(
-                ExtensionPoint.DISPLAYTEST,
-                () -> Pair.of(
-                        () -> FMLNetworkConstants.IGNORESERVERONLY,
-                        (a, b) -> true
-                )
+                IExtensionPoint.DisplayTest.class,
+                ()-> new IExtensionPoint.DisplayTest(() -> "anything", (remoteVersion, isServer)-> true)
         );
 
     }
@@ -128,7 +123,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
             TextureLoader<EventDrivenTexture.Builder> loader, Logger logger) {
 
-        return new ISelectiveResourceReloadListener() {
+        return new PreparableReloadListener() {
             private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
 
             @Override
