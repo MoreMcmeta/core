@@ -26,8 +26,8 @@ import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -39,9 +39,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.resource.IResourceType;
-import net.minecraftforge.resource.ISelectiveResourceReloadListener;
-import net.minecraftforge.resource.VanillaResourceType;
+import net.minecraftforge.fmllegacy.network.FMLNetworkConstants;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +47,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * The main mod class and entrypoint for Forge.
@@ -73,7 +70,10 @@ public final class MoreMcmetaForge extends MoreMcmeta {
            cause the client to display the server as incompatible. */
         ModLoadingContext.get().registerExtensionPoint(
                 IExtensionPoint.DisplayTest.class,
-                ()-> new IExtensionPoint.DisplayTest(() -> "anything", (remoteVersion, isServer)-> true)
+                ()-> new IExtensionPoint.DisplayTest(
+                        () -> FMLNetworkConstants.IGNORESERVERONLY,
+                        (remoteVersion, isServer)-> true
+                )
         );
 
     }
@@ -118,31 +118,29 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @param logger        a logger to write output
      * @return a reload listener that loads and queues animated textures
      */
+    @SuppressWarnings("deprecation")
     @Override
-    public PreparableReloadListener makeListener(
+    public ResourceManagerReloadListener makeListener(
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
             TextureLoader<EventDrivenTexture.Builder> loader, Logger logger) {
 
-        return new PreparableReloadListener() {
+        return new ResourceManagerReloadListener() {
             private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
 
             @Override
-            public void onResourceManagerReload(@NotNull ResourceManager manager,
-                                                @NotNull Predicate<IResourceType> predicate) {
+            public void onResourceManagerReload(@NotNull ResourceManager manager) {
+                Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
+                textures.putAll(loader.load(manager, "textures"));
+                textures.putAll(loader.load(manager, "optifine"));
 
-                if (predicate.test(VanillaResourceType.TEXTURES)) {
-                    Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
-                    textures.putAll(loader.load(manager, "textures"));
-                    textures.putAll(loader.load(manager, "optifine"));
+                LAST_TEXTURES_ADDED.keySet().forEach(texManager::unregister);
+                LAST_TEXTURES_ADDED.clear();
+                LAST_TEXTURES_ADDED.putAll(textures);
 
-                    LAST_TEXTURES_ADDED.keySet().forEach(texManager::unregister);
-                    LAST_TEXTURES_ADDED.clear();
-                    LAST_TEXTURES_ADDED.putAll(textures);
-
-                    textures.forEach(texManager::register);
-                }
+                textures.forEach(texManager::register);
             }
         };
+
     }
 
     /**
