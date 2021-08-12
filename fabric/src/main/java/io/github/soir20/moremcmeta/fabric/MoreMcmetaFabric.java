@@ -15,11 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta;
+package io.github.soir20.moremcmeta.fabric;
 
-import io.github.soir20.moremcmeta.client.event.ResourceManagerInitializedCallback;
-import io.github.soir20.moremcmeta.client.mixin.MinecraftAccessor;
-import io.github.soir20.moremcmeta.client.mixin.TextureManagerAccessor;
+import io.github.soir20.moremcmeta.MoreMcmeta;
+import io.github.soir20.moremcmeta.fabric.client.event.ResourceManagerInitializedCallback;
+import io.github.soir20.moremcmeta.fabric.client.mixin.MinecraftAccessor;
+import io.github.soir20.moremcmeta.fabric.client.mixin.TextureManagerAccessor;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;

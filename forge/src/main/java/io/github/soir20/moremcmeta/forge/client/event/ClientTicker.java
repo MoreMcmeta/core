@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.event;
+package io.github.soir20.moremcmeta.forge.client.event;
 
 import com.google.common.collect.ImmutableCollection;
 import io.github.soir20.moremcmeta.client.texture.CustomTickable;

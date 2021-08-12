@@ -17,7 +17,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "io.github.soir20.moremcmeta.MoreMcmetaFabric"
+      "io.github.soir20.moremcmeta.fabric.MoreMcmetaFabric"
     ]
   },
   "mixins": [

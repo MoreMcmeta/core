@@ -19,14 +19,14 @@ package client.event;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import io.github.soir20.moremcmeta.client.event.ClientTicker;
+import io.github.soir20.moremcmeta.forge.client.event.ClientTicker;
 import net.minecraftforge.event.TickEvent;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests using and stopping the client-side ticker.

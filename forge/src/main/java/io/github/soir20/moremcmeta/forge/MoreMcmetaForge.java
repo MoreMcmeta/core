@@ -15,10 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta;
+package io.github.soir20.moremcmeta.forge;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.event.ClientTicker;
+import io.github.soir20.moremcmeta.MoreMcmeta;
+import io.github.soir20.moremcmeta.forge.client.event.ClientTicker;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;

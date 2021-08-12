@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.mixin;
+package io.github.soir20.moremcmeta.fabric.client.mixin;
 
-import io.github.soir20.moremcmeta.client.event.ResourceManagerInitializedCallback;
+import io.github.soir20.moremcmeta.fabric.client.event.ResourceManagerInitializedCallback;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
