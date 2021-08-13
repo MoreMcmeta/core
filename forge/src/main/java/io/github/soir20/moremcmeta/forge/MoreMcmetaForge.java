@@ -172,7 +172,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         lastEvent.enqueueWork(() -> {
             try {
                 ObfuscationReflectionHelper.setPrivateValue(
-                        Minecraft.class, client, manager, "field_110451_am"
+                        Minecraft.class, client, manager, "f_91036_"
                 );
             } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
                 logger.error("Unable to access Minecraft's resource manager field. " +
