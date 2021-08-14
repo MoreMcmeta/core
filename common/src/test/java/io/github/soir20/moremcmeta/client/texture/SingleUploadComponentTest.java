@@ -20,7 +20,9 @@ package io.github.soir20.moremcmeta.client.texture;
 import io.github.soir20.moremcmeta.client.resource.MockResourceManager;
 import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
 
@@ -34,25 +36,39 @@ import static org.junit.Assert.*;
  * @author soir20
  */
 public class SingleUploadComponentTest {
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
     private static final ResourceManager MOCK_RESOURCE_MANAGER = new MockResourceManager(Collections.emptyList(),
             Collections.emptyList(), false);
 
     @Test
-    public void register_NotOnRenderThread_ImageNotPrepared() {
+    public void construct_NullPreparer_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new SingleUploadComponent(null);
+    }
+
+    @Test
+    public void register_FirstRegistration_TexturePrepared() {
+        boolean[] wasPrepared = {false};
+
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent()).getListeners());
-        builder.setImage(new MockRGBAImageFrame());
+        builder.add(() -> (
+                new SingleUploadComponent((id, mipmap, width, height) -> wasPrepared[0] = true)
+        ).getListeners());
+
+        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
-        // No exception means the image wasn't prepared
         texture.load(MOCK_RESOURCE_MANAGER);
 
+        assertTrue(wasPrepared[0]);
     }
 
     @Test
     public void upload_FirstUpload_FrameUploadedAtOrigin() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent()).getListeners());
+        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
         MockRGBAImageFrame frame = new MockRGBAImageFrame();
         builder.setImage(frame);
@@ -69,7 +85,7 @@ public class SingleUploadComponentTest {
     @Test
     public void upload_SecondUpload_FrameUploadedAtOriginAgain() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent()).getListeners());
+        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
         MockRGBAImageFrame frame = new MockRGBAImageFrame();
         builder.setImage(frame);

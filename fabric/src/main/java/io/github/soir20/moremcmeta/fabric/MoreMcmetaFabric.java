@@ -17,7 +17,10 @@
 
 package io.github.soir20.moremcmeta.fabric;
 
+import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
+import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
 import io.github.soir20.moremcmeta.fabric.client.event.ResourceManagerInitializedCallback;
 import io.github.soir20.moremcmeta.fabric.client.mixin.MinecraftAccessor;
 import io.github.soir20.moremcmeta.fabric.client.mixin.TextureManagerAccessor;
@@ -56,6 +59,20 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     @Override
     public void onInitializeClient() {
         start();
+    }
+
+    /**
+     * Gets the OpenGL preparer for new textures on this loader.
+     * @return the OpenGL preparer for this loader
+     */
+    public ITexturePreparer getPreparer() {
+        return (glId, mipmap, width, height) -> {
+            if (!RenderSystem.isOnRenderThreadOrInit()) {
+                RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(glId, mipmap, width, height));
+            } else {
+                TextureUtil.prepareImage(glId, mipmap, width, height);
+            }
+        };
     }
 
     /**

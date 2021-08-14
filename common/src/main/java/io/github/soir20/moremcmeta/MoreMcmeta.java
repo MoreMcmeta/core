@@ -23,6 +23,7 @@ import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
+import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
@@ -54,7 +55,7 @@ public abstract class MoreMcmeta {
 
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder(AtlasAdapter::new);
-        TextureFinisher finisher = new TextureFinisher(spriteFinder);
+        TextureFinisher finisher = new TextureFinisher(spriteFinder, getPreparer());
         LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager = new LazyTextureManager<>(
                 new TextureManagerAdapter(minecraft::getTextureManager, getUnregisterAction()),
                 finisher
@@ -85,6 +86,12 @@ public abstract class MoreMcmeta {
         startTicking(manager);
 
     }
+
+    /**
+     * Gets the OpenGL preparer for new textures on this loader.
+     * @return the OpenGL preparer for this loader
+     */
+    public abstract ITexturePreparer getPreparer();
 
     /**
      * Gets the action that should be executed to unregister a texture on a specific mod loader.

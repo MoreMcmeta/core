@@ -41,13 +41,20 @@ public class TextureFinisherTest {
     @Test
     public void construct_NullSpriteFinder_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new TextureFinisher(null);
+        new TextureFinisher(null, (id, mipmap, width, height) -> {});
+    }
+
+    @Test
+    public void construct_NullPreparer_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new TextureFinisher(new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty()), null);
     }
 
     @Test
     public void queue_NullLocation_NullPointerException() {
         TextureFinisher finisher = new TextureFinisher(
-                new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty())
+                new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty()),
+                (id, mipmap, width, height) -> {}
         );
         expectedException.expect(NullPointerException.class);
         finisher.queue(null, new EventDrivenTexture.Builder());
@@ -56,7 +63,8 @@ public class TextureFinisherTest {
     @Test
     public void queue_NullBuilder_NullPointerException() {
         TextureFinisher finisher = new TextureFinisher(
-                new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty())
+                new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty()),
+                (id, mipmap, width, height) -> {}
         );
         expectedException.expect(NullPointerException.class);
         finisher.queue(new ResourceLocation("dummy"), null);
@@ -67,7 +75,8 @@ public class TextureFinisherTest {
         TextureFinisher finisher = new TextureFinisher(
                 new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                         Optional.of(new MockSprite(spriteLocation, new Point(2, 3)))
-                )
+                ),
+                (id, mipmap, width, height) -> {}
         );
 
         Set<ResourceLocation> locations = new HashSet<>();
@@ -100,7 +109,8 @@ public class TextureFinisherTest {
     @Test
     public void queueAndFinish_AllSingles_SingleUploadComponentAdded() {
         TextureFinisher finisher = new TextureFinisher(
-                new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty())
+                new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty()),
+                (id, mipmap, width, height) -> {}
         );
 
         Set<ResourceLocation> locations = new HashSet<>();
@@ -133,7 +143,8 @@ public class TextureFinisherTest {
     @Test
     public void finish_NoneQueued_NoneFinished() {
         TextureFinisher finisher = new TextureFinisher(
-                new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty())
+                new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.empty()),
+                (id, mipmap, width, height) -> {}
         );
 
         assertTrue(finisher.finish().isEmpty());

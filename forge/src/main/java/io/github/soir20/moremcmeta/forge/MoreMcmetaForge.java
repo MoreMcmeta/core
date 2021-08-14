@@ -18,7 +18,10 @@
 package io.github.soir20.moremcmeta.forge;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
+import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
 import io.github.soir20.moremcmeta.forge.client.event.ClientTicker;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
@@ -89,6 +92,20 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     public void onPreInit(final FMLConstructModEvent event) {
         lastEvent = event;
         start();
+    }
+
+    /**
+     * Gets the OpenGL preparer for new textures on this loader.
+     * @return the OpenGL preparer for this loader
+     */
+    public ITexturePreparer getPreparer() {
+        return (glId, mipmap, width, height) -> {
+            if (!RenderSystem.isOnRenderThreadOrInit()) {
+                RenderSystem.recordRenderCall(() -> TextureUtil.m_85287_(glId, mipmap, width, height));
+            } else {
+                TextureUtil.m_85287_(glId, mipmap, width, height);
+            }
+        };
     }
 
     /**
