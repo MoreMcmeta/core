@@ -386,6 +386,44 @@ public class SizeSwappingResourceTest {
     }
 
     @Test
+    public void hasMetadata_HasVanillaMetadataNoModMetadata_True() {
+        Resource original = new SimpleResource("dummy", new ResourceLocation("dummy-location"),
+                EMPTY_STREAM, EMPTY_STREAM);
+
+        SizeSwappingResource wrapper = new SizeSwappingResource(original, null);
+        assertTrue(wrapper.hasMetadata());
+    }
+
+    @Test
+    public void hasMetadata_HasVanillaMetadataAndModMetadata_True() {
+        Resource original = new SimpleResource("dummy", new ResourceLocation("dummy-location"),
+                EMPTY_STREAM, EMPTY_STREAM);
+        InputStream stream = new ByteArrayInputStream("{ \"animation\": { \"frametime\": 4 } }".getBytes());
+
+        SizeSwappingResource wrapper = new SizeSwappingResource(original, stream);
+        assertTrue(wrapper.hasMetadata());
+    }
+
+    @Test
+    public void hasMetadata_NoVanillaMetadataHasModMetadata_True() {
+        Resource original = new SimpleResource("dummy", new ResourceLocation("dummy-location"),
+                EMPTY_STREAM, null);
+        InputStream stream = new ByteArrayInputStream("{ \"animation\": { \"frametime\": 4 } }".getBytes());
+
+        SizeSwappingResource wrapper = new SizeSwappingResource(original, stream);
+        assertTrue(wrapper.hasMetadata());
+    }
+
+    @Test
+    public void hasMetadata_NoVanillaMetadataNoModMetadata_False() {
+        Resource original = new SimpleResource("dummy", new ResourceLocation("dummy-location"),
+                EMPTY_STREAM, null);
+
+        SizeSwappingResource wrapper = new SizeSwappingResource(original, null);
+        assertFalse(wrapper.hasMetadata());
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void getMetadata_OriginalHasMetadataStreamNoModMetadata_SameAsOriginal() {
         Resource original = new SimpleResource("dummy", new ResourceLocation("dummy-location"),
@@ -422,17 +460,17 @@ public class SizeSwappingResourceTest {
                 new ByteArrayInputStream("{ \"animation\": { \"frametime\": 10 } }".getBytes()));
 
         MetadataSectionSerializer<AnimationMetadataSection> mockSerializer =
-                new MetadataSectionSerializer<AnimationMetadataSection>() {
-            @Override
-            public String getMetadataSectionName() {
-                return "animation";
-            }
+                new MetadataSectionSerializer<>() {
+                    @Override
+                    public String getMetadataSectionName() {
+                        return "animation";
+                    }
 
-            @Override
-            public AnimationMetadataSection fromJson(JsonObject jsonObject) {
-                return AnimationMetadataSection.SERIALIZER.fromJson(jsonObject);
-            }
-        };
+                    @Override
+                    public AnimationMetadataSection fromJson(JsonObject jsonObject) {
+                        return AnimationMetadataSection.SERIALIZER.fromJson(jsonObject);
+                    }
+                };
 
         assertNull(wrapper.getMetadata(mockSerializer));
     }
