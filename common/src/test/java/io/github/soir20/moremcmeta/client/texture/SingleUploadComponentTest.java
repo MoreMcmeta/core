@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.client.resource.MockResourceManager;
 import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -38,31 +39,11 @@ import static org.junit.Assert.*;
 public class SingleUploadComponentTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-    private static final ResourceManager MOCK_RESOURCE_MANAGER = new MockResourceManager(Collections.emptyList(),
-            Collections.emptyList(), false);
 
     @Test
     public void construct_NullPreparer_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new SingleUploadComponent(null);
-    }
-
-    @Test
-    public void register_FirstRegistration_TexturePrepared() {
-        boolean[] wasPrepared = {false};
-
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (
-                new SingleUploadComponent((id, mipmap, width, height) -> wasPrepared[0] = true)
-        ).getListeners());
-
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
-        builder.setImage(frame);
-        EventDrivenTexture texture = builder.build();
-
-        texture.load(MOCK_RESOURCE_MANAGER);
-
-        assertTrue(wasPrepared[0]);
     }
 
     @Test

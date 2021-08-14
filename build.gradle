@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id "architectury-plugin" version "3.3-SNAPSHOT"
@@ -47,11 +48,26 @@ subprojects {
 
     build.dependsOn(signJar)
 
+    def lwjglNatives
+    switch (OperatingSystem.current()) {
+        case OperatingSystem.LINUX:
+            lwjglNatives = "natives-linux"
+            break
+        case OperatingSystem.MAC_OS:
+            lwjglNatives = "natives-macos"
+            break
+        case OperatingSystem.WINDOWS:
+            lwjglNatives = "natives-windows"
+            break
+    }
+
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraftVersion}"
         mappings loom.officialMojangMappings()
 
         testImplementation "junit:junit:${rootProject.junitVersion}"
+        testImplementation "org.lwjgl:lwjgl:${rootProject.lwjglVersion}"
+        testRuntimeOnly "org.lwjgl:lwjgl:${rootProject.lwjglVersion}:${lwjglNatives}"
     }
 }
 

@@ -89,23 +89,6 @@ public class TextureManagerAdapterTest {
     }
 
     @Test
-    public void register_TextureAlreadyRegistered_NewTextureRegistered() {
-        AbstractTexture firstTexture = new MockAnimatedTexture();
-        AbstractTexture secondTexture = new MockAnimatedTexture();
-
-        TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
-        texManager.register(new ResourceLocation("dummy.png"), firstTexture);
-
-        TextureManagerAdapter adapter = new TextureManagerAdapter(() -> texManager, (manager, location) -> {});
-
-        /* This is a bit hacky, but we expect a linker error because the manager
-        uses code that is only usable on the render thread when an old texture is closed. */
-        expectedException.expect(LinkageError.class);
-
-        adapter.register(new ResourceLocation("dummy.png"), secondTexture);
-    }
-
-    @Test
     public void unregister_NullManagerSupplied_NullPointerException() {
         TextureManagerAdapter adapter = new TextureManagerAdapter(() -> null,
                 (manager, location) -> {});
