@@ -17,6 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +50,15 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     @Override
     public void bind() {
-        super.bind();
+
+        /* We need to get the ID from the superclass, so we don't get stuck in an infinite
+           loop if the texture isn't bound. */
+        if (!RenderSystem.isOnRenderThreadOrInit()) {
+            RenderSystem.recordRenderCall(() -> GlStateManager._bindTexture(super.getId()));
+        } else {
+            GlStateManager._bindTexture(super.getId());
+        }
+
         runListeners(TextureListener.Type.BIND);
 
         if (CURRENT_STATE.hasUpdatedSinceUpload) {
@@ -88,6 +98,37 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     @Override
     public void close() {
         runListeners(TextureListener.Type.CLOSE);
+    }
+
+    /**
+     * Gets the OpenGL ID of this texture. Released IDs may be reused.
+     * @return the texture's OpenGL ID
+     */
+    @Override
+    public int getId() {
+        int id = super.getId();
+
+        /* Check if this texture is currently bound. If it isn't bound, the texture is
+           probably being used in RenderSystem#setShaderTexture(). That RenderSystem method
+           binds the ID directly instead of this texture, preventing the title screen
+           textures from animating normally. */
+        if (!isCurrentlyBound()) {
+            bind();
+        }
+
+        return id;
+    }
+
+    /**
+     * Checks if this texture is currently bound to OpenGL.
+     * @return whether this texture is bound
+     */
+    private boolean isCurrentlyBound() {
+
+        // The GlStateManager adds this character when it returns the active texture
+        char offset = '蓀';
+
+        return GlStateManager._getTextureId(GlStateManager._getActiveTexture() - offset) == id;
     }
 
     /**
