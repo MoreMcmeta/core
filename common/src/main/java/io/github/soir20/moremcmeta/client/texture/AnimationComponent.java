@@ -76,7 +76,7 @@ public class AnimationComponent implements ITextureComponent {
 
                     if (timeOptional.isPresent()) {
                         long currentTime = timeOptional.get();
-                        int ticksToAdd = (int) Math.floorMod(currentTime - ticks, SYNC_TICKS);
+                        int ticksToAdd = Math.floorMod(currentTime - ticks, SYNC_TICKS);
 
                         ticks += ticksToAdd;
                         FRAME_MANAGER.tick(ticksToAdd);

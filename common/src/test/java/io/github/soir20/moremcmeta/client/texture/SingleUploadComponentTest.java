@@ -17,15 +17,10 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.soir20.moremcmeta.client.resource.MockResourceManager;
 import io.github.soir20.moremcmeta.math.Point;
-import net.minecraft.server.packs.resources.ResourceManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Collections;
 
 import static org.junit.Assert.*;
 

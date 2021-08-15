@@ -141,7 +141,7 @@ public class AnimationFrameManagerTest {
         ImmutableList<Integer> mockFrames = mockFramesBuilder.build();
 
         AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames, (frame) -> 10);
-        assertEquals(new Integer(0), manager.getCurrentFrame());
+        assertEquals(Integer.valueOf(0), manager.getCurrentFrame());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class AnimationFrameManagerTest {
             for (int tick = 0; tick < frameLength; tick++) {
                 manager.tick();
             }
-            assertEquals(new Integer(nextFrame), manager.getCurrentFrame());
+            assertEquals(Integer.valueOf(nextFrame), manager.getCurrentFrame());
         }
     }
 
@@ -180,7 +180,7 @@ public class AnimationFrameManagerTest {
         for (int tick = 0; tick < frameLength * 3; tick++) {
             manager.tick();
         }
-        assertEquals(new Integer(3), manager.getCurrentFrame());
+        assertEquals(Integer.valueOf(3), manager.getCurrentFrame());
     }
 
     @Test
@@ -198,7 +198,7 @@ public class AnimationFrameManagerTest {
             manager.tick();
         }
 
-        assertEquals(new Integer(1), manager.getCurrentFrame());
+        assertEquals(Integer.valueOf(1), manager.getCurrentFrame());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class AnimationFrameManagerTest {
         AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames, (frame) -> frameLength);
         for (int tick = 1; tick < frameLength; tick++) {
             manager.tick();
-            assertEquals(new Integer(1), manager.getCurrentFrame());
+            assertEquals(Integer.valueOf(1), manager.getCurrentFrame());
         }
     }
 
@@ -307,7 +307,7 @@ public class AnimationFrameManagerTest {
 
         frameManager.tick(15);
         frameManager.tick(0);
-        assertEquals(new Integer(2), frameManager.getCurrentFrame());
+        assertEquals(Integer.valueOf(2), frameManager.getCurrentFrame());
     }
 
     @Test
@@ -326,7 +326,7 @@ public class AnimationFrameManagerTest {
             for (int tick = 0; tick < frameLength / 5; tick++) {
                 manager.tick(5);
             }
-            assertEquals(new Integer(nextFrame), manager.getCurrentFrame());
+            assertEquals(Integer.valueOf(nextFrame), manager.getCurrentFrame());
         }
     }
 
@@ -346,7 +346,7 @@ public class AnimationFrameManagerTest {
         for (int tick = 0; tick < (frameLength * 3) / 5; tick++) {
             manager.tick(5);
         }
-        assertEquals(new Integer(3), manager.getCurrentFrame());
+        assertEquals(Integer.valueOf(3), manager.getCurrentFrame());
     }
 
     @Test
@@ -364,7 +364,7 @@ public class AnimationFrameManagerTest {
             manager.tick(5);
         }
 
-        assertEquals(new Integer(1), manager.getCurrentFrame());
+        assertEquals(Integer.valueOf(1), manager.getCurrentFrame());
     }
 
     @Test
@@ -380,7 +380,7 @@ public class AnimationFrameManagerTest {
         AnimationFrameManager<Integer> manager = new AnimationFrameManager<>(mockFrames, (frame) -> frameLength);
         for (int tick = 1; tick < frameLength / 5; tick++) {
             manager.tick(5);
-            assertEquals(new Integer(1), manager.getCurrentFrame());
+            assertEquals(Integer.valueOf(1), manager.getCurrentFrame());
         }
     }
 
