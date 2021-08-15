@@ -43,6 +43,7 @@ import static java.util.Objects.requireNonNull;
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
     private final Map<TextureListener.Type, List<TextureListener>> LISTENERS;
     private final TextureState CURRENT_STATE;
+    private boolean registered;
 
     /**
      * Binds this texture or the texture it proxies to OpenGL. Fires upload listeners
@@ -74,6 +75,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     @Override
     public void load(@Nullable ResourceManager resourceManager) {
         runListeners(TextureListener.Type.REGISTRATION);
+        registered = true;
     }
 
     /**
@@ -112,7 +114,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
            probably being used in RenderSystem#setShaderTexture(). That RenderSystem method
            binds the ID directly instead of this texture, preventing the title screen
            textures from animating normally. */
-        if (!isCurrentlyBound()) {
+        if (!isCurrentlyBound() && registered) {
             bind();
         }
 
