@@ -20,25 +20,20 @@ package io.github.soir20.moremcmeta.client.resource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.Unit;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,7 +48,6 @@ import static java.util.Objects.requireNonNull;
 public class SizeSwappingResourceManager extends SimpleReloadableResourceManager {
     private static final String EXTENSION = ".moremcmeta";
 
-    private final SimpleReloadableResourceManager ORIGINAL;
     private final Runnable RELOAD_CALLBACK;
 
     /**
@@ -67,27 +61,14 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
         // We only use the client-side resource manager
         super(PackType.CLIENT_RESOURCES);
 
-        ORIGINAL = requireNonNull(original, "Original resource manager cannot be null");
+        requireNonNull(original, "Original resource manager cannot be null");
+
+        namespacedPacks.putAll(original.namespacedPacks);
+        listeners.addAll(original.listeners);
+        namespaces.addAll(original.namespaces);
+        packs.addAll(original.packs);
+
         RELOAD_CALLBACK = requireNonNull(reloadCallback, "Callback cannot be null");
-    }
-
-    /**
-     * Adds a resource pack to the original manager.
-     * @param packResources     pack to add
-     */
-    @Override
-    public void add(PackResources packResources) {
-        requireNonNull(packResources, "Pack resources cannot be null");
-        ORIGINAL.add(packResources);
-    }
-
-    /**
-     * Gets the original manager's namespaces.
-     * @return the original manager's namespaces
-     */
-    @Override
-    public Set<String> getNamespaces() {
-        return ORIGINAL.getNamespaces();
     }
 
     /**
@@ -101,10 +82,10 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     public Resource getResource(ResourceLocation resourceLocation) throws IOException {
         requireNonNull(resourceLocation, "Location cannot be null");
 
-        Resource resource = ORIGINAL.getResource(resourceLocation);
+        Resource resource = super.getResource(resourceLocation);
         ResourceLocation metadataLoc = getModMetadataLocation(resourceLocation);
-        if (resourceLocation.getPath().endsWith(".png") && ORIGINAL.hasResource(metadataLoc)) {
-            Resource metadataResource = ORIGINAL.getResource(metadataLoc);
+        if (resourceLocation.getPath().endsWith(".png") && hasResource(metadataLoc)) {
+            Resource metadataResource = super.getResource(metadataLoc);
 
             if (metadataResource.getSourceName().equals(resource.getSourceName())) {
                 InputStream metadataStream = metadataResource.getInputStream();
@@ -113,17 +94,6 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
         }
 
         return resource;
-    }
-
-    /**
-     * Determines whether the original manager has a resource.
-     * @param resourceLocation      the location to check
-     * @return whether the original manager has this resource
-     */
-    @Override
-    public boolean hasResource(ResourceLocation resourceLocation) {
-        requireNonNull(resourceLocation, "Location cannot be null");
-        return ORIGINAL.hasResource(resourceLocation);
     }
 
     /**
@@ -139,9 +109,9 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
 
         ResourceLocation metadataLoc = getModMetadataLocation(resourceLocation);
 
-        List<Resource> resources = ORIGINAL.getResources(resourceLocation);
-        if (resourceLocation.getPath().endsWith(".png") && ORIGINAL.hasResource(metadataLoc)) {
-            Map<String, Resource> modMetadataPacks = ORIGINAL.getResources(metadataLoc).stream()
+        List<Resource> resources = super.getResources(resourceLocation);
+        if (resourceLocation.getPath().endsWith(".png") && hasResource(metadataLoc)) {
+            Map<String, Resource> modMetadataPacks = super.getResources(metadataLoc).stream()
                     .collect(Collectors.toMap(Resource::getSourceName, Function.identity()));
 
             Predicate<Resource> hasModMetadata = (resource) -> modMetadataPacks.containsKey(resource.getSourceName());
@@ -154,49 +124,6 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
         }
 
         return resources;
-    }
-
-    /**
-     * Gets a list of resource locations from the original manager.
-     * @param path          the path to look for resources in
-     * @param predicate     test for file name
-     * @return all resources in the original manager that meet the given criteria
-     */
-    @Override
-    public Collection<ResourceLocation> listResources(String path, Predicate<String> predicate) {
-        requireNonNull(path, "Path cannot be null");
-        requireNonNull(predicate, "File name predicate cannot be null");
-        return ORIGINAL.listResources(path, predicate);
-    }
-
-    /**
-     * Closes the original manager.
-     */
-    @Override
-    public void close() {
-        ORIGINAL.close();
-    }
-
-    /**
-     * Registers a reload listener. Listeners will execute with this wrapper as their parameter.
-     * Listeners registered directly to the original manager (and not through this method) before
-     * or after it was original will execute with the original manager as their parameter.
-     * The original manager is aware of any listeners registered here.
-     * @param preparableReloadListener      listener to add
-     */
-    @Override
-    public void registerReloadListener(PreparableReloadListener preparableReloadListener) {
-        requireNonNull(preparableReloadListener, "Reload listener cannot be null");
-        
-        ResourceManager thisManager = this;
-
-        ORIGINAL.registerReloadListener(
-                (preparationBarrier, resourceManager, profilerFiller, profilerFiller2, executor, executor2) ->
-                        preparableReloadListener.reload(
-                                preparationBarrier, thisManager, profilerFiller,
-                                profilerFiller2, executor, executor2
-                        )
-        );
     }
 
     /**
@@ -216,18 +143,9 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
         requireNonNull(completableFuture, "Completable future must not be null");
         requireNonNull(packs, "List of resource packs must not be null");
         
-        ReloadInstance reload = ORIGINAL.createReload(loadingExec, appExec, completableFuture, packs);
+        ReloadInstance reload = super.createReload(loadingExec, appExec, completableFuture, packs);
         reload.done().thenRun(RELOAD_CALLBACK);
         return reload;
-    }
-
-    /**
-     * Gets all the packs in the original manager.
-     * @return all the packs in the original manager
-     */
-    @Override
-    public Stream<PackResources> listPacks() {
-        return ORIGINAL.listPacks();
     }
 
     /**
