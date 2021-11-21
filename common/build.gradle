@@ -21,6 +21,16 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabricLoaderVersion}"
 }
 
+loom {
+    accessWidener = file("src/main/resources/moremcmeta.accesswidener")
+}
+
+remapJar {
+    afterEvaluate {
+        remapAccessWidener = false
+    }
+}
+
 architectury {
     injectInjectables = false
     common()

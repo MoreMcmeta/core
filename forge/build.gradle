@@ -51,6 +51,7 @@ processResources {
 }
 
 shadowJar {
+    exclude "moremcmeta.accesswidener"
     exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadowCommon]

@@ -1,0 +1,3 @@
+accessWidener	v1	named
+accessible field net/minecraft/server/packs/resources/SimpleReloadableResourceManager namespacedPacks Ljava/util/Map;
+accessible field net/minecraft/server/packs/resources/SimpleReloadableResourceManager listeners Ljava/util/List;
