@@ -17,15 +17,25 @@
 
 package io.github.soir20.moremcmeta.fabric.client.mixin;
 
-import net.minecraft.client.gui.screens.LoadingOverlay;
-import net.minecraft.server.packs.resources.ReloadInstance;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(LoadingOverlay.class)
-public interface LoadingOverlayAccessor {
+/**
+ * Allows the resource manager in {@link Minecraft} to be replaced.
+ * @author soir20
+ */
+@Mixin(Minecraft.class)
+public interface MinecraftAccessor {
 
-    @Accessor("reload")
-    ReloadInstance getReloadInstance();
+    /**
+     * Sets Minecraft's resource manager.
+     * @param manager       the new resource manager to use
+     */
+    @Accessor("resourceManager")
+    @Mutable
+    void setResourceManager(ReloadableResourceManager manager);
 
 }

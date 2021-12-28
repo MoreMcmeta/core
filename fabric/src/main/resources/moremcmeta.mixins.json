@@ -6,10 +6,9 @@
   "mixins": [
   ],
   "client": [
-    "PackRepositoryAccessor",
+    "MinecraftAccessor",
     "ManagerInitializationMixin",
-    "TextureManagerAccessor",
-    "LoadingOverlayAccessor"
+    "TextureManagerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

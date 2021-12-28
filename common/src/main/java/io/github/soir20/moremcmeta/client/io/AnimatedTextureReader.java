@@ -76,8 +76,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
     }
 
     /**
-     * Reads an {@link EventDrivenTexture}, which is guaranteed to have its initial image, animation, and cleanup
-     * components. It is left in builder form so that other components, like upload components, can be added.
+     * Reads an {@link EventDrivenTexture}.
      * @param textureStream           input stream with image data
      * @param metadataStream          input stream with texture and animation properties
      * @return  an animated texture based on the provided data
@@ -253,10 +252,6 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
                 to.setPixelRGBA(xPos, yPos, from.getPixelRGBA(xPos, yPos));
             }
         }
-    }
-
-    public static class ReaderOutput {
-
     }
 
 }

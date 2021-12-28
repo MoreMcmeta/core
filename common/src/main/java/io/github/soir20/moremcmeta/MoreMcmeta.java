@@ -20,7 +20,7 @@ package io.github.soir20.moremcmeta;
 import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.client.adapter.TextureManagerAdapter;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
-import io.github.soir20.moremcmeta.client.resource.ModRepositorySource;
+import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
@@ -30,9 +30,7 @@ import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,16 +72,14 @@ public abstract class MoreMcmeta {
                 return;
             }
 
-            ModRepositorySource packRepository = new ModRepositorySource();
-
             /* Even though this is not the normal way to register reload listeners in Fabric,
                registering our listener like a vanilla listener ensures it is executed
                before the TextureManager resets its textures. This is the least invasive way to
                animate preloaded title screen textures. */
-            rscManager.registerReloadListener(makeListener(manager, loader, packRepository, logger));
+            rscManager.registerReloadListener(makeListener(manager, loader, logger));
             logger.debug("Added texture reload listener");
 
-            //addPackRepository(client, packRepository, logger);
+            replaceResourceManager(client, new SizeSwappingResourceManager(rscManager, manager::finishQueued), logger);
         });
 
         // Enable animation by ticking the manager
@@ -118,24 +114,17 @@ public abstract class MoreMcmeta {
      */
     public abstract PreparableReloadListener makeListener(
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
-            TextureLoader<EventDrivenTexture.Builder> loader,
-            ModRepositorySource packRepository,
-            Logger logger
+            TextureLoader<EventDrivenTexture.Builder> loader, Logger logger
     );
 
     /**
      * Replaces the {@link net.minecraft.server.packs.resources.SimpleReloadableResourceManager}
      * with the mod's custom one in a mod loader.
      * @param client        the Minecraft client
-     * @param repository    the manager that should be made Minecraft's resource manager
+     * @param manager       the manager that should be made Minecraft's resource manager
      * @param logger        a logger to write output
      */
-    public abstract void addPackRepository(Minecraft client, RepositorySource repository, Logger logger);
-
-    public void addCompletedReloadCallback(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager,
-                                           ReloadInstance reloadInstance) {
-        reloadInstance.done().thenRun(manager::finishQueued);
-    }
+    public abstract void replaceResourceManager(Minecraft client, SizeSwappingResourceManager manager, Logger logger);
 
     /**
      * Begins ticking the {@link LazyTextureManager} on a mod loader.

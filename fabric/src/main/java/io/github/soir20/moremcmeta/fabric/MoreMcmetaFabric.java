@@ -17,17 +17,14 @@
 
 package io.github.soir20.moremcmeta.fabric;
 
-import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
-import io.github.soir20.moremcmeta.client.resource.DisableVanillaSpriteAnimationPack;
-import io.github.soir20.moremcmeta.client.resource.ModRepositorySource;
 import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
 import io.github.soir20.moremcmeta.fabric.client.event.ResourceManagerInitializedCallback;
-import io.github.soir20.moremcmeta.fabric.client.mixin.LoadingOverlayAccessor;
-import io.github.soir20.moremcmeta.fabric.client.mixin.PackRepositoryAccessor;
+import io.github.soir20.moremcmeta.fabric.client.mixin.MinecraftAccessor;
 import io.github.soir20.moremcmeta.fabric.client.mixin.TextureManagerAccessor;
+import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
@@ -35,15 +32,10 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.LoadingOverlay;
-import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.Logger;
 
@@ -115,11 +107,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     @Override
     public PreparableReloadListener makeListener(
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
-            TextureLoader<EventDrivenTexture.Builder> loader,
-            ModRepositorySource packRepository,
-            Logger logger) {
-
-        MoreMcmeta initializer = this;
+            TextureLoader<EventDrivenTexture.Builder> loader, Logger logger) {
 
         return new SimpleResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>>() {
             private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
@@ -133,18 +121,10 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
             public CompletableFuture<Map<ResourceLocation, EventDrivenTexture.Builder>> load(ResourceManager manager,
                                                                                              ProfilerFiller profiler,
                                                                                              Executor executor) {
-                Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
-                ((SimpleReloadableResourceManager) manager).add(new DisableVanillaSpriteAnimationPack(textures));
-
-                packRepository.reload();
-
                 return CompletableFuture.supplyAsync(() -> {
-
+                    Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
                     textures.putAll(loader.load(manager, "textures"));
                     textures.putAll(loader.load(manager, "optifine"));
-
-                    packRepository.setTextures(textures);
-
                     return textures;
                 }, executor);
             }
@@ -153,15 +133,6 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
             public CompletableFuture<Void> apply(Map<ResourceLocation, EventDrivenTexture.Builder> data,
                                                  ResourceManager manager, ProfilerFiller profiler, Executor executor) {
                 return CompletableFuture.runAsync(() -> {
-                    Overlay overlay = Minecraft.getInstance().getOverlay();
-                    if (overlay instanceof LoadingOverlay) {
-                        ReloadInstance reloadInstance = ((LoadingOverlayAccessor) overlay).getReloadInstance();
-                        initializer.addCompletedReloadCallback(texManager, reloadInstance);
-                    } else {
-                        logger.error("Reload instance not found during reload. This shouldn't be possible! " +
-                                "Textures will be broken.");
-                    }
-
                     LAST_TEXTURES_ADDED.keySet().forEach(texManager::unregister);
                     LAST_TEXTURES_ADDED.clear();
                     LAST_TEXTURES_ADDED.putAll(data);
@@ -176,19 +147,13 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * Replaces the {@link net.minecraft.server.packs.resources.SimpleReloadableResourceManager}
      * with the mod's custom one in Fabric.
      * @param client        the Minecraft client
-     * @param repository    the manager that should be made Minecraft's resource manager
+     * @param manager       the manager that should be made Minecraft's resource manager
      * @param logger        a logger to write output
      */
     @Override
-    public void addPackRepository(Minecraft client, RepositorySource repository, Logger logger) {
-        PackRepositoryAccessor accessor = (PackRepositoryAccessor) client.getResourcePackRepository();
-
-        // Vanilla sources set is immutable, so we can't add to it directly
-        ImmutableSet.Builder<RepositorySource> sources = new ImmutableSet.Builder<>();
-        sources.addAll(accessor.getSources());
-        sources.add(repository);
-
-        accessor.setSources(sources.build());
+    public void replaceResourceManager(Minecraft client, SizeSwappingResourceManager manager, Logger logger) {
+        MinecraftAccessor accessor = (MinecraftAccessor) client;
+        accessor.setResourceManager(manager);
     }
 
     /**
