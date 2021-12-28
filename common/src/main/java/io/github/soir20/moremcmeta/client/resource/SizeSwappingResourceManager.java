@@ -17,25 +17,21 @@
 
 package io.github.soir20.moremcmeta.client.resource;
 
+import com.mojang.datafixers.util.Pair;
+import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
+import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
-import net.minecraft.util.Unit;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,35 +46,20 @@ import static java.util.Objects.requireNonNull;
  * with other mods that expect a {@link SimpleReloadableResourceManager}.
  * @author soir20
  */
-public class SizeSwappingResourceManager extends SimpleReloadableResourceManager {
+public class SizeSwappingResourceManager implements ResourceManager {
     private static final String EXTENSION = ".moremcmeta";
 
-    private final SimpleReloadableResourceManager ORIGINAL;
-    private final Runnable RELOAD_CALLBACK;
+    private final ResourceManager ORIGINAL;
+    private final Map<ResourceLocation, EventDrivenTexture.Builder> TEXTURES;
 
     /**
      * Creates a new size swapping resource manager wrapper.
      * @param original          original resource manager to wrap
-     * @param reloadCallback    callback to run once all resource reloading has finished and
-     *                          all listeners have executed
      */
-    public SizeSwappingResourceManager(SimpleReloadableResourceManager original, Runnable reloadCallback) {
-
-        // We only use the client-side resource manager
-        super(PackType.CLIENT_RESOURCES);
-
+    public SizeSwappingResourceManager(ResourceManager original,
+                                       Map<ResourceLocation, EventDrivenTexture.Builder> textures) {
         ORIGINAL = requireNonNull(original, "Original resource manager cannot be null");
-        RELOAD_CALLBACK = requireNonNull(reloadCallback, "Callback cannot be null");
-    }
-
-    /**
-     * Adds a resource pack to the original manager.
-     * @param packResources     pack to add
-     */
-    @Override
-    public void add(PackResources packResources) {
-        requireNonNull(packResources, "Pack resources cannot be null");
-        ORIGINAL.add(packResources);
+        TEXTURES = requireNonNull(textures, "Textures cannot be null");
     }
 
     /**
@@ -101,18 +82,18 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     public Resource getResource(ResourceLocation resourceLocation) throws IOException {
         requireNonNull(resourceLocation, "Location cannot be null");
 
-        Resource resource = ORIGINAL.getResource(resourceLocation);
-        ResourceLocation metadataLoc = getModMetadataLocation(resourceLocation);
-        if (resourceLocation.getPath().endsWith(".png") && ORIGINAL.hasResource(metadataLoc)) {
-            Resource metadataResource = ORIGINAL.getResource(metadataLoc);
+        System.out.println(resourceLocation);
 
-            if (metadataResource.getSourceName().equals(resource.getSourceName())) {
-                InputStream metadataStream = metadataResource.getInputStream();
-                resource = new SizeSwappingResource(resource, metadataStream);
-            }
+        Resource originalResource = ORIGINAL.getResource(resourceLocation);
+        if (!TEXTURES.containsKey(resourceLocation)) {
+            return originalResource;
         }
 
-        return resource;
+        Pair<Integer, Integer> frameSize = getFrameSize(resourceLocation);
+        int frameWidth = frameSize.getFirst();
+        int frameHeight = frameSize.getSecond();
+
+        return new SizeSwappingResource(originalResource, frameWidth, frameHeight);
     }
 
     /**
@@ -140,16 +121,17 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
         ResourceLocation metadataLoc = getModMetadataLocation(resourceLocation);
 
         List<Resource> resources = ORIGINAL.getResources(resourceLocation);
-        if (resourceLocation.getPath().endsWith(".png") && ORIGINAL.hasResource(metadataLoc)) {
-            Map<String, Resource> modMetadataPacks = ORIGINAL.getResources(metadataLoc).stream()
-                    .collect(Collectors.toMap(Resource::getSourceName, Function.identity()));
+        if (TEXTURES.containsKey(resourceLocation)) {
+            Pair<Integer, Integer> frameSize = getFrameSize(resourceLocation);
+            int frameWidth = frameSize.getFirst();
+            int frameHeight = frameSize.getSecond();
 
-            Predicate<Resource> hasModMetadata = (resource) -> modMetadataPacks.containsKey(resource.getSourceName());
-            Function<Resource, InputStream> getMetadataStream =
-                    (resource) -> modMetadataPacks.get(resource.getSourceName()).getInputStream();
+            Set<String> modMetadataPacks = ORIGINAL.getResources(metadataLoc).stream().map(Resource::getSourceName)
+                    .collect(Collectors.toSet());
+            Predicate<Resource> hasModMetadata = (resource) -> modMetadataPacks.contains(resource.getSourceName());
 
             resources = resources.stream().map((resource) -> hasModMetadata.test(resource) ?
-                    new SizeSwappingResource(resource, getMetadataStream.apply(resource)) : resource
+                    new SizeSwappingResource(resource, frameWidth, frameHeight) : resource
             ).collect(Collectors.toList());
         }
 
@@ -170,64 +152,29 @@ public class SizeSwappingResourceManager extends SimpleReloadableResourceManager
     }
 
     /**
-     * Closes the original manager.
-     */
-    @Override
-    public void close() {
-        ORIGINAL.close();
-    }
-
-    /**
-     * Registers a reload listener. Listeners will execute with this wrapper as their parameter.
-     * Listeners registered directly to the original manager (and not through this method) before
-     * or after it was original will execute with the original manager as their parameter.
-     * The original manager is aware of any listeners registered here.
-     * @param preparableReloadListener      listener to add
-     */
-    @Override
-    public void registerReloadListener(PreparableReloadListener preparableReloadListener) {
-        requireNonNull(preparableReloadListener, "Reload listener cannot be null");
-        
-        ResourceManager thisManager = this;
-
-        ORIGINAL.registerReloadListener(
-                (preparationBarrier, resourceManager, profilerFiller, profilerFiller2, executor, executor2) ->
-                        preparableReloadListener.reload(
-                                preparationBarrier, thisManager, profilerFiller,
-                                profilerFiller2, executor, executor2
-                        )
-        );
-    }
-
-    /**
-     * Reloads the original resource manager, including any listeners that were registered
-     * before or after it was wrapped.
-     * @param loadingExec           executor for loading tasks
-     * @param appExec               executor for application tasks
-     * @param completableFuture     asynchronous reloading task
-     * @param packs                 packs to add to listener
-     * @return a reload instance for the current reload
-     */
-    @Override
-    public ReloadInstance createReload(Executor loadingExec, Executor appExec,
-                                       CompletableFuture<Unit> completableFuture, List<PackResources> packs) {
-        requireNonNull(loadingExec, "Loading executor cannot be null");
-        requireNonNull(appExec, "Application executor cannot be null");
-        requireNonNull(completableFuture, "Completable future must not be null");
-        requireNonNull(packs, "List of resource packs must not be null");
-        
-        ReloadInstance reload = ORIGINAL.createReload(loadingExec, appExec, completableFuture, packs);
-        reload.done().thenRun(RELOAD_CALLBACK);
-        return reload;
-    }
-
-    /**
      * Gets all the packs in the original manager.
      * @return all the packs in the original manager
      */
     @Override
     public Stream<PackResources> listPacks() {
         return ORIGINAL.listPacks();
+    }
+
+    /**
+     * Gets the frame size of a texture, assuming it is an animated texture.
+     * @param location      the resource location of the texture (non-sprite location)
+     * @return a (frameWidth, frameHeight) tuple
+     */
+    private Pair<Integer, Integer> getFrameSize(ResourceLocation location) {
+        Optional<RGBAImageFrame> initialFrame = TEXTURES.get(location).getImage();
+        if (initialFrame.isEmpty()) {
+            throw new IllegalStateException("Missing initial image guaranteed by texture reader");
+        }
+
+        int frameWidth = initialFrame.get().getWidth();
+        int frameHeight = initialFrame.get().getHeight();
+
+        return Pair.of(frameWidth, frameHeight);
     }
 
     /**

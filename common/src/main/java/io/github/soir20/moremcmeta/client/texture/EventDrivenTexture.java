@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -173,6 +174,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public Builder() {
             COMPONENTS = new ArrayList<>();
+        }
+
+        /**
+         * Gets the initial image set in this builder if there is one.
+         * @return the initial image for the texture, or an empty
+         */
+        public Optional<RGBAImageFrame> getImage() {
+            return Optional.ofNullable(firstImage);
         }
 
         /**
