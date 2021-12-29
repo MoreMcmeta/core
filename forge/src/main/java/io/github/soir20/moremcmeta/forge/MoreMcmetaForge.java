@@ -23,25 +23,22 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
 import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
 import io.github.soir20.moremcmeta.forge.client.event.ClientTicker;
-import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.fmllegacy.network.FMLNetworkConstants;
 import org.apache.logging.log4j.Logger;
@@ -49,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -59,16 +57,12 @@ import java.util.function.Consumer;
 @Mod(MoreMcmetaForge.MODID)
 public final class MoreMcmetaForge extends MoreMcmeta {
     public static final String MODID = "moremcmeta";
-    private FMLConstructModEvent lastEvent;
 
     /**
      * Registers this class as an event listener. This must be left as the default
      * constructor to be recognized by Forge as the mod entrypoint.
      */
     public MoreMcmetaForge() {
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            FMLJavaModLoadingContext.get().getModEventBus().register(this);
-        }
 
         /* Make sure the mod being absent on the other network side does not
            cause the client to display the server as incompatible. */
@@ -80,17 +74,6 @@ public final class MoreMcmetaForge extends MoreMcmeta {
                 )
         );
 
-    }
-
-    /**
-     * The actual/effective entrypoint for the mod. Begins the startup process on the client
-     * when the mod is constructed.
-     * @param event     the mod construction event
-     */
-    @SubscribeEvent
-    @SuppressWarnings("unused")
-    public void onPreInit(final FMLConstructModEvent event) {
-        lastEvent = event;
         start();
     }
 
@@ -129,17 +112,35 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         callback.accept(Minecraft.getInstance());
     }
 
+    @Override
+    public Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger) {
+        try {
+            return Optional.ofNullable(
+                    ObfuscationReflectionHelper.getPrivateValue(LoadingOverlay.class, overlay, "f_96164_")
+            );
+        } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
+            logger.error("Unable to access LoadingOverlay's reload instance field. " +
+                    "Animated atlas sprites will be squished!");
+        } catch (ObfuscationReflectionHelper.UnableToFindFieldException err) {
+            logger.error("Unable to find LoadingOverlay's reload instance field. " +
+                    "Animated atlas sprites will be squished!");
+        }
+
+        return Optional.empty();
+    }
+
     /**
      * Creates a new reload listener that loads and queues animated textures for Forge.
-     * @param texManager    manages prebuilt textures
-     * @param loader        loads textures from resource packs
-     * @param logger        a logger to write output
+     * @param texManager        manages prebuilt textures
+     * @param resourceManager   Minecraft's resource manager
+     * @param loader            loads textures from resource packs
+     * @param logger            a logger to write output
      * @return a reload listener that loads and queues animated textures
      */
-    @SuppressWarnings("deprecation")
     @Override
     public ResourceManagerReloadListener makeListener(
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
+            SimpleReloadableResourceManager resourceManager,
             TextureLoader<EventDrivenTexture.Builder> loader, Logger logger) {
 
         return new ResourceManagerReloadListener() {
@@ -158,47 +159,6 @@ public final class MoreMcmetaForge extends MoreMcmeta {
                 textures.forEach(texManager::register);
             }
         };
-
-    }
-
-    /**
-     * Replaces the {@link net.minecraft.server.packs.resources.SimpleReloadableResourceManager}
-     * with the mod's custom one in Forge.
-     * @param client        the Minecraft client
-     * @param manager       the manager that should be made Minecraft's resource manager
-     * @param logger        a logger to write output
-     */
-    @Override
-    public void replaceResourceManager(Minecraft client, SizeSwappingResourceManager manager, Logger logger) {
-
-        /* enqueueWork() will run after all mods have added their listeners but before Minecraft
-           adds any of its own listeners. This allows us to wrap the resource manager and intercept
-           how metadata is retrieved during atlas stitching. It prevents animated sprites
-           from having all of their frames stitched onto the atlas when no .mcmeta file is present.
-           Checks inside the wrapper prevent any difference in how textures are loaded for
-           non-MoreMcmeta textures.
-
-           We have to use reflection to replace the resource manager here because the only other ways
-           to intercept metadata retrieval would be:
-           1. add a custom resource pack (requires reflection and breaks when users change pack order)
-           2. replace AnimationMetadataSection.EMPTY (requires reflection and affects non-MoreMcmeta textures)
-           3. Mixin/ASM/bytecode manipulation (obviously more prone to compatibility issues)
-
-           The resource manager wrapper mostly calls the original, so it should be the solution
-           most compatible with other mods. */
-        lastEvent.enqueueWork(() -> {
-            try {
-                ObfuscationReflectionHelper.setPrivateValue(
-                        Minecraft.class, client, manager, "f_91036_"
-                );
-            } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
-                logger.error("Unable to access Minecraft's resource manager field. " +
-                        "Animated atlas sprites will be squished!");
-            } catch (ObfuscationReflectionHelper.UnableToFindFieldException err) {
-                logger.error("Unable to find Minecraft's resource manager field. " +
-                        "Animated atlas sprites will be squished!");
-            }
-        });
 
     }
 

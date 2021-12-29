@@ -20,7 +20,7 @@ package io.github.soir20.moremcmeta;
 import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.client.adapter.TextureManagerAdapter;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
-import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
+import io.github.soir20.moremcmeta.client.resource.DisableVanillaSpriteAnimationPack;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
@@ -28,13 +28,17 @@ import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -76,15 +80,56 @@ public abstract class MoreMcmeta {
                registering our listener like a vanilla listener ensures it is executed
                before the TextureManager resets its textures. This is the least invasive way to
                animate preloaded title screen textures. */
-            rscManager.registerReloadListener(makeListener(manager, loader, logger));
+            rscManager.registerReloadListener(makeListener(manager, rscManager, loader, logger));
             logger.debug("Added texture reload listener");
-
-            replaceResourceManager(client, new SizeSwappingResourceManager(rscManager, manager::finishQueued), logger);
         });
 
         // Enable animation by ticking the manager
         startTicking(manager);
 
+    }
+
+    /**
+     * Adds the mod-animated sprite resource pack to the resource manager.
+     * @param resourceManager       the resource manager to add the pack to
+     * @return the added pack
+     */
+    public DisableVanillaSpriteAnimationPack addSpriteFixPack(SimpleReloadableResourceManager resourceManager) {
+        DisableVanillaSpriteAnimationPack pack = new DisableVanillaSpriteAnimationPack();
+        resourceManager.add(pack);
+        return pack;
+    }
+
+    /**
+     * Gets the current loading overlay if there is one. Returns empty if the current
+     * overlay is not a loading overlay.
+     * @param logger    a logger to write output
+     * @return the loading overlay if there is one
+     */
+    public Optional<LoadingOverlay> getLoadingOverlay(Logger logger) {
+        Overlay currentOverlay = Minecraft.getInstance().getOverlay();
+
+        if (!(currentOverlay instanceof LoadingOverlay)) {
+            logger.error("Loading overlay expected; textures will not be finished!");
+            return Optional.empty();
+        }
+
+        return Optional.of((LoadingOverlay) currentOverlay);
+    }
+
+    /**
+     * Adds a callback for any necessary post-reload work.
+     * @param manager           texture manager with unfinished work
+     */
+    public void addCompletedReloadCallback(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager,
+                                           Logger logger) {
+        Optional<LoadingOverlay> overlay = getLoadingOverlay(logger);
+        if (overlay.isEmpty()) {
+            return;
+        }
+
+        Optional<ReloadInstance> reloadInstance = getReloadInstance(overlay.get(), logger);
+        reloadInstance.ifPresent((instance) -> instance.done().thenRun(manager::finishQueued));
     }
 
     /**
@@ -107,24 +152,26 @@ public abstract class MoreMcmeta {
 
     /**
      * Creates a new reload listener that loads and queues animated textures for a mod loader.
-     * @param texManager    manages prebuilt textures
-     * @param loader        loads textures from resource packs
-     * @param logger        a logger to write output
+     * @param texManager        manages prebuilt textures
+     * @param loader            loads textures from resource packs
+     * @param resourceManager   Minecraft's resource manager
+     * @param logger            a logger to write output
      * @return a reload listener that loads and queues animated textures
      */
     public abstract PreparableReloadListener makeListener(
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
-            TextureLoader<EventDrivenTexture.Builder> loader, Logger logger
+            SimpleReloadableResourceManager resourceManager,
+            TextureLoader<EventDrivenTexture.Builder> loader,
+            Logger logger
     );
 
     /**
-     * Replaces the {@link net.minecraft.server.packs.resources.SimpleReloadableResourceManager}
-     * with the mod's custom one in a mod loader.
-     * @param client        the Minecraft client
-     * @param manager       the manager that should be made Minecraft's resource manager
-     * @param logger        a logger to write output
+     * Gets the current reload instance.
+     * @param overlay    the overlay containing the instance
+     * @param logger     a logger to write output
+     * @return the current reload instance
      */
-    public abstract void replaceResourceManager(Minecraft client, SizeSwappingResourceManager manager, Logger logger);
+    public abstract Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger);
 
     /**
      * Begins ticking the {@link LazyTextureManager} on a mod loader.
