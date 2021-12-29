@@ -21,6 +21,7 @@ import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.client.adapter.TextureManagerAdapter;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.client.resource.DisableVanillaSpriteAnimationPack;
+import io.github.soir20.moremcmeta.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
@@ -32,15 +33,22 @@ import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ReloadInstance;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * An entrypoint with common elements of the startup process in both
@@ -80,13 +88,30 @@ public abstract class MoreMcmeta {
                registering our listener like a vanilla listener ensures it is executed
                before the TextureManager resets its textures. This is the least invasive way to
                animate preloaded title screen textures. */
-            rscManager.registerReloadListener(makeListener(manager, rscManager, loader, logger));
+            rscManager.registerReloadListener(wrapListener(makeListener(manager, rscManager, loader, logger)));
             logger.debug("Added texture reload listener");
         });
 
         // Enable animation by ticking the manager
         startTicking(manager);
 
+    }
+
+    /**
+     * Creates a new reload listener that loads and queues animated textures for a mod loader.
+     * @param texManager        manages prebuilt textures
+     * @param loader            loads textures from resource packs
+     * @param resourceManager   Minecraft's resource manager
+     * @param logger            a logger to write output
+     * @return a reload listener that loads and queues animated textures
+     */
+    public StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> makeListener(
+            LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
+            SimpleReloadableResourceManager resourceManager,
+            TextureLoader<EventDrivenTexture.Builder> loader,
+            Logger logger
+    ) {
+        return new TextureResourceReloadListener(texManager, resourceManager, loader, logger);
     }
 
     /**
@@ -150,19 +175,8 @@ public abstract class MoreMcmeta {
      */
     public abstract void onResourceManagerInitialized(Consumer<Minecraft> callback);
 
-    /**
-     * Creates a new reload listener that loads and queues animated textures for a mod loader.
-     * @param texManager        manages prebuilt textures
-     * @param loader            loads textures from resource packs
-     * @param resourceManager   Minecraft's resource manager
-     * @param logger            a logger to write output
-     * @return a reload listener that loads and queues animated textures
-     */
-    public abstract PreparableReloadListener makeListener(
-            LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
-            SimpleReloadableResourceManager resourceManager,
-            TextureLoader<EventDrivenTexture.Builder> loader,
-            Logger logger
+    public abstract StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
+            StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
     );
 
     /**
@@ -178,5 +192,54 @@ public abstract class MoreMcmeta {
      * @param texManager        the manager to begin ticking
      */
     public abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
+
+    private class TextureResourceReloadListener
+            implements StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> {
+        private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
+        private final LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> TEX_MANAGER;
+        private final SimpleReloadableResourceManager RESOURCE_MANAGER;
+        private final TextureLoader<EventDrivenTexture.Builder> LOADER;
+        private final Logger LOGGER;
+
+        public TextureResourceReloadListener(
+                LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
+                SimpleReloadableResourceManager resourceManager,
+                TextureLoader<EventDrivenTexture.Builder> loader,
+                Logger logger
+        ) {
+            TEX_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
+            RESOURCE_MANAGER = requireNonNull(resourceManager, "Resource manager cannot be null");
+            LOADER = requireNonNull(loader, "Texture loader cannot be null");
+            LOGGER = requireNonNull(logger, "Logger cannot be null");
+        }
+
+        @Override
+        public CompletableFuture<Map<ResourceLocation, EventDrivenTexture.Builder>> load(ResourceManager manager,
+                                                                                         ProfilerFiller profiler,
+                                                                                         Executor executor) {
+            DisableVanillaSpriteAnimationPack spriteFixPack = addSpriteFixPack(RESOURCE_MANAGER);
+            return CompletableFuture.supplyAsync(() -> {
+                Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
+                textures.putAll(LOADER.load(manager, "textures"));
+                textures.putAll(LOADER.load(manager, "optifine"));
+                spriteFixPack.setTextures(textures);
+                return textures;
+            }, executor);
+        }
+
+        @Override
+        public CompletableFuture<Void> apply(Map<ResourceLocation, EventDrivenTexture.Builder> data,
+                                             ResourceManager manager, ProfilerFiller profiler, Executor executor) {
+            addCompletedReloadCallback(TEX_MANAGER, LOGGER);
+
+            return CompletableFuture.runAsync(() -> {
+                LAST_TEXTURES_ADDED.keySet().forEach(TEX_MANAGER::unregister);
+                LAST_TEXTURES_ADDED.clear();
+                LAST_TEXTURES_ADDED.putAll(data);
+
+                data.forEach(TEX_MANAGER::register);
+            }, executor);
+        }
+    }
 
 }
