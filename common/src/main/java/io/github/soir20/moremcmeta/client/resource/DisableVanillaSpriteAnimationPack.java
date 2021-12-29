@@ -33,7 +33,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -84,10 +86,15 @@ public class DisableVanillaSpriteAnimationPack implements PackResources {
 
         ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 
-        Stream<PackResources> allPacks = resourceManager.listPacks();
-        Optional<PackResources> packWithResource = allPacks.reduce(
-                (lastVal, pack) -> otherPackHasResource(pack, textureLocation) ? pack : lastVal
-        );
+        List<PackResources> allPacks = resourceManager.listPacks().collect(Collectors.toList());
+
+        /* Reverse the list since highest packs are at the end.
+           We don't need to search the files of more packs than necessary */
+        Collections.reverse(allPacks);
+
+        Optional<PackResources> packWithResource = allPacks.stream().filter(
+                (pack) -> otherPackHasResource(pack, textureLocation)
+        ).findFirst();
 
         if (packWithResource.isEmpty()) {
             throw new IOException("Texture set in sprite fix pack does not actually exist!");
