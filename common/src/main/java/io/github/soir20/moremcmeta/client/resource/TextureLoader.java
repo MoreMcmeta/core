@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Loads and queues animated textures during resource reloading.
+ * Loads animated textures during resource reloading.
  * @param <R> resource type
  * @author soir20
  */
@@ -114,7 +114,7 @@ public class TextureLoader<R> {
     }
 
     /**
-     * Gets an texture from a file.
+     * Gets a texture from a file.
      * @param resourceManager   resource manager to get textures/metadata from
      * @param textureLocation   location of the image/.png texture
      * @param metadataLocation  file location of texture's metadata for this mod (not .mcmeta)
