@@ -61,7 +61,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * Gets the OpenGL preparer for new textures on this loader.
      * @return the OpenGL preparer for this loader
      */
-    public ITexturePreparer getPreparer() {
+    protected ITexturePreparer getPreparer() {
         return (glId, mipmap, width, height) -> {
             if (!RenderSystem.isOnRenderThreadOrInit()) {
                 RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(glId, mipmap, width, height));
@@ -76,7 +76,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return the action that will unregister textures
      */
     @Override
-    public BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
+    protected BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
         return (manager, location) -> {
             TextureManagerAccessor accessor = (TextureManagerAccessor) manager;
             accessor.getByPath().remove(location);
@@ -89,21 +89,32 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @param callback      the callback to execute
      */
     @Override
-    public void onResourceManagerInitialized(Consumer<Minecraft> callback) {
+    protected void onResourceManagerInitialized(Consumer<Minecraft> callback) {
         ResourceManagerInitializedCallback.EVENT.register(callback::accept);
     }
 
+    /**
+     * Wraps the given resource reload listener in any Fabric-specific interfaces, if necessary.
+     * @param original      the original resource reload listener to wrap
+     * @return the wrapped resource reload listener
+     */
     @Override
-    public StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
+    protected StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
             StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
     ) {
         return new SimpleReloadListenerAdapter<>(original,
                 new ResourceLocation("moremcmeta", "texture_reload_listener"));
     }
 
+    /**
+     * Gets the current reload instance.
+     * @param overlay    the overlay containing the instance
+     * @param logger     a logger to write output
+     * @return the current reload instance
+     */
     @Override
-    public Optional<ReloadInstance> getReloadInstance(LoadingOverlay loadingOverlay, Logger logger) {
-        return Optional.of(((LoadingOverlayAccessor) loadingOverlay).getReloadInstance());
+    protected Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger) {
+        return Optional.of(((LoadingOverlayAccessor) overlay).getReloadInstance());
     }
 
     /**
@@ -111,7 +122,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @param texManager        the manager to begin ticking
      */
     @Override
-    public void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
+    protected void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
         ClientTickEvents.START_CLIENT_TICK.register((client) -> texManager.tick());
     }
 

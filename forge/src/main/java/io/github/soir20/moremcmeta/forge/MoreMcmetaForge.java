@@ -54,8 +54,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     public static final String MODID = "moremcmeta";
 
     /**
-     * Registers this class as an event listener. This must be left as the default
-     * constructor to be recognized by Forge as the mod entrypoint.
+     * Serves as mod entrypoint on Forge and tells the server to ignore this mod.
      */
     public MoreMcmetaForge() {
 
@@ -76,7 +75,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * Gets the OpenGL preparer for new textures on this loader.
      * @return the OpenGL preparer for this loader
      */
-    public ITexturePreparer getPreparer() {
+    protected ITexturePreparer getPreparer() {
         return (glId, mipmap, width, height) -> {
             if (!RenderSystem.isOnRenderThreadOrInit()) {
                 RenderSystem.recordRenderCall(() -> TextureUtil.m_85287_(glId, mipmap, width, height));
@@ -91,7 +90,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @return the action that will unregister textures
      */
     @Override
-    public BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
+    protected BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
 
         // Forge already fixes the bug that prevents texture removal
         return TextureManager::release;
@@ -103,19 +102,30 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @param callback      the callback to execute
      */
     @Override
-    public void onResourceManagerInitialized(Consumer<Minecraft> callback) {
+    protected void onResourceManagerInitialized(Consumer<Minecraft> callback) {
         callback.accept(Minecraft.getInstance());
     }
 
+    /**
+     * Wraps the given resource reload listener in any Forge-specific interfaces, if necessary.
+     * @param original      the original resource reload listener to wrap
+     * @return the wrapped resource reload listener
+     */
     @Override
-    public StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
+    protected StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
             StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
     ) {
         return original;
     }
 
+    /**
+     * Gets the current reload instance.
+     * @param overlay    the overlay containing the instance
+     * @param logger     a logger to write output
+     * @return the current reload instance
+     */
     @Override
-    public Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger) {
+    protected Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger) {
         try {
             return Optional.ofNullable(
                     ObfuscationReflectionHelper.getPrivateValue(LoadingOverlay.class, overlay, "f_96164_")
@@ -136,7 +146,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @param texManager        the manager to begin ticking
      */
     @Override
-    public void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
+    protected void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
         new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS, TickEvent.Phase.START, () -> true);
     }
 

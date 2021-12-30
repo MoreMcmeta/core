@@ -98,14 +98,55 @@ public abstract class MoreMcmeta {
     }
 
     /**
+     * Gets the OpenGL preparer for new textures on this loader.
+     * @return the OpenGL preparer for this loader
+     */
+    protected abstract ITexturePreparer getPreparer();
+
+    /**
+     * Gets the action that should be executed to unregister a texture on a specific mod loader.
+     * @return the action that will unregister textures
+     */
+    protected abstract BiConsumer<TextureManager, ResourceLocation> getUnregisterAction();
+
+    /**
+     * Executes a callback when the vanilla resource manager is initialized in a mod loader.
+     * @param callback      the callback to execute
+     */
+    protected abstract void onResourceManagerInitialized(Consumer<Minecraft> callback);
+
+    /**
+     * Wraps the given resource reload listener in any mod loader-specific interfaces, if necessary.
+     * @param original      the original resource reload listener to wrap
+     * @return the wrapped resource reload listener
+     */
+    protected abstract StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
+            StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
+    );
+
+    /**
+     * Gets the current reload instance.
+     * @param overlay    the overlay containing the instance
+     * @param logger     a logger to write output
+     * @return the current reload instance
+     */
+    protected abstract Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger);
+
+    /**
+     * Begins ticking the {@link LazyTextureManager} on a mod loader.
+     * @param texManager        the manager to begin ticking
+     */
+    protected abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
+
+    /**
      * Creates a new reload listener that loads and queues animated textures for a mod loader.
      * @param texManager        manages prebuilt textures
      * @param loader            loads textures from resource packs
      * @param resourceManager   Minecraft's resource manager
      * @param logger            a logger to write output
-     * @return a reload listener that loads and queues animated textures
+     * @return reload listener that loads and queues animated textures
      */
-    public StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> makeListener(
+    private StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> makeListener(
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
             SimpleReloadableResourceManager resourceManager,
             TextureLoader<EventDrivenTexture.Builder> loader,
@@ -119,7 +160,7 @@ public abstract class MoreMcmeta {
      * @param resourceManager       the resource manager to add the pack to
      * @return the added pack
      */
-    public DisableVanillaSpriteAnimationPack addSpriteFixPack(SimpleReloadableResourceManager resourceManager) {
+    private DisableVanillaSpriteAnimationPack addSpriteFixPack(SimpleReloadableResourceManager resourceManager) {
         DisableVanillaSpriteAnimationPack pack = new DisableVanillaSpriteAnimationPack();
         resourceManager.add(pack);
         return pack;
@@ -131,11 +172,11 @@ public abstract class MoreMcmeta {
      * @param logger    a logger to write output
      * @return the loading overlay if there is one
      */
-    public Optional<LoadingOverlay> getLoadingOverlay(Logger logger) {
+    private Optional<LoadingOverlay> getLoadingOverlay(Logger logger) {
         Overlay currentOverlay = Minecraft.getInstance().getOverlay();
 
         if (!(currentOverlay instanceof LoadingOverlay)) {
-            logger.error("Loading overlay expected; textures will not be finished!");
+            logger.error("Loading overlay expected. Textures will not be finished!");
             return Optional.empty();
         }
 
@@ -146,8 +187,8 @@ public abstract class MoreMcmeta {
      * Adds a callback for any necessary post-reload work.
      * @param manager           texture manager with unfinished work
      */
-    public void addCompletedReloadCallback(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager,
-                                           Logger logger) {
+    private void addCompletedReloadCallback(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager,
+                                            Logger logger) {
         Optional<LoadingOverlay> overlay = getLoadingOverlay(logger);
         if (overlay.isEmpty()) {
             return;
@@ -158,41 +199,10 @@ public abstract class MoreMcmeta {
     }
 
     /**
-     * Gets the OpenGL preparer for new textures on this loader.
-     * @return the OpenGL preparer for this loader
+     * Loads and queues textures controlled by this mod on resource reloading. Clears out old textures that
+     * no longer have metadata for this mod.
+     * @author soir20
      */
-    public abstract ITexturePreparer getPreparer();
-
-    /**
-     * Gets the action that should be executed to unregister a texture on a specific mod loader.
-     * @return the action that will unregister textures
-     */
-    public abstract BiConsumer<TextureManager, ResourceLocation> getUnregisterAction();
-
-    /**
-     * Executes a callback when the vanilla resource manager is initialized in a mod loader.
-     * @param callback      the callback to execute
-     */
-    public abstract void onResourceManagerInitialized(Consumer<Minecraft> callback);
-
-    public abstract StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
-            StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
-    );
-
-    /**
-     * Gets the current reload instance.
-     * @param overlay    the overlay containing the instance
-     * @param logger     a logger to write output
-     * @return the current reload instance
-     */
-    public abstract Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger);
-
-    /**
-     * Begins ticking the {@link LazyTextureManager} on a mod loader.
-     * @param texManager        the manager to begin ticking
-     */
-    public abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
-
     private class TextureResourceReloadListener
             implements StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> {
         private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
@@ -201,6 +211,13 @@ public abstract class MoreMcmeta {
         private final TextureLoader<EventDrivenTexture.Builder> LOADER;
         private final Logger LOGGER;
 
+        /**
+         * Creates a new resource reload listener.
+         * @param texManager            texture manager that accepts queued textures
+         * @param resourceManager       Minecraft's resource manager (as a {@link SimpleReloadableResourceManager})
+         * @param loader                texture loader
+         * @param logger                a logger to write output
+         */
         public TextureResourceReloadListener(
                 LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
                 SimpleReloadableResourceManager resourceManager,
@@ -213,6 +230,13 @@ public abstract class MoreMcmeta {
             LOGGER = requireNonNull(logger, "Logger cannot be null");
         }
 
+        /**
+         * Loads textures and adds the resource pack to fix animated sprites.
+         * @param manager       Minecraft's resource manager
+         * @param profiler      load stage profiler
+         * @param executor      asynchronously executes load stage tasks
+         * @return task returning loaded texture builders by location
+         */
         @Override
         public CompletableFuture<Map<ResourceLocation, EventDrivenTexture.Builder>> load(ResourceManager manager,
                                                                                          ProfilerFiller profiler,
@@ -227,6 +251,14 @@ public abstract class MoreMcmeta {
             }, executor);
         }
 
+        /**
+         * Clears old textures, if any, and registers new ones.
+         * @param data          texture builders by location that were just loaded
+         * @param manager       Minecraft's resource manager
+         * @param profiler      apply stage profiler
+         * @param executor      asynchronously executes apply stage tasks
+         * @return task with no return data
+         */
         @Override
         public CompletableFuture<Void> apply(Map<ResourceLocation, EventDrivenTexture.Builder> data,
                                              ResourceManager manager, ProfilerFiller profiler, Executor executor) {
@@ -240,6 +272,7 @@ public abstract class MoreMcmeta {
                 data.forEach(TEX_MANAGER::register);
             }, executor);
         }
+
     }
 
 }
