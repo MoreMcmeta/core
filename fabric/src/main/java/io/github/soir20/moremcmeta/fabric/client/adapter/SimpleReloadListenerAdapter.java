@@ -77,7 +77,10 @@ public class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListe
      */
     @Override
     public CompletableFuture<T> load(ResourceManager manager, ProfilerFiller loadProfiler, Executor loadExecutor) {
+
+        // Let delegate do null checks in case null values are acceptable
         return DELEGATE.load(manager, loadProfiler, loadExecutor);
+
     }
 
     /**
@@ -91,7 +94,10 @@ public class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListe
     @Override
     public CompletableFuture<Void> apply(T data, ResourceManager manager, ProfilerFiller applyProfiler,
                                          Executor applyExecutor) {
+
+        // Let delegate do null checks in case null values are acceptable
         return DELEGATE.apply(data, manager, applyProfiler, applyExecutor);
+
     }
 
     /**
