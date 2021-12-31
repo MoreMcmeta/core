@@ -30,6 +30,7 @@ import java.util.concurrent.Executor;
  * necessary work with it. This is based off of Fabric's listener, but it can be used on Forge 
  * as well.
  * @param <T>   type of data that is loaded
+ * @author soir20
  */
 public interface StagedResourceReloadListener<T> extends PreparableReloadListener {
 
