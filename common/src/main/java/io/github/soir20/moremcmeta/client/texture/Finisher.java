@@ -19,30 +19,28 @@ package io.github.soir20.moremcmeta.client.texture;
 
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Map;
+
 /**
- * A container for resources that can be added and removed. It represents what textures Minecraft is aware of.
- * @param <R> resource type
- * @author soir20
+ * Finishes items that need to be completed lazily.
+ * @param <I> input type
+ * @param <O> output type
  */
-public interface IManager<R> extends CustomTickable {
+public interface Finisher<I, O> {
 
     /**
-     * Prepares a texture and makes Minecraft aware of it.
-     * @param location      file location of resource identical to how it is used in a entity/gui/map
-     * @param resource      the actual resource that should be used
+     * Queues an item that needs to be finished. If an item at the
+     * same location is already queued, the original will be discarded
+     * and replaced.
+     * @param location      location identifying the item
+     * @param input         the unfinished item
      */
-    void register(ResourceLocation location, R resource);
+    void queue(ResourceLocation location, I input);
 
     /**
-     * Unregisters a resource so Minecraft is no longer aware of it.
-     * This also allows the resource to be replaced.
-     * @param location   file location of resource to delete
+     * Finishes all currently-queued items.
+     * @return a map with all finished items by their locations
      */
-    void unregister(ResourceLocation location);
-
-    /**
-     * Updates all animated resources that were loaded through this manager.
-     */
-    void tick();
+    Map<ResourceLocation, O> finish();
 
 }

@@ -25,7 +25,7 @@ import io.github.soir20.moremcmeta.client.animation.WobbleFunction;
 import io.github.soir20.moremcmeta.client.resource.ModAnimationMetadataSection;
 import io.github.soir20.moremcmeta.client.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
-import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
+import io.github.soir20.moremcmeta.client.texture.RGBAImage;
 import io.github.soir20.moremcmeta.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
@@ -59,7 +59,7 @@ import static java.util.Objects.requireNonNull;
  * to add components related to texture registration and binding.
  * @author soir20
  */
-public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder> {
+public class AnimatedTextureReader implements TextureReader<EventDrivenTexture.Builder> {
     private static final int TICKS_PER_MC_DAY = 24000;
     private final Logger LOGGER;
     private final ChangingPointsAdapter POINT_READER;
@@ -128,13 +128,13 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
         boolean clamp = textureMetadata.isClamp();
 
         // Frames
-        List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
+        List<RGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
         FrameReader<RGBAImageFrame> frameReader = new FrameReader<>(frameData -> {
 
             /* The immutable list collector was marked as beta for a while,
                and the marking was removed in a later version. */
             @SuppressWarnings("UnstableApiUsage")
-            ImmutableList<IRGBAImage> wrappedMipmaps = IntStream.range(0, mipmaps.size()).mapToObj((level) -> {
+            ImmutableList<RGBAImage> wrappedMipmaps = IntStream.range(0, mipmaps.size()).mapToObj((level) -> {
                 int width = frameData.getWidth() >> level;
                 int height = frameData.getHeight() >> level;
 
@@ -213,7 +213,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
      */
     private ImmutableList<NativeImageAdapter> getInterpolationMipmaps(List<NativeImage> originals, int frameWidth,
                                                                       int frameHeight, boolean blur, boolean clamp,
-                                                                      List<IRGBAImage.VisibleArea> visibleAreas) {
+                                                                      List<RGBAImage.VisibleArea> visibleAreas) {
         ImmutableList.Builder<NativeImageAdapter> images = new ImmutableList.Builder<>();
 
         for (int level = 0; level < originals.size(); level++) {

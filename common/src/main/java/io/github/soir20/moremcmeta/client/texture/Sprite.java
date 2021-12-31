@@ -15,23 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.animation;
+package io.github.soir20.moremcmeta.client.texture;
+
+import io.github.soir20.moremcmeta.math.Point;
+import net.minecraft.resources.ResourceLocation;
 
 /**
- * Interpolates between two images.
- * @param <I>   type of image
+ * An adapter for {@link net.minecraft.client.renderer.texture.TextureAtlasSprite}
+ * to provide a cleaner interface and make it easier to instantiate in test code.
  * @author soir20
  */
-public interface IInterpolator<I> {
+public interface Sprite {
 
     /**
-     * Creates an image between two other images at a certain step.
-     * @param steps     total number of steps to interpolate
-     * @param step      current step of the interpolation (between 1 and steps - 1)
-     * @param start     image to start interpolation from
-     * @param end       image to end interpolation at
-     * @return  the interpolated image at the given step
+     * Binds the sprite (and thus its atlas) to OpenGL.
      */
-    I interpolate(int steps, int step, I start, I end);
+    void bind();
+
+    /**
+     * Gets the name of this sprite (without an extension).
+     * @return the sprite's name
+     */
+    ResourceLocation getName();
+
+    /**
+     * Gets the position of the sprite's top-left corner on its atlas.
+     * @return the sprite's upload point
+     */
+    Point getUploadPoint();
 
 }

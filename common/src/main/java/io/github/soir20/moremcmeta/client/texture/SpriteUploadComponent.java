@@ -27,8 +27,8 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture to an atlas sprite.
  * @author soir20
  */
-public class SpriteUploadComponent implements ITextureComponent {
-    private final ISprite SPRITE;
+public class SpriteUploadComponent implements TextureComponent {
+    private final Sprite SPRITE;
 
     /**
      * Creates a new component for uploading a texture to an atlas sprite.
@@ -36,7 +36,7 @@ public class SpriteUploadComponent implements ITextureComponent {
      * point in the future.
      * @param sprite        the sprite to upload the texture to
      */
-    public SpriteUploadComponent(ISprite sprite) {
+    public SpriteUploadComponent(Sprite sprite) {
         SPRITE = requireNonNull(sprite, "Sprite cannot be null");
     }
 

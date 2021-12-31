@@ -7,7 +7,7 @@ package io.github.soir20.moremcmeta.client.texture;
  * @author soir20
  */
 @FunctionalInterface
-public interface ITexturePreparer {
+public interface TexturePreparer {
 
     /**
      * Prepares a new texture in OpenGL.

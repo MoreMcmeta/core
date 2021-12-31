@@ -17,8 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.adapter;
 
-import io.github.soir20.moremcmeta.client.texture.IAtlas;
-import io.github.soir20.moremcmeta.client.texture.ISprite;
+import io.github.soir20.moremcmeta.client.texture.Atlas;
+import io.github.soir20.moremcmeta.client.texture.Sprite;
 import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -31,10 +31,10 @@ import java.util.Optional;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Adapts a {@link TextureAtlas} to be a {@link IAtlas}.
+ * Adapts a {@link TextureAtlas} to be a {@link Atlas}.
  * @author soir20
  */
-public class AtlasAdapter implements IAtlas {
+public class AtlasAdapter implements Atlas {
     private final TextureAtlas ATLAS;
 
     /**
@@ -60,7 +60,7 @@ public class AtlasAdapter implements IAtlas {
      * @return the sprite if found
      */
     @Override
-    public Optional<ISprite> getSprite(ResourceLocation location) {
+    public Optional<Sprite> getSprite(ResourceLocation location) {
         if (ATLAS == null) {
             return Optional.empty();
         }
@@ -74,15 +74,15 @@ public class AtlasAdapter implements IAtlas {
     }
 
     /**
-     * Adapts a {@link TextureAtlasSprite} to be a {@link ISprite}.
+     * Adapts a {@link TextureAtlasSprite} to be a {@link Sprite}.
      * @author soir20
      */
-    private static class SpriteAdapter implements ISprite {
+    private static class SpriteAdapter implements Sprite {
         private final TextureAtlasSprite SPRITE;
         private final Point UPLOAD_POINT;
 
         /**
-         * Adapts the given sprite to be a {@link ISprite}.
+         * Adapts the given sprite to be a {@link Sprite}.
          * @param sprite    the sprite to adapt
          */
         public SpriteAdapter(TextureAtlasSprite sprite) {

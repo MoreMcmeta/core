@@ -15,25 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.io;
+package io.github.soir20.moremcmeta.client.texture;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.stream.Stream;
 
 /**
- * Reads an texture.
- * @param <T>
+ * A container for related {@link TextureListener}s.
  * @author soir20
  */
-public interface ITextureReader<T> {
+public interface TextureComponent {
 
     /**
-     * Reads an animated texture from file data.
-     * @param textureStream     input stream of image data
-     * @param metadataStream    input stream of texture metadata (JSON)
-     * @return getter for retrieving an animated texture after all resources are loaded
-     * @throws IOException  failure reading from either input stream
+     * Gets all listeners for this component.
+     * @return all of this component's listeners
      */
-    T read(InputStream textureStream, InputStream metadataStream) throws IOException;
+    Stream<TextureListener> getListeners();
 
 }

@@ -25,7 +25,7 @@ import net.minecraft.resources.ResourceLocation;
  * A fake {@link TextureAtlasSprite}.
  * @author soir20
  */
-public class MockAtlasSprite implements ISprite {
+public class MockAtlasSprite implements Sprite {
     private final ResourceLocation NAME;
 
     public MockAtlasSprite(ResourceLocation name) {

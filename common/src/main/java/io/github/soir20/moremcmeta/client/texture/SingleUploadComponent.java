@@ -27,14 +27,14 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture that is not associated with an atlas sprite.
  * @author soir20
  */
-public class SingleUploadComponent implements ITextureComponent {
-    private final ITexturePreparer PREPARER;
+public class SingleUploadComponent implements TextureComponent {
+    private final TexturePreparer PREPARER;
 
     /**
      * Creates a new upload component for an independent texture.
      * @param preparer      prepares the texture for OpenGL on registration
      */
-    public SingleUploadComponent(ITexturePreparer preparer) {
+    public SingleUploadComponent(TexturePreparer preparer) {
         PREPARER = requireNonNull(preparer, "Preparer cannot be null");
     }
 

@@ -24,7 +24,7 @@ import io.github.soir20.moremcmeta.client.resource.SpriteFrameSizeFixPack;
 import io.github.soir20.moremcmeta.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
-import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
+import io.github.soir20.moremcmeta.client.texture.TexturePreparer;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
@@ -101,7 +101,7 @@ public abstract class MoreMcmeta {
      * Gets the OpenGL preparer for new textures on this loader.
      * @return the OpenGL preparer for this loader
      */
-    protected abstract ITexturePreparer getPreparer();
+    protected abstract TexturePreparer getPreparer();
 
     /**
      * Gets the action that should be executed to unregister a texture on a specific mod loader.

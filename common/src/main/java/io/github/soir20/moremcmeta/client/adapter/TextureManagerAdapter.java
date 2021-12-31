@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.adapter;
 
-import io.github.soir20.moremcmeta.client.texture.IManager;
+import io.github.soir20.moremcmeta.client.texture.Manager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
@@ -28,13 +28,13 @@ import java.util.function.Supplier;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Wraps a {@link TextureManager} so it is compatible with the {@link IManager}
+ * Wraps a {@link TextureManager} so it is compatible with the {@link Manager}
  * interface and because it is not immediately available during mod construction.
  * This class also retrieves the texture manager and throws errors
  * if it is used too early (and the manager is null).
  * @author soir20
  */
-public class TextureManagerAdapter implements IManager<AbstractTexture> {
+public class TextureManagerAdapter implements Manager<AbstractTexture> {
     private final Supplier<TextureManager> MANAGER_GETTER;
     private final BiConsumer<TextureManager, ResourceLocation> UNREGISTER_ACTION;
 

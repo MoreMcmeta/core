@@ -26,22 +26,22 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Finishes loaded textures lazily with upload components according to the provided {@link IFinisher}.
+ * Finishes loaded textures lazily with upload components according to the provided {@link Finisher}.
  * @param <I> type of texture builders (input)
  * @param <O> type of textures (output)
  * @author soir20
  */
-public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> implements IManager<I> {
-    private final IManager<AbstractTexture> DELEGATE;
+public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> implements Manager<I> {
+    private final Manager<AbstractTexture> DELEGATE;
     private final Map<ResourceLocation, CustomTickable> ANIMATED_TEXTURES;
-    private final IFinisher<I, O> FINISHER;
+    private final Finisher<I, O> FINISHER;
 
     /**
      * Creates the TextureManagerWrapper.
      * @param delegate      Minecraft's the texture manager
      * @param finisher      lazily finishes textures once resource loading is complete
      */
-    public LazyTextureManager(IManager<AbstractTexture> delegate, IFinisher<I, O> finisher) {
+    public LazyTextureManager(Manager<AbstractTexture> delegate, Finisher<I, O> finisher) {
         DELEGATE = requireNonNull(delegate, "Delegate manager cannot be null");
         ANIMATED_TEXTURES = new HashMap<>();
         FINISHER = requireNonNull(finisher, "Finisher cannot be null");
@@ -49,7 +49,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
 
     /**
      * Registers a texture that needs to be finished. What happens when duplicate locations are added
-     * depends on the provided {@link IFinisher}.
+     * depends on the provided {@link Finisher}.
      * @param textureLocation   file location of texture identical to how it is used in a entity/gui/map
      * @param builder           unfinished texture
      */
@@ -69,7 +69,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
 
     /**
      * Finishes all queued textures by adding them to Minecraft's texture manager
-     * according to the provided {@link IFinisher}.
+     * according to the provided {@link Finisher}.
      */
     public void finishQueued() {
         Map<ResourceLocation, O> textures = FINISHER.finish();

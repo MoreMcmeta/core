@@ -36,7 +36,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void construct_FrameDataNull_NullPointerException() {
-        ImmutableList<IRGBAImage> mipmaps = ImmutableList.of(new MockRGBAImage());
+        ImmutableList<RGBAImage> mipmaps = ImmutableList.of(new MockRGBAImage());
 
         expectedException.expect(NullPointerException.class);
         new RGBAImageFrame(null, mipmaps);
@@ -120,7 +120,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void getMipmapLevel_MipmapsProvided_MipmapLevelReturned() {
-        ImmutableList<IRGBAImage> mipmaps = ImmutableList.of(
+        ImmutableList<RGBAImage> mipmaps = ImmutableList.of(
                 new MockRGBAImage(),
                 new MockRGBAImage(),
                 new MockRGBAImage(),
@@ -138,7 +138,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void getMipmap_MipmapAtArrayLength_IllegalArgException() {
-        ImmutableList<IRGBAImage> mipmaps = ImmutableList.of(
+        ImmutableList<RGBAImage> mipmaps = ImmutableList.of(
                 new MockRGBAImage(),
                 new MockRGBAImage(),
                 new MockRGBAImage(),
@@ -157,7 +157,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void getMipmap_MipmapBeyondArrayLength_IllegalArgException() {
-        ImmutableList<IRGBAImage> mipmaps = ImmutableList.of(
+        ImmutableList<RGBAImage> mipmaps = ImmutableList.of(
                 new MockRGBAImage(),
                 new MockRGBAImage(),
                 new MockRGBAImage(),
@@ -176,7 +176,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void upload_NullPoint_NullPointerException() {
-        ImmutableList<IRGBAImage> mipmaps = ImmutableList.of(
+        ImmutableList<RGBAImage> mipmaps = ImmutableList.of(
                 new MockRGBAImage(),
                 new MockRGBAImage(),
                 new MockRGBAImage(),
@@ -195,7 +195,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void upload_NegativeXPoint_IllegalArgException() {
-        ImmutableList<IRGBAImage> mipmaps = ImmutableList.of(
+        ImmutableList<RGBAImage> mipmaps = ImmutableList.of(
                 new MockRGBAImage(),
                 new MockRGBAImage(),
                 new MockRGBAImage(),
@@ -214,7 +214,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void upload_NegativeYPoint_IllegalArgException() {
-        ImmutableList<IRGBAImage> mipmaps = ImmutableList.of(
+        ImmutableList<RGBAImage> mipmaps = ImmutableList.of(
                 new MockRGBAImage(),
                 new MockRGBAImage(),
                 new MockRGBAImage(),
@@ -233,7 +233,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void upload_NegativeBothPoint_IllegalArgException() {
-        ImmutableList<IRGBAImage> mipmaps = ImmutableList.of(
+        ImmutableList<RGBAImage> mipmaps = ImmutableList.of(
                 new MockRGBAImage(),
                 new MockRGBAImage(),
                 new MockRGBAImage(),
@@ -546,7 +546,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_NullStartFrame_NullPointerException() {
-        ImmutableList<IRGBAImage> frames = ImmutableList.of(
+        ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
                 new MockRGBAImage(2, 2)
@@ -558,7 +558,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_NullEndFrame_NullPointerException() {
-        ImmutableList<IRGBAImage> frames = ImmutableList.of(
+        ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
                 new MockRGBAImage(2, 2)
@@ -570,7 +570,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_StepLessThanOne_IllegalArgException() {
-        ImmutableList<IRGBAImage> frames = ImmutableList.of(
+        ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
                 new MockRGBAImage(2, 2)
@@ -583,7 +583,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_StepEqualsSteps_IllegalArgException() {
-        ImmutableList<IRGBAImage> frames = ImmutableList.of(
+        ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
                 new MockRGBAImage(2, 2)
@@ -596,7 +596,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_StepGreaterThanSteps_IllegalArgException() {
-        ImmutableList<IRGBAImage> frames = ImmutableList.of(
+        ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
                 new MockRGBAImage(2, 2)
@@ -609,7 +609,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_StartFrameFewerMipmaps_IllegalArgException() {
-        ImmutableList<IRGBAImage> frames = ImmutableList.of(
+        ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
                 new MockRGBAImage(2, 2),
@@ -623,7 +623,7 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_EndFrameFewerMipmaps_IllegalArgException() {
-        ImmutableList<IRGBAImage> frames = ImmutableList.of(
+        ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
                 new MockRGBAImage(2, 2),
@@ -637,13 +637,13 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_SameMipmaps_CorrectInterpolation() {
-        ImmutableList.Builder<IRGBAImage> frameBuilder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<RGBAImage> frameBuilder = new ImmutableList.Builder<>();
 
         MockRGBAImageFrame startFrame = new MockRGBAImageFrame(10, 10, 3);
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(10, 10, 3);
 
         for (int level = 0; level <= 3; level++) {
-            IRGBAImage.VisibleArea.Builder areaBuilder = new IRGBAImage.VisibleArea.Builder();
+            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
             areaBuilder.addPixel(6 >> level, 7 >> level);
             frameBuilder.add(new MockRGBAImage(new int[10 >> level][10 >> level], areaBuilder.build()));
 
@@ -661,13 +661,13 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_StartFrameMoreMipmaps_CorrectInterpolation() {
-        ImmutableList.Builder<IRGBAImage> frameBuilder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<RGBAImage> frameBuilder = new ImmutableList.Builder<>();
 
         MockRGBAImageFrame startFrame = new MockRGBAImageFrame(10, 10, 3);
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(10, 10, 2);
 
         for (int level = 0; level <= 2; level++) {
-            IRGBAImage.VisibleArea.Builder areaBuilder = new IRGBAImage.VisibleArea.Builder();
+            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
             areaBuilder.addPixel(6 >> level, 7 >> level);
             frameBuilder.add(new MockRGBAImage(new int[10 >> level][10 >> level], areaBuilder.build()));
 
@@ -687,13 +687,13 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_EndFrameMoreMipmaps_CorrectInterpolation() {
-        ImmutableList.Builder<IRGBAImage> frameBuilder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<RGBAImage> frameBuilder = new ImmutableList.Builder<>();
 
         MockRGBAImageFrame startFrame = new MockRGBAImageFrame(10, 10, 2);
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(10, 10, 3);
 
         for (int level = 0; level <= 2; level++) {
-            IRGBAImage.VisibleArea.Builder areaBuilder = new IRGBAImage.VisibleArea.Builder();
+            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
             areaBuilder.addPixel(6 >> level, 7 >> level);
             frameBuilder.add(new MockRGBAImage(new int[10 >> level][10 >> level], areaBuilder.build()));
 
@@ -713,13 +713,13 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_EmptyMipmap_CorrectInterpolation() {
-        ImmutableList.Builder<IRGBAImage> frameBuilder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<RGBAImage> frameBuilder = new ImmutableList.Builder<>();
 
         MockRGBAImageFrame startFrame = new MockRGBAImageFrame(5, 5, 3);
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(5, 5, 3);
 
         for (int level = 0; level <= 2; level++) {
-            IRGBAImage.VisibleArea.Builder areaBuilder = new IRGBAImage.VisibleArea.Builder();
+            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
             areaBuilder.addPixel(3 >> level, 2 >> level);
             frameBuilder.add(new MockRGBAImage(new int[5 >> level][5 >> level], areaBuilder.build()));
 
@@ -739,13 +739,13 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_StartOrEndLarger_CorrectInterpolation() {
-        ImmutableList.Builder<IRGBAImage> frameBuilder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<RGBAImage> frameBuilder = new ImmutableList.Builder<>();
 
         MockRGBAImageFrame startFrame = new MockRGBAImageFrame(10, 5, 2);
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(5, 10, 2);
 
         for (int level = 0; level <= 2; level++) {
-            IRGBAImage.VisibleArea.Builder areaBuilder = new IRGBAImage.VisibleArea.Builder();
+            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
             areaBuilder.addPixel(3 >> level, 2 >> level);
             frameBuilder.add(new MockRGBAImage(new int[5 >> level][5 >> level], areaBuilder.build()));
 
@@ -763,13 +763,13 @@ public class RGBAImageFrameTest {
 
     @Test
     public void interpolate_StartOrEndSmaller_CorrectInterpolation() {
-        ImmutableList.Builder<IRGBAImage> frameBuilder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<RGBAImage> frameBuilder = new ImmutableList.Builder<>();
 
         MockRGBAImageFrame startFrame = new MockRGBAImageFrame(10, 5, 2);
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(5, 10, 2);
 
         for (int level = 0; level <= 2; level++) {
-            IRGBAImage.VisibleArea.Builder areaBuilder = new IRGBAImage.VisibleArea.Builder();
+            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
             areaBuilder.addPixel(3 >> level, 2 >> level);
             frameBuilder.add(new MockRGBAImage(new int[10 >> level][10 >> level], areaBuilder.build()));
 

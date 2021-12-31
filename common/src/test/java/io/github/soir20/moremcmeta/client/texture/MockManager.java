@@ -29,7 +29,7 @@ import java.util.Set;
  * @param <R> resource type
  * @author soir20
  */
-public class MockManager<R> implements IManager<R> {
+public class MockManager<R> implements Manager<R> {
     private final Map<ResourceLocation, R> TEXTURES;
     private final Map<ResourceLocation, Tickable> ANIMATED_TEXTURES;
 

@@ -17,31 +17,32 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * An adapter for {@link net.minecraft.client.renderer.texture.TextureAtlasSprite}
- * to provide a cleaner interface and make it easier to instantiate in test code.
+ * A container for resources that can be added and removed. It represents what textures Minecraft is aware of.
+ * @param <R> resource type
  * @author soir20
  */
-public interface ISprite {
+public interface Manager<R> extends CustomTickable {
 
     /**
-     * Binds the sprite (and thus its atlas) to OpenGL.
+     * Prepares a texture and makes Minecraft aware of it.
+     * @param location      file location of resource identical to how it is used in a entity/gui/map
+     * @param resource      the actual resource that should be used
      */
-    void bind();
+    void register(ResourceLocation location, R resource);
 
     /**
-     * Gets the name of this sprite (without an extension).
-     * @return the sprite's name
+     * Unregisters a resource so Minecraft is no longer aware of it.
+     * This also allows the resource to be replaced.
+     * @param location   file location of resource to delete
      */
-    ResourceLocation getName();
+    void unregister(ResourceLocation location);
 
     /**
-     * Gets the position of the sprite's top-left corner on its atlas.
-     * @return the sprite's upload point
+     * Updates all animated resources that were loaded through this manager.
      */
-    Point getUploadPoint();
+    void tick();
 
 }

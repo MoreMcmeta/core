@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.animation;
 
-import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
+import io.github.soir20.moremcmeta.client.texture.RGBAImage;
 import io.github.soir20.moremcmeta.client.texture.MockRGBAImage;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,12 +45,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] endPixels = new int[width][height];
         endPixels[1][2] = toBinary(25, 181, 119, 37);
@@ -71,12 +71,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] startPixels = new int[width][height];
         startPixels[1][2] = toBinary(184, 143, 65, 197);
@@ -97,12 +97,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] startPixels = new int[width][height];
         startPixels[1][2] = toBinary(184, 143, 65, 197);
@@ -129,7 +129,7 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea area = (new IRGBAImage.VisibleArea.Builder()).build();
+        RGBAImage.VisibleArea area = (new RGBAImage.VisibleArea.Builder()).build();
 
         int[][] startPixels = new int[width][height];
         MockRGBAImage start = new MockRGBAImage(startPixels, area);
@@ -151,7 +151,7 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea area = (new IRGBAImage.VisibleArea.Builder()).build();
+        RGBAImage.VisibleArea area = (new RGBAImage.VisibleArea.Builder()).build();
 
         int[][] startPixels = new int[width][height];
         MockRGBAImage start = new MockRGBAImage(startPixels, area);
@@ -173,7 +173,7 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea area = (new IRGBAImage.VisibleArea.Builder()).build();
+        RGBAImage.VisibleArea area = (new RGBAImage.VisibleArea.Builder()).build();
 
         int[][] startPixels = new int[width][height];
         MockRGBAImage start = new MockRGBAImage(startPixels, area);
@@ -195,12 +195,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int firstColor = toBinary(25, 50, 250, 255);
         int secondColor = toBinary(25, 250, 50, 150);
@@ -224,7 +224,7 @@ public class RGBAInterpolatorTest {
         RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
                 new MockRGBAImage(new int[w][h], area));
 
-        IRGBAImage output = interpolator.interpolate(10, 1, start, end);
+        RGBAImage output = interpolator.interpolate(10, 1, start, end);
 
         assertEquals(firstColor, output.getPixel(1, 2));
         assertEquals(secondColor, output.getPixel(4, 0));
@@ -239,12 +239,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] startPixels = new int[width][height];
         startPixels[1][2] = toBinary(25, 50, 250, 0);
@@ -263,7 +263,7 @@ public class RGBAInterpolatorTest {
         RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
                 new MockRGBAImage(new int[w][h], area));
 
-        IRGBAImage output = interpolator.interpolate(10, 5, start, end);
+        RGBAImage output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(39, 64, 246, 0), output.getPixel(1, 2));
         assertEquals(toBinary(137, 137, 50, 0), output.getPixel(4, 0));
@@ -278,12 +278,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] startPixels = new int[width][height];
         startPixels[1][2] = toBinary(184, 143, 65, 197);
@@ -302,7 +302,7 @@ public class RGBAInterpolatorTest {
         RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
                 new MockRGBAImage(new int[w][h], area));
 
-        IRGBAImage output = interpolator.interpolate(10, 2, start, end);
+        RGBAImage output = interpolator.interpolate(10, 2, start, end);
 
         assertEquals(toBinary(152, 150, 75, 197), output.getPixel(1, 2));
         assertEquals(toBinary(54, 223, 98, 100), output.getPixel(4, 0));
@@ -317,12 +317,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] startPixels = new int[width][height];
         startPixels[1][2] = toBinary(184, 143, 65, 197);
@@ -341,7 +341,7 @@ public class RGBAInterpolatorTest {
         RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
                 new MockRGBAImage(new int[w][h], area));
 
-        IRGBAImage output = interpolator.interpolate(10, 5, start, end);
+        RGBAImage output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));
@@ -356,12 +356,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] startPixels = new int[width][height];
         startPixels[1][2] = toBinary(184, 143, 65, 197);
@@ -380,7 +380,7 @@ public class RGBAInterpolatorTest {
         RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
                 new MockRGBAImage(new int[w][h], area));
 
-        IRGBAImage output = interpolator.interpolate(10, 8, start, end);
+        RGBAImage output = interpolator.interpolate(10, 8, start, end);
 
         assertEquals(toBinary(56, 173, 108, 197), output.getPixel(1, 2));
         assertEquals(toBinary(93, 150, 155, 100), output.getPixel(4, 0));
@@ -392,13 +392,13 @@ public class RGBAInterpolatorTest {
 
     @Test
     public void interpolate_DifferentDimensions_DimensionsExpand() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 6);
         builder.addPixel(9, 3);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] startPixels = new int[5][8];
         startPixels[1][2] = toBinary(184, 143, 65, 197);
@@ -417,7 +417,7 @@ public class RGBAInterpolatorTest {
         RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
                 new MockRGBAImage(new int[w][h], area));
 
-        IRGBAImage output = interpolator.interpolate(10, 5, start, end);
+        RGBAImage output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));
@@ -433,12 +433,12 @@ public class RGBAInterpolatorTest {
         int width = 5;
         int height = 5;
 
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         builder.addPixel(1, 2);
         builder.addPixel(4, 0);
         builder.addPixel(2, 3);
         builder.addPixel(0, 4);
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         int[][] startPixels = new int[width][height];
         startPixels[1][2] = toBinary(184, 143, 65, 197);
@@ -457,7 +457,7 @@ public class RGBAInterpolatorTest {
         RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
                 new MockRGBAImage(new int[w][h], area));
 
-        IRGBAImage output = interpolator.interpolate(10, 5, start, end);
+        RGBAImage output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));

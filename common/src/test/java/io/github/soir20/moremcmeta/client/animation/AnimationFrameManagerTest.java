@@ -227,7 +227,7 @@ public class AnimationFrameManagerTest {
 
         ImmutableList<String> mockFrames = mockFramesBuilder.build();
 
-        IInterpolator<String> interpolator = ((steps, step, start, end) ->
+        Interpolator<String> interpolator = ((steps, step, start, end) ->
                 String.format("steps: %s, step: %s, start: %s, end: %s", steps, step, start, end)
         );
 
@@ -393,7 +393,7 @@ public class AnimationFrameManagerTest {
 
         ImmutableList<String> mockFrames = mockFramesBuilder.build();
 
-        IInterpolator<String> interpolator = ((steps, step, start, end) ->
+        Interpolator<String> interpolator = ((steps, step, start, end) ->
                 String.format("steps: %s, step: %s, start: %s, end: %s", steps, step, start, end)
         );
 

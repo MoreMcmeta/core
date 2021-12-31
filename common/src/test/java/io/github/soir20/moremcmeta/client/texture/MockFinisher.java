@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * A fake {@link IFinisher} that turns items to textures.
+ * A fake {@link Finisher} that turns items to textures.
  * @param <I> input type
  * @author soir20
  */
-public class MockFinisher<I> implements IFinisher<I, MockAnimatedTexture> {
+public class MockFinisher<I> implements Finisher<I, MockAnimatedTexture> {
     private final Map<ResourceLocation, I> ITEMS;
 
     public MockFinisher() {

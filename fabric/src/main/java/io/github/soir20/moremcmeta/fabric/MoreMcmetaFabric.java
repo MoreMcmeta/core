@@ -21,7 +21,7 @@ import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
 import io.github.soir20.moremcmeta.client.resource.StagedResourceReloadListener;
-import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
+import io.github.soir20.moremcmeta.client.texture.TexturePreparer;
 import io.github.soir20.moremcmeta.fabric.client.adapter.SimpleReloadListenerAdapter;
 import io.github.soir20.moremcmeta.fabric.client.event.ResourceManagerInitializedCallback;
 import io.github.soir20.moremcmeta.fabric.client.mixin.LoadingOverlayAccessor;
@@ -61,7 +61,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * Gets the OpenGL preparer for new textures on this loader.
      * @return the OpenGL preparer for this loader
      */
-    protected ITexturePreparer getPreparer() {
+    protected TexturePreparer getPreparer() {
         return (glId, mipmap, width, height) -> {
             if (!RenderSystem.isOnRenderThreadOrInit()) {
                 RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(glId, mipmap, width, height));

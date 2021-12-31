@@ -36,7 +36,7 @@ public class AnimationFrameManager<F> implements CustomTickable {
     private final ToIntFunction<F> FRAME_TIME_CALCULATOR;
 
     @Nullable
-    private final IInterpolator<F> INTERPOLATOR;
+    private final Interpolator<F> INTERPOLATOR;
 
     private int ticksInThisFrame;
     private int currentFrameIndex;
@@ -74,7 +74,7 @@ public class AnimationFrameManager<F> implements CustomTickable {
      * @param interpolator          interpolates between frames of the animation
      */
     public AnimationFrameManager(ImmutableList<? extends F> frames, ToIntFunction<F> frameTimeCalculator,
-                                 IInterpolator<F> interpolator) {
+                                 Interpolator<F> interpolator) {
         FRAMES = requireNonNull(frames, "Frames cannot be null");
         FRAME_TIME_CALCULATOR = requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
         INTERPOLATOR = requireNonNull(interpolator, "Interpolator cannot be null");

@@ -27,13 +27,13 @@ import java.util.Optional;
  * @author soir20
  */
 @FunctionalInterface
-public interface IAtlas {
+public interface Atlas {
 
     /**
      * Gets a sprite from this atlas if it is present.
      * @param location      the location of the sprite
      * @return the sprite at the given location if present
      */
-    Optional<ISprite> getSprite(ResourceLocation location);
+    Optional<Sprite> getSprite(ResourceLocation location);
 
 }

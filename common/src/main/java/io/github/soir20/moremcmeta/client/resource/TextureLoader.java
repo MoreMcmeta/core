@@ -19,7 +19,7 @@ package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParseException;
-import io.github.soir20.moremcmeta.client.io.ITextureReader;
+import io.github.soir20.moremcmeta.client.io.TextureReader;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -43,7 +43,7 @@ import static java.util.Objects.requireNonNull;
 public class TextureLoader<R> {
     private static final String METADATA_EXTENSION = ".moremcmeta";
 
-    private final ITextureReader<R> TEXTURE_READER;
+    private final TextureReader<R> TEXTURE_READER;
     private final Logger LOGGER;
 
     /**
@@ -51,7 +51,7 @@ public class TextureLoader<R> {
      * @param texReader             reads textures
      * @param logger                logs listener-related messages to the game's output
      */
-    public TextureLoader(ITextureReader<R> texReader, Logger logger) {
+    public TextureLoader(TextureReader<R> texReader, Logger logger) {
         TEXTURE_READER = requireNonNull(texReader, "Texture reader cannot be null");
         LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
