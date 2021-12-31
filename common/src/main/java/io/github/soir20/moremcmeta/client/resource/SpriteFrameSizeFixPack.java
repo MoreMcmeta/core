@@ -43,6 +43,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Provides dummy metadata for mod-animated atlas sprites when vanilla metadata is requested.
  * This prevents the atlas sprites from being "squished" because only the first frame is stitched
@@ -57,6 +59,8 @@ public class SpriteFrameSizeFixPack implements PackResources {
        pack during parallel resource reloading. */
     private final ConcurrentMap<ResourceLocation, EventDrivenTexture.Builder> TEXTURES;
 
+    private boolean wasSet;
+
     /**
      * Creates a new sprite fix pack.
      */
@@ -65,11 +69,17 @@ public class SpriteFrameSizeFixPack implements PackResources {
     }
 
     /**
-     * Updates the textures recognized by this pack.
+     * Updates the textures recognized by this pack. Should only be used once per pack.
      * @param textures      the current mod-controlled textures
      */
     public void setTextures(Map<ResourceLocation, EventDrivenTexture.Builder> textures) {
-        TEXTURES.clear();
+        requireNonNull(textures, "Textures cannot be null");
+
+        if (wasSet) {
+            throw new IllegalStateException("Textures can only be set once per sprite fix pack");
+        }
+
+        wasSet = true;
         TEXTURES.putAll(textures);
     }
 
@@ -81,6 +91,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
     @Nullable
     @Override
     public InputStream getRootResource(String resourceName) {
+        requireNonNull(resourceName, "Resource name cannot be null");
         return null;
     }
 
@@ -95,6 +106,9 @@ public class SpriteFrameSizeFixPack implements PackResources {
      */
     @Override
     public InputStream getResource(PackType packType, ResourceLocation location) throws IOException {
+        requireNonNull(packType, "Pack type cannot be null");
+        requireNonNull(location, "Location cannot be null");
+
         if (packType != PackType.CLIENT_RESOURCES) {
             throw new IOException("MoreMcmeta's internal pack only contains client resources");
         }
@@ -146,6 +160,10 @@ public class SpriteFrameSizeFixPack implements PackResources {
     @Override
     public Collection<ResourceLocation> getResources(PackType packType, String namespace, String pathStart,
                                                      int depth, Predicate<String> pathFilter) {
+        requireNonNull(packType, "Pack type cannot be null");
+        requireNonNull(namespace, "Namespace cannot be null");
+        requireNonNull(pathStart, "Path start cannot be null");
+        requireNonNull(pathFilter, "Path filter cannot be null");
 
         // Vanilla packs exclude .mcmeta metadata files, so we should not include them here
         return TEXTURES.keySet().stream().filter((location) -> {
@@ -167,6 +185,9 @@ public class SpriteFrameSizeFixPack implements PackResources {
      */
     @Override
     public boolean hasResource(PackType packType, ResourceLocation location) {
+        requireNonNull(packType, "Pack type cannot be null");
+        requireNonNull(location, "Location cannot be null");
+
         if (packType != PackType.CLIENT_RESOURCES) {
             return false;
         }
@@ -181,6 +202,8 @@ public class SpriteFrameSizeFixPack implements PackResources {
      */
     @Override
     public Set<String> getNamespaces(PackType packType) {
+        requireNonNull(packType, "Pack type cannot be null");
+
         if (packType != PackType.CLIENT_RESOURCES) {
             return Set.of();
         }
@@ -197,6 +220,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
     @Nullable
     @Override
     public <T> T getMetadataSection(MetadataSectionSerializer<T> metadataSectionSerializer) {
+        requireNonNull(metadataSectionSerializer, "Serializer cannot be null");
         return null;
     }
 

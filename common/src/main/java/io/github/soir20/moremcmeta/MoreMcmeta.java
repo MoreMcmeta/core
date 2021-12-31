@@ -232,15 +232,19 @@ public abstract class MoreMcmeta {
 
         /**
          * Loads textures and adds the resource pack to fix animated sprites.
-         * @param manager       Minecraft's resource manager
-         * @param profiler      load stage profiler
-         * @param executor      asynchronously executes load stage tasks
+         * @param manager           Minecraft's resource manager
+         * @param loadProfiler      load stage profiler
+         * @param loadExecutor          asynchronously executes load stage tasks
          * @return task returning loaded texture builders by location
          */
         @Override
         public CompletableFuture<Map<ResourceLocation, EventDrivenTexture.Builder>> load(ResourceManager manager,
-                                                                                         ProfilerFiller profiler,
-                                                                                         Executor executor) {
+                                                                                         ProfilerFiller loadProfiler,
+                                                                                         Executor loadExecutor) {
+            requireNonNull(manager, "Resource manager cannot be null");
+            requireNonNull(loadProfiler, "Profiler cannot be null");
+            requireNonNull(loadExecutor, "Executor cannot be null");
+
             SpriteFrameSizeFixPack spriteFixPack = addSpriteFixPack(RESOURCE_MANAGER);
             return CompletableFuture.supplyAsync(() -> {
                 Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
@@ -248,20 +252,26 @@ public abstract class MoreMcmeta {
                 textures.putAll(LOADER.load(manager, "optifine"));
                 spriteFixPack.setTextures(textures);
                 return textures;
-            }, executor);
+            }, loadExecutor);
         }
 
         /**
          * Clears old textures, if any, and registers new ones.
          * @param data          texture builders by location that were just loaded
          * @param manager       Minecraft's resource manager
-         * @param profiler      apply stage profiler
-         * @param executor      asynchronously executes apply stage tasks
+         * @param applyProfiler      apply stage profiler
+         * @param applyExecutor      asynchronously executes apply stage tasks
          * @return task with no return data
          */
         @Override
         public CompletableFuture<Void> apply(Map<ResourceLocation, EventDrivenTexture.Builder> data,
-                                             ResourceManager manager, ProfilerFiller profiler, Executor executor) {
+                                             ResourceManager manager, ProfilerFiller applyProfiler,
+                                             Executor applyExecutor) {
+            requireNonNull(data, "Data cannot be null");
+            requireNonNull(manager, "Resource manager cannot be null");
+            requireNonNull(applyProfiler, "Profiler cannot be null");
+            requireNonNull(applyExecutor, "Executor cannot be null");
+
             addCompletedReloadCallback(TEX_MANAGER, LOGGER);
 
             return CompletableFuture.runAsync(() -> {
@@ -270,7 +280,7 @@ public abstract class MoreMcmeta {
                 LAST_TEXTURES_ADDED.putAll(data);
 
                 data.forEach(TEX_MANAGER::register);
-            }, executor);
+            }, applyExecutor);
         }
 
     }
