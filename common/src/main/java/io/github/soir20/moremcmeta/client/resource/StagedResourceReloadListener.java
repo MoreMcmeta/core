@@ -34,7 +34,7 @@ import java.util.concurrent.Executor;
 public interface StagedResourceReloadListener<T> extends PreparableReloadListener {
 
     /**
-     * 
+     * Executes the load and apply tasks in order when the resource manager reloads.
      * @param barrier           barrier between data gathering and using that data
      * @param manager           Minecraft's resource manager
      * @param loadProfiler      profiler for load stage
