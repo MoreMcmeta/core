@@ -34,35 +34,65 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class DisableVanillaSpriteAnimationPack implements PackResources {
+/**
+ * Provides dummy metadata for mod-animated atlas sprites when vanilla metadata is requested.
+ * This prevents the atlas sprites from being "squished" because only the first frame is stitched
+ * onto the atlas, not all of them.
+ * @author soir20
+ */
+public class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
 
-    private final Map<ResourceLocation, EventDrivenTexture.Builder> TEXTURES;
+    /* A concurrent map is not necessary for MoreMcmeta since it only accesses the pack from one
+       thread at a time. However, it offers protection in case another mod tries to modify the
+       pack during parallel resource reloading. */
+    private final ConcurrentMap<ResourceLocation, EventDrivenTexture.Builder> TEXTURES;
 
-    public DisableVanillaSpriteAnimationPack() {
-        TEXTURES = new HashMap<>();
+    /**
+     * Creates a new sprite fix pack.
+     */
+    public SpriteFrameSizeFixPack() {
+        TEXTURES = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Updates the textures recognized by this pack.
+     * @param textures      the current mod-controlled textures
+     */
     public void setTextures(Map<ResourceLocation, EventDrivenTexture.Builder> textures) {
         TEXTURES.clear();
         TEXTURES.putAll(textures);
     }
 
+    /**
+     * Gets a resource at the root of this pack.
+     * @param resourceName      name of resource
+     * @return the resource with that name or null if not found
+     */
     @Nullable
     @Override
-    public InputStream getRootResource(String string) {
+    public InputStream getRootResource(String resourceName) {
         return null;
     }
 
+    /**
+     * Gets a resource from this pack. Only mod-controlled textures provided in
+     * {@link #setTextures(Map)} can be found. .mcmeta files for those textures are replaced
+     * with dummy metadata.
+     * @param packType      client or server resources. Only client resources are available.
+     * @param location      location of the resource to retrieve
+     * @return the requested resource
+     * @throws IOException if the requested resource is not found or a server pack type is provided
+     */
     @Override
     public InputStream getResource(PackType packType, ResourceLocation location) throws IOException {
         if (packType != PackType.CLIENT_RESOURCES) {
@@ -84,8 +114,8 @@ public class DisableVanillaSpriteAnimationPack implements PackResources {
             throw new IOException("Requested non-animated resource from MoreMcmeta's internal pack");
         }
 
+        // Textures and metadata must come from the same pack, so search other packs for the texture
         ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-
         List<PackResources> allPacks = resourceManager.listPacks().collect(Collectors.toList());
 
         /* Reverse the list since highest packs are at the end.
@@ -103,6 +133,16 @@ public class DisableVanillaSpriteAnimationPack implements PackResources {
         return packWithResource.get().getResource(packType, textureLocation);
     }
 
+    /**
+     * Gets the locations of the available resources in this pack (the textures provided in
+     * {@link #setTextures(Map)}).
+     * @param packType          client or server resources. Only client resources are available.
+     * @param namespace         namespace of the requested resources
+     * @param pathStart         required start of the resources' paths (like folders)
+     * @param depth             depth of directory tree to search
+     * @param pathFilter        filter for entire paths, including the file name and extension
+     * @return the matching resources in this pack
+     */
     @Override
     public Collection<ResourceLocation> getResources(PackType packType, String namespace, String pathStart,
                                                      int depth, Predicate<String> pathFilter) {
@@ -118,6 +158,13 @@ public class DisableVanillaSpriteAnimationPack implements PackResources {
 
     }
 
+    /**
+     * Checks if this pack contains a resource. Only contains textures and their metadata for
+     * the textures provided in {@link #setTextures(Map)}.
+     * @param packType      client or server resources. Only client resources are available.
+     * @param location      location of the resource to look for
+     * @return whether the pack contains the requested resource
+     */
     @Override
     public boolean hasResource(PackType packType, ResourceLocation location) {
         if (packType != PackType.CLIENT_RESOURCES) {
@@ -127,45 +174,70 @@ public class DisableVanillaSpriteAnimationPack implements PackResources {
         return TEXTURES.containsKey(getTextureLocation(location));
     }
 
+    /**
+     * Gets the unique namespaces of all the resources in this pack.
+     * @param packType      client or server resources. Only client resources are available.
+     * @return the unique namespaces of this pack's resources
+     */
     @Override
     public Set<String> getNamespaces(PackType packType) {
         if (packType != PackType.CLIENT_RESOURCES) {
             return Set.of();
         }
 
-        return Minecraft.getInstance().getResourcePackRepository().openAllSelected().stream()
-                .filter((pack) -> !pack.getName().equals(getName()))
-                .flatMap((pack) -> {
-                    Stream<String> namespaces = pack.getNamespaces(PackType.CLIENT_RESOURCES).stream();
-                    pack.close();
-                    return namespaces;
-                }).collect(Collectors.toSet());
+        return Minecraft.getInstance().getResourceManager().getNamespaces();
     }
 
+    /**
+     * Gets the metadata for this pack (not individual resource metadata).
+     * @param metadataSectionSerializer     metadata serializer to read metadata
+     * @param <T>                           metadata section type
+     * @return the requested section of metadata or null if there is none
+     */
     @Nullable
     @Override
     public <T> T getMetadataSection(MetadataSectionSerializer<T> metadataSectionSerializer) {
         return null;
     }
 
+    /**
+     * Gets the name of this resource pack.
+     * @return the name of this resource pack
+     */
     @Override
     public String getName() {
         return "__MoreMcmeta Internal__";
     }
 
+    /**
+     * Closes this resource pack and any internal resources it has open.
+     */
     @Override
     public void close() {}
 
+    /**
+     * Converts a location ending with the vanilla metadata extension (.mcmeta) to the
+     * texture location.
+     * @param location      location of vanilla metadata for a texture
+     * @return location of the texture associated with the metadata or the same location
+     *         if it is not the location of vanilla metadata
+     */
     private ResourceLocation getTextureLocation(ResourceLocation location) {
         return new ResourceLocation(
                 location.getNamespace(), location.getPath().replace(VANILLA_METADATA_EXTENSION, "")
         );
     }
 
+    /**
+     * Check if a resource pack is a different pack and has the given resource.
+     * @param otherPack     the other pack to search
+     * @param location      the location of the resource to look for
+     * @return whether the given pack is not the same as this pack and has the requested resource
+     */
     private boolean otherPackHasResource(PackResources otherPack, ResourceLocation location) {
         boolean isOtherPack = otherPack != this;
 
-        if (isOtherPack && otherPack instanceof DisableVanillaSpriteAnimationPack) {
+        if (isOtherPack && otherPack instanceof SpriteFrameSizeFixPack) {
             throw new IllegalStateException("Two sprite fix packs were added to the resource manager!");
         }
 
@@ -191,6 +263,12 @@ public class DisableVanillaSpriteAnimationPack implements PackResources {
         return Pair.of(frameWidth, frameHeight);
     }
 
+    /**
+     * Makes dummy metadata for an animation with one frame of the given size.
+     * @param frameWidth        width of a frame
+     * @param frameHeight       height of a frame
+     * @return dummy metadata with the given frame size
+     */
     private String makeEmptyAnimationJson(int frameWidth, int frameHeight) {
         return String.format(
                 "{" +
@@ -203,4 +281,5 @@ public class DisableVanillaSpriteAnimationPack implements PackResources {
                 frameWidth, frameHeight
         );
     }
+
 }

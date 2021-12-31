@@ -20,7 +20,7 @@ package io.github.soir20.moremcmeta;
 import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.client.adapter.TextureManagerAdapter;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
-import io.github.soir20.moremcmeta.client.resource.DisableVanillaSpriteAnimationPack;
+import io.github.soir20.moremcmeta.client.resource.SpriteFrameSizeFixPack;
 import io.github.soir20.moremcmeta.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
@@ -160,8 +160,8 @@ public abstract class MoreMcmeta {
      * @param resourceManager       the resource manager to add the pack to
      * @return the added pack
      */
-    private DisableVanillaSpriteAnimationPack addSpriteFixPack(SimpleReloadableResourceManager resourceManager) {
-        DisableVanillaSpriteAnimationPack pack = new DisableVanillaSpriteAnimationPack();
+    private SpriteFrameSizeFixPack addSpriteFixPack(SimpleReloadableResourceManager resourceManager) {
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack();
         resourceManager.add(pack);
         return pack;
     }
@@ -241,7 +241,7 @@ public abstract class MoreMcmeta {
         public CompletableFuture<Map<ResourceLocation, EventDrivenTexture.Builder>> load(ResourceManager manager,
                                                                                          ProfilerFiller profiler,
                                                                                          Executor executor) {
-            DisableVanillaSpriteAnimationPack spriteFixPack = addSpriteFixPack(RESOURCE_MANAGER);
+            SpriteFrameSizeFixPack spriteFixPack = addSpriteFixPack(RESOURCE_MANAGER);
             return CompletableFuture.supplyAsync(() -> {
                 Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
                 textures.putAll(LOADER.load(manager, "textures"));
