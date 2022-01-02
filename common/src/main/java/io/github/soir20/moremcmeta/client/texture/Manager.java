@@ -28,7 +28,7 @@ public interface Manager<R> extends CustomTickable {
 
     /**
      * Prepares a texture and makes Minecraft aware of it.
-     * @param location      file location of resource identical to how it is used in a entity/gui/map
+     * @param location      file location of resource identical to how it is used in an entity/gui/map
      * @param resource      the actual resource that should be used
      */
     void register(ResourceLocation location, R resource);

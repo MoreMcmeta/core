@@ -43,7 +43,7 @@ import static java.util.Objects.requireNonNull;
 public class TextureLoader<R> {
     private static final String METADATA_EXTENSION = ".moremcmeta";
 
-    private final TextureReader<R> TEXTURE_READER;
+    private final TextureReader<? extends R> TEXTURE_READER;
     private final Logger LOGGER;
 
     /**
@@ -51,7 +51,7 @@ public class TextureLoader<R> {
      * @param texReader             reads textures
      * @param logger                logs listener-related messages to the game's output
      */
-    public TextureLoader(TextureReader<R> texReader, Logger logger) {
+    public TextureLoader(TextureReader<? extends R> texReader, Logger logger) {
         TEXTURE_READER = requireNonNull(texReader, "Texture reader cannot be null");
         LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
@@ -94,8 +94,8 @@ public class TextureLoader<R> {
      * @param candidates        possible locations of textures
      * @param resourceManager   the resource manager for the current reload
      */
-    private ImmutableMap<ResourceLocation, R> getTextures(Collection<ResourceLocation> candidates,
-                                                                     ResourceManager resourceManager) {
+    private ImmutableMap<ResourceLocation, R> getTextures(Collection<? extends ResourceLocation> candidates,
+                                                          ResourceManager resourceManager) {
         Map<ResourceLocation, R> textures = new ConcurrentHashMap<>();
 
         // Create textures from unique candidates

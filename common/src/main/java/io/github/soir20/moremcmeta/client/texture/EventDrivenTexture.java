@@ -150,7 +150,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      *                      in the order given (by type)
      * @param image         initial image for this texture
      */
-    private EventDrivenTexture(List<TextureListener> listeners, RGBAImageFrame image) {
+    private EventDrivenTexture(List<? extends TextureListener> listeners, RGBAImageFrame image) {
         super();
         LISTENERS = new EnumMap<>(TextureListener.Type.class);
         for (TextureListener listener : listeners) {

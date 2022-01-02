@@ -39,14 +39,14 @@ public class TextureListener {
     }
 
     private final Type TYPE;
-    private final Consumer<EventDrivenTexture.TextureState> ACTION;
+    private final Consumer<? super EventDrivenTexture.TextureState> ACTION;
 
     /**
      * Creates a listener for a certain type of event.
      * @param type      event type
      * @param action    callback to execute when the event occurs
      */
-    public TextureListener(Type type, Consumer<EventDrivenTexture.TextureState> action) {
+    public TextureListener(Type type, Consumer<? super EventDrivenTexture.TextureState> action) {
         TYPE = requireNonNull(type, "Type cannot be null");
         ACTION = requireNonNull(action, "Action cannot be null");
     }

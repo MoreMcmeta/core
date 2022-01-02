@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureManagerAdapter implements Manager<AbstractTexture> {
-    private final Supplier<TextureManager> MANAGER_GETTER;
+    private final Supplier<? extends TextureManager> MANAGER_GETTER;
     private final BiConsumer<TextureManager, ResourceLocation> UNREGISTER_ACTION;
 
     /**
@@ -43,7 +43,7 @@ public class TextureManagerAdapter implements Manager<AbstractTexture> {
      * @param managerGetter         retrieves the texture manager, which should not be null
      * @param unregisterAction      unregisters a texture from the manager on a specific mod loader
      */
-    public TextureManagerAdapter(Supplier<TextureManager> managerGetter,
+    public TextureManagerAdapter(Supplier<? extends TextureManager> managerGetter,
                                  BiConsumer<TextureManager, ResourceLocation> unregisterAction) {
         MANAGER_GETTER = requireNonNull(managerGetter, "Manager getter cannot be null");
         UNREGISTER_ACTION = requireNonNull(unregisterAction, "Unregister action cannot be null");

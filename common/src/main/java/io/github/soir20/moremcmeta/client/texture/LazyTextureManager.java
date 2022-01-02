@@ -32,16 +32,17 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> implements Manager<I> {
-    private final Manager<AbstractTexture> DELEGATE;
+    private final Manager<? super AbstractTexture> DELEGATE;
     private final Map<ResourceLocation, CustomTickable> ANIMATED_TEXTURES;
-    private final Finisher<I, O> FINISHER;
+    private final Finisher<? super I, ? extends O> FINISHER;
 
     /**
      * Creates the TextureManagerWrapper.
      * @param delegate      Minecraft's the texture manager
      * @param finisher      lazily finishes textures once resource loading is complete
      */
-    public LazyTextureManager(Manager<AbstractTexture> delegate, Finisher<I, O> finisher) {
+    public LazyTextureManager(Manager<? super AbstractTexture> delegate,
+                              Finisher<? super I, ? extends O> finisher) {
         DELEGATE = requireNonNull(delegate, "Delegate manager cannot be null");
         ANIMATED_TEXTURES = new HashMap<>();
         FINISHER = requireNonNull(finisher, "Finisher cannot be null");
@@ -72,7 +73,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
      * according to the provided {@link Finisher}.
      */
     public void finishQueued() {
-        Map<ResourceLocation, O> textures = FINISHER.finish();
+        Map<ResourceLocation, ? extends O> textures = FINISHER.finish();
 
         textures.forEach((location, texture) -> {
             DELEGATE.register(location, texture);

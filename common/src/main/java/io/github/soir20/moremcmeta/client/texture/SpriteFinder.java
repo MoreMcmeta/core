@@ -43,13 +43,13 @@ public class SpriteFinder {
             new ResourceLocation("textures/atlas/mob_effects.png")
     );
 
-    private final Function<ResourceLocation, Atlas> ATLAS_GETTER;
+    private final Function<ResourceLocation, ? extends Atlas> ATLAS_GETTER;
 
     /**
      * Creates a new sprite finder.
      * @param atlasGetter  provides an atlas from a location
      */
-    public SpriteFinder(Function<ResourceLocation, Atlas> atlasGetter) {
+    public SpriteFinder(Function<ResourceLocation, ? extends Atlas> atlasGetter) {
         ATLAS_GETTER = requireNonNull(atlasGetter, "Atlas getter cannot be null");
     }
 

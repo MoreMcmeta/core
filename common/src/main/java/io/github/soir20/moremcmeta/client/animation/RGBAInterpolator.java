@@ -30,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class RGBAInterpolator implements Interpolator<RGBAImage> {
-    private final BiFunction<Integer, Integer, RGBAImage> IMAGE_GETTER;
+    private final BiFunction<Integer, Integer, ? extends RGBAImage> IMAGE_GETTER;
 
     /**
      * Creates a new interpolator.
@@ -38,7 +38,7 @@ public class RGBAInterpolator implements Interpolator<RGBAImage> {
      *                         Colors are overwritten. The longest width and the longest height
      *                         are selected between the start and end images.
      */
-    public RGBAInterpolator(BiFunction<Integer, Integer, RGBAImage> imageGetter) {
+    public RGBAInterpolator(BiFunction<Integer, Integer, ? extends RGBAImage> imageGetter) {
         IMAGE_GETTER = requireNonNull(imageGetter, "Image getter cannot be null");
     }
 
