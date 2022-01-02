@@ -17,29 +17,28 @@
 
 package io.github.soir20.moremcmeta.client.resource;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
-import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -53,34 +52,25 @@ import static java.util.Objects.requireNonNull;
  */
 public class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
+    private final Map<ResourceLocation, EventDrivenTexture.Builder> TEXTURES;
 
-    /* A concurrent map is not necessary for MoreMcmeta since it only accesses the pack from one
-       thread at a time. However, it offers protection in case another mod tries to modify the
-       pack during parallel resource reloading. */
-    private final ConcurrentMap<ResourceLocation, EventDrivenTexture.Builder> TEXTURES;
-
-    private boolean wasSet;
+    private final List<ResourceCollection> OTHER_PACKS;
 
     /**
      * Creates a new sprite fix pack.
+     * @param textures         textures controlled by the mod
+     * @param otherPacks       resource packs besides this one
      */
-    public SpriteFrameSizeFixPack() {
-        TEXTURES = new ConcurrentHashMap<>();
-    }
-
-    /**
-     * Updates the textures recognized by this pack. Should only be used once per pack.
-     * @param textures      the current mod-controlled textures
-     */
-    public void setTextures(Map<ResourceLocation, EventDrivenTexture.Builder> textures) {
+    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends EventDrivenTexture.Builder> textures,
+                                  List<? extends ResourceCollection> otherPacks) {
+        requireNonNull(otherPacks, "Packs cannot be null");
         requireNonNull(textures, "Textures cannot be null");
 
-        if (wasSet) {
-            throw new IllegalStateException("Textures can only be set once per sprite fix pack");
-        }
+        List<ResourceCollection> reversedList = new ArrayList<>(otherPacks);
+        Collections.reverse(reversedList);
+        OTHER_PACKS = ImmutableList.copyOf(reversedList);
 
-        wasSet = true;
-        TEXTURES.putAll(textures);
+        TEXTURES = ImmutableMap.copyOf(textures);
     }
 
     /**
@@ -97,7 +87,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
 
     /**
      * Gets a resource from this pack. Only mod-controlled textures provided in
-     * {@link #setTextures(Map)} can be found. .mcmeta files for those textures are replaced
+     * the constructor can be found. .mcmeta files for those textures are replaced
      * with dummy metadata.
      * @param packType      client or server resources. Only client resources are available.
      * @param location      location of the resource to retrieve
@@ -129,15 +119,13 @@ public class SpriteFrameSizeFixPack implements PackResources {
         }
 
         // Textures and metadata must come from the same pack, so search other packs for the texture
-        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-        List<PackResources> allPacks = resourceManager.listPacks().collect(Collectors.toList());
 
         /* Reverse the list since highest packs are at the end.
            We don't need to search the files of more packs than necessary */
-        Collections.reverse(allPacks);
 
-        Optional<PackResources> packWithResource = allPacks.stream().filter(
-                (pack) -> otherPackHasResource(pack, textureLocation)
+
+        Optional<ResourceCollection> packWithResource = OTHER_PACKS.stream().filter(
+                (pack) -> checkResource(pack, textureLocation)
         ).findFirst();
 
         if (packWithResource.isEmpty()) {
@@ -149,7 +137,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
 
     /**
      * Gets the locations of the available resources in this pack (the textures provided in
-     * {@link #setTextures(Map)}).
+     * the constructor).
      * @param packType          client or server resources. Only client resources are available.
      * @param namespace         namespace of the requested resources
      * @param pathStart         required start of the resources' paths (like folders)
@@ -178,7 +166,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
 
     /**
      * Checks if this pack contains a resource. Only contains textures and their metadata for
-     * the textures provided in {@link #setTextures(Map)}.
+     * the textures provided in the constructor.
      * @param packType      client or server resources. Only client resources are available.
      * @param location      location of the resource to look for
      * @return whether the pack contains the requested resource
@@ -208,7 +196,9 @@ public class SpriteFrameSizeFixPack implements PackResources {
             return Set.of();
         }
 
-        return Minecraft.getInstance().getResourceManager().getNamespaces();
+        return OTHER_PACKS.stream().flatMap(
+                (pack) -> pack.getNamespaces(packType).stream()
+        ).collect(Collectors.toSet());
     }
 
     /**
@@ -253,20 +243,14 @@ public class SpriteFrameSizeFixPack implements PackResources {
     }
 
     /**
-     * Check if a resource pack is a different pack and has the given resource.
+     * Check if a resource pack has the given resource more efficiently than directly using the
+     * {@link ResourceCollection#hasResource(PackType, ResourceLocation)} method.
      * @param otherPack     the other pack to search
      * @param location      the location of the resource to look for
      * @return whether the given pack is not the same as this pack and has the requested resource
      */
-    private boolean otherPackHasResource(PackResources otherPack, ResourceLocation location) {
-        boolean isOtherPack = otherPack != this;
-
-        if (isOtherPack && otherPack instanceof SpriteFrameSizeFixPack) {
-            throw new IllegalStateException("Two sprite fix packs were added to the resource manager!");
-        }
-
-        return isOtherPack
-                && otherPack.getNamespaces(PackType.CLIENT_RESOURCES).contains(location.getNamespace())
+    private boolean checkResource(ResourceCollection otherPack, ResourceLocation location) {
+        return otherPack.getNamespaces(PackType.CLIENT_RESOURCES).contains(location.getNamespace())
                 && otherPack.hasResource(PackType.CLIENT_RESOURCES, location);
     }
 
@@ -278,7 +262,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
     private Pair<Integer, Integer> getFrameSize(ResourceLocation location) {
         Optional<RGBAImageFrame> initialFrame = TEXTURES.get(location).getImage();
         if (initialFrame.isEmpty()) {
-            throw new IllegalStateException("Missing initial image guaranteed by texture reader");
+            throw new IllegalStateException("Missing initial image that should have been checked earlier");
         }
 
         int frameWidth = initialFrame.get().getWidth();

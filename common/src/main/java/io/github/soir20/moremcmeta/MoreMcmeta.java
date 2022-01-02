@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta;
 
 import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
+import io.github.soir20.moremcmeta.client.adapter.PackResourcesAdapter;
 import io.github.soir20.moremcmeta.client.adapter.TextureManagerAdapter;
 import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
 import io.github.soir20.moremcmeta.client.resource.SpriteFrameSizeFixPack;
@@ -41,6 +42,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -157,13 +159,15 @@ public abstract class MoreMcmeta {
 
     /**
      * Adds the mod-animated sprite resource pack to the resource manager.
+     * @param textures              textures controlled by this mod
      * @param resourceManager       the resource manager to add the pack to
-     * @return the added pack
      */
-    private SpriteFrameSizeFixPack addSpriteFixPack(SimpleReloadableResourceManager resourceManager) {
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack();
+    private void addSpriteFixPack(Map<ResourceLocation, EventDrivenTexture.Builder> textures,
+                                  SimpleReloadableResourceManager resourceManager) {
+        List<PackResourcesAdapter> otherPacks = resourceManager.listPacks().map(PackResourcesAdapter::new).toList();
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures, otherPacks);
         resourceManager.add(pack);
-        return pack;
     }
 
     /**
@@ -245,12 +249,10 @@ public abstract class MoreMcmeta {
             requireNonNull(loadProfiler, "Profiler cannot be null");
             requireNonNull(loadExecutor, "Executor cannot be null");
 
-            SpriteFrameSizeFixPack spriteFixPack = addSpriteFixPack(RESOURCE_MANAGER);
             return CompletableFuture.supplyAsync(() -> {
                 Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
                 textures.putAll(LOADER.load(manager, "textures"));
                 textures.putAll(LOADER.load(manager, "optifine"));
-                spriteFixPack.setTextures(textures);
                 return textures;
             }, loadExecutor);
         }
@@ -272,6 +274,7 @@ public abstract class MoreMcmeta {
             requireNonNull(applyProfiler, "Profiler cannot be null");
             requireNonNull(applyExecutor, "Executor cannot be null");
 
+            addSpriteFixPack(data, RESOURCE_MANAGER);
             addCompletedReloadCallback(TEX_MANAGER, LOGGER);
 
             return CompletableFuture.runAsync(() -> {
