@@ -22,6 +22,7 @@ import com.google.gson.JsonParseException;
 import io.github.soir20.moremcmeta.client.io.TextureReader;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -122,13 +123,22 @@ public class TextureLoader<R> {
     private Optional<R> getTexture(OrderedResourceRepository resourceRepository,
                                    ResourceLocation textureLocation,
                                    ResourceLocation metadataLocation) {
-        try (OrderedResourceRepository.FoundResources resources =
-                     resourceRepository.getFromSameCollection(textureLocation, metadataLocation)) {
+        PackType resourceType = resourceRepository.getResourceType();
 
-            InputStream textureStream = resources.get(textureLocation);
-            InputStream metadataStream = resources.get(metadataLocation);
+        try {
+            ResourceCollection resources = resourceRepository.getFirstCollectionWith(textureLocation);
 
-            return Optional.of(TEXTURE_READER.read(textureStream, metadataStream));
+            if (resources.hasResource(resourceType, metadataLocation)) {
+                InputStream textureStream = resources.getResource(resourceType, textureLocation);
+                InputStream metadataStream = resources.getResource(resourceType, metadataLocation);
+
+                Optional<R> texture = Optional.of(TEXTURE_READER.read(textureStream, metadataStream));
+
+                textureStream.close();
+                metadataStream.close();
+
+                return texture;
+            }
         } catch (IOException ioException) {
             LOGGER.error("Using missing texture, unable to load {}: {}",
                     textureLocation, ioException);

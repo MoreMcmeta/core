@@ -59,6 +59,9 @@ public class SpriteFrameSizeFixPack implements PackResources {
                                   OrderedResourceRepository resourceRepository) {
         requireNonNull(textures, "Textures cannot be null");
         RESOURCE_REPOSITORY = requireNonNull(resourceRepository, "Packs cannot be null");
+        if (RESOURCE_REPOSITORY.getResourceType() != PackType.CLIENT_RESOURCES) {
+            throw new IllegalArgumentException("Resource repository must have client resources");
+        }
 
         TEXTURES = ImmutableMap.copyOf(textures);
     }
@@ -108,7 +111,10 @@ public class SpriteFrameSizeFixPack implements PackResources {
             throw new IOException("Requested non-animated resource from MoreMcmeta's internal pack");
         }
 
-        return RESOURCE_REPOSITORY.getFromSameCollection(textureLocation).get(textureLocation);
+        // If the texture is controlled by the mod, we already know it's in the topmost pack
+        return RESOURCE_REPOSITORY.getFirstCollectionWith(textureLocation).getResource(PackType.CLIENT_RESOURCES,
+                textureLocation);
+
     }
 
     /**

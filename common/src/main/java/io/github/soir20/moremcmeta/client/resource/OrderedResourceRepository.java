@@ -19,17 +19,11 @@ package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -63,32 +57,31 @@ public class OrderedResourceRepository {
     }
 
     /**
-     * Gets the given resources from the first collection that contains all of them.
-     * @param locations     the resources to retrieve
-     * @return the requested resources from the same collection
-     * @throws IOException if the resources are not found together in any collection
+     * Gets the type of resources in this repository (client or server).
+     * @return the type of resources in this repository
      */
-    public FoundResources getFromSameCollection(ResourceLocation... locations) throws IOException {
-        requireNonNull(locations, "Resource locations cannot be null");
-        if (Arrays.stream(locations).anyMatch(Objects::isNull)) {
-            throw new NullPointerException("Individual resource locations cannot be null");
-        }
+    public PackType getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
+    /**
+     * Gets the first collection that has a given resource.
+     * @param location          location of the resource to search for
+     * @return the collection with the given resource
+     * @throws IOException if the resource is not found in any collection
+     */
+    public ResourceCollection getFirstCollectionWith(ResourceLocation location) throws IOException {
+        requireNonNull(location, "Location cannot be null");
 
         Optional<ResourceCollection> collectionWithResource = COLLECTIONS.stream().filter((collection) ->
-                Arrays.stream(locations).allMatch((location) -> collection.hasResource(RESOURCE_TYPE, location))
+                collection.hasResource(RESOURCE_TYPE, location)
         ).findFirst();
 
         if (collectionWithResource.isEmpty()) {
-            throw new IOException("Resources not found in same collection: " + Arrays.toString(locations));
+            throw new IOException("Resource not found in any collection: " + location);
         }
 
-        ResourceCollection collection = collectionWithResource.get();
-
-        Map<ResourceLocation, InputStream> streams = new HashMap<>();
-        for (ResourceLocation location : locations) {
-            streams.put(location, collection.getResource(RESOURCE_TYPE, location));
-        }
-        return new FoundResources(streams);
+        return collectionWithResource.get();
     }
 
     /**
@@ -118,48 +111,4 @@ public class OrderedResourceRepository {
         ).collect(Collectors.toSet());
     }
 
-    /**
-     * Container for resources returned from a {@link OrderedResourceRepository}. All requested
-     * resources are guaranteed to exist.
-     * @author soir20
-     */
-    public static class FoundResources implements Closeable {
-        private final ImmutableMap<ResourceLocation, InputStream> RESOURCES;
-
-        /**
-         * Creates a new container for retrieved resources.
-         * @param resources     the resources retrieved
-         */
-        protected FoundResources(Map<ResourceLocation, InputStream> resources) {
-            requireNonNull(resources, "Resources cannot be null");
-            RESOURCES = ImmutableMap.copyOf(resources);
-        }
-
-        /**
-         * Gets a resource at the given location.
-         * @param location      location of the resource to retrieve. Must have been requested from the
-         *                      {@link OrderedResourceRepository}.
-         * @return the resource at the given location
-         */
-        public InputStream get(ResourceLocation location) {
-            if (!RESOURCES.containsKey(location)) {
-                throw new IllegalArgumentException("Tried to retrieve resource that was not originally requested");
-            }
-
-            return RESOURCES.get(location);
-        }
-
-        /**
-         * Closes all the resources in this container. If any resource was already closed,
-         * it is skipped, and there is no exception.
-         * @throws IOException if there is a problem closing a resource
-         */
-        @Override
-        public void close() throws IOException {
-            for (InputStream stream : RESOURCES.values()) {
-                stream.close();
-            }
-        }
-
-    }
 }

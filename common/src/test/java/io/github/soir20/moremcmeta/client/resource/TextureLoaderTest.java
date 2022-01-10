@@ -30,9 +30,6 @@ import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -299,36 +296,26 @@ public class TextureLoaderTest {
 
     @Test
     public void load_ResourceManagerReturnsNullTexture_NullPointerException() {
-        OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
-                Set.of(new MockResourceCollection(Set.of(
-                        new ResourceLocation("textures/bat.png"),
-                        new ResourceLocation("textures/creeper.png"),
-                        new ResourceLocation("textures/zombie.png"),
-                        new ResourceLocation("textures/bat.png.moremcmeta"),
-                        new ResourceLocation("textures/creeper.png.moremcmeta"),
-                        new ResourceLocation("textures/zombie.png.moremcmeta")
-                )))
-        ) {
-            @Override
-            public FoundResources getFromSameCollection(ResourceLocation... resourceLocations) throws IOException {
-                Map<ResourceLocation, InputStream> streams = new HashMap<>();
-
-                Map<Boolean, List<ResourceLocation>> dividedLocations = Arrays.stream(resourceLocations)
-                        .collect(Collectors.partitioningBy((location) -> location.getPath().endsWith(".moremcmeta")));
-
-                List<ResourceLocation> metadata = dividedLocations.get(true);
-                FoundResources found = super.getFromSameCollection(metadata.toArray(new ResourceLocation[0]));
-                for (ResourceLocation location : metadata) {
-                    streams.put(location, found.get(location));
+        ResourceCollection collection = new MockResourceCollection(Set.of(
+                new ResourceLocation("textures/bat.png"),
+                new ResourceLocation("textures/creeper.png"),
+                new ResourceLocation("textures/zombie.png"),
+                new ResourceLocation("textures/bat.png.moremcmeta"),
+                new ResourceLocation("textures/creeper.png.moremcmeta"),
+                new ResourceLocation("textures/zombie.png.moremcmeta")
+        )) {
+            public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
+                if (hasResource(resourceType, location) && !location.getPath().endsWith(".moremcmeta")) {
+                    return null;
                 }
 
-                for (ResourceLocation location : dividedLocations.get(false)) {
-                    streams.put(location, null);
-                }
-
-                return new FoundResources(streams);
+                return super.getResource(resourceType, location);
             }
         };
+        OrderedResourceRepository repository = new OrderedResourceRepository(
+                PackType.CLIENT_RESOURCES,
+                Set.of(collection)
+        );
 
         TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
 
@@ -338,36 +325,26 @@ public class TextureLoaderTest {
 
     @Test
     public void load_ResourceManagerReturnsNullMetadata_NullPointerException() {
-        OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
-                Set.of(new MockResourceCollection(Set.of(
-                        new ResourceLocation("textures/bat.png"),
-                        new ResourceLocation("textures/creeper.png"),
-                        new ResourceLocation("textures/zombie.png"),
-                        new ResourceLocation("textures/bat.png.moremcmeta"),
-                        new ResourceLocation("textures/creeper.png.moremcmeta"),
-                        new ResourceLocation("textures/zombie.png.moremcmeta")
-                )))
-        ) {
-            @Override
-            public FoundResources getFromSameCollection(ResourceLocation... resourceLocations) throws IOException {
-                Map<ResourceLocation, InputStream> streams = new HashMap<>();
-
-                Map<Boolean, List<ResourceLocation>> dividedLocations = Arrays.stream(resourceLocations)
-                        .collect(Collectors.partitioningBy((location) -> location.getPath().endsWith(".moremcmeta")));
-
-                List<ResourceLocation> metadata = dividedLocations.get(false);
-                FoundResources found = super.getFromSameCollection(metadata.toArray(new ResourceLocation[0]));
-                for (ResourceLocation location : metadata) {
-                    streams.put(location, found.get(location));
+        ResourceCollection collection = new MockResourceCollection(Set.of(
+                new ResourceLocation("textures/bat.png"),
+                new ResourceLocation("textures/creeper.png"),
+                new ResourceLocation("textures/zombie.png"),
+                new ResourceLocation("textures/bat.png.moremcmeta"),
+                new ResourceLocation("textures/creeper.png.moremcmeta"),
+                new ResourceLocation("textures/zombie.png.moremcmeta")
+        )) {
+            public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
+                if (hasResource(resourceType, location) && location.getPath().endsWith(".moremcmeta")) {
+                    return null;
                 }
 
-                for (ResourceLocation location : dividedLocations.get(true)) {
-                    streams.put(location, null);
-                }
-
-                return new FoundResources(streams);
+                return super.getResource(resourceType, location);
             }
         };
+        OrderedResourceRepository repository = new OrderedResourceRepository(
+                PackType.CLIENT_RESOURCES,
+                Set.of(collection)
+        );
 
         TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
 
@@ -377,31 +354,17 @@ public class TextureLoaderTest {
 
     @Test
     public void load_ClosureIOException_LoadsValidTextures() {
-        OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
-                Set.of(new MockResourceCollection(Set.of(
-                        new ResourceLocation("textures/bat.png"),
-                        new ResourceLocation("textures/bat.png.moremcmeta"),
-                        new ResourceLocation("textures/creeper.png"),
-                        new ResourceLocation("textures/creeper.png.moremcmeta"),
-                        new ResourceLocation("textures/zombie.png"),
-                        new ResourceLocation("textures/zombie.png.moremcmeta")
-                )))
-        ) {
-            @Override
-            public FoundResources getFromSameCollection(ResourceLocation... resourceLocations) throws IOException {
-                Map<ResourceLocation, InputStream> streams = new HashMap<>();
-
-                Map<Boolean, List<ResourceLocation>> dividedLocations = Arrays.stream(resourceLocations)
-                        .collect(Collectors.partitioningBy((location) -> location.getPath().contains("bat")));
-
-                List<ResourceLocation> selected = dividedLocations.get(true);
-                FoundResources found = super.getFromSameCollection(selected.toArray(new ResourceLocation[0]));
-                for (ResourceLocation location : selected) {
-                    streams.put(location, found.get(location));
-                }
-
-                for (ResourceLocation location : dividedLocations.get(false)) {
-                    streams.put(location, new InputStream() {
+        ResourceCollection collection = new MockResourceCollection(Set.of(
+                new ResourceLocation("textures/bat.png"),
+                new ResourceLocation("textures/creeper.png"),
+                new ResourceLocation("textures/zombie.png"),
+                new ResourceLocation("textures/bat.png.moremcmeta"),
+                new ResourceLocation("textures/creeper.png.moremcmeta"),
+                new ResourceLocation("textures/zombie.png.moremcmeta")
+        )) {
+            public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
+                if (hasResource(resourceType, location) && !location.getPath().contains("bat")) {
+                    return new InputStream() {
                         @Override
                         public int read() {
                             return 0;
@@ -411,12 +374,16 @@ public class TextureLoaderTest {
                         public void close() throws IOException {
                             throw new IOException("Dummy exception");
                         }
-                    });
+                    };
                 }
 
-                return new FoundResources(streams);
+                return super.getResource(resourceType, location);
             }
         };
+        OrderedResourceRepository repository = new OrderedResourceRepository(
+                PackType.CLIENT_RESOURCES,
+                Set.of(collection)
+        );
 
         TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
 
@@ -428,27 +395,17 @@ public class TextureLoaderTest {
 
     @Test
     public void load_ClosureUnknownException_ExceptionNotCaught() {
-        OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
-                Set.of(new MockResourceCollection(Set.of(
-                        new ResourceLocation("textures/bat.png"),
-                        new ResourceLocation("textures/creeper.png"),
-                        new ResourceLocation("textures/zombie.png"),
-                        new ResourceLocation("textures/bat.png.moremcmeta"),
-                        new ResourceLocation("textures/creeper.png.moremcmeta"),
-                        new ResourceLocation("textures/zombie.png.moremcmeta")
-                )))
-        ) {
-            @Override
-            public FoundResources getFromSameCollection(ResourceLocation... resourceLocations) throws IOException {
-                Map<ResourceLocation, InputStream> streams = new HashMap<>();
-
-                Map<Boolean, List<ResourceLocation>> dividedLocations = Arrays.stream(resourceLocations)
-                        .collect(Collectors.partitioningBy((location) -> location.getPath().contains("bat")));
-
-                List<ResourceLocation> selected = dividedLocations.get(true);
-                FoundResources found = super.getFromSameCollection(selected.toArray(new ResourceLocation[0]));
-                for (ResourceLocation location : selected) {
-                    streams.put(location, new InputStream() {
+        ResourceCollection collection = new MockResourceCollection(Set.of(
+                new ResourceLocation("textures/bat.png"),
+                new ResourceLocation("textures/creeper.png"),
+                new ResourceLocation("textures/zombie.png"),
+                new ResourceLocation("textures/bat.png.moremcmeta"),
+                new ResourceLocation("textures/creeper.png.moremcmeta"),
+                new ResourceLocation("textures/zombie.png.moremcmeta")
+        )) {
+            public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
+                if (hasResource(resourceType, location) && location.getPath().contains("bat")) {
+                    return new InputStream() {
                         @Override
                         public int read() {
                             return 0;
@@ -458,16 +415,16 @@ public class TextureLoaderTest {
                         public void close() {
                             throw new RuntimeException("Dummy exception");
                         }
-                    });
+                    };
                 }
 
-                for (ResourceLocation location : dividedLocations.get(false)) {
-                    streams.put(location, found.get(location));
-                }
-
-                return new FoundResources(streams);
+                return super.getResource(resourceType, location);
             }
         };
+        OrderedResourceRepository repository = new OrderedResourceRepository(
+                PackType.CLIENT_RESOURCES,
+                Set.of(collection)
+        );
 
         TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
 
@@ -478,8 +435,27 @@ public class TextureLoaderTest {
     @Test
     public void load_TextureAndMetadataInDifferentPacks_SkipsSeparatedTextures() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/creeper.png", "textures/zombie.png", "textures/zombie.png.moremcmeta"),
+                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/creeper.png", "textures/zombie.png",
+                        "textures/zombie.png.moremcmeta"),
                 Set.of("textures/creeper.png.moremcmeta")
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+
+        Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
+
+        assertEquals(2, results.size());
+        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+    }
+
+    @Test
+    public void load_LaterPackHasMetadataAndTexture_SkipsSeparatedTextures() {
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/creeper.png", "textures/zombie.png",
+                        "textures/zombie.png.moremcmeta"),
+                Set.of("textures/creeper.png.moremcmeta"),
+                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
