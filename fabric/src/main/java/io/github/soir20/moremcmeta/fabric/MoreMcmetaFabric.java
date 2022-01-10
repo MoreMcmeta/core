@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.fabric;
 
+import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
@@ -25,6 +26,7 @@ import io.github.soir20.moremcmeta.client.texture.TexturePreparer;
 import io.github.soir20.moremcmeta.fabric.client.adapter.SimpleReloadListenerAdapter;
 import io.github.soir20.moremcmeta.fabric.client.event.ResourceManagerInitializedCallback;
 import io.github.soir20.moremcmeta.fabric.client.mixin.LoadingOverlayAccessor;
+import io.github.soir20.moremcmeta.fabric.client.mixin.PackRepositoryAccessor;
 import io.github.soir20.moremcmeta.fabric.client.mixin.TextureManagerAccessor;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
@@ -34,6 +36,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import org.apache.logging.log4j.Logger;
 
@@ -91,6 +95,25 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     @Override
     protected void onResourceManagerInitialized(Consumer<Minecraft> callback) {
         ResourceManagerInitializedCallback.EVENT.register(callback::accept);
+    }
+
+    /**
+     * Adds a repository source to Minecraft's {@link PackRepository}.
+     * @param packRepository        the repository to add a source to
+     * @param repositorySource      the source to add
+     */
+    @Override
+    protected void addRepositorySource(PackRepository packRepository, RepositorySource repositorySource) {
+        PackRepositoryAccessor accessor = (PackRepositoryAccessor) packRepository;
+
+        // The vanilla list of sources is immutable, so we need to create a new set.
+        ImmutableSet.Builder<RepositorySource> sources = new ImmutableSet.Builder<>();
+        sources.addAll(accessor.getSources());
+        sources.add(repositorySource);
+
+        // Restore immutability
+        accessor.setSources(sources.build());
+
     }
 
     /**

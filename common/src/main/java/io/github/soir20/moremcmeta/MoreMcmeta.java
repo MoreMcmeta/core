@@ -39,6 +39,10 @@ import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
@@ -46,6 +50,8 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +70,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public abstract class MoreMcmeta {
+    private Map<ResourceLocation, TextureData<NativeImageAdapter>> lastTextures;
 
     /**
      * Begins the startup process, creating necessary objects and registering the
@@ -92,12 +99,25 @@ public abstract class MoreMcmeta {
                 return;
             }
 
+            PackRepository packRepository = client.getResourcePackRepository();
+            ModRepositorySource source = new ModRepositorySource(() -> {
+                OrderedResourceRepository repository = getResourceRepository(packRepository,
+                        ModRepositorySource.getPackId());
+
+                lastTextures = loadData(repository, loader);
+
+                return new SpriteFrameSizeFixPack(lastTextures, repository);
+            });
+
+            addRepositorySource(packRepository, source);
+
             /* Even though this is not the normal way to register reload listeners in Fabric,
                registering our listener like a vanilla listener ensures it is executed
                before the TextureManager resets its textures. This is the least invasive way to
                animate preloaded title screen textures. */
-            rscManager.registerReloadListener(wrapListener(makeListener(manager, rscManager, loader, logger)));
+            rscManager.registerReloadListener(wrapListener(makeListener(manager, logger)));
             logger.debug("Added texture reload listener");
+
         });
 
         // Enable animation by ticking the manager
@@ -124,6 +144,13 @@ public abstract class MoreMcmeta {
     protected abstract void onResourceManagerInitialized(Consumer<Minecraft> callback);
 
     /**
+     * Adds a repository source to Minecraft's {@link PackRepository}.
+     * @param packRepository        the repository to add a source to
+     * @param repositorySource      the source to add
+     */
+    protected abstract void addRepositorySource(PackRepository packRepository, RepositorySource repositorySource);
+
+    /**
      * Wraps the given resource reload listener in any mod loader-specific interfaces, if necessary.
      * @param original      the original resource reload listener to wrap
      * @return the wrapped resource reload listener
@@ -147,10 +174,49 @@ public abstract class MoreMcmeta {
     protected abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
 
     /**
+     * Gets the repository containing all the game's resources except the pack this mod adds.
+     * @param packRepository        the repository containing all packs
+     * @param modPackId             unique identifier of the pack this mod adds
+     * @return the repository with all resources
+     */
+    private OrderedResourceRepository getResourceRepository(PackRepository packRepository, String modPackId) {
+        List<PackResourcesAdapter> otherPacks = new ArrayList<>(packRepository.getSelectedPacks()
+                .stream()
+                .filter((pack) -> !pack.getId().equals(modPackId))
+                .map(Pack::open)
+                .map(PackResourcesAdapter::new)
+                .toList());
+
+        Collections.reverse(otherPacks);
+
+        return new OrderedResourceRepository(PackType.CLIENT_RESOURCES, otherPacks);
+    }
+
+    /**
+     * Loads minimum texture data for textures controlled by this mod.
+     * @param resourceRepository    repository containing resources to load from
+     * @param loader                loader to load data
+     * @return texture data for textures controlled by this mod
+     */
+    private Map<ResourceLocation, TextureData<NativeImageAdapter>> loadData(
+            OrderedResourceRepository resourceRepository,
+            TextureLoader<TextureData<NativeImageAdapter>> loader
+    ) {
+        requireNonNull(loader, "Loader cannot be null");
+
+        /* We would normally want to load data asynchronously during reloading. However, this
+           portion of texture loading is efficient, even for large images. We have to do this
+           before reloading starts to avoid a race with texture atlases. */
+        Map<ResourceLocation, TextureData<NativeImageAdapter>> textures = new HashMap<>();
+        textures.putAll(loader.load(resourceRepository, "textures"));
+        textures.putAll(loader.load(resourceRepository, "optifine"));
+        return textures;
+
+    }
+
+    /**
      * Creates a new reload listener that loads and queues animated textures for a mod loader.
      * @param texManager        manages prebuilt textures
-     * @param loader            loads textures from resource packs
-     * @param resourceManager   Minecraft's resource manager
      * @param logger            a logger to write output
      * @return reload listener that loads and queues animated textures
      */
@@ -158,7 +224,7 @@ public abstract class MoreMcmeta {
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
             Logger logger
     ) {
-        return new TextureResourceReloadListener(texManager, resourceManager, loader, logger);
+        return new TextureResourceReloadListener(texManager, logger);
     }
 
     /**
@@ -207,8 +273,6 @@ public abstract class MoreMcmeta {
         /**
          * Creates a new resource reload listener.
          * @param texManager            texture manager that accepts queued textures
-         * @param resourceManager       Minecraft's resource manager (as a {@link SimpleReloadableResourceManager})
-         * @param loader                texture loader
          * @param logger                a logger to write output
          */
         public TextureResourceReloadListener(
@@ -216,8 +280,6 @@ public abstract class MoreMcmeta {
                 Logger logger
         ) {
             TEX_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
-            RESOURCE_MANAGER = requireNonNull(resourceManager, "Resource manager cannot be null");
-            LOADER = requireNonNull(loader, "Texture loader cannot be null");
             LOGGER = requireNonNull(logger, "Logger cannot be null");
         }
 

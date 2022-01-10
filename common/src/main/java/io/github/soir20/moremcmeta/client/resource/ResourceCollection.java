@@ -22,7 +22,9 @@ import net.minecraft.server.packs.PackType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * A container for resources.
@@ -46,6 +48,17 @@ public interface ResourceCollection {
      * @return whether this collection contains the resource
      */
     boolean hasResource(PackType resourceType, ResourceLocation location);
+
+    /**
+     * Gets all the resource locations in this collection that match the provided filters.
+     * @param resourceType      type of resources to look for
+     * @param namespace         namespace of resources
+     * @param pathStart         start of the path of the resources (not including the namespace)
+     * @param fileFilter        filter for the file name
+     * @return all the matching resource locations
+     */
+    Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
+                                              Predicate<String> fileFilter);
 
     /**
      * Gets the namespaces of all resources in this collection.

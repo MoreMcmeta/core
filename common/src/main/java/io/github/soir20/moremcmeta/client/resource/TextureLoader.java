@@ -22,8 +22,6 @@ import com.google.gson.JsonParseException;
 import io.github.soir20.moremcmeta.client.io.TextureReader;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -41,7 +39,8 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureLoader<R> {
-    private static final String METADATA_EXTENSION = ".moremcmeta";
+    private static final String IMAGE_EXTENSION = ".png";
+    private static final String METADATA_EXTENSION = IMAGE_EXTENSION +  ".moremcmeta";
 
     private final TextureReader<? extends R> TEXTURE_READER;
     private final Logger LOGGER;
@@ -58,11 +57,11 @@ public class TextureLoader<R> {
 
     /**
      * Searches for and loads animated textures from a folder throughout all resource packs.
-     * @param resourceManager       the game's central resource manager
+     * @param resourceRepository    resources to search through
      * @param path                  the path to search for textures in
      */
-    public ImmutableMap<ResourceLocation, R> load(ResourceManager resourceManager, String path) {
-        requireNonNull(resourceManager, "Resource manager cannot be null");
+    public ImmutableMap<ResourceLocation, R> load(OrderedResourceRepository resourceRepository, String path) {
+        requireNonNull(resourceRepository, "Resource manager cannot be null");
         requireNonNull(path, "Path cannot be null");
         if (path.isEmpty() || path.startsWith("/")) {
             throw new IllegalArgumentException("Path cannot be empty or start with a slash");
@@ -75,7 +74,7 @@ public class TextureLoader<R> {
            invalid texture names for consistency.
            NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
         try {
-             textureCandidates = resourceManager.listResources(
+             textureCandidates = resourceRepository.listResources(
                     path,
                     fileName -> fileName.endsWith(METADATA_EXTENSION)
              );
@@ -86,24 +85,24 @@ public class TextureLoader<R> {
             return ImmutableMap.of();
         }
 
-        return getTextures(textureCandidates, resourceManager);
+        return getTextures(textureCandidates, resourceRepository);
     }
 
     /**
      * Creates all valid textures from candidates.
-     * @param candidates        possible locations of textures
-     * @param resourceManager   the resource manager for the current reload
+     * @param candidates           possible locations of textures
+     * @param resourceRepository   resources to search through
      */
     private ImmutableMap<ResourceLocation, R> getTextures(Collection<? extends ResourceLocation> candidates,
-                                                          ResourceManager resourceManager) {
+                                                          OrderedResourceRepository resourceRepository) {
         Map<ResourceLocation, R> textures = new ConcurrentHashMap<>();
 
         // Create textures from unique candidates
         candidates.stream().distinct().parallel().forEach((metadataLocation) -> {
             ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
-                    metadataLocation.getPath().replace(METADATA_EXTENSION, ""));
+                    metadataLocation.getPath().replace(METADATA_EXTENSION, IMAGE_EXTENSION));
 
-            Optional<R> texture = getTexture(resourceManager, textureLocation, metadataLocation);
+            Optional<R> texture = getTexture(resourceRepository, textureLocation, metadataLocation);
 
             // Keep track of which textures are created
             texture.ifPresent(tex -> textures.put(textureLocation, tex));
@@ -115,24 +114,21 @@ public class TextureLoader<R> {
 
     /**
      * Gets a texture from a file.
-     * @param resourceManager   resource manager to get textures/metadata from
-     * @param textureLocation   location of the image/.png texture
-     * @param metadataLocation  file location of texture's metadata for this mod (not .mcmeta)
+     * @param resourceRepository   resource manager to get textures/metadata from
+     * @param textureLocation      location of the image/.png texture
+     * @param metadataLocation     file location of texture's metadata for this mod (not .mcmeta)
      * @return the texture, or empty if the file is not found
      */
-    private Optional<R> getTexture(ResourceManager resourceManager,
+    private Optional<R> getTexture(OrderedResourceRepository resourceRepository,
                                    ResourceLocation textureLocation,
                                    ResourceLocation metadataLocation) {
-        try (Resource originalResource = resourceManager.getResource(textureLocation);
-             Resource metadataResource = resourceManager.getResource(metadataLocation)) {
+        try (OrderedResourceRepository.FoundResources resources =
+                     resourceRepository.getFromSameCollection(textureLocation, metadataLocation)) {
 
-            // We don't want to get metadata from a lower pack than the texture
-            if (originalResource.getSourceName().equals(metadataResource.getSourceName())) {
-                InputStream textureStream = originalResource.getInputStream();
-                InputStream metadataStream = metadataResource.getInputStream();
+            InputStream textureStream = resources.get(textureLocation);
+            InputStream metadataStream = resources.get(metadataLocation);
 
-                return Optional.of(TEXTURE_READER.read(textureStream, metadataStream));
-            }
+            return Optional.of(TEXTURE_READER.read(textureStream, metadataStream));
         } catch (IOException ioException) {
             LOGGER.error("Using missing texture, unable to load {}: {}",
                     textureLocation, ioException);

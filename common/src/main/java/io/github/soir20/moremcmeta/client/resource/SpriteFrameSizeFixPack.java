@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.client.resource;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.soir20.moremcmeta.client.io.TextureData;
 import net.minecraft.resources.ResourceLocation;
@@ -31,12 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -53,7 +48,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
 
-    private final List<ResourceCollection> OTHER_PACKS;
+    private final OrderedResourceRepository RESOURCE_REPOSITORY;
 
     /**
      * Creates a new sprite fix pack.
@@ -63,10 +58,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
     public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures,
                                   OrderedResourceRepository resourceRepository) {
         requireNonNull(textures, "Textures cannot be null");
-
-        List<ResourceCollection> reversedList = new ArrayList<>(otherPacks);
-        Collections.reverse(reversedList);
-        OTHER_PACKS = ImmutableList.copyOf(reversedList);
+        RESOURCE_REPOSITORY = requireNonNull(resourceRepository, "Packs cannot be null");
 
         TEXTURES = ImmutableMap.copyOf(textures);
     }
@@ -116,7 +108,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
             throw new IOException("Requested non-animated resource from MoreMcmeta's internal pack");
         }
 
-        return packWithResource.get().getResource(packType, textureLocation);
+        return RESOURCE_REPOSITORY.getFromSameCollection(textureLocation).get(textureLocation);
     }
 
     /**
@@ -180,14 +172,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
     @Override
     public Set<String> getNamespaces(PackType packType) {
         requireNonNull(packType, "Pack type cannot be null");
-
-        if (packType != PackType.CLIENT_RESOURCES) {
-            return Set.of();
-        }
-
-        return OTHER_PACKS.stream().flatMap(
-                (pack) -> pack.getNamespaces(packType).stream()
-        ).collect(Collectors.toSet());
+        return packType == PackType.CLIENT_RESOURCES ? RESOURCE_REPOSITORY.getNamespaces() : Set.of();
     }
 
     /**
@@ -229,18 +214,6 @@ public class SpriteFrameSizeFixPack implements PackResources {
         return new ResourceLocation(
                 location.getNamespace(), location.getPath().replace(VANILLA_METADATA_EXTENSION, "")
         );
-    }
-
-    /**
-     * Check if a resource pack has the given resource more efficiently than directly using the
-     * {@link ResourceCollection#hasResource(PackType, ResourceLocation)} method.
-     * @param otherPack     the other pack to search
-     * @param location      the location of the resource to look for
-     * @return whether the given pack is not the same as this pack and has the requested resource
-     */
-    private boolean checkResource(ResourceCollection otherPack, ResourceLocation location) {
-        return otherPack.getNamespaces(PackType.CLIENT_RESOURCES).contains(location.getNamespace())
-                && otherPack.hasResource(PackType.CLIENT_RESOURCES, location);
     }
 
     /**

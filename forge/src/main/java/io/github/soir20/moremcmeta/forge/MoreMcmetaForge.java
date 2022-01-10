@@ -30,6 +30,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -104,6 +106,16 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     @Override
     protected void onResourceManagerInitialized(Consumer<Minecraft> callback) {
         callback.accept(Minecraft.getInstance());
+    }
+
+    /**
+     * Adds a repository source to Minecraft's {@link PackRepository}.
+     * @param packRepository        the repository to add a source to
+     * @param repositorySource      the source to add
+     */
+    @Override
+    protected void addRepositorySource(PackRepository packRepository, RepositorySource repositorySource) {
+        packRepository.addPackFinder(repositorySource);
     }
 
     /**
