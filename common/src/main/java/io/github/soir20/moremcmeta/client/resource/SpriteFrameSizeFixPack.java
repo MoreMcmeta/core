@@ -19,13 +19,12 @@ package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
-import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
+import io.github.soir20.moremcmeta.client.io.TextureData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
@@ -52,18 +51,17 @@ import static java.util.Objects.requireNonNull;
  */
 public class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
-    private final Map<ResourceLocation, EventDrivenTexture.Builder> TEXTURES;
+    private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
 
     private final List<ResourceCollection> OTHER_PACKS;
 
     /**
      * Creates a new sprite fix pack.
-     * @param textures         textures controlled by the mod
-     * @param otherPacks       resource packs besides this one
+     * @param textures              textures controlled by the mod. Every texture must have an image set.
+     * @param resourceRepository    repository of all resources to search, excluding this pack
      */
-    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends EventDrivenTexture.Builder> textures,
-                                  List<? extends ResourceCollection> otherPacks) {
-        requireNonNull(otherPacks, "Packs cannot be null");
+    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures,
+                                  OrderedResourceRepository resourceRepository) {
         requireNonNull(textures, "Textures cannot be null");
 
         List<ResourceCollection> reversedList = new ArrayList<>(otherPacks);
@@ -108,28 +106,14 @@ public class SpriteFrameSizeFixPack implements PackResources {
         boolean isVanillaMetadata = location.getPath().endsWith(VANILLA_METADATA_EXTENSION);
 
         if (isKnownTexture && isVanillaMetadata) {
-            Pair<Integer, Integer> frameSize = getFrameSize(textureLocation);
-            int frameWidth = frameSize.getFirst();
-            int frameHeight = frameSize.getSecond();
+            TextureData<?> textureData = TEXTURES.get(textureLocation);
+            int frameWidth = textureData.getFrameWidth();
+            int frameHeight = textureData.getFrameHeight();
             return new ByteArrayInputStream(
                     makeEmptyAnimationJson(frameWidth, frameHeight).getBytes(StandardCharsets.UTF_8)
             );
         } else if (!isKnownTexture) {
             throw new IOException("Requested non-animated resource from MoreMcmeta's internal pack");
-        }
-
-        // Textures and metadata must come from the same pack, so search other packs for the texture
-
-        /* Reverse the list since highest packs are at the end.
-           We don't need to search the files of more packs than necessary */
-
-
-        Optional<ResourceCollection> packWithResource = OTHER_PACKS.stream().filter(
-                (pack) -> checkResource(pack, textureLocation)
-        ).findFirst();
-
-        if (packWithResource.isEmpty()) {
-            throw new IOException("Texture set in sprite fix pack does not actually exist!");
         }
 
         return packWithResource.get().getResource(packType, textureLocation);
@@ -141,7 +125,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
      * @param packType          client or server resources. Only client resources are available.
      * @param namespace         namespace of the requested resources
      * @param pathStart         required start of the resources' paths (like folders)
-     * @param depth             depth of directory tree to search
+     * @param depth             maximum depth of directory tree to search
      * @param pathFilter        filter for entire paths, including the file name and extension
      * @return the matching resources in this pack
      */
@@ -153,13 +137,18 @@ public class SpriteFrameSizeFixPack implements PackResources {
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(pathFilter, "Path filter cannot be null");
 
+        if (depth < 0) {
+            throw new IllegalArgumentException("Depth is negative");
+        }
+
         // Vanilla packs exclude .mcmeta metadata files, so we should not include them here
         return TEXTURES.keySet().stream().filter((location) -> {
             String path = location.getPath();
             boolean isRightNamespace = location.getNamespace().equals(namespace);
             boolean isRightPath = path.startsWith(pathStart + "/") && pathFilter.test(path);
+            boolean isRightDepth = StringUtils.countMatches(path, '/') <= depth;
 
-            return isRightNamespace && isRightPath;
+            return isRightNamespace && isRightPath && isRightDepth;
         }).collect(Collectors.toList());
 
     }
@@ -252,23 +241,6 @@ public class SpriteFrameSizeFixPack implements PackResources {
     private boolean checkResource(ResourceCollection otherPack, ResourceLocation location) {
         return otherPack.getNamespaces(PackType.CLIENT_RESOURCES).contains(location.getNamespace())
                 && otherPack.hasResource(PackType.CLIENT_RESOURCES, location);
-    }
-
-    /**
-     * Gets the frame size of a texture, assuming it is an animated texture.
-     * @param location      the resource location of the texture (non-sprite location)
-     * @return a (frameWidth, frameHeight) tuple
-     */
-    private Pair<Integer, Integer> getFrameSize(ResourceLocation location) {
-        Optional<RGBAImageFrame> initialFrame = TEXTURES.get(location).getImage();
-        if (initialFrame.isEmpty()) {
-            throw new IllegalStateException("Missing initial image that should have been checked earlier");
-        }
-
-        int frameWidth = initialFrame.get().getWidth();
-        int frameHeight = initialFrame.get().getHeight();
-
-        return Pair.of(frameWidth, frameHeight);
     }
 
     /**

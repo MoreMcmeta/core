@@ -18,9 +18,14 @@
 package io.github.soir20.moremcmeta;
 
 import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
+import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.adapter.PackResourcesAdapter;
 import io.github.soir20.moremcmeta.client.adapter.TextureManagerAdapter;
-import io.github.soir20.moremcmeta.client.io.AnimatedTextureReader;
+import io.github.soir20.moremcmeta.client.io.TextureData;
+import io.github.soir20.moremcmeta.client.io.TextureDataAssembler;
+import io.github.soir20.moremcmeta.client.io.TextureDataReader;
+import io.github.soir20.moremcmeta.client.resource.ModRepositorySource;
+import io.github.soir20.moremcmeta.client.resource.OrderedResourceRepository;
 import io.github.soir20.moremcmeta.client.resource.SpriteFrameSizeFixPack;
 import io.github.soir20.moremcmeta.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
@@ -49,6 +54,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -76,8 +82,8 @@ public abstract class MoreMcmeta {
         );
 
         // Resource loaders
-        AnimatedTextureReader reader = new AnimatedTextureReader(logger);
-        TextureLoader<EventDrivenTexture.Builder> loader = new TextureLoader<>(reader, logger);
+        TextureDataReader reader = new TextureDataReader();
+        TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(reader, logger);
 
         // Listener registration and resource manager replacement
         onResourceManagerInitialized((client) -> {
@@ -150,24 +156,9 @@ public abstract class MoreMcmeta {
      */
     private StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> makeListener(
             LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
-            SimpleReloadableResourceManager resourceManager,
-            TextureLoader<EventDrivenTexture.Builder> loader,
             Logger logger
     ) {
         return new TextureResourceReloadListener(texManager, resourceManager, loader, logger);
-    }
-
-    /**
-     * Adds the mod-animated sprite resource pack to the resource manager.
-     * @param textures              textures controlled by this mod
-     * @param resourceManager       the resource manager to add the pack to
-     */
-    private void addSpriteFixPack(Map<ResourceLocation, EventDrivenTexture.Builder> textures,
-                                  SimpleReloadableResourceManager resourceManager) {
-        List<PackResourcesAdapter> otherPacks = resourceManager.listPacks().map(PackResourcesAdapter::new).toList();
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures, otherPacks);
-        resourceManager.add(pack);
     }
 
     /**
@@ -211,8 +202,6 @@ public abstract class MoreMcmeta {
             implements StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> {
         private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
         private final LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> TEX_MANAGER;
-        private final SimpleReloadableResourceManager RESOURCE_MANAGER;
-        private final TextureLoader<EventDrivenTexture.Builder> LOADER;
         private final Logger LOGGER;
 
         /**
@@ -224,8 +213,6 @@ public abstract class MoreMcmeta {
          */
         public TextureResourceReloadListener(
                 LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
-                SimpleReloadableResourceManager resourceManager,
-                TextureLoader<EventDrivenTexture.Builder> loader,
                 Logger logger
         ) {
             TEX_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
@@ -249,12 +236,11 @@ public abstract class MoreMcmeta {
             requireNonNull(loadProfiler, "Profiler cannot be null");
             requireNonNull(loadExecutor, "Executor cannot be null");
 
-            return CompletableFuture.supplyAsync(() -> {
-                Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
-                textures.putAll(LOADER.load(manager, "textures"));
-                textures.putAll(LOADER.load(manager, "optifine"));
-                return textures;
-            }, loadExecutor);
+            TextureDataAssembler assembler = new TextureDataAssembler();
+
+            return CompletableFuture.supplyAsync(() -> lastTextures.entrySet().stream().parallel().collect(
+                    Collectors.toMap(Map.Entry::getKey, (entry) -> assembler.assemble(entry.getValue()))
+            ), loadExecutor);
         }
 
         /**
@@ -274,7 +260,6 @@ public abstract class MoreMcmeta {
             requireNonNull(applyProfiler, "Profiler cannot be null");
             requireNonNull(applyExecutor, "Executor cannot be null");
 
-            addSpriteFixPack(data, RESOURCE_MANAGER);
             addCompletedReloadCallback(TEX_MANAGER, LOGGER);
 
             return CompletableFuture.runAsync(() -> {
