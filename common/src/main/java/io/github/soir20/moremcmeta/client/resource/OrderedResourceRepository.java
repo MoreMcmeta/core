@@ -85,6 +85,17 @@ public class OrderedResourceRepository {
     }
 
     /**
+     * Checks if any collection has the given resource.
+     * @param location      the resource to check for
+     * @return whether this repository has that resource
+     */
+    public boolean hasResource(ResourceLocation location) {
+        return COLLECTIONS.stream().anyMatch((collection) ->
+                collection.hasResource(RESOURCE_TYPE, location)
+        );
+    }
+
+    /**
      * Lists all resources in any collection that match the provided filters.
      * @param pathStart     the required start of each resource's path
      * @param fileFilter    filter for the file name

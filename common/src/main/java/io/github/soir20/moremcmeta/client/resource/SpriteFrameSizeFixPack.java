@@ -30,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -111,6 +112,12 @@ public class SpriteFrameSizeFixPack implements PackResources {
             throw new IOException("Requested non-animated resource from MoreMcmeta's internal pack");
         }
 
+        // Don't let a potential bug be silenced as an IOException
+        if (!RESOURCE_REPOSITORY.hasResource(textureLocation)) {
+            throw new IllegalStateException("A texture given to the sprite fix pack as one being controlled by this " +
+                    "mod does not actually exist");
+        }
+
         // If the texture is controlled by the mod, we already know it's in the topmost pack
         return RESOURCE_REPOSITORY.getFirstCollectionWith(textureLocation).getResource(PackType.CLIENT_RESOURCES,
                 textureLocation);
@@ -122,7 +129,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
      * the constructor).
      * @param packType          client or server resources. Only client resources are available.
      * @param namespace         namespace of the requested resources
-     * @param pathStart         required start of the resources' paths (like folders)
+     * @param pathStart         required start of the resources' paths (like folders, no trailing slash)
      * @param depth             maximum depth of directory tree to search
      * @param pathFilter        filter for entire paths, including the file name and extension
      * @return the matching resources in this pack
@@ -139,14 +146,21 @@ public class SpriteFrameSizeFixPack implements PackResources {
             throw new IllegalArgumentException("Depth is negative");
         }
 
+        if (packType == PackType.SERVER_DATA) {
+            return new ArrayList<>();
+        }
+
+        String directoryStart = pathStart.length() > 0 ? pathStart + "/" : "";
+
         // Vanilla packs exclude .mcmeta metadata files, so we should not include them here
         return TEXTURES.keySet().stream().filter((location) -> {
             String path = location.getPath();
             boolean isRightNamespace = location.getNamespace().equals(namespace);
-            boolean isRightPath = path.startsWith(pathStart + "/") && pathFilter.test(path);
-            boolean isRightDepth = StringUtils.countMatches(path, '/') <= depth;
+            boolean isRightPath = path.startsWith(directoryStart) && pathFilter.test(path);
+            boolean isRightDepth = isRightPath &&
+                    StringUtils.countMatches(path.substring(directoryStart.length()), '/') <= depth - 1;
 
-            return isRightNamespace && isRightPath && isRightDepth;
+            return isRightNamespace && isRightDepth;
         }).collect(Collectors.toList());
 
     }
