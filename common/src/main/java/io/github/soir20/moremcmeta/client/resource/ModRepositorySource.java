@@ -51,6 +51,9 @@ public class ModRepositorySource implements RepositorySource {
      */
     @Override
     public void loadPacks(Consumer<Pack> consumer, Pack.PackConstructor packConstructor) {
+        requireNonNull(consumer, "Pack consumer cannot be null");
+        requireNonNull(packConstructor, "Pack constructor cannot be null");
+
         Pack pack = new Pack(
                 getPackId(),
                 true,
