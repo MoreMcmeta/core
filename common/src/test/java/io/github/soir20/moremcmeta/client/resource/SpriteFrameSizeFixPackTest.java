@@ -24,6 +24,7 @@ import io.github.soir20.moremcmeta.client.io.TextureData;
 import io.github.soir20.moremcmeta.client.texture.MockRGBAImage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.util.GsonHelper;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -646,6 +648,281 @@ public class SpriteFrameSizeFixPackTest {
                 2, (path) -> path.endsWith(".png"));
         assertEquals(1, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/folder/two.png")));
+    }
+
+    @Test
+    public void hasResource_NullPackType_NullPointerException() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        expectedException.expect(NullPointerException.class);
+        pack.hasResource(null, new ResourceLocation("textures/one.png"));
+    }
+
+    @Test
+    public void hasResource_NullLocation_NullPointerException() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        expectedException.expect(NullPointerException.class);
+        pack.hasResource(PackType.CLIENT_RESOURCES, null);
+    }
+
+    @Test
+    public void hasResource_ServerType_NotFound() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertFalse(pack.hasResource(PackType.SERVER_DATA, new ResourceLocation("textures/one.png")));
+    }
+
+    @Test
+    public void hasResource_HasVanillaMetadata_Found() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png.mcmeta")));
+    }
+
+    @Test
+    public void hasResource_MissingVanillaMetadata_NotFound() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/two.png.mcmeta")));
+    }
+
+    @Test
+    public void hasResource_HasOtherResource_Found() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png.moremcmeta"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png.moremcmeta")));
+    }
+
+    @Test
+    public void hasResource_MissingOtherResource_NotFound() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png.moremcmeta")));
+    }
+
+    @Test
+    public void hasResource_HasTexture_Found() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png")));
+    }
+
+    @Test
+    public void hasResource_MissingTexture_NotFound() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/two.png")));
+    }
+
+    @Test
+    public void hasResource_NoTextures_NotFound() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png")));
+    }
+
+    @Test
+    public void hasResource_NotInRepo_Found() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/other.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/other.png")));
+    }
+
+    @Test
+    public void getNamespaces_NullPackType_NullPointerException() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        expectedException.expect(NullPointerException.class);
+        pack.getNamespaces(null);
+    }
+
+    @Test
+    public void getNamespaces_ClientType_UniqueNamespaces() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("first", "textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("second", "textures/two.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("third", "textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertEquals(Set.of("first", "second", "third", "minecraft"), pack.getNamespaces(PackType.CLIENT_RESOURCES));
+    }
+
+    @Test
+    public void getNamespaces_ServerType_None() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("first", "textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("second", "textures/two.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("third", "textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertEquals(0, pack.getNamespaces(PackType.SERVER_DATA).size());
+    }
+
+    @Test
+    public void getNamespaces_NoTextures_None() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+        assertEquals(0, pack.getNamespaces(PackType.CLIENT_RESOURCES).size());
+    }
+
+    @Test
+    public void getMetadataSection_NullSerializer_NullPointerException() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        expectedException.expect(NullPointerException.class);
+        pack.getMetadataSection(null);
+    }
+
+    @Test
+    public void getMetadataSection_ProvidedSerializer_NullMetadata() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertNull(pack.getMetadataSection(PackMetadataSection.SERIALIZER));
+    }
+
+    @Test
+    public void getName_OnePack_NameNotEmpty() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertNotEquals(0, pack.getName().length());
+    }
+
+    @Test
+    public void getName_TwoPacks_SameName() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+
+        Map<ResourceLocation, TextureData<?>> textures2 = new HashMap<>();
+        textures2.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures2.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack2 = new SpriteFrameSizeFixPack(textures2, DUMMY_REPO);
+
+        assertEquals(pack.getName(), pack2.getName());
+    }
+
+    @Test
+    public void close_NotYetClosed_NoException() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        pack.close();
+    }
+
+    @Test
+    public void close_AlreadyClosed_NoException() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        pack.close();
+        pack.close();
     }
 
     private JsonObject readJson(InputStream stream) throws IOException {
