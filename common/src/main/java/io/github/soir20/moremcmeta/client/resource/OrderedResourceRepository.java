@@ -112,14 +112,4 @@ public class OrderedResourceRepository {
         ).collect(Collectors.toSet());
     }
 
-    /**
-     * Gets all the unique namespaces for the resources in this repository.
-     * @return all unique namespaces in the repository
-     */
-    public Set<String> getNamespaces() {
-        return COLLECTIONS.stream().flatMap(
-                (collection) -> collection.getNamespaces(RESOURCE_TYPE).stream()
-        ).collect(Collectors.toSet());
-    }
-
 }

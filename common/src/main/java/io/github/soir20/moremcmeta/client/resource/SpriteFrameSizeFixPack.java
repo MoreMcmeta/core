@@ -192,7 +192,8 @@ public class SpriteFrameSizeFixPack implements PackResources {
     @Override
     public Set<String> getNamespaces(PackType packType) {
         requireNonNull(packType, "Pack type cannot be null");
-        return packType == PackType.CLIENT_RESOURCES ? RESOURCE_REPOSITORY.getNamespaces() : Set.of();
+        return packType == PackType.CLIENT_RESOURCES ?
+                TEXTURES.keySet().stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet()) : Set.of();
     }
 
     /**
