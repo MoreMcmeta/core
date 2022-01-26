@@ -90,6 +90,8 @@ public class OrderedResourceRepository {
      * @return whether this repository has that resource
      */
     public boolean hasResource(ResourceLocation location) {
+        requireNonNull(location, "Location cannot be null");
+
         return COLLECTIONS.stream().anyMatch((collection) ->
                 collection.hasResource(RESOURCE_TYPE, location)
         );
