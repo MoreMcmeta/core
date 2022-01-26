@@ -28,6 +28,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests the link {@link TextureData} container.
+ * @author soir20
+ */
 public class TextureDataTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
