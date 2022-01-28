@@ -17,24 +17,15 @@
 
 package io.github.soir20.moremcmeta.client.resource;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.server.packs.repository.Pack;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
@@ -98,52 +89,6 @@ public class ModRepositorySourceTest {
         repositorySource.loadPacks((pack) -> packId.set(pack.getId()), MOCK_CONSTRUCTOR);
 
         assertEquals(ModRepositorySource.getPackId(), packId.get());
-    }
-
-    /**
-     * Mock {@link PackResources} implementation for testing.
-     * @author soir20
-     */
-    private static class MockPackResources implements PackResources {
-
-        @Override
-        public InputStream getRootResource(String string) {
-            return new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
-        }
-
-        @Override
-        public InputStream getResource(PackType packType, ResourceLocation resourceLocation) {
-            return new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
-        }
-
-        @Override
-        public Collection<ResourceLocation> getResources(PackType packType, String string, String string2, int i,
-                                                         Predicate<String> predicate) {
-            return Set.of();
-        }
-
-        @Override
-        public boolean hasResource(PackType packType, ResourceLocation resourceLocation) {
-            return false;
-        }
-
-        @Override
-        public Set<String> getNamespaces(PackType packType) {
-            return Set.of();
-        }
-
-        @Override
-        public <T> T getMetadataSection(MetadataSectionSerializer<T> metadataSectionSerializer) {
-            return null;
-        }
-
-        @Override
-        public String getName() {
-            return "name";
-        }
-
-        @Override
-        public void close() {}
     }
 
 }
