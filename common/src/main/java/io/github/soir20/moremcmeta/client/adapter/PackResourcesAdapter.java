@@ -54,6 +54,8 @@ public class PackResourcesAdapter implements ResourceCollection {
      */
     @Override
     public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
+        requireNonNull(resourceType, "Resource type cannot be null");
+        requireNonNull(location, "Location cannot be null");
         return ORIGINAL.getResource(resourceType, location);
     }
 
@@ -65,6 +67,8 @@ public class PackResourcesAdapter implements ResourceCollection {
      */
     @Override
     public boolean hasResource(PackType resourceType, ResourceLocation location) {
+        requireNonNull(resourceType, "Resource type cannot be null");
+        requireNonNull(location, "Location cannot be null");
         return ORIGINAL.hasResource(resourceType, location);
     }
 
@@ -79,6 +83,10 @@ public class PackResourcesAdapter implements ResourceCollection {
     @Override
     public Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
                                                      Predicate<String> fileFilter) {
+        requireNonNull(resourceType, "Resource type cannot be null");
+        requireNonNull(namespace, "Namespace cannot be null");
+        requireNonNull(pathStart, "Path start cannot be null");
+        requireNonNull(fileFilter, "File filter cannot be null");
         return ORIGINAL.getResources(resourceType, namespace, pathStart, Integer.MAX_VALUE, fileFilter);
     }
 
@@ -90,6 +98,7 @@ public class PackResourcesAdapter implements ResourceCollection {
      */
     @Override
     public Set<String> getNamespaces(PackType resourceType) {
+        requireNonNull(resourceType, "Resource type cannot be null");
         return ORIGINAL.getNamespaces(resourceType);
     }
 
