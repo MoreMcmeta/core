@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2021 soir20
+ * Copyright (C) 2022 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,28 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.mixin;
+package forge.client.event;
 
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceLocation;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
-
-import java.util.Map;
+import io.github.soir20.moremcmeta.client.texture.CustomTickable;
 
 /**
- * Allows the {@link TextureManager}'s texture list to be accessed.
+ * A tick counter that represents a tickable item.
  * @author soir20
  */
-@Mixin(TextureManager.class)
-public interface TextureManagerAccessor {
+public class MockTickable implements CustomTickable {
+    private int ticks;
 
-    /**
-     * Makes the texture manager's texture list accessible.
-     * @return the texture manager's internal texture list
-     */
-    @Accessor("byPath")
-    Map<ResourceLocation, AbstractTexture> getByPath();
+    @Override
+    public void tick() {
+        ticks++;
+    }
+
+    public int getTicks() {
+        return ticks;
+    }
 
 }

@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2021 soir20
+ * Copyright (C) 2022 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package client.event;
+package forge.client.event;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import io.github.soir20.moremcmeta.client.event.ClientTicker;
+import io.github.soir20.moremcmeta.forge.client.event.ClientTicker;
 import net.minecraftforge.event.TickEvent;
 import org.junit.After;
 import org.junit.Rule;

@@ -18,7 +18,7 @@
 package io.github.soir20.moremcmeta;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.event.ClientTicker;
+import io.github.soir20.moremcmeta.forge.client.event.ClientTicker;
 import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
 import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
