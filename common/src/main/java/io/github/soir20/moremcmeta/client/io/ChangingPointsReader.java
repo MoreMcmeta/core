@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.io;
 
-import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
+import io.github.soir20.moremcmeta.client.texture.RGBAImage;
 import io.github.soir20.moremcmeta.math.Point;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Finds the pixels that change during an animation for an {@link IRGBAImage}.
+ * Finds the pixels that change during an animation for an {@link RGBAImage}.
  * @author soir20
  */
 public class ChangingPointsReader {
@@ -42,7 +42,7 @@ public class ChangingPointsReader {
      * @param mipmap        number of mipmap levels to use. Must be greater than or equal to 0.
      * @return  pixels that change for every mipmap (starting with the default image)
      */
-    public List<IRGBAImage.VisibleArea> read(IRGBAImage image, int frameWidth, int frameHeight, int mipmap) {
+    public List<RGBAImage.VisibleArea> read(RGBAImage image, int frameWidth, int frameHeight, int mipmap) {
         requireNonNull(image, "Image cannot be null");
         if (frameWidth <= 0 || frameHeight <= 0) {
             throw new IllegalArgumentException("Frames must not be empty");
@@ -51,13 +51,13 @@ public class ChangingPointsReader {
             throw new IllegalArgumentException("Mipmap level cannot be less than zero");
         }
 
-        List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
+        List<RGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
 
         int widthWithFrames = image.getWidth() / frameWidth * frameWidth;
         int heightWithFrames = image.getHeight() / frameHeight * frameHeight;
 
         // Find points in original image
-        IRGBAImage.VisibleArea.Builder noMipmapBuilder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder noMipmapBuilder = new RGBAImage.VisibleArea.Builder();
         for (int y = 0; y < heightWithFrames; y++) {
             for (int x = 0; x < widthWithFrames; x++) {
                 int frameX = x % frameWidth;
@@ -74,7 +74,7 @@ public class ChangingPointsReader {
 
         // Point coordinates will be different for all mipmap levels
         for (int level = 1; level <= mipmap; level++) {
-            IRGBAImage.VisibleArea.Builder mipmapBuilder = new IRGBAImage.VisibleArea.Builder();
+            RGBAImage.VisibleArea.Builder mipmapBuilder = new RGBAImage.VisibleArea.Builder();
 
             if (frameWidth >> level > 0 & frameHeight >> level > 0) {
                 for (Point point : visibleAreas.get(0)) {

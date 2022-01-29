@@ -15,34 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.texture;
+package io.github.soir20.moremcmeta.fabric.client.mixin;
 
-import io.github.soir20.moremcmeta.math.Point;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.server.packs.resources.ReloadInstance;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
- * A fake {@link TextureAtlasSprite}.
+ * Allows retrieval of the {@link ReloadInstance} from the {@link LoadingOverlay}.
  * @author soir20
  */
-public class MockAtlasSprite implements Sprite {
-    private final ResourceLocation NAME;
+@Mixin(LoadingOverlay.class)
+public interface LoadingOverlayAccessor {
 
-    public MockAtlasSprite(ResourceLocation name) {
-        NAME = name;
-    }
-
-    @Override
-    public void bind() {}
-
-    @Override
-    public ResourceLocation getName() {
-        return NAME;
-    }
-
-    @Override
-    public Point getUploadPoint() {
-        return new Point(1, 2);
-    }
+    /**
+     * Gets the current reload instance from the loading overlay.
+     * @return the current reload instance
+     */
+    @Accessor("reload")
+    ReloadInstance getReloadInstance();
 
 }

@@ -17,25 +17,34 @@
 
 package io.github.soir20.moremcmeta.fabric.client.mixin;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
+import java.util.Set;
+
 /**
- * Allows the resource manager in {@link Minecraft} to be replaced.
+ * Allows retrieval of the {@link RepositorySource}s in the {@link PackRepository}.
  * @author soir20
  */
-@Mixin(Minecraft.class)
-public interface MinecraftAccessor {
+@Mixin(PackRepository.class)
+public interface PackRepositoryAccessor {
 
     /**
-     * Sets Minecraft's resource manager.
-     * @param manager       the new resource manager to use
+     * Gets the pack sources from the repository. Set is immutable in the vanilla code.
+     * @return the pack resources in the repository
      */
-    @Accessor("resourceManager")
+    @Accessor("sources")
+    Set<RepositorySource> getSources();
+
+    /**
+     * Replaces the pack sources in the repository.
+     * @param sources       the new sources for the pack repository
+     */
+    @Accessor("sources")
     @Mutable
-    void setResourceManager(ReloadableResourceManager manager);
+    void setSources(Set<RepositorySource> sources);
 
 }

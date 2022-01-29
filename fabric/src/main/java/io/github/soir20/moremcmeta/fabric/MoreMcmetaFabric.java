@@ -17,32 +17,32 @@
 
 package io.github.soir20.moremcmeta.fabric;
 
+import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
-import io.github.soir20.moremcmeta.client.texture.ITexturePreparer;
+import io.github.soir20.moremcmeta.client.resource.StagedResourceReloadListener;
+import io.github.soir20.moremcmeta.client.texture.TexturePreparer;
+import io.github.soir20.moremcmeta.fabric.client.adapter.SimpleReloadListenerAdapter;
 import io.github.soir20.moremcmeta.fabric.client.event.ResourceManagerInitializedCallback;
-import io.github.soir20.moremcmeta.fabric.client.mixin.MinecraftAccessor;
+import io.github.soir20.moremcmeta.fabric.client.mixin.LoadingOverlayAccessor;
+import io.github.soir20.moremcmeta.fabric.client.mixin.PackRepositoryAccessor;
 import io.github.soir20.moremcmeta.fabric.client.mixin.TextureManagerAccessor;
-import io.github.soir20.moremcmeta.client.resource.SizeSwappingResourceManager;
-import io.github.soir20.moremcmeta.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.server.packs.resources.ReloadInstance;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -65,7 +65,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * Gets the OpenGL preparer for new textures on this loader.
      * @return the OpenGL preparer for this loader
      */
-    public ITexturePreparer getPreparer() {
+    protected TexturePreparer getPreparer() {
         return (glId, mipmap, width, height) -> {
             if (!RenderSystem.isOnRenderThreadOrInit()) {
                 RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(glId, mipmap, width, height));
@@ -80,7 +80,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return the action that will unregister textures
      */
     @Override
-    public BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
+    protected BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
         return (manager, location) -> {
             TextureManagerAccessor accessor = (TextureManagerAccessor) manager;
             accessor.getByPath().remove(location);
@@ -93,67 +93,51 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @param callback      the callback to execute
      */
     @Override
-    public void onResourceManagerInitialized(Consumer<Minecraft> callback) {
+    protected void onResourceManagerInitialized(Consumer<Minecraft> callback) {
         ResourceManagerInitializedCallback.EVENT.register(callback::accept);
     }
 
     /**
-     * Creates a new reload listener that loads and queues animated textures for Fabric.
-     * @param texManager    manages prebuilt textures
-     * @param loader        loads textures from resource packs
-     * @param logger        a logger to write output
-     * @return a reload listener that loads and queues animated textures
+     * Adds a repository source to Minecraft's {@link PackRepository}.
+     * @param packRepository        the repository to add a source to
+     * @param repositorySource      the source to add
      */
     @Override
-    public PreparableReloadListener makeListener(
-            LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
-            TextureLoader<EventDrivenTexture.Builder> loader, Logger logger) {
+    protected void addRepositorySource(PackRepository packRepository, RepositorySource repositorySource) {
+        PackRepositoryAccessor accessor = (PackRepositoryAccessor) packRepository;
 
-        return new SimpleResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>>() {
-            private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
+        // The vanilla list of sources is immutable, so we need to create a new set.
+        ImmutableSet.Builder<RepositorySource> sources = new ImmutableSet.Builder<>();
+        sources.addAll(accessor.getSources());
+        sources.add(repositorySource);
 
-            @Override
-            public ResourceLocation getFabricId() {
-                return new ResourceLocation("moremcmeta", "texture_reload_listener");
-            }
+        // Restore immutability
+        accessor.setSources(sources.build());
 
-            @Override
-            public CompletableFuture<Map<ResourceLocation, EventDrivenTexture.Builder>> load(ResourceManager manager,
-                                                                                             ProfilerFiller profiler,
-                                                                                             Executor executor) {
-                return CompletableFuture.supplyAsync(() -> {
-                    Map<ResourceLocation, EventDrivenTexture.Builder> textures = new HashMap<>();
-                    textures.putAll(loader.load(manager, "textures"));
-                    textures.putAll(loader.load(manager, "optifine"));
-                    return textures;
-                }, executor);
-            }
-
-            @Override
-            public CompletableFuture<Void> apply(Map<ResourceLocation, EventDrivenTexture.Builder> data,
-                                                 ResourceManager manager, ProfilerFiller profiler, Executor executor) {
-                return CompletableFuture.runAsync(() -> {
-                    LAST_TEXTURES_ADDED.keySet().forEach(texManager::unregister);
-                    LAST_TEXTURES_ADDED.clear();
-                    LAST_TEXTURES_ADDED.putAll(data);
-
-                    data.forEach(texManager::register);
-                }, executor);
-            }
-        };
     }
 
     /**
-     * Replaces the {@link net.minecraft.server.packs.resources.SimpleReloadableResourceManager}
-     * with the mod's custom one in Fabric.
-     * @param client        the Minecraft client
-     * @param manager       the manager that should be made Minecraft's resource manager
-     * @param logger        a logger to write output
+     * Wraps the given resource reload listener in any Fabric-specific interfaces, if necessary.
+     * @param original      the original resource reload listener to wrap
+     * @return the wrapped resource reload listener
      */
     @Override
-    public void replaceResourceManager(Minecraft client, SizeSwappingResourceManager manager, Logger logger) {
-        MinecraftAccessor accessor = (MinecraftAccessor) client;
-        accessor.setResourceManager(manager);
+    protected StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
+            StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
+    ) {
+        return new SimpleReloadListenerAdapter<>(original,
+                new ResourceLocation("moremcmeta", "texture_reload_listener"));
+    }
+
+    /**
+     * Gets the current reload instance.
+     * @param overlay    the overlay containing the instance
+     * @param logger     a logger to write output
+     * @return the current reload instance
+     */
+    @Override
+    protected Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger) {
+        return Optional.of(((LoadingOverlayAccessor) overlay).getReloadInstance());
     }
 
     /**
@@ -161,7 +145,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @param texManager        the manager to begin ticking
      */
     @Override
-    public void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
+    protected void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
         ClientTickEvents.START_CLIENT_TICK.register((client) -> texManager.tick());
     }
 

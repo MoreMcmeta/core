@@ -21,10 +21,10 @@ import io.github.soir20.moremcmeta.math.Point;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * A fake {@link ISprite}.
+ * A fake {@link Sprite}.
  * @author soir20
  */
-public class MockSprite implements ISprite {
+public class MockSprite implements Sprite {
     private final ResourceLocation NAME;
     private final Point UPLOAD_POINT;
     private int timesBound;

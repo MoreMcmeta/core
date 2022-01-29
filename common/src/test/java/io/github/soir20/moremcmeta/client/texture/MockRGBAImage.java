@@ -20,10 +20,10 @@ package io.github.soir20.moremcmeta.client.texture;
 import io.github.soir20.moremcmeta.math.Point;
 
 /**
- * Mocks an {@link IRGBAImage}. Keeps track of set pixel colors.
+ * Mocks an {@link RGBAImage}. Keeps track of set pixel colors.
  * @author soir20
  */
-public class MockRGBAImage implements IRGBAImage {
+public class MockRGBAImage implements RGBAImage {
     public static final int DEFAULT_DIMENSION = 100;
 
     private final int[][] PIXELS;

@@ -62,8 +62,8 @@ public class MockRGBAImageFrame extends RGBAImageFrame {
         return uploads;
     }
 
-    private static ImmutableList<IRGBAImage> createMipmaps(int mipmap, int width, int height) {
-        ImmutableList.Builder<IRGBAImage> builder = new ImmutableList.Builder<>();
+    private static ImmutableList<RGBAImage> createMipmaps(int mipmap, int width, int height) {
+        ImmutableList.Builder<RGBAImage> builder = new ImmutableList.Builder<>();
 
         for (int level = 0; level <= mipmap; level++) {
             builder.add(new MockRGBAImage(width >> level, height >> level));

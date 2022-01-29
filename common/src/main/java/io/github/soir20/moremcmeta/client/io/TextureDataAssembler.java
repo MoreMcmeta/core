@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2021 soir20
+ * Copyright (C) 2022 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,30 +18,23 @@
 package io.github.soir20.moremcmeta.client.io;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.adapter.ChangingPointsAdapter;
+import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
+import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import io.github.soir20.moremcmeta.client.animation.WobbleFunction;
 import io.github.soir20.moremcmeta.client.resource.ModAnimationMetadataSection;
 import io.github.soir20.moremcmeta.client.texture.AnimationComponent;
-import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
-import io.github.soir20.moremcmeta.client.texture.IRGBAImage;
 import io.github.soir20.moremcmeta.client.texture.CleanupComponent;
-import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
+import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
+import io.github.soir20.moremcmeta.client.texture.RGBAImage;
 import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
-import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
-import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.SimpleResource;
-import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -53,88 +46,56 @@ import java.util.stream.IntStream;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Reads an {@link EventDrivenTexture} from file data. It is reusable for all
- * animated textures with the same mipmap level. It leaves textures in an pre-built
- * state to allow for the {@link LazyTextureManager}
- * to add components related to texture registration and binding.
+ * Assembles texture data into a texture builder.
  * @author soir20
  */
-public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.Builder> {
+public class TextureDataAssembler {
     private static final int TICKS_PER_MC_DAY = 24000;
-    private final Logger LOGGER;
     private final ChangingPointsAdapter POINT_READER;
     private final WobbleFunction WOBBLE_FUNCTION;
 
     /**
-     * Creates a new reader for animated textures.
-     * @param logger        logger for reading-related messages
+     * Creates a new texture data assembler.
      */
-    public AnimatedTextureReader(Logger logger) {
-        LOGGER = requireNonNull(logger, "Logger cannot be null");
+    public TextureDataAssembler() {
         POINT_READER = new ChangingPointsAdapter();
         WOBBLE_FUNCTION = new WobbleFunction();
     }
 
     /**
-     * Reads an {@link EventDrivenTexture}.
-     * @param textureStream           input stream with image data
-     * @param metadataStream          input stream with texture and animation properties
-     * @return  an animated texture based on the provided data
-     * @throws IOException  failure reading from either input stream
+     * Combines the texture image and metadata into a {@link EventDrivenTexture.Builder} that
+     * minimally needs an upload component. The image is guaranteed to be set in the builder.
+     * @param data          texture data to assemble
+     * @return texture data assembled as a texture builder
      */
-    public EventDrivenTexture.Builder read(InputStream textureStream, InputStream metadataStream) throws IOException,
-            JsonParseException, IllegalArgumentException {
-
-        requireNonNull(textureStream, "Texture input stream cannot be null");
-        requireNonNull(metadataStream, "Metadata input stream cannot be null");
+    public EventDrivenTexture.Builder assemble(TextureData<NativeImageAdapter> data) {
+        requireNonNull(data, "Data cannot be null");
 
         Minecraft minecraft = Minecraft.getInstance();
         final int MIPMAP = minecraft.options.mipmapLevels;
 
-        NativeImage image = NativeImage.read(textureStream);
-        LOGGER.debug("Successfully read image from input");
-
+        NativeImage image = data.getImage().getImage();
         List<NativeImage> mipmaps = new ArrayList<>(Arrays.asList(MipmapGenerator.generateMipLevels(image, MIPMAP)));
-
-        /* The SimpleResource class would normally handle metadata parsing when we originally
-           got the resource. However, the ResourceManager only looks for .mcmeta metadata, and its
-           nested structure and an unordered (stream) accessor for resource packs cannot be
-           easily overridden. However, we can create a dummy resource to parse the metadata. */
-        SimpleResource metadataParser = new SimpleResource("dummy", new ResourceLocation(""),
-                textureStream, metadataStream);
-
-        AnimationMetadataSection animationMetadata =
-                metadataParser.getMetadata(AnimationMetadataSection.SERIALIZER);
-        ModAnimationMetadataSection modAnimationMetadata =
-                metadataParser.getMetadata(ModAnimationMetadataSection.SERIALIZER);
-        TextureMetadataSection textureMetadata =
-                metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
 
         /* Use defaults if no metadata was read.
            The metadata parser can set these to null even if there was no error. */
-        if (animationMetadata == null) {
-            animationMetadata = AnimationMetadataSection.EMPTY;
-        }
+        AnimationMetadataSection animationMetadata = data.getMetadata(AnimationMetadataSection.class)
+                .orElse(AnimationMetadataSection.EMPTY);
+        ModAnimationMetadataSection modAnimationMetadata = data.getMetadata(ModAnimationMetadataSection.class)
+                .orElse(ModAnimationMetadataSection.EMPTY);
 
-        if (modAnimationMetadata == null) {
-            modAnimationMetadata = ModAnimationMetadataSection.EMPTY;
-        }
-
-        if (textureMetadata == null) {
-            textureMetadata = new TextureMetadataSection(false, false);
-        }
-
-        boolean blur = textureMetadata.isBlur();
-        boolean clamp = textureMetadata.isClamp();
+        Optional<TextureMetadataSection> textureMetadata = data.getMetadata(TextureMetadataSection.class);
+        boolean blur = textureMetadata.map(TextureMetadataSection::isBlur).orElse(false);
+        boolean clamp = textureMetadata.map(TextureMetadataSection::isClamp).orElse(false);
 
         // Frames
-        List<IRGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
+        List<RGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
         FrameReader<RGBAImageFrame> frameReader = new FrameReader<>(frameData -> {
 
             /* The immutable list collector was marked as beta for a while,
                and the marking was removed in a later version. */
             @SuppressWarnings("UnstableApiUsage")
-            ImmutableList<IRGBAImage> wrappedMipmaps = IntStream.range(0, mipmaps.size()).mapToObj((level) -> {
+            ImmutableList<RGBAImage> wrappedMipmaps = IntStream.range(0, mipmaps.size()).mapToObj((level) -> {
                 int width = frameData.getWidth() >> level;
                 int height = frameData.getHeight() >> level;
 
@@ -213,7 +174,7 @@ public class AnimatedTextureReader implements ITextureReader<EventDrivenTexture.
      */
     private ImmutableList<NativeImageAdapter> getInterpolationMipmaps(List<NativeImage> originals, int frameWidth,
                                                                       int frameHeight, boolean blur, boolean clamp,
-                                                                      List<IRGBAImage.VisibleArea> visibleAreas) {
+                                                                      List<RGBAImage.VisibleArea> visibleAreas) {
         ImmutableList.Builder<NativeImageAdapter> images = new ImmutableList.Builder<>();
 
         for (int level = 0; level < originals.size(); level++) {

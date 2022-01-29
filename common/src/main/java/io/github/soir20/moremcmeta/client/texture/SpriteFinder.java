@@ -43,13 +43,13 @@ public class SpriteFinder {
             new ResourceLocation("textures/atlas/mob_effects.png")
     );
 
-    private final Function<ResourceLocation, IAtlas> ATLAS_GETTER;
+    private final Function<ResourceLocation, ? extends Atlas> ATLAS_GETTER;
 
     /**
      * Creates a new sprite finder.
      * @param atlasGetter  provides an atlas from a location
      */
-    public SpriteFinder(Function<ResourceLocation, IAtlas> atlasGetter) {
+    public SpriteFinder(Function<ResourceLocation, ? extends Atlas> atlasGetter) {
         ATLAS_GETTER = requireNonNull(atlasGetter, "Atlas getter cannot be null");
     }
 
@@ -58,7 +58,7 @@ public class SpriteFinder {
      * @param location          the location of the texture
      * @return an {@link Optional} containing the atlas sprite
      */
-    public Optional<ISprite> findSprite(ResourceLocation location) {
+    public Optional<Sprite> findSprite(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
 
         return findNew(location);
@@ -69,16 +69,16 @@ public class SpriteFinder {
      * @param location      the location of the texture to look for (with extension)
      * @return an {@link Optional} containing the atlas sprite
      */
-    private Optional<ISprite> findNew(ResourceLocation location) {
+    private Optional<Sprite> findNew(ResourceLocation location) {
 
         // Atlases store sprites without their extension
         ResourceLocation pathWithoutExtension = makeSpritePath(location);
 
         for (ResourceLocation atlasLocation : ATLAS_LOCATIONS) {
-            IAtlas atlas = ATLAS_GETTER.apply(atlasLocation);
+            Atlas atlas = ATLAS_GETTER.apply(atlasLocation);
             requireNonNull(atlas, "Atlas getter cannot supply null");
 
-            Optional<ISprite> sprite = atlas.getSprite(pathWithoutExtension);
+            Optional<Sprite> sprite = atlas.getSprite(pathWithoutExtension);
             if (sprite.isPresent() && sprite.get().getName() == MissingTextureAtlasSprite.getLocation()) {
                 return Optional.empty();
             } else if (sprite.isPresent()) {

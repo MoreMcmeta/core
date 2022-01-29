@@ -83,7 +83,7 @@ public class SpriteFinderTest {
                         Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
-        Optional<ISprite> result = finder.findSprite(LOCATION_BOTH);
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
         assertTrue(result.isPresent());
         assertEquals(LOCATION_IN_ATLAS, result.get().getName());
     }
@@ -95,7 +95,7 @@ public class SpriteFinderTest {
                         Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
-        Optional<ISprite> result = finder.findSprite(LOCATION_BOTH);
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
         assertTrue(result.isPresent());
         assertEquals(LOCATION_IN_ATLAS, result.get().getName());
     }
@@ -107,7 +107,7 @@ public class SpriteFinderTest {
                         Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
-        Optional<ISprite> result = finder.findSprite(LOCATION_EXTENSION);
+        Optional<Sprite> result = finder.findSprite(LOCATION_EXTENSION);
         assertTrue(result.isPresent());
         assertEquals(LOCATION_IN_ATLAS, result.get().getName());
     }
@@ -119,7 +119,7 @@ public class SpriteFinderTest {
                         Optional.of(new MockAtlasSprite(LOCATION_IN_ATLAS)) : Optional.empty()
         );
 
-        Optional<ISprite> result = finder.findSprite(LOCATION_PREFIX);
+        Optional<Sprite> result = finder.findSprite(LOCATION_PREFIX);
         assertTrue(result.isPresent());
         assertEquals(LOCATION_IN_ATLAS, result.get().getName());
     }
@@ -130,7 +130,7 @@ public class SpriteFinderTest {
                 (atlasLocation) -> (spriteLocation) -> Optional.empty()
         );
 
-        Optional<ISprite> result = finder.findSprite(LOCATION_BOTH);
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
         assertFalse(result.isPresent());
     }
 
@@ -141,7 +141,7 @@ public class SpriteFinderTest {
                         Optional.of(new MockAtlasSprite(MissingTextureAtlasSprite.getLocation()))
         );
 
-        Optional<ISprite> result = finder.findSprite(LOCATION_BOTH);
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
         assertFalse(result.isPresent());
     }
 

@@ -27,21 +27,21 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Tests the building and use of the {@link IRGBAImage.VisibleArea} class.
+ * Tests the building and use of the {@link RGBAImage.VisibleArea} class.
  * @author soir20
  */
 public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_NoPoints_Empty() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea area = builder.build();
         assertFalse(area.iterator().hasNext());
     }
 
     @Test
     public void buildVisibleArea_OrderedPoints_AllAdded() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -59,7 +59,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -72,7 +72,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_UnorderedPoints_AllAdded() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(2, 2));
         points.add(new Point(0, 0));
@@ -90,7 +90,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -103,7 +103,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_NegativePoints_AllAdded() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(-2, 0));
         points.add(new Point(-2, 1));
@@ -120,7 +120,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -133,7 +133,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_DuplicatePoints_AreaDoesNotDuplicatePoints() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -157,7 +157,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -170,7 +170,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_SinglePixelFirstInRow_AllAdded() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -187,7 +187,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -200,7 +200,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_SinglePixelMiddleInRow_AllAdded() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -219,7 +219,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -232,7 +232,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_SinglePixelLastInRow_AllAdded() {
-        IRGBAImage.VisibleArea.Builder builder = new IRGBAImage.VisibleArea.Builder();
+        RGBAImage.VisibleArea.Builder builder = new RGBAImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -251,7 +251,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        IRGBAImage.VisibleArea area = builder.build();
+        RGBAImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {

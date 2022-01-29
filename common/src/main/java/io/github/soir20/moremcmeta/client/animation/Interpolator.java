@@ -15,32 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.texture;
-
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.Map;
+package io.github.soir20.moremcmeta.client.animation;
 
 /**
- * Finishes items that need to be completed lazily.
- * @param <I> input type
- * @param <O> output type
+ * Interpolates between two images.
+ * @param <I>   type of image
+ * @author soir20
  */
-public interface IFinisher<I, O> {
+public interface Interpolator<I> {
 
     /**
-     * Queues an item that needs to be finished. If an item at the
-     * same location is already queued, the original will be discarded
-     * and replaced.
-     * @param location      location identifying the item
-     * @param input         the unfinished item
+     * Creates an image between two other images at a certain step.
+     * @param steps     total number of steps to interpolate
+     * @param step      current step of the interpolation (between 1 and steps - 1)
+     * @param start     image to start interpolation from
+     * @param end       image to end interpolation at
+     * @return  the interpolated image at the given step
      */
-    void queue(ResourceLocation location, I input);
-
-    /**
-     * Finishes all currently-queued items.
-     * @return a map with all finished items by their locations
-     */
-    Map<ResourceLocation, O> finish();
+    I interpolate(int steps, int step, I start, I end);
 
 }
