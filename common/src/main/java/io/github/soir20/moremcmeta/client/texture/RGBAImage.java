@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
  * @author soir20
  */
-public interface IRGBAImage {
+public interface RGBAImage {
 
     /**
      * Gets the color of a pixel in this image.

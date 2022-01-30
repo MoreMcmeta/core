@@ -17,17 +17,26 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.math.Point;
 
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Manages uploading a texture that is not associated with an atlas sprite.
  * @author soir20
  */
-public class SingleUploadComponent implements ITextureComponent {
+public class SingleUploadComponent implements TextureComponent {
+    private final TexturePreparer PREPARER;
+
+    /**
+     * Creates a new upload component for an independent texture.
+     * @param preparer      prepares the texture for OpenGL on registration
+     */
+    public SingleUploadComponent(TexturePreparer preparer) {
+        PREPARER = requireNonNull(preparer, "Preparer cannot be null");
+    }
 
     /**
      * Gets the listeners for this component.
@@ -38,15 +47,8 @@ public class SingleUploadComponent implements ITextureComponent {
         TextureListener registrationListener = new TextureListener(TextureListener.Type.REGISTRATION,
                 (state) -> {
                     RGBAImageFrame image = state.getImage();
-
-                    if (!RenderSystem.isOnRenderThreadOrInit()) {
-                        RenderSystem.recordRenderCall(() ->
-                                TextureUtil.prepareImage(state.getTexture().getId(), image.getMipmapLevel(),
-                                        image.getWidth(), image.getHeight()));
-                    } else {
-                        TextureUtil.prepareImage(state.getTexture().getId(), image.getMipmapLevel(),
-                                image.getWidth(), image.getHeight());
-                    }
+                    PREPARER.prepare(state.getTexture().getId(), image.getMipmapLevel(),
+                            image.getWidth(), image.getHeight());
                 });
 
         Point uploadPoint = new Point(0, 0);

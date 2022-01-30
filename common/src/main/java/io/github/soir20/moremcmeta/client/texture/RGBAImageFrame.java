@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.animation.IInterpolator;
 import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
@@ -26,11 +25,11 @@ import io.github.soir20.moremcmeta.math.Point;
 import static java.util.Objects.requireNonNull;
 
 /**
- * An animation frame based on a {@link IRGBAImage}.
+ * An animation frame based on a {@link RGBAImage}.
  * @author soir20
  */
 public class RGBAImageFrame {
-    private final ImmutableList<? extends IRGBAImage> MIPMAPS;
+    private final ImmutableList<? extends RGBAImage> MIPMAPS;
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
@@ -42,7 +41,7 @@ public class RGBAImageFrame {
      * @param frameData     general data associated with the frame
      * @param mipmaps       mipmapped images for this frame (starting with the original image)
      */
-    public RGBAImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends IRGBAImage> mipmaps) {
+    public RGBAImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends RGBAImage> mipmaps) {
         requireNonNull(frameData, "Frame data cannot be null");
         MIPMAPS = requireNonNull(mipmaps, "Mipmaps cannot be null");
         if (mipmaps.size() == 0) {
@@ -79,7 +78,7 @@ public class RGBAImageFrame {
             int mipmappedX = point.getX() >> level;
             int mipmappedY = point.getY() >> level;
 
-            IRGBAImage mipmap = MIPMAPS.get(level);
+            RGBAImage mipmap = MIPMAPS.get(level);
             int mipmappedWidth = mipmap.getWidth();
             int mipmappedHeight = mipmap.getHeight();
 
@@ -134,7 +133,7 @@ public class RGBAImageFrame {
      * @param level     the mipmap level
      * @return  the image at the given mipmap level
      */
-    public IRGBAImage getImage(int level) {
+    public RGBAImage getImage(int level) {
         if (level >= MIPMAPS.size()) {
             throw new IllegalArgumentException("There is no mipmap of level " + level);
         }
@@ -147,7 +146,7 @@ public class RGBAImageFrame {
      * are <em>not</em> unique; the mipmaps are overwritten.
      * @author soir20
      */
-    public static class Interpolator implements IInterpolator<RGBAImageFrame> {
+    public static class Interpolator implements io.github.soir20.moremcmeta.client.animation.Interpolator<RGBAImageFrame> {
         private final RGBAInterpolator INTERPOLATOR;
         private final RGBAImageFrame FRAME;
         private int lastLevel;
@@ -158,7 +157,7 @@ public class RGBAImageFrame {
          *                      The mipmaps should contain only a copy of one animation frame
          *                      and be the same size as a mipmapped frame.
          */
-        public Interpolator(ImmutableList<? extends IRGBAImage> mipmaps) {
+        public Interpolator(ImmutableList<? extends RGBAImage> mipmaps) {
             requireNonNull(mipmaps, "Mipmap list cannot be null");
 
             FrameReader.FrameData data = new FrameReader.FrameData(
@@ -191,8 +190,8 @@ public class RGBAImageFrame {
 
             for (int level = 0; level <= FRAME.getMipmapLevel(); level++) {
                 lastLevel = level;
-                IRGBAImage startImage = start.getImage(level);
-                IRGBAImage endImage = end.getImage(level);
+                RGBAImage startImage = start.getImage(level);
+                RGBAImage endImage = end.getImage(level);
 
                 // We don't need to do anything with the result because the mipmaps are altered directly
                 INTERPOLATOR.interpolate(steps, step, startImage, endImage);

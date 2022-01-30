@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2021 soir20
+ * Copyright (C) 2022 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,23 +17,25 @@
 
 package io.github.soir20.moremcmeta.client.io;
 
-import java.io.IOException;
-import java.io.InputStream;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
- * Reads an texture.
- * @param <T>
+ * Tests the {@link TextureDataAssembler}. This class uses some Minecraft IO functions, and it
+ * is planned to completely revamp how this class works in the future. Its code is mostly creating
+ * other things that are tested. Therefore, the tests for it are less thorough.
  * @author soir20
  */
-public interface ITextureReader<T> {
+public class TextureDataAssemblerTest {
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
-    /**
-     * Reads an animated texture from file data.
-     * @param textureStream     input stream of image data
-     * @param metadataStream    input stream of texture metadata (JSON)
-     * @return getter for retrieving an animated texture after all resources are loaded
-     * @throws IOException  failure reading from either input stream
-     */
-    T read(InputStream textureStream, InputStream metadataStream) throws IOException;
+    @Test
+    public void assemble_NullData_NullPointerException() {
+        TextureDataAssembler assembler = new TextureDataAssembler();
+        expectedException.expect(NullPointerException.class);
+        assembler.assemble(null);
+    }
 
 }

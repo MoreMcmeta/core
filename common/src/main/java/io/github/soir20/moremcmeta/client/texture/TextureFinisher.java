@@ -32,17 +32,20 @@ import static java.util.Objects.requireNonNull;
  * all atlas stitching has completed.
  * @author soir20
  */
-public class TextureFinisher implements IFinisher<EventDrivenTexture.Builder, EventDrivenTexture> {
+public class TextureFinisher implements Finisher<EventDrivenTexture.Builder, EventDrivenTexture> {
     private final ArrayDeque<Pair<ResourceLocation, EventDrivenTexture.Builder>> QUEUED_BUILDERS;
     private final SpriteFinder SPRITE_FINDER;
+    private final TexturePreparer PREPARER;
 
     /**
      * Creates a new finisher for event-driven textures.
      * @param spriteFinder      finder for atlas sprites
+     * @param preparer          prepares independent textures for OpenGL when they are registered
      */
-    public TextureFinisher(SpriteFinder spriteFinder) {
+    public TextureFinisher(SpriteFinder spriteFinder, TexturePreparer preparer) {
         QUEUED_BUILDERS = new ArrayDeque<>();
-        SPRITE_FINDER = requireNonNull(spriteFinder);
+        SPRITE_FINDER = requireNonNull(spriteFinder, "Sprite finder cannot be null");
+        PREPARER = requireNonNull(preparer, "Preparer cannot be null");
     }
 
     /**
@@ -83,11 +86,11 @@ public class TextureFinisher implements IFinisher<EventDrivenTexture.Builder, Ev
      * @return the finished texture
      */
     private EventDrivenTexture finishOne(ResourceLocation location, EventDrivenTexture.Builder builder) {
-        Optional<ISprite> sprite = SPRITE_FINDER.findSprite(location);
+        Optional<Sprite> sprite = SPRITE_FINDER.findSprite(location);
         if (sprite.isPresent()) {
             builder.add(new SpriteUploadComponent(sprite.get()));
         } else {
-            builder.add(new SingleUploadComponent());
+            builder.add(new SingleUploadComponent(PREPARER));
         }
 
         return builder.build();

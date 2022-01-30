@@ -29,7 +29,7 @@ import static java.util.Objects.requireNonNull;
  * Manages an animation for an {@link EventDrivenTexture}.
  * @author soir20
  */
-public class AnimationComponent implements ITextureComponent {
+public class AnimationComponent implements TextureComponent {
     private final int SYNC_TICKS;
     private final Supplier<Optional<Long>> TIME_GETTER;
     private final AnimationFrameManager<? extends RGBAImageFrame> FRAME_MANAGER;

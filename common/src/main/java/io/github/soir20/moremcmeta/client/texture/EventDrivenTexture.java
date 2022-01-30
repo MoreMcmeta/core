@@ -25,12 +25,13 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * A flexible texture "shell" for mixing {@link ITextureComponent}s. Listeners in each
+ * A flexible texture "shell" for mixing {@link TextureComponent}s. Listeners in each
  * component provide texture implementation.
  *
  * No listeners are fired on the render thread. Wrap listener code with calls to
@@ -106,7 +107,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      *                      in the order given (by type)
      * @param image         initial image for this texture
      */
-    private EventDrivenTexture(List<TextureListener> listeners, RGBAImageFrame image) {
+    private EventDrivenTexture(List<? extends TextureListener> listeners, RGBAImageFrame image) {
         super();
         LISTENERS = new EnumMap<>(TextureListener.Type.class);
         for (TextureListener listener : listeners) {
@@ -122,7 +123,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Builds an event-driven texture from components.
      */
     public static class Builder {
-        private final List<ITextureComponent> COMPONENTS;
+        private final List<TextureComponent> COMPONENTS;
         private RGBAImageFrame firstImage;
 
         /**
@@ -130,6 +131,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public Builder() {
             COMPONENTS = new ArrayList<>();
+        }
+
+        /**
+         * Gets the initial image set in this builder if there is one.
+         * @return the initial image for the texture, or an empty
+         */
+        public Optional<RGBAImageFrame> getImage() {
+            return Optional.ofNullable(firstImage);
         }
 
         /**
@@ -150,7 +159,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param component     component to add to the texture
          * @return this builder for chaining
          */
-        public Builder add(ITextureComponent component) {
+        public Builder add(TextureComponent component) {
             requireNonNull(component, "Component cannot be null");
             COMPONENTS.add(component);
             return this;
@@ -167,7 +176,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             }
 
             List<TextureListener> listeners = COMPONENTS.stream().flatMap(
-                    ITextureComponent::getListeners
+                    TextureComponent::getListeners
             ).collect(Collectors.toList());
 
             return new EventDrivenTexture(listeners, firstImage);

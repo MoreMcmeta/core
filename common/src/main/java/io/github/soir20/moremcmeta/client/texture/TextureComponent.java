@@ -17,23 +17,18 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
- * An adapter for {@link net.minecraft.client.renderer.texture.TextureAtlas}
- * because it is difficult to instantiate in tests.
+ * A container for related {@link TextureListener}s.
  * @author soir20
  */
-@FunctionalInterface
-public interface IAtlas {
+public interface TextureComponent {
 
     /**
-     * Gets a sprite from this atlas if it is present.
-     * @param location      the location of the sprite
-     * @return the sprite at the given location if present
+     * Gets all listeners for this component.
+     * @return all of this component's listeners
      */
-    Optional<ISprite> getSprite(ResourceLocation location);
+    Stream<TextureListener> getListeners();
 
 }

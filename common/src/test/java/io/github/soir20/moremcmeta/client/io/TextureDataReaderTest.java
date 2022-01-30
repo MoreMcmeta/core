@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2021 soir20
+ * Copyright (C) 2022 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -21,37 +21,32 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import org.apache.logging.log4j.LogManager;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
- * Tests the {@link AnimatedTextureReader}.
+ * Tests the {@link TextureDataReader}. This class uses some Minecraft IO functions, and it
+ * is planned to completely revamp how this class works in the future. Its code is mostly creating
+ * other things that are tested. Therefore, the tests for it are less thorough.
  * @author soir20
  */
-public class AnimatedTextureReaderTest {
+public class TextureDataReaderTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void construct_NullLogger_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimatedTextureReader(null);
-    }
-
-    @Test
     public void read_NullTextureStream_NullPointerException() throws IOException {
-        AnimatedTextureReader reader = new AnimatedTextureReader(LogManager.getLogger());
+        TextureDataReader reader = new TextureDataReader();
         expectedException.expect(NullPointerException.class);
-        reader.read(null, new ByteArrayInputStream("".getBytes()));
+        reader.read(null, new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
     }
 
     @Test
     public void read_NullMetadataStream_NullPointerException() throws IOException {
-        AnimatedTextureReader reader = new AnimatedTextureReader(LogManager.getLogger());
+        TextureDataReader reader = new TextureDataReader();
         expectedException.expect(NullPointerException.class);
-        reader.read(new ByteArrayInputStream("".getBytes()), null);
+        reader.read(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)), null);
     }
 
 }

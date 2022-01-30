@@ -1,4 +1,4 @@
-# eclipse
+# Eclipse
 bin
 *.launch
 .settings
@@ -6,18 +6,18 @@ bin
 .classpath
 .project
 
-# idea
+# IDEA
 out
 *.ipr
 *.iws
 *.iml
 .idea
 
-# gradle
+# Gradle
 build
 .gradle
 
-# other
+# Other
 eclipse
 run
 
@@ -27,3 +27,6 @@ forge*changelog.txt
 # Crash logs
 logs
 /.vscode/launch.json
+
+# Architectury Files
+.architectury-transformer

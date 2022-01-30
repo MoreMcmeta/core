@@ -36,7 +36,8 @@ public class ManagerInitializationMixin {
      * Injects a callback after the resource manager is initialized on Fabric.
      * @param info      information about the callback
      */
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackRepository;reload()V"), method = "<init>*")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackRepository;reload()V"),
+            method = "<init>*")
     @SuppressWarnings("ConstantConditions")
     public void onReloaded(CallbackInfo info) {
         ResourceManagerInitializedCallback.EVENT.invoker().onManagerInitialized((Minecraft) (Object) this);
