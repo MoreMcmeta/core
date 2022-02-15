@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import org.junit.Rule;
 import org.junit.Test;
