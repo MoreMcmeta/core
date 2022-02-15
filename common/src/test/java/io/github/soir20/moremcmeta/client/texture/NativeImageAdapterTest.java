@@ -47,18 +47,4 @@ public class NativeImageAdapterTest {
         new NativeImageAdapter(null, 0, new NativeImageAdapter.ClosedStatus());
     }
 
-    @Test
-    public void constructFull_NullStatus_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new NativeImageAdapter(new NativeImage(10, 10, true), 0, 0, 100, 100, 2,
-                false, false, false, (new RGBAImage.VisibleArea.Builder()).build(),
-                null);
-    }
-
-    @Test
-    public void constructReduced_NullStatus_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new NativeImageAdapter(new NativeImage(10, 10, true), 0, null);
-    }
-
 }
