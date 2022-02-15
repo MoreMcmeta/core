@@ -83,7 +83,7 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
         TextureData<NativeImageAdapter> data = new TextureData<>(
                 frameSize.getFirst(),
                 frameSize.getSecond(),
-                new NativeImageAdapter(image, 0)
+                new NativeImageAdapter(image, 0, new NativeImageAdapter.ClosedStatus())
         );
 
         data.addMetadataSection(AnimationMetadataSection.class, animationMetadata);

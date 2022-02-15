@@ -27,15 +27,29 @@ import net.minecraft.resources.ResourceLocation;
 public class MockSprite implements Sprite {
     private final ResourceLocation NAME;
     private final Point UPLOAD_POINT;
+    private final int MIPMAP_LEVEL;
     private int timesBound;
 
+    public MockSprite(ResourceLocation name) {
+        this(name, new Point(0, 0));
+    }
+
     public MockSprite(ResourceLocation name, Point uploadPoint) {
-        NAME = name;
-        UPLOAD_POINT = uploadPoint;
+        this(name, uploadPoint, 2);
     }
 
     public MockSprite(Point uploadPoint) {
         this(new ResourceLocation("dummy"), uploadPoint);
+    }
+
+    public MockSprite(int mipmapLevel) {
+        this(new ResourceLocation("dummy"), new Point(0, 0), mipmapLevel);
+    }
+
+    public MockSprite(ResourceLocation name, Point uploadPoint, int mipmapLevel) {
+        NAME = name;
+        UPLOAD_POINT = uploadPoint;
+        MIPMAP_LEVEL = mipmapLevel;
     }
 
     @Override
@@ -51,6 +65,11 @@ public class MockSprite implements Sprite {
     @Override
     public Point getUploadPoint() {
         return UPLOAD_POINT;
+    }
+
+    @Override
+    public int getMipmapLevel() {
+        return MIPMAP_LEVEL;
     }
 
     public int getBindCount() {

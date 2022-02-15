@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.forge;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
@@ -28,6 +29,7 @@ import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -49,6 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
 
 /**
  * The main mod class and entrypoint for Forge.
@@ -74,6 +77,34 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         );
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> this::start);
+    }
+
+    /**
+     * Gets the function that converts atlas sprites to their mipmap level.
+     * @return the mipmap level getter
+     */
+    protected ToIntFunction<TextureAtlasSprite> getMipmapLevelGetter(Logger logger) {
+        return (sprite) -> {
+            try {
+                NativeImage[] mipmaps = ObfuscationReflectionHelper.getPrivateValue(TextureAtlasSprite.class,
+                        sprite, "f_118342_");
+
+                if (mipmaps != null) {
+                    return mipmaps.length - 1;
+                }
+
+                logger.error("Unable to retrieve mipmaps for TextureAtlasSprite " + sprite.getName()
+                        + ". Defaulting to mipmap level 0 for this sprite.");
+            } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
+                logger.error("Unable to access TextureAtlasSprite's mipmap field. " +
+                        "Defaulting to mipmap level 0 for this sprite.");
+            } catch (ObfuscationReflectionHelper.UnableToFindFieldException err) {
+                logger.error("Unable to find TextureAtlasSprite's mipmap field. " +
+                        "Defaulting to mipmap level 0 for this sprite.");
+            }
+
+            return 0;
+        };
     }
 
     /**

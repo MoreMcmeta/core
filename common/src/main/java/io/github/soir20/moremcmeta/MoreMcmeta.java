@@ -37,6 +37,7 @@ import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -59,6 +60,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -80,7 +82,7 @@ public abstract class MoreMcmeta {
         Logger logger = LogManager.getLogger();
 
         // Texture manager
-        SpriteFinder spriteFinder = new SpriteFinder(AtlasAdapter::new);
+        SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, getMipmapLevelGetter(logger)));
         TextureFinisher finisher = new TextureFinisher(spriteFinder, getPreparer());
         LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager = new LazyTextureManager<>(
                 new TextureManagerAdapter(minecraft::getTextureManager, getUnregisterAction()),
@@ -124,6 +126,12 @@ public abstract class MoreMcmeta {
         startTicking(manager);
 
     }
+
+    /**
+     * Gets the function that converts atlas sprites to their mipmap level.
+     * @return the mipmap level getter
+     */
+    protected abstract ToIntFunction<TextureAtlasSprite> getMipmapLevelGetter(Logger logger);
 
     /**
      * Gets the OpenGL preparer for new textures on this loader.

@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2021 soir20
+ * Copyright (C) 2022 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,34 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.texture;
+package io.github.soir20.moremcmeta.fabric.client.mixin;
 
-import io.github.soir20.moremcmeta.math.Point;
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
- * A fake {@link TextureAtlasSprite}.
+ * Allows the {@link TextureAtlasSprite}'s mipmaps to be accessed.
  * @author soir20
  */
-public class MockAtlasSprite implements Sprite {
-    private final ResourceLocation NAME;
+@Mixin(TextureAtlasSprite.class)
+public interface SpriteAccessor {
 
-    public MockAtlasSprite(ResourceLocation name) {
-        NAME = name;
-    }
-
-    @Override
-    public void bind() {}
-
-    @Override
-    public ResourceLocation getName() {
-        return NAME;
-    }
-
-    @Override
-    public Point getUploadPoint() {
-        return new Point(1, 2);
-    }
+    /**
+     * Makes the atlas sprite's mipmaps accessible.
+     * @return the atlas sprite's mipmaps
+     */
+    @Accessor("mainImage")
+    NativeImage[] getMainImage();
 
 }

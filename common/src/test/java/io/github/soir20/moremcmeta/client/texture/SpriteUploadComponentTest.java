@@ -22,6 +22,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.stream.Stream;
+
 import static org.junit.Assert.*;
 
 public class SpriteUploadComponentTest {
@@ -106,6 +108,41 @@ public class SpriteUploadComponentTest {
         assertEquals(new Point(2, 3), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
         assertEquals(new Point(1, 1), ((MockRGBAImage) frame.getImage(1)).getLastUploadPoint());
         assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(2)).getLastUploadPoint());
+    }
+
+    @Test
+    public void upload_OriginalImage_MipmapLoweredToSprite() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        MockSprite sprite = new MockSprite(1);
+        builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
+
+        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        builder.setImage(frame);
+        EventDrivenTexture texture = builder.build();
+
+        assertEquals(2, frame.getMipmapLevel());
+        texture.upload();
+        assertEquals(1, frame.getMipmapLevel());
+    }
+
+    @Test
+    public void upload_SecondImage_MipmapLoweredToSprite() {
+        MockRGBAImageFrame frame2 = new MockRGBAImageFrame();
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        MockSprite sprite = new MockSprite(1);
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
+        builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
+
+        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        builder.setImage(frame);
+        EventDrivenTexture texture = builder.build();
+
+        texture.upload();
+        texture.tick();
+
+        // The frame automatically uploads on tick
+        assertEquals(1, frame2.getMipmapLevel());
+
     }
 
 }

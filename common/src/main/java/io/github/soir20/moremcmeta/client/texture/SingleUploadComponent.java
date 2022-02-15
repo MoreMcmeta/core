@@ -40,21 +40,23 @@ public class SingleUploadComponent implements TextureComponent {
 
     /**
      * Gets the listeners for this component.
-     * @return all of the listeners for this component
+     * @return all the listeners for this component
      */
     @Override
     public Stream<TextureListener> getListeners() {
         TextureListener registrationListener = new TextureListener(TextureListener.Type.REGISTRATION,
                 (state) -> {
                     RGBAImageFrame image = state.getImage();
-                    PREPARER.prepare(state.getTexture().getId(), image.getMipmapLevel(),
-                            image.getWidth(), image.getHeight());
+                    PREPARER.prepare(state.getTexture().getId(), 0, image.getWidth(), image.getHeight());
                 });
 
         Point uploadPoint = new Point(0, 0);
         TextureListener uploadListener = new TextureListener(
                 TextureListener.Type.UPLOAD,
-                (state) -> state.getImage().uploadAt(uploadPoint)
+                (state) -> {
+                    state.getImage().lowerMipmapLevel(0);
+                    state.getImage().uploadAt(uploadPoint);
+                }
         );
 
         return Stream.of(registrationListener, uploadListener);

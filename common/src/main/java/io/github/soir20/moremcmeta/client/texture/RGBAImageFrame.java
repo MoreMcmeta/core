@@ -29,12 +29,12 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class RGBAImageFrame {
-    private final ImmutableList<? extends RGBAImage> MIPMAPS;
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
     private final int Y_OFFSET;
     private final int FRAME_TIME;
+    private ImmutableList<? extends RGBAImage> mipmaps;
 
     /**
      * Creates a new frame based on frame data.
@@ -43,7 +43,7 @@ public class RGBAImageFrame {
      */
     public RGBAImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends RGBAImage> mipmaps) {
         requireNonNull(frameData, "Frame data cannot be null");
-        MIPMAPS = requireNonNull(mipmaps, "Mipmaps cannot be null");
+        this.mipmaps = requireNonNull(mipmaps, "Mipmaps cannot be null");
         if (mipmaps.size() == 0) {
             throw new IllegalArgumentException("At least one mipmap must be provided");
         }
@@ -74,11 +74,11 @@ public class RGBAImageFrame {
             throw new IllegalArgumentException("Point coordinates must be greater than zero");
         }
 
-        for (int level = 0; level < MIPMAPS.size(); level++) {
+        for (int level = 0; level < mipmaps.size(); level++) {
             int mipmappedX = point.getX() >> level;
             int mipmappedY = point.getY() >> level;
 
-            RGBAImage mipmap = MIPMAPS.get(level);
+            RGBAImage mipmap = mipmaps.get(level);
             int mipmappedWidth = mipmap.getWidth();
             int mipmappedHeight = mipmap.getHeight();
 
@@ -125,7 +125,32 @@ public class RGBAImageFrame {
      * @return the mipmap level of this frame
      */
     public int getMipmapLevel() {
-        return MIPMAPS.size() - 1;
+        return mipmaps.size() - 1;
+    }
+
+    /**
+     * Lowers the mipmap level of this frame, closing all mipmaps above the provided level.
+     * @param newMipmapLevel        the maximum new mipmap level
+     */
+    public void lowerMipmapLevel(int newMipmapLevel) {
+        if (newMipmapLevel == getMipmapLevel()) {
+            return;
+        }
+
+        if (newMipmapLevel < 0) {
+            throw new IllegalArgumentException("New mipmap level must be at least zero");
+        }
+
+        if (newMipmapLevel > getMipmapLevel()) {
+            throw new IllegalArgumentException("New mipmap level " + newMipmapLevel + " is greater than current " +
+                    "mipmap level " + getMipmapLevel());
+        }
+
+        for (int level = newMipmapLevel + 1; level < mipmaps.size(); level++) {
+            mipmaps.get(level).close();
+        }
+
+        mipmaps = mipmaps.subList(0, newMipmapLevel + 1);
     }
 
     /**
@@ -134,11 +159,11 @@ public class RGBAImageFrame {
      * @return  the image at the given mipmap level
      */
     public RGBAImage getImage(int level) {
-        if (level >= MIPMAPS.size()) {
+        if (level >= mipmaps.size()) {
             throw new IllegalArgumentException("There is no mipmap of level " + level);
         }
 
-        return MIPMAPS.get(level);
+        return mipmaps.get(level);
     }
 
     /**
@@ -171,8 +196,9 @@ public class RGBAImageFrame {
 
         /**
          * Interpolates between a starting frame and an ending frame for all mipmap levels.
-         * The mipmap level of the start and end frames must be greater than or equal to
-         * the highest mipmap level of the provided mipmaps.
+         * If the mipmap level of either the start frame or the end frame is lower than the
+         * mipmaps provided, the mipmap level of all frames returned by this interpolator
+         * is lowered, and the now-unused mipmaps are closed.
          * @param steps     total steps between the start and end frame
          * @param step      current step of the interpolation (between 1 and steps - 1)
          * @param start     the frame to start interpolation from
@@ -185,7 +211,7 @@ public class RGBAImageFrame {
             requireNonNull(end, "End frame cannot be null");
 
             if (start.getMipmapLevel() < FRAME.getMipmapLevel() || end.getMipmapLevel() < FRAME.getMipmapLevel()) {
-                throw new IllegalArgumentException("The start or end frame has fewer mipmaps than the interpolator");
+                FRAME.lowerMipmapLevel(Math.min(start.getMipmapLevel(), end.getMipmapLevel()));
             }
 
             for (int level = 0; level <= FRAME.getMipmapLevel(); level++) {

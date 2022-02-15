@@ -9,7 +9,8 @@
     "LoadingOverlayAccessor",
     "PackRepositoryAccessor",
     "ManagerInitializationMixin",
-    "TextureManagerAccessor"
+    "TextureManagerAccessor",
+    "SpriteAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

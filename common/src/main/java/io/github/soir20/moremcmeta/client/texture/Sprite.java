@@ -44,4 +44,10 @@ public interface Sprite {
      */
     Point getUploadPoint();
 
+    /**
+     * Gets the mipmap level of the sprite.
+     * @return the mipmap level of the sprite
+     */
+    int getMipmapLevel();
+
 }

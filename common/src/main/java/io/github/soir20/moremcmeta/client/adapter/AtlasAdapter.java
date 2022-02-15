@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
+import java.util.function.ToIntFunction;
 
 import static java.util.Objects.requireNonNull;
 
@@ -36,15 +37,19 @@ import static java.util.Objects.requireNonNull;
  */
 public class AtlasAdapter implements Atlas {
     private final TextureAtlas ATLAS;
+    private final ToIntFunction<TextureAtlasSprite> MIPMAP_LEVEL_GETTER;
 
     /**
      * Creates a new adapter for an atlas at the given location. If no texture exists at the
      * location or the texture there is not an atlas, this adapter will simply act as an
      * empty atlas and provide no sprites.
-     * @param location      the location to look for an atlas
+     * @param location              the location to look for an atlas
+     * @param mipmapLevelGetter     gets the mipmap level of this atlas from a sprite
      */
-    public AtlasAdapter(ResourceLocation location) {
-        requireNonNull(location);
+    public AtlasAdapter(ResourceLocation location, ToIntFunction<TextureAtlasSprite> mipmapLevelGetter) {
+        requireNonNull(location, "Location cannot be null");
+        MIPMAP_LEVEL_GETTER = requireNonNull(mipmapLevelGetter, "Mipmap level getter cannot be null");
+
         AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(location);
         if (texture instanceof TextureAtlas) {
             ATLAS = (TextureAtlas) texture;
@@ -70,7 +75,7 @@ public class AtlasAdapter implements Atlas {
             return Optional.empty();
         }
 
-        return Optional.of(new SpriteAdapter(sprite));
+        return Optional.of(new SpriteAdapter(sprite, MIPMAP_LEVEL_GETTER.applyAsInt(sprite)));
     }
 
     /**
@@ -80,14 +85,22 @@ public class AtlasAdapter implements Atlas {
     private static class SpriteAdapter implements Sprite {
         private final TextureAtlasSprite SPRITE;
         private final Point UPLOAD_POINT;
+        private final int MIPMAP_LEVEL;
 
         /**
          * Adapts the given sprite to be a {@link Sprite}.
-         * @param sprite    the sprite to adapt
+         * @param sprite        the sprite to adapt
+         * @param mipmapLevel   the number of mipmaps for this sprite
          */
-        public SpriteAdapter(TextureAtlasSprite sprite) {
+        public SpriteAdapter(TextureAtlasSprite sprite, int mipmapLevel) {
             SPRITE = sprite;
             UPLOAD_POINT = findUploadPoint();
+
+            if (mipmapLevel < 0) {
+                throw new IllegalArgumentException("Sprite cannot have negative mipmaps");
+            }
+
+            MIPMAP_LEVEL = mipmapLevel;
         }
 
         /**
@@ -115,6 +128,15 @@ public class AtlasAdapter implements Atlas {
         @Override
         public Point getUploadPoint() {
             return UPLOAD_POINT;
+        }
+
+        /**
+         * Gets the mipmap level of the sprite.
+         * @return the mipmap level of the sprite
+         */
+        @Override
+        public int getMipmapLevel() {
+            return MIPMAP_LEVEL;
         }
 
         /**
