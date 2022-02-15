@@ -145,4 +145,112 @@ public class SpriteFinderTest {
         assertFalse(result.isPresent());
     }
 
+    @Test
+    public void find_SpriteInBlockAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/blocks.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void find_SpriteInSignAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/signs.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void find_SpriteInBannerAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/banner_patterns.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void find_SpriteInShieldAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/shield_patterns.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void find_SpriteInChestAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/chest.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void find_SpriteInBedAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/beds.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void find_SpriteInParticleAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/particles.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void find_SpriteInPaintingAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/paintings.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void find_SpriteInEffectAtlas_SpriteFound() {
+        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+                atlasLocation.equals(new ResourceLocation("textures/atlas/mob_effects.png"))
+                        && spriteLocation.equals(LOCATION_IN_ATLAS) ?
+                        Optional.of(new MockSprite(LOCATION_IN_ATLAS)) : Optional.empty()
+        );
+
+        Optional<Sprite> result = finder.findSprite(LOCATION_BOTH);
+        assertTrue(result.isPresent());
+    }
+
 }
