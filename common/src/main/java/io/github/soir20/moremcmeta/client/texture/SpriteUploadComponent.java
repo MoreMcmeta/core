@@ -43,7 +43,7 @@ public class SpriteUploadComponent implements TextureComponent {
     /**
      * Gets the listeners for this component. Sprite will be bound and uploaded
      * on every tick, in addition to regularly-triggered uploads.
-     * @return all of the listeners for this component
+     * @return all the listeners for this component
      */
     @Override
     public Stream<TextureListener> getListeners() {
@@ -51,7 +51,10 @@ public class SpriteUploadComponent implements TextureComponent {
 
         TextureListener uploadListener = new TextureListener(
                 TextureListener.Type.UPLOAD,
-                (state) -> state.getImage().uploadAt(uploadPoint)
+                (state) -> {
+                    state.getImage().lowerMipmapLevel(SPRITE.getMipmapLevel());
+                    state.getImage().uploadAt(uploadPoint);
+                }
         );
 
         // We need this listener because atlas sprites will never be bound

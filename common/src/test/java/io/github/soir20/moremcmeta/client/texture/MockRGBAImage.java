@@ -31,6 +31,7 @@ public class MockRGBAImage implements RGBAImage {
     private final int HEIGHT;
     private final VisibleArea VISIBLE_AREA;
     private Point uploadPoint;
+    private boolean closed;
 
     public MockRGBAImage() {
         PIXELS = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
@@ -62,32 +63,65 @@ public class MockRGBAImage implements RGBAImage {
 
     @Override
     public int getPixel(int x, int y) {
+        if (closed) {
+            throw new IllegalStateException("Mock image closed");
+        }
+
         return PIXELS[x][y];
     }
 
     @Override
     public void setPixel(int x, int y, int color) {
+        if (closed) {
+            throw new IllegalStateException("Mock image closed");
+        }
+
         PIXELS[x][y] = color;
     }
 
     @Override
     public int getWidth() {
+        if (closed) {
+            throw new IllegalStateException("Mock image closed");
+        }
+
         return WIDTH;
     }
 
     @Override
     public int getHeight() {
+        if (closed) {
+            throw new IllegalStateException("Mock image closed");
+        }
+
         return HEIGHT;
     }
 
     @Override
     public VisibleArea getVisibleArea() {
+        if (closed) {
+            throw new IllegalStateException("Mock image closed");
+        }
+
         return VISIBLE_AREA;
     }
 
     @Override
     public void upload(int uploadX, int uploadY) {
+        if (closed) {
+            throw new IllegalStateException("Mock image closed");
+        }
+
         uploadPoint = new Point(uploadX, uploadY);
+    }
+
+    @Override
+    public void close() {
+        closed = true;
+    }
+
+    public boolean isClosed() {
+        return closed;
     }
 
     public Point getLastUploadPoint() {

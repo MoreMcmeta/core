@@ -22,6 +22,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.stream.Stream;
+
 import static org.junit.Assert.*;
 
 /**
@@ -54,8 +56,6 @@ public class SingleUploadComponentTest {
 
         assertEquals(1, frame.getUploadCount());
         assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(2)).getLastUploadPoint());
     }
 
     @Test
@@ -72,8 +72,39 @@ public class SingleUploadComponentTest {
 
         assertEquals(2, frame.getUploadCount());
         assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(2)).getLastUploadPoint());
+    }
+
+    @Test
+    public void upload_OriginalImage_MipmapLoweredTo0() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
+
+        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        builder.setImage(frame);
+        EventDrivenTexture texture = builder.build();
+
+        assertEquals(2, frame.getMipmapLevel());
+        texture.upload();
+        assertEquals(0, frame.getMipmapLevel());
+    }
+
+    @Test
+    public void upload_SecondImage_MipmapLoweredTo0() {
+        MockRGBAImageFrame frame2 = new MockRGBAImageFrame();
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
+        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
+
+        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        builder.setImage(frame);
+        EventDrivenTexture texture = builder.build();
+
+        texture.upload();
+        texture.tick();
+
+        assertEquals(2, frame2.getMipmapLevel());
+        texture.upload();
+        assertEquals(0, frame2.getMipmapLevel());
     }
 
 }

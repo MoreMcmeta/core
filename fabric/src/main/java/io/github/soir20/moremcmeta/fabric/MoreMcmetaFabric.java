@@ -27,6 +27,7 @@ import io.github.soir20.moremcmeta.fabric.client.adapter.SimpleReloadListenerAda
 import io.github.soir20.moremcmeta.fabric.client.event.ResourceManagerInitializedCallback;
 import io.github.soir20.moremcmeta.fabric.client.mixin.LoadingOverlayAccessor;
 import io.github.soir20.moremcmeta.fabric.client.mixin.PackRepositoryAccessor;
+import io.github.soir20.moremcmeta.fabric.client.mixin.SpriteAccessor;
 import io.github.soir20.moremcmeta.fabric.client.mixin.TextureManagerAccessor;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
@@ -34,6 +35,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -45,6 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
 
 /**
  * The main mod class and entrypoint for Fabric.
@@ -59,6 +62,14 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     @Override
     public void onInitializeClient() {
         start();
+    }
+
+    /**
+     * Gets the function that converts atlas sprites to their mipmap level.
+     * @return the mipmap level getter
+     */
+    protected ToIntFunction<TextureAtlasSprite> getMipmapLevelGetter(Logger logger) {
+        return (sprite) -> ((SpriteAccessor) sprite).getMainImage().length - 1;
     }
 
     /**

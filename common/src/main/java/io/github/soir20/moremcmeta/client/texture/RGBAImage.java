@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * An image with an RGB color scheme.
@@ -40,6 +39,7 @@ public interface RGBAImage {
      * @param x     x-coordinate of the pixel
      * @param y     y-coordinate of the pixel
      * @return  the color of the given pixel
+     * @throws IllegalStateException if this image has been closed
      */
     int getPixel(int x, int y);
 
@@ -48,24 +48,28 @@ public interface RGBAImage {
      * @param x         x-coordinate of the pixel
      * @param y         y-coordinate of the pixel
      * @param color     new color of the pixel
+     * @throws IllegalStateException if this image has been closed
      */
     void setPixel(int x, int y, int color);
 
     /**
      * Gets the width (pixels) of this image.
      * @return  the width of this image
+     * @throws IllegalStateException if this image has been closed
      */
     int getWidth();
 
     /**
      * Gets the height (pixels) of this image.
      * @return  the height of this image
+     * @throws IllegalStateException if this image has been closed
      */
     int getHeight();
 
     /**
      * Gets the visible area (iterable by point) of this image. Order of points is not guaranteed.
      * @return  the visible area of this image
+     * @throws IllegalStateException if this image has been closed
      */
     VisibleArea getVisibleArea();
 
@@ -73,8 +77,18 @@ public interface RGBAImage {
      * Uploads the top-left corner of this image at the given coordinates.
      * @param uploadX       horizontal position to upload at
      * @param uploadY       vertical position to upload at
+     * @throws IllegalStateException if this image has been closed
      */
     void upload(int uploadX, int uploadY);
+
+    /**
+     * Closes any resources associated with this image. Implementations should be idempotent.
+     *
+     * Currently, no image implementations need to throw exceptions, and {@link AutoCloseable} is not
+     * idempotent. An image is not an I/O resource like {@link java.io.Closeable}. Hence, this interface
+     * has its own close() method instead of extending one of the existing closeable interfaces.
+     */
+    void close();
 
     /**
      * Represents a collection of unordered visible points in an image. Use this to ignore parts of an image
@@ -131,7 +145,7 @@ public interface RGBAImage {
                 Set<VisibleRow> visibleRows = new HashSet<>();
 
                 for (Map.Entry<Integer, Set<Integer>> entry : ROWS.entrySet()) {
-                    List<Integer> xPoints = entry.getValue().stream().sorted().collect(Collectors.toList());
+                    List<Integer> xPoints = entry.getValue().stream().sorted().toList();
                     int numPoints = xPoints.size();
 
                     int startIndex = 0;

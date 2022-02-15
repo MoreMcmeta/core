@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.adapter;
 
+import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -32,7 +33,13 @@ public class AtlasAdapterTest {
     @Test
     public void construct_NullLocation_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AtlasAdapter(null);
+        new AtlasAdapter(null, (sprite) -> 1);
+    }
+
+    @Test
+    public void construct_NullGetter_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AtlasAdapter(new ResourceLocation("textures/atlas/blocks.png"), null);
     }
 
 }

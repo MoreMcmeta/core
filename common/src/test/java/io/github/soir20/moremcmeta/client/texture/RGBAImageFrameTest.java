@@ -539,6 +539,267 @@ public class RGBAImageFrameTest {
     }
 
     @Test
+    public void lowerMipmapLevel_NegativeLevel_IllegalArtException() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        frame.lowerMipmapLevel(-1);
+    }
+
+    @Test
+    public void lowerMipmapLevel_ZeroLevel_MipmapsClosed() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = 0;
+        frame.lowerMipmapLevel(newLevel);
+
+        for (int level = newLevel + 1; level < mipmaps.size(); level++) {
+            assertTrue(mipmaps.get(level).isClosed());
+        }
+    }
+
+    @Test
+    public void lowerMipmapLevel_ZeroLevel_ClosedMipmapsNoLongerProvided() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = 0;
+        frame.lowerMipmapLevel(newLevel);
+
+        int mipmapsNotClosed = mipmaps.size() - 1;
+
+        for (int level = newLevel + 1; level < mipmaps.size(); level++) {
+            try {
+                frame.getImage(level);
+            } catch (IllegalArgumentException err) {
+                mipmapsNotClosed--;
+            }
+        }
+
+        assertEquals(0, mipmapsNotClosed);
+    }
+
+    @Test
+    public void lowerMipmapLevel_LessThanMaxLevel_MipmapsClosed() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = 2;
+        frame.lowerMipmapLevel(newLevel);
+
+        for (int level = newLevel + 1; level < mipmaps.size(); level++) {
+            assertTrue(mipmaps.get(level).isClosed());
+        }
+    }
+
+    @Test
+    public void lowerMipmapLevel_LessThanMaxLevel_ClosedMipmapsNoLongerProvided() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = 2;
+        frame.lowerMipmapLevel(newLevel);
+
+        int mipmapsNotClosed = mipmaps.size() - 1;
+
+        for (int level = newLevel + 1; level < mipmaps.size(); level++) {
+            try {
+                frame.getImage(level);
+            } catch (IllegalArgumentException err) {
+                mipmapsNotClosed--;
+            }
+        }
+
+        assertEquals(newLevel, mipmapsNotClosed);
+    }
+
+    @Test
+    public void lowerMipmapLevel_MaxLevel_NothingClosed() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = mipmaps.size() - 1;
+        frame.lowerMipmapLevel(newLevel);
+
+        for (int level = 0; level < mipmaps.size(); level++) {
+            assertFalse(mipmaps.get(level).isClosed());
+        }
+    }
+
+    @Test
+    public void lowerMipmapLevel_MaxLevel_MipmapsStillProvided() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = mipmaps.size() - 1;
+        frame.lowerMipmapLevel(newLevel);
+
+        int mipmapsNotClosed = mipmaps.size() - 1;
+
+        for (int level = 0; level < mipmaps.size(); level++) {
+            try {
+                frame.getImage(level);
+            } catch (IllegalArgumentException err) {
+                mipmapsNotClosed--;
+            }
+        }
+
+        assertEquals(mipmaps.size() - 1, mipmapsNotClosed);
+    }
+
+    @Test
+    public void lowerMipmapLevel_MoreThanMaxLevel_IllegalArgException() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = mipmaps.size();
+
+        expectedException.expect(IllegalArgumentException.class);
+        frame.lowerMipmapLevel(newLevel);
+    }
+
+    @Test
+    public void lowerMipmapLevel_MoreThanMaxLevel_NothingClosed() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = mipmaps.size();
+
+        try {
+            frame.lowerMipmapLevel(newLevel);
+        } catch (IllegalArgumentException ignored) {
+
+        } finally {
+            for (int level = 0; level < mipmaps.size(); level++) {
+                assertFalse(mipmaps.get(level).isClosed());
+            }
+        }
+    }
+
+    @Test
+    public void lowerMipmapLevel_MoreThanMaxLevel_MipmapsStillProvided() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps
+        );
+
+        int newLevel = mipmaps.size();
+
+        try {
+            frame.lowerMipmapLevel(newLevel);
+        } catch (IllegalArgumentException ignored) {
+
+        } finally {
+
+            // No exceptions should be thrown here
+            for (int level = 0; level < mipmaps.size(); level++) {
+                frame.getImage(level);
+            }
+
+        }
+    }
+
+    @Test
     public void constructInterpolator_NullMipmaps_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new RGBAImageFrame.Interpolator(null);
@@ -608,7 +869,7 @@ public class RGBAImageFrameTest {
     }
 
     @Test
-    public void interpolate_StartFrameFewerMipmaps_IllegalArgException() {
+    public void interpolate_StartFrameFewerMipmaps_ResultMipmapLowered() {
         ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
@@ -616,13 +877,43 @@ public class RGBAImageFrameTest {
                 new MockRGBAImage(1, 1)
         );
         RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(frames);
-        expectedException.expect(IllegalArgumentException.class);
-        interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 2),
+        RGBAImageFrame result = interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 2),
                 new MockRGBAImageFrame(10, 10, 3));
+        assertEquals(2, result.getMipmapLevel());
     }
 
     @Test
-    public void interpolate_EndFrameFewerMipmaps_IllegalArgException() {
+    public void interpolate_StartFrameFewerMipmaps_ResultMipmapsClosed() {
+        ImmutableList<MockRGBAImage> frames = ImmutableList.of(
+                new MockRGBAImage(10, 10),
+                new MockRGBAImage(5, 5),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1)
+        );
+        RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(frames);
+        interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 2),
+                new MockRGBAImageFrame(10, 10, 3));
+        assertTrue(frames.get(3).isClosed());
+    }
+
+    @Test
+    public void interpolate_StartFrameFewerMipmaps_SubsequentResultsLowered() {
+        ImmutableList<MockRGBAImage> frames = ImmutableList.of(
+                new MockRGBAImage(10, 10),
+                new MockRGBAImage(5, 5),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1)
+        );
+        RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(frames);
+        interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 2),
+                new MockRGBAImageFrame(10, 10, 3));
+        RGBAImageFrame result2 = interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 3),
+                new MockRGBAImageFrame(10, 10, 3));
+        assertEquals(2, result2.getMipmapLevel());
+    }
+
+    @Test
+    public void interpolate_EndFrameFewerMipmaps_ResultMipmapLowered() {
         ImmutableList<RGBAImage> frames = ImmutableList.of(
                 new MockRGBAImage(10, 10),
                 new MockRGBAImage(5, 5),
@@ -630,9 +921,39 @@ public class RGBAImageFrameTest {
                 new MockRGBAImage(1, 1)
         );
         RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(frames);
-        expectedException.expect(IllegalArgumentException.class);
+        RGBAImageFrame result = interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 3),
+                new MockRGBAImageFrame(10, 10, 2));
+        assertEquals(2, result.getMipmapLevel());
+    }
+
+    @Test
+    public void interpolate_EndFrameFewerMipmaps_ResultMipmapsClosed() {
+        ImmutableList<MockRGBAImage> frames = ImmutableList.of(
+                new MockRGBAImage(10, 10),
+                new MockRGBAImage(5, 5),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1)
+        );
+        RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(frames);
         interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 3),
                 new MockRGBAImageFrame(10, 10, 2));
+        assertTrue(frames.get(3).isClosed());
+    }
+
+    @Test
+    public void interpolate_EndFrameFewerMipmaps_SubsequentResultsLowered() {
+        ImmutableList<MockRGBAImage> frames = ImmutableList.of(
+                new MockRGBAImage(10, 10),
+                new MockRGBAImage(5, 5),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1)
+        );
+        RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(frames);
+        interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 3),
+                new MockRGBAImageFrame(10, 10, 2));
+        RGBAImageFrame result2 = interpolator.interpolate(10, 3, new MockRGBAImageFrame(10, 10, 3),
+                new MockRGBAImageFrame(10, 10, 3));
+        assertEquals(2, result2.getMipmapLevel());
     }
 
     @Test

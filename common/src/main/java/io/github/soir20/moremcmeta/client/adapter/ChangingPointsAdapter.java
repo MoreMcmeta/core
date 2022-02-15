@@ -49,7 +49,7 @@ public class ChangingPointsAdapter {
      */
     public List<RGBAImage.VisibleArea> read(NativeImage image, int frameWidth, int frameHeight, int mipmap) {
         requireNonNull(image, "Image cannot be null");
-        RGBAImage wrappedImage = new NativeImageAdapter(image, mipmap);
+        RGBAImage wrappedImage = new NativeImageAdapter(image, mipmap, new NativeImageAdapter.ClosedStatus());
         return READER.read(wrappedImage, frameWidth, frameHeight, mipmap);
     }
 
