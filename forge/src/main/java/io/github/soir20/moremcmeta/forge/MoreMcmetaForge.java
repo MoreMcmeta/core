@@ -87,7 +87,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         return (sprite) -> {
             try {
                 NativeImage[] mipmaps = ObfuscationReflectionHelper.getPrivateValue(TextureAtlasSprite.class,
-                        sprite, "f_118342_");
+                        sprite, "field_195670_c");
 
                 if (mipmaps != null) {
                     return mipmaps.length - 1;
