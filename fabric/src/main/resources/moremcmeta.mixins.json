@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.github.soir20.moremcmeta.fabric.client.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
   "client": [
