@@ -22,6 +22,9 @@ import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -34,17 +37,21 @@ public class RGBAImageFrame {
     private final int X_OFFSET;
     private final int Y_OFFSET;
     private final int FRAME_TIME;
+    private final SharedMipmapLevel SHARED_MIPMAP_LEVEL;
     private ImmutableList<? extends RGBAImage> mipmaps;
 
     /**
      * Creates a new frame based on frame data.
-     * @param frameData     general data associated with the frame
-     * @param mipmaps       mipmapped images for this frame (starting with the original image)
+     * @param frameData             general data associated with the frame
+     * @param mipmaps               mipmapped images for this frame (starting with the original image)
+     * @param sharedMipmapLevel     mipmap level potentially shared with other frames. Upon the mipmap level being
+     *                              lowered, this frame's mipmap level lowers, and its extra mipmaps close.
      */
-    public RGBAImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends RGBAImage> mipmaps) {
+    public RGBAImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends RGBAImage> mipmaps,
+                          SharedMipmapLevel sharedMipmapLevel) {
         requireNonNull(frameData, "Frame data cannot be null");
         this.mipmaps = requireNonNull(mipmaps, "Mipmaps cannot be null");
-        if (mipmaps.size() == 0) {
+        if (mipmaps.isEmpty()) {
             throw new IllegalArgumentException("At least one mipmap must be provided");
         }
 
@@ -53,6 +60,8 @@ public class RGBAImageFrame {
         X_OFFSET = frameData.getXOffset();
         Y_OFFSET = frameData.getYOffset();
         FRAME_TIME = frameData.getTime();
+        SHARED_MIPMAP_LEVEL = requireNonNull(sharedMipmapLevel, "Shared mipmap level cannot be null");
+        SHARED_MIPMAP_LEVEL.addSubscriber(this);
     }
 
     /**
@@ -151,6 +160,7 @@ public class RGBAImageFrame {
         }
 
         mipmaps = mipmaps.subList(0, newMipmapLevel + 1);
+        SHARED_MIPMAP_LEVEL.lowerMipmapLevel(newMipmapLevel);
     }
 
     /**
@@ -167,6 +177,63 @@ public class RGBAImageFrame {
     }
 
     /**
+     * Represents a shared open/close status for multiple {@link RGBAImageFrame}s referencing the same mipmaps or
+     * that should have the same mipmap level. All subscribers run when the mipmap level is lowered.
+     * @author soir20
+     */
+    public static final class SharedMipmapLevel {
+        private final List<RGBAImageFrame> SUBSCRIBERS;
+        private int mipmapLevel;
+
+        /**
+         * Creates a new shared mipmap level.
+         * @param currentLevel      current mipmap level shared between all frames
+         */
+        public SharedMipmapLevel(int currentLevel) {
+            if (currentLevel < 0) {
+                throw new IllegalArgumentException("Mipmap level cannot be negative");
+            }
+
+            SUBSCRIBERS = new ArrayList<>();
+            mipmapLevel = currentLevel;
+        }
+
+        /**
+         * Adds an {@link RGBAImageFrame} whose mipmap level will be lowered when the shared level is lowered. This
+         * frame's mipmap level will be lowered to the current shared level immediately.
+         */
+        public void addSubscriber(RGBAImageFrame frame) {
+            requireNonNull(frame, "Frame cannot be null");
+            frame.lowerMipmapLevel(mipmapLevel);
+            SUBSCRIBERS.add(frame);
+        }
+
+        /**
+         * Lowers the shared mipmap level and runs all subscribers. It is not guaranteed subscribers will be run
+         * if the new mipmap level is the same as the current level.
+         * @param newMipmapLevel      new mipmap level of this shared level. Must be lower than or the same as the
+         *                            current level.
+         */
+        public void lowerMipmapLevel(int newMipmapLevel) {
+            if (newMipmapLevel == mipmapLevel) {
+                return;
+            }
+
+            if (newMipmapLevel > mipmapLevel) {
+                throw new IllegalArgumentException("New mipmap level cannot be greater than old one");
+            }
+
+            if (newMipmapLevel < 0) {
+                throw new IllegalArgumentException("New mipmap level cannot be negative");
+            }
+
+            mipmapLevel = newMipmapLevel;
+            SUBSCRIBERS.forEach((subscriber) -> subscriber.lowerMipmapLevel(newMipmapLevel));
+        }
+
+    }
+
+    /**
      * Interpolates between {@link RGBAImageFrame}s. The frames returned by this interpolator
      * are <em>not</em> unique; the mipmaps are overwritten.
      * @author soir20
@@ -178,18 +245,21 @@ public class RGBAImageFrame {
 
         /**
          * Creates a new interpolator.
-         * @param mipmaps       the mipmaps, which will be overwritten starting at (0, 0).
-         *                      The mipmaps should contain only a copy of one animation frame
-         *                      and be the same size as a mipmapped frame.
+         * @param mipmaps               the mipmaps, which will be overwritten starting at (0, 0).
+         *                              The mipmaps should contain only a copy of one animation frame
+         *                              and be the same size as a mipmapped frame.
          */
         public Interpolator(ImmutableList<? extends RGBAImage> mipmaps) {
             requireNonNull(mipmaps, "Mipmap list cannot be null");
+            if (mipmaps.isEmpty()) {
+                throw new IllegalArgumentException("Mipmap list cannot be empty");
+            }
 
             FrameReader.FrameData data = new FrameReader.FrameData(
                     mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(),
                     0, 0, 1
             );
-            FRAME = new RGBAImageFrame(data, mipmaps);
+            FRAME = new RGBAImageFrame(data, mipmaps, new SharedMipmapLevel(mipmaps.size() - 1));
 
             INTERPOLATOR = new RGBAInterpolator((width, height) -> mipmaps.get(lastLevel));
         }
