@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,28 +36,13 @@ public class NativeImageAdapterTest {
     public void constructFull_NullImage_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new NativeImageAdapter(null, 0, 0, 100, 100, 2,
-                false, false, false, (new RGBAImage.VisibleArea.Builder()).build(),
-                new NativeImageAdapter.ClosedStatus());
+                false, false, false, (new RGBAImage.VisibleArea.Builder()).build());
     }
 
     @Test
     public void constructReduced_NullImage_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new NativeImageAdapter(null, 0, new NativeImageAdapter.ClosedStatus());
-    }
-
-    @Test
-    public void constructFull_NullStatus_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new NativeImageAdapter(new NativeImage(10, 10, true), 0, 0, 100, 100, 2,
-                false, false, false, (new RGBAImage.VisibleArea.Builder()).build(),
-                null);
-    }
-
-    @Test
-    public void constructReduced_NullStatus_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new NativeImageAdapter(new NativeImage(10, 10, true), 0, null);
+        new NativeImageAdapter(null, 0);
     }
 
 }

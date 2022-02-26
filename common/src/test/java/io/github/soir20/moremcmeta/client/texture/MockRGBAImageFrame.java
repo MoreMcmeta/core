@@ -35,7 +35,8 @@ public class MockRGBAImageFrame extends RGBAImageFrame {
 
     public MockRGBAImageFrame(int frameNumber) {
         super(new FrameReader.FrameData(10, 10, 0, 0, 1),
-                ImmutableList.of(new MockRGBAImage(), new MockRGBAImage(), new MockRGBAImage()));
+                ImmutableList.of(new MockRGBAImage(), new MockRGBAImage(), new MockRGBAImage()),
+                new SharedMipmapLevel(2));
         FRAME_NUMBER = frameNumber;
     }
 
@@ -44,7 +45,8 @@ public class MockRGBAImageFrame extends RGBAImageFrame {
     }
 
     public MockRGBAImageFrame(int width, int height, int mipmap) {
-        super(new FrameReader.FrameData(width, height, 0, 0, 1), createMipmaps(mipmap, width, height));
+        super(new FrameReader.FrameData(width, height, 0, 0, 1), createMipmaps(mipmap, width, height),
+                new SharedMipmapLevel(mipmap));
         FRAME_NUMBER = 0;
     }
 

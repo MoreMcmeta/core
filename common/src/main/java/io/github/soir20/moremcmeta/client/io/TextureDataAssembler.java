@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -89,8 +88,8 @@ public class TextureDataAssembler {
 
         // Create frames
         List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(original, MAX_MIPMAP));
-        List<NativeImageAdapter.ClosedStatus> statuses = makeStatuses(MAX_MIPMAP + 1);
-        ImmutableList<RGBAImageFrame> frames = getFrames(mipmaps, blur, clamp, statuses, animationMetadata);
+        RGBAImageFrame.SharedMipmapLevel sharedMipmapLevel = new RGBAImageFrame.SharedMipmapLevel(MAX_MIPMAP);
+        ImmutableList<RGBAImageFrame> frames = getFrames(mipmaps, blur, clamp, sharedMipmapLevel, animationMetadata);
 
         RGBAImageFrame firstFrame = frames.get(0);
         int frameWidth = firstFrame.getWidth();
@@ -99,20 +98,28 @@ public class TextureDataAssembler {
         List<RGBAImage.VisibleArea> visibleAreas = getVisibleAreas(firstFrame);
 
         // Frame manager
+        ImmutableList<NativeImageAdapter> interpolatedMipmaps;
         AnimationFrameManager<RGBAImageFrame> frameManager;
         if (animationMetadata.isInterpolatedFrames()) {
-            ImmutableList<NativeImageAdapter> interpolatedMipmaps = getInterpolationMipmaps(
-                    mipmaps, frameWidth, frameHeight, blur, clamp, visibleAreas, statuses
-            );
+             interpolatedMipmaps = getInterpolationMipmaps(mipmaps, frameWidth, frameHeight, blur, clamp, visibleAreas);
             RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(interpolatedMipmaps);
 
             frameManager = new AnimationFrameManager<>(frames, RGBAImageFrame::getFrameTime, interpolator);
         } else {
+            interpolatedMipmaps = ImmutableList.of();
             frameManager = new AnimationFrameManager<>(frames, RGBAImageFrame::getFrameTime);
         }
 
         // Resource cleanup
-        Runnable closeMipmaps = () -> statuses.forEach(NativeImageAdapter.ClosedStatus::close);
+        Runnable closeMipmaps = () -> {
+
+            // The images are shared between all frames
+            for (int level = 0; level <= firstFrame.getMipmapLevel(); level++) {
+                firstFrame.getImage(level).close();
+            }
+
+            interpolatedMipmaps.forEach(NativeImageAdapter::close);
+        };
 
         // Time retrieval
         Supplier<Optional<Long>> timeGetter = () -> {
@@ -140,26 +147,16 @@ public class TextureDataAssembler {
     }
 
     /**
-     * Creates the given number of close statuses.
-     * @param count     the number of statuses to create
-     * @return the created statuses
-     */
-    private List<NativeImageAdapter.ClosedStatus> makeStatuses(int count) {
-        return Stream.generate(NativeImageAdapter.ClosedStatus::new).limit(count).toList();
-    }
-
-    /**
      * Gets all frames from the generated mipmaps and animation metadata.
      * @param mipmaps               mipmaps of the full texture image (with all frames)
      * @param blur                  whether to blur the texture
      * @param clamp                 whether to clamp the texture
-     * @param statuses              close statuses in order of increasing mipmap level, starting at 0. There
-     *                              should be as many statuses as there are mipmaps.
+     * @param sharedMipmapLevel     mipmap level shared between all frames
      * @param animationMetadata     animation metadata for this texture
      * @return the frames based on the texture image in chronological order
      */
     private ImmutableList<RGBAImageFrame> getFrames(List<NativeImage> mipmaps, boolean blur, boolean clamp,
-                                                    List<NativeImageAdapter.ClosedStatus> statuses,
+                                                    RGBAImageFrame.SharedMipmapLevel sharedMipmapLevel,
                                                     AnimationMetadataSection animationMetadata) {
         int mipmap = mipmaps.size() - 1;
 
@@ -183,12 +180,11 @@ public class TextureDataAssembler {
                         frameData.getXOffset() >> level, frameData.getYOffset() >> level,
                         width, height,
                         level, blur, clamp, false,
-                        visibleAreas.get(level),
-                        statuses.get(level)
+                        visibleAreas.get(level)
                 );
             }).collect(ImmutableList.toImmutableList());
 
-            return new RGBAImageFrame(frameData, wrappedMipmaps);
+            return new RGBAImageFrame(frameData, wrappedMipmaps, sharedMipmapLevel);
         });
 
         return frameReader.read(mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(), animationMetadata);
@@ -207,19 +203,17 @@ public class TextureDataAssembler {
 
     /**
      * Creates mipmapped images for interpolation.
-     * @param originals         the original mipmaps to copy from
-     * @param frameWidth        the width of a single frame
-     * @param frameHeight       the height of a single frame
-     * @param blur              whether the images are blurred
-     * @param clamp             whether the images are clamped
-     * @param visibleAreas      visible areas in ascending order of mipmap level
-     * @param statuses          close statuses for the original mipmaps
+     * @param originals             the original mipmaps to copy from
+     * @param frameWidth            the width of a single frame
+     * @param frameHeight           the height of a single frame
+     * @param blur                  whether the images are blurred
+     * @param clamp                 whether the images are clamped
+     * @param visibleAreas          visible areas in ascending order of mipmap level
      * @return the adapters for the interpolation images
      */
     private ImmutableList<NativeImageAdapter> getInterpolationMipmaps(List<NativeImage> originals, int frameWidth,
                                                                       int frameHeight, boolean blur, boolean clamp,
-                                                                      List<RGBAImage.VisibleArea> visibleAreas,
-                                                                      List<NativeImageAdapter.ClosedStatus> statuses) {
+                                                                      List<RGBAImage.VisibleArea> visibleAreas) {
         ImmutableList.Builder<NativeImageAdapter> images = new ImmutableList.Builder<>();
 
         for (int level = 0; level < originals.size(); level++) {
@@ -237,11 +231,7 @@ public class TextureDataAssembler {
                     mipmappedWidth, mipmappedHeight,
                     level,
                     blur, clamp, false,
-                    visibleAreas.get(level),
-
-                    // If the original image is closed, the interpolation mipmap should also be closed
-                    statuses.get(level)
-
+                    visibleAreas.get(level)
             );
             images.add(adapter);
         }
