@@ -39,14 +39,14 @@ public class RGBAImageFrameTest {
         ImmutableList<RGBAImage> mipmaps = ImmutableList.of(new MockRGBAImage());
 
         expectedException.expect(NullPointerException.class);
-        new RGBAImageFrame(null, mipmaps);
+        new RGBAImageFrame(null, mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1));
     }
 
     @Test
     public void construct_MipmapsNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new RGBAImageFrame(new FrameReader.FrameData(100, 100, 0, 0, 10),
-                null);
+                null, new RGBAImageFrame.SharedMipmapLevel(0));
     }
 
     @Test
@@ -54,7 +54,54 @@ public class RGBAImageFrameTest {
         expectedException.expect(IllegalArgumentException.class);
         new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                ImmutableList.of()
+                ImmutableList.of(), new RGBAImageFrame.SharedMipmapLevel(0)
+        );
+    }
+
+    @Test
+    public void construct_SharedLevelNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new RGBAImageFrame(
+                new FrameReader.FrameData(100, 100, 0, 0, 10),
+                ImmutableList.of(new MockRGBAImage()), null
+        );
+    }
+
+    @Test
+    public void construct_SharedLevelLessThanMipmaps_MipmapLevelLoweredImmediately() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(new MockRGBAImage(), new MockRGBAImage(),
+                new MockRGBAImage());
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 100, 0, 0, 10),
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(1)
+        );
+
+        assertEquals(1, frame.getMipmapLevel());
+        expectedException.expect(IllegalArgumentException.class);
+        frame.getImage(2);
+    }
+
+    @Test
+    public void construct_SharedLevelLessThanMipmaps_ExtraMipmapsClosedImmediately() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(new MockRGBAImage(), new MockRGBAImage(),
+                new MockRGBAImage());
+        new RGBAImageFrame(
+                new FrameReader.FrameData(100, 100, 0, 0, 10),
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(1)
+        );
+
+        assertTrue(mipmaps.get(2).isClosed());
+    }
+
+    @Test
+    public void construct_SharedLevelMoreThanMipmaps_IllegalArgException() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(new MockRGBAImage(), new MockRGBAImage(),
+                new MockRGBAImage());
+
+        expectedException.expect(IllegalArgumentException.class);
+        new RGBAImageFrame(
+                new FrameReader.FrameData(100, 100, 0, 0, 10),
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(3)
         );
     }
 
@@ -62,7 +109,7 @@ public class RGBAImageFrameTest {
     public void getFrameTime_NotEmptyTime_SameTimeReturned() {
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 100, 0, 0, 10),
-                ImmutableList.of(new MockRGBAImage())
+                ImmutableList.of(new MockRGBAImage()), new RGBAImageFrame.SharedMipmapLevel(0)
         );
 
         assertEquals(10, frame.getFrameTime());
@@ -72,7 +119,7 @@ public class RGBAImageFrameTest {
     public void getFrameTime_EmptyTime_SameTimeReturned() {
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 100, 0, 0, FrameReader.FrameData.EMPTY_TIME),
-                ImmutableList.of(new MockRGBAImage())
+                ImmutableList.of(new MockRGBAImage()), new RGBAImageFrame.SharedMipmapLevel(0)
         );
 
         assertEquals(FrameReader.FrameData.EMPTY_TIME, frame.getFrameTime());
@@ -82,7 +129,7 @@ public class RGBAImageFrameTest {
     public void getWidth_WidthProvided_SameWidthReturned() {
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0, 10),
-                ImmutableList.of(new MockRGBAImage())
+                ImmutableList.of(new MockRGBAImage()), new RGBAImageFrame.SharedMipmapLevel(0)
         );
 
         assertEquals(100, frame.getWidth());
@@ -92,7 +139,7 @@ public class RGBAImageFrameTest {
     public void getHeight_HeightProvided_SameHeightReturned() {
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0, 10),
-                ImmutableList.of(new MockRGBAImage())
+                ImmutableList.of(new MockRGBAImage()), new RGBAImageFrame.SharedMipmapLevel(0)
         );
 
         assertEquals(200, frame.getHeight());
@@ -102,7 +149,7 @@ public class RGBAImageFrameTest {
     public void getXOffset_XOffsetProvided_SameXOffsetReturned() {
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                ImmutableList.of(new MockRGBAImage())
+                ImmutableList.of(new MockRGBAImage()), new RGBAImageFrame.SharedMipmapLevel(0)
         );
 
         assertEquals(30, frame.getXOffset());
@@ -112,7 +159,7 @@ public class RGBAImageFrameTest {
     public void getYOffset_YOffsetProvided_SameYOffsetReturned() {
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                ImmutableList.of(new MockRGBAImage())
+                ImmutableList.of(new MockRGBAImage()), new RGBAImageFrame.SharedMipmapLevel(0)
         );
 
         assertEquals(40, frame.getYOffset());
@@ -130,7 +177,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         assertEquals(4, frame.getMipmapLevel());
@@ -148,7 +195,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -167,7 +214,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -186,7 +233,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         expectedException.expect(NullPointerException.class);
@@ -205,7 +252,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -224,7 +271,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -243,7 +290,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -262,7 +309,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(0, 0));
@@ -286,7 +333,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(6, 4));
@@ -310,7 +357,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(55, 40));
@@ -334,7 +381,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(55, 40));
@@ -358,7 +405,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(4, 16));
@@ -382,7 +429,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(8, 8));
@@ -406,7 +453,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(8, 16));
@@ -430,7 +477,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(5, 5));
@@ -454,7 +501,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(5, 5));
@@ -478,7 +525,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(5, 5));
@@ -502,7 +549,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(500, 500));
@@ -526,7 +573,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         frame.uploadAt(new Point(5, 5));
@@ -550,7 +597,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -569,7 +616,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = 0;
@@ -592,7 +639,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = 0;
@@ -623,7 +670,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = 2;
@@ -646,7 +693,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = 2;
@@ -677,7 +724,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = mipmaps.size() - 1;
@@ -700,7 +747,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = mipmaps.size() - 1;
@@ -731,7 +778,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = mipmaps.size();
@@ -752,7 +799,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = mipmaps.size();
@@ -780,7 +827,7 @@ public class RGBAImageFrameTest {
 
         RGBAImageFrame frame = new RGBAImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40, 10),
-                mipmaps
+                mipmaps, new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
         int newLevel = mipmaps.size();
@@ -800,9 +847,93 @@ public class RGBAImageFrameTest {
     }
 
     @Test
+    public void lowerMipmapLevel_LoweredByAnotherFrame_MipmapsClosed() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+        new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps, sharedLevel
+        );
+
+        ImmutableList<MockRGBAImage> mipmaps2 = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame frame2 = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps2, sharedLevel
+        );
+
+        int newLevel = 2;
+        frame2.lowerMipmapLevel(newLevel);
+
+        for (int level = newLevel + 1; level < mipmaps.size(); level++) {
+            assertTrue(mipmaps.get(level).isClosed());
+        }
+    }
+
+    @Test
+    public void lowerMipmapLevel_LoweredByAnotherFrame_ClosedMipmapsNoLongerProvided() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps, sharedLevel
+        );
+
+        ImmutableList<MockRGBAImage> mipmaps2 = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame frame2 = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps2, sharedLevel
+        );
+
+        int newLevel = 2;
+        frame2.lowerMipmapLevel(newLevel);
+
+        int mipmapsNotClosed = mipmaps.size() - 1;
+
+        for (int level = newLevel + 1; level < mipmaps.size(); level++) {
+            try {
+                frame.getImage(level);
+            } catch (IllegalArgumentException err) {
+                mipmapsNotClosed--;
+            }
+        }
+
+        assertEquals(newLevel, mipmapsNotClosed);
+    }
+
+    @Test
     public void constructInterpolator_NullMipmaps_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new RGBAImageFrame.Interpolator(null);
+    }
+
+    @Test
+    public void constructInterpolator_EmptyMipmaps_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new RGBAImageFrame.Interpolator(ImmutableList.of());
     }
 
     @Test
@@ -1104,6 +1235,169 @@ public class RGBAImageFrameTest {
             int color = frame.getImage(level).getPixel(3 >> level, 2 >> level);
             assertEquals(toBinary(217, 134, 99, 76), color);
         }
+    }
+
+    @Test
+    public void constructSharedLevel_NegativeLevel_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new RGBAImageFrame.SharedMipmapLevel(-1);
+    }
+
+    @Test
+    public void constructSharedLevel_IntMinLevel_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new RGBAImageFrame.SharedMipmapLevel(Integer.MIN_VALUE);
+    }
+
+    @Test
+    public void constructSharedLevel_ZeroLevel_NoException() {
+        new RGBAImageFrame.SharedMipmapLevel(0);
+    }
+
+    @Test
+    public void constructSharedLevel_PositiveLevel_NoException() {
+        new RGBAImageFrame.SharedMipmapLevel(1);
+    }
+
+    @Test
+    public void constructSharedLevel_IntMaxLevel_NoException() {
+        new RGBAImageFrame.SharedMipmapLevel(Integer.MAX_VALUE);
+    }
+
+    @Test
+    public void lowerSharedLevel_SameAsCurrent_LevelNotLowered() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps, sharedLevel
+        );
+
+        sharedLevel.lowerMipmapLevel(mipmaps.size() - 1);
+        assertEquals(mipmaps.size() - 1, frame.getMipmapLevel());
+    }
+
+    @Test
+    public void lowerSharedLevel_LargerThanCurrent_IllegalArgException() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+        new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps, sharedLevel
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        sharedLevel.lowerMipmapLevel(mipmaps.size());
+    }
+
+    @Test
+    public void lowerSharedLevel_LessThanCurrent_LevelLowered() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps, sharedLevel
+        );
+
+        sharedLevel.lowerMipmapLevel(mipmaps.size() - 2);
+        assertEquals(mipmaps.size() - 2, frame.getMipmapLevel());
+    }
+
+    @Test
+    public void lowerSharedLevel_Negative_IllegalArgException() {
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(4);
+        expectedException.expect(IllegalArgumentException.class);
+        sharedLevel.lowerMipmapLevel(-1);
+    }
+
+    @Test
+    public void lowerSharedLevel_SubscriberAddedAfterFirstLowering_LevelLowered() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+
+        sharedLevel.lowerMipmapLevel(mipmaps.size() - 2);
+
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps, sharedLevel
+        );
+        sharedLevel.lowerMipmapLevel(mipmaps.size() - 3);
+        assertEquals(mipmaps.size() - 3, frame.getMipmapLevel());
+    }
+
+    @Test
+    public void lowerSharedLevel_NoSubscribers_NoException() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+
+        sharedLevel.lowerMipmapLevel(mipmaps.size() - 2);
+    }
+
+    @Test
+    public void addSubscriber_NullFrame_NullPointerException() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+
+        expectedException.expect(NullPointerException.class);
+        sharedLevel.addSubscriber(null);
+    }
+
+    @Test
+    public void addSubscriber_DuplicateFrame_NoException() {
+        ImmutableList<MockRGBAImage> mipmaps = ImmutableList.of(
+                new MockRGBAImage(8, 8),
+                new MockRGBAImage(2, 2),
+                new MockRGBAImage(1, 1),
+                new MockRGBAImage(0, 0),
+                new MockRGBAImage(0, 0)
+        );
+        RGBAImageFrame.SharedMipmapLevel sharedLevel = new RGBAImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
+        RGBAImageFrame frame = new RGBAImageFrame(
+                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                mipmaps, sharedLevel
+        );
+
+        // Frame already subscribes to the shared level
+        sharedLevel.addSubscriber(frame);
+
+        sharedLevel.lowerMipmapLevel(mipmaps.size() - 2);
+        assertEquals(mipmaps.size() - 2, frame.getMipmapLevel());
     }
 
     private int toBinary(int r, int g, int b, int a) {

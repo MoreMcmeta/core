@@ -22,9 +22,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.client.texture.RGBAImage;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -43,7 +40,7 @@ public class NativeImageAdapter implements RGBAImage {
     private final boolean CLAMP;
     private final boolean AUTO_CLOSE;
     private final VisibleArea VISIBLE_AREA;
-    private final ClosedStatus CLOSED;
+    private boolean closed;
 
     /**
      * Creates a new {@link NativeImage} wrapper for part of an image.
@@ -57,12 +54,10 @@ public class NativeImageAdapter implements RGBAImage {
      * @param clamp         whether to clamp this image
      * @param autoClose     whether to automatically close this image
      * @param visibleArea   the visible portions of this image
-     * @param closedStatus  common close status for all adapters sharing the same underlying image.
-     *                      If one is closed, then all the images are closed.
      */
     public NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
                               int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
-                              VisibleArea visibleArea, ClosedStatus closedStatus) {
+                              VisibleArea visibleArea) {
         IMAGE = requireNonNull(image, "Image cannot be null");
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
@@ -73,8 +68,6 @@ public class NativeImageAdapter implements RGBAImage {
         CLAMP = clamp;
         AUTO_CLOSE = autoClose;
         VISIBLE_AREA = requireNonNull(visibleArea, "Visible area cannot be null");
-        CLOSED = requireNonNull(closedStatus, "Close status cannot be null");
-        CLOSED.addSubscriber(this::close);
     }
 
     /**
@@ -82,10 +75,8 @@ public class NativeImageAdapter implements RGBAImage {
      * is not blurred, clamped, or auto-closed, and it has no visible area.
      * @param image             the image to wrap
      * @param mipmapLevel       mipmap level of the image
-     * @param closedStatus  common close status for all adapters sharing the same underlying image.
-     *                      If one is closed, then all the images are closed.
      */
-    public NativeImageAdapter(NativeImage image, int mipmapLevel, ClosedStatus closedStatus) {
+    public NativeImageAdapter(NativeImage image, int mipmapLevel) {
         IMAGE = requireNonNull(image, "Image cannot be null");
         X_OFFSET = 0;
         Y_OFFSET = 0;
@@ -96,8 +87,6 @@ public class NativeImageAdapter implements RGBAImage {
         CLAMP = false;
         AUTO_CLOSE = false;
         VISIBLE_AREA = (new VisibleArea.Builder()).build();
-        CLOSED = requireNonNull(closedStatus, "Close status cannot be null");
-        CLOSED.addSubscriber(this::close);
     }
 
     /**
@@ -183,8 +172,8 @@ public class NativeImageAdapter implements RGBAImage {
     public void close() {
 
         // NativeImage's close implementation is idempotent.
+        closed = true;
         IMAGE.close();
-        CLOSED.close();
 
     }
 
@@ -215,64 +204,9 @@ public class NativeImageAdapter implements RGBAImage {
      * @throws IllegalStateException if the image is not open
      */
     private void checkOpen() {
-        if (CLOSED.isClosed()) {
+        if (closed) {
             throw new IllegalStateException("Image is closed");
         }
-    }
-
-    /**
-     * Represents a shared open/close status for multiple {@link NativeImageAdapter}s referencing the same or
-     * related {@link NativeImage}s. When {@link #close()}, the subscribers run to clean up all the related images
-     * at the same time.
-     * @author soir20
-     */
-    public static final class ClosedStatus {
-        private final List<Runnable> SUBSCRIBERS;
-        private boolean closed;
-
-        /**
-         * Creates a new shared status.
-         */
-        public ClosedStatus() {
-            SUBSCRIBERS = new ArrayList<>();
-        }
-
-        /**
-         * Adds a subscriber that will run when {@link #close()} is called.
-         * @param subscriber        code to run to clean up one of the related images
-         * @throws IllegalStateException if a subscriber is added after closure has started
-         */
-        public void addSubscriber(Runnable subscriber) {
-            requireNonNull(subscriber, "Subscriber cannot be null");
-
-            if (closed) {
-                throw new IllegalStateException("Can't add subscribers after closure begins");
-            }
-
-            SUBSCRIBERS.add(subscriber);
-        }
-
-        /**
-         * Changes the status to a closed state and runs all subscribers. Idempotent.
-         */
-        public void close() {
-            if (closed) {
-                return;
-            }
-
-            closed = true;
-            SUBSCRIBERS.forEach(Runnable::run);
-            SUBSCRIBERS.clear();
-        }
-
-        /**
-         * Gets whether all the related images have started the closure process.
-         * @return whether all the subscribers are closing or have closed
-         */
-        public boolean isClosed() {
-            return closed;
-        }
-
     }
 
 }

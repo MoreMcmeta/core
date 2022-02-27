@@ -36,14 +36,13 @@ public class NativeImageAdapterTest {
     public void constructFull_NullImage_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new NativeImageAdapter(null, 0, 0, 100, 100, 2,
-                false, false, false, (new RGBAImage.VisibleArea.Builder()).build(),
-                new NativeImageAdapter.ClosedStatus());
+                false, false, false, (new RGBAImage.VisibleArea.Builder()).build());
     }
 
     @Test
     public void constructReduced_NullImage_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new NativeImageAdapter(null, 0, new NativeImageAdapter.ClosedStatus());
+        new NativeImageAdapter(null, 0);
     }
 
 }
