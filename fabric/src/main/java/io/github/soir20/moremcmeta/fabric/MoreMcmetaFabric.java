@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
+import io.github.soir20.moremcmeta.api.MoreMcmetaPlugin;
 import io.github.soir20.moremcmeta.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.client.texture.TexturePreparer;
 import io.github.soir20.moremcmeta.fabric.client.adapter.SimpleReloadListenerAdapter;
@@ -33,6 +34,7 @@ import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -43,6 +45,9 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -62,6 +67,20 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     @Override
     public void onInitializeClient() {
         start();
+    }
+
+    @Override
+    protected Collection<MoreMcmetaPlugin> getPlugins(Logger logger) {
+        List<MoreMcmetaPlugin> plugins = new ArrayList<>();
+        FabricLoader.getInstance().getEntrypointContainers(MODID, MoreMcmetaPlugin.class).forEach((entrypoint) -> {
+            try {
+                plugins.add(entrypoint.getEntrypoint());
+            } catch (Throwable err) {
+                logger.error("Mod {} provided broken plugin to {}: {}",
+                        entrypoint.getProvider().getMetadata().getId(), MODID, err);
+            }
+        });
+        return plugins;
     }
 
     /**

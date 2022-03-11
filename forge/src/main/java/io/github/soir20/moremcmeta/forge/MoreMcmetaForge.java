@@ -22,8 +22,10 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.MoreMcmeta;
+import io.github.soir20.moremcmeta.api.MoreMcmetaPlugin;
 import io.github.soir20.moremcmeta.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.client.texture.TexturePreparer;
+import io.github.soir20.moremcmeta.forge.api.MoreMcmetaPluginRegisterEvent;
 import io.github.soir20.moremcmeta.forge.client.event.ClientTicker;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
@@ -42,23 +44,28 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.network.NetworkConstants;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
+import static io.github.soir20.moremcmeta.MoreMcmeta.MODID;
+
 /**
  * The main mod class and entrypoint for Forge.
  * @author soir20
  */
-@Mod(MoreMcmetaForge.MODID)
+@Mod(MODID)
 public final class MoreMcmetaForge extends MoreMcmeta {
-    public static final String MODID = "moremcmeta";
 
     /**
      * Serves as mod entrypoint on Forge and tells the server to ignore this mod.
@@ -76,6 +83,13 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         );
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> this::start);
+    }
+
+    @Override
+    protected Collection<MoreMcmetaPlugin> getPlugins(Logger logger) {
+        List<MoreMcmetaPlugin> plugins = new ArrayList<>();
+        FMLJavaModLoadingContext.get().getModEventBus().post(new MoreMcmetaPluginRegisterEvent(plugins));
+        return plugins;
     }
 
     /**

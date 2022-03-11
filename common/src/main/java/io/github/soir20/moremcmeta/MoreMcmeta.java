@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta;
 
+import io.github.soir20.moremcmeta.api.MoreMcmetaPlugin;
 import io.github.soir20.moremcmeta.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.adapter.PackResourcesAdapter;
@@ -52,6 +53,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +74,8 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public abstract class MoreMcmeta {
+    public static final String MODID = "moremcmeta";
+
     private Map<ResourceLocation, TextureData<NativeImageAdapter>> lastTextures;
 
     /**
@@ -81,6 +85,7 @@ public abstract class MoreMcmeta {
     public void start() {
         Minecraft minecraft = Minecraft.getInstance();
         Logger logger = LogManager.getLogger();
+        getPlugins(logger);
 
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, getMipmapLevelGetter(logger)));
@@ -126,6 +131,8 @@ public abstract class MoreMcmeta {
         startTicking(manager);
 
     }
+
+    protected abstract Collection<MoreMcmetaPlugin> getPlugins(Logger logger);
 
     /**
      * Gets the function that converts atlas sprites to their mipmap level.
