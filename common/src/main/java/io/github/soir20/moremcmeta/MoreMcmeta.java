@@ -45,8 +45,8 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -96,7 +96,7 @@ public abstract class MoreMcmeta {
 
         // Listener registration and resource manager replacement
         onResourceManagerInitialized((client) -> {
-            if (!(client.getResourceManager() instanceof SimpleReloadableResourceManager rscManager)) {
+            if (!(client.getResourceManager() instanceof ReloadableResourceManager rscManager)) {
                 logger.error("Reload listener was not added because resource manager is not reloadable");
                 return;
             }
