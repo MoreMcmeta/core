@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.api.TextureListener;
 import io.github.soir20.moremcmeta.math.Point;
 import org.junit.Rule;
 import org.junit.Test;
@@ -92,7 +93,7 @@ public class SingleUploadComponentTest {
     public void upload_SecondImage_MipmapLoweredTo0() {
         MockClosableImageFrame frame2 = new MockClosableImageFrame();
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
         MockClosableImageFrame frame = new MockClosableImageFrame();

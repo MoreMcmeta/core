@@ -15,20 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.texture;
+package io.github.soir20.moremcmeta.api;
+
+import io.github.soir20.moremcmeta.client.texture.GenericTextureComponent;
 
 import java.util.stream.Stream;
 
-/**
- * A container for related {@link TextureListener}s.
- * @author soir20
- */
-public interface TextureComponent {
+public interface TextureComponent extends GenericTextureComponent<TextureView> {
 
     /**
      * Gets all listeners for this component.
      * @return all of this component's listeners
      */
-    Stream<TextureListener> getListeners();
+    Stream<TextureListener<? super TextureView>> getListeners();
 
 }

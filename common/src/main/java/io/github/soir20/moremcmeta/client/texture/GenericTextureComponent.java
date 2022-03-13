@@ -21,30 +21,16 @@ import io.github.soir20.moremcmeta.api.TextureListener;
 
 import java.util.stream.Stream;
 
-import static java.util.Objects.requireNonNull;
-
 /**
- * Cleans up images when an {@link EventDrivenTexture} closes.
+ * A container for related {@link TextureListener}s.
  * @author soir20
  */
-public class CleanupComponent implements GenericTextureComponent<EventDrivenTexture.TextureState> {
-    private final Runnable CLOSE_ACTION;
+public interface GenericTextureComponent<V> {
 
     /**
-     * Creates a cleanup component for a texture.
-     * @param closeAction       action to clean up all native image resources
+     * Gets all listeners for this component.
+     * @return all of this component's listeners
      */
-    public CleanupComponent(Runnable closeAction) {
-        CLOSE_ACTION = requireNonNull(closeAction, "Close action cannot be null");
-    }
-
-    /**
-     * Gets all the listeners for this component.
-     * @return the cleanup listener
-     */
-    @Override
-    public Stream<TextureListener<? super EventDrivenTexture.TextureState>> getListeners() {
-        return Stream.of(new TextureListener<>(TextureListener.Type.CLOSE, (state) -> CLOSE_ACTION.run()));
-    }
+    Stream<TextureListener<? super V>> getListeners();
 
 }

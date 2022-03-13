@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.api.TextureListener;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 
 import java.util.Optional;
@@ -29,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  * Manages an animation for an {@link EventDrivenTexture}.
  * @author soir20
  */
-public class AnimationComponent implements TextureComponent {
+public class AnimationComponent implements GenericTextureComponent<EventDrivenTexture.TextureState> {
     private final int SYNC_TICKS;
     private final Supplier<Optional<Long>> TIME_GETTER;
     private final AnimationFrameManager<? extends ClosableImageFrame> FRAME_MANAGER;
@@ -68,9 +69,9 @@ public class AnimationComponent implements TextureComponent {
      * @return the listeners for this component
      */
     @Override
-    public Stream<TextureListener> getListeners() {
-        TextureListener tickListener =
-                new TextureListener(TextureListener.Type.TICK, (state) -> {
+    public Stream<TextureListener<? super EventDrivenTexture.TextureState>> getListeners() {
+        TextureListener<EventDrivenTexture.TextureState> tickListener =
+                new TextureListener<>(TextureListener.Type.TICK, (state) -> {
                     Optional<Long> timeOptional = TIME_GETTER.get();
                     requireNonNull(timeOptional, "Timer getter cannot supply null");
 
@@ -88,8 +89,8 @@ public class AnimationComponent implements TextureComponent {
                     state.markNeedsUpload();
                 });
 
-        TextureListener uploadListener =
-                new TextureListener(TextureListener.Type.UPLOAD, (state) ->
+        TextureListener<EventDrivenTexture.TextureState> uploadListener =
+                new TextureListener<>(TextureListener.Type.UPLOAD, (state) ->
                         state.replaceImage(FRAME_MANAGER.getCurrentFrame()));
 
         return Stream.of(tickListener, uploadListener);

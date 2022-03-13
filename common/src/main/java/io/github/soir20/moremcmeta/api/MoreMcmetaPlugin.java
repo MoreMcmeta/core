@@ -25,6 +25,8 @@ public interface MoreMcmetaPlugin {
 
     MetadataParser parser();
 
+    MetadataAssembler assembler();
+
     Set<String> replacedDefaultPlugins();
 
 }

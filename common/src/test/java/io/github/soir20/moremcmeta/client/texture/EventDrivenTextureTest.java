@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.api.TextureListener;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -48,7 +49,7 @@ public class EventDrivenTextureTest {
     @Test
     public void build_NoImage_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.REGISTRATION, (state) -> {})));
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION, (state) -> {})));
 
         expectedException.expect(IllegalStateException.class);
         builder.build();
@@ -59,7 +60,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(new MockClosableImageFrame(1));
         builder.setImage(new MockClosableImageFrame(2));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.REGISTRATION,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION,
                 (state) -> assertEquals(2, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         builder.build().load(null);
@@ -89,7 +90,7 @@ public class EventDrivenTextureTest {
         final Object[] textureGetter = new Object[1];
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
                 (state) -> assertEquals(textureGetter[0], state.getTexture())
         )));
         builder.setImage(new MockClosableImageFrame());
@@ -104,9 +105,9 @@ public class EventDrivenTextureTest {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
                 EventDrivenTexture.TextureState::markNeedsUpload
-        ), new TextureListener(TextureListener.Type.UPLOAD,
+        ), new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
@@ -127,9 +128,9 @@ public class EventDrivenTextureTest {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
                 EventDrivenTexture.TextureState::getImage
-        ), new TextureListener(TextureListener.Type.UPLOAD,
+        ), new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
@@ -150,9 +151,9 @@ public class EventDrivenTextureTest {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 EventDrivenTexture.TextureState::getImage
-        ), new TextureListener(TextureListener.Type.UPLOAD,
+        ), new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
@@ -171,7 +172,7 @@ public class EventDrivenTextureTest {
     public void runListeners_SetImageNull_NullPointerException() {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
                 (state) -> state.replaceImage(null)
         )));
         builder.setImage(new MockClosableImageFrame());
@@ -186,9 +187,9 @@ public class EventDrivenTextureTest {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
                 (state) -> state.replaceImage(new MockClosableImageFrame(5))
-        ), new TextureListener(TextureListener.Type.UPLOAD,
+        ), new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
@@ -208,9 +209,9 @@ public class EventDrivenTextureTest {
     public void runListeners_SetImage_ImageReplaced() {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
                 (state) -> state.replaceImage(new MockClosableImageFrame(5))
-        ), new TextureListener(TextureListener.Type.CLOSE,
+        ), new TextureListener<>(TextureListener.Type.CLOSE,
                 (state) -> assertEquals(5, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
 
@@ -311,7 +312,7 @@ public class EventDrivenTextureTest {
             for (int index = 0; index < 3; index++) {
                 lastId++;
                 final int listenerId = lastId;
-                texture.add(() -> Stream.of(new TextureListener(type,
+                texture.add(() -> Stream.of(new TextureListener<>(type,
                         (state) -> {
                             if (flagForUpload) state.markNeedsUpload();
                             execOrder.add(listenerId);

@@ -17,9 +17,11 @@
 
 package io.github.soir20.moremcmeta.api;
 
-@FunctionalInterface
-public interface MetadataAssembler {
+public interface TextureView {
 
-    Iterable<TextureComponent> assemble(ParsedMetadata metadata);
+    Frame getFrame();
 
+    void replaceFrame(Frame newImage);
+
+    void markNeedsUpload();
 }

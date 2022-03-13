@@ -15,7 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.client.texture;
+package io.github.soir20.moremcmeta.api;
+
+import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
 
 import java.util.function.Consumer;
 
@@ -25,7 +27,7 @@ import static java.util.Objects.requireNonNull;
  * A listener for an {@link EventDrivenTexture}'s events.
  * @author soir20
  */
-public class TextureListener {
+public class TextureListener<V> {
 
     /**
      * The available event types for listeners.
@@ -39,14 +41,14 @@ public class TextureListener {
     }
 
     private final Type TYPE;
-    private final Consumer<? super EventDrivenTexture.TextureState> ACTION;
+    private final Consumer<? super V> ACTION;
 
     /**
      * Creates a listener for a certain type of event.
      * @param type      event type
      * @param action    callback to execute when the event occurs
      */
-    public TextureListener(Type type, Consumer<? super EventDrivenTexture.TextureState> action) {
+    public TextureListener(Type type, Consumer<? super V> action) {
         TYPE = requireNonNull(type, "Type cannot be null");
         ACTION = requireNonNull(action, "Action cannot be null");
     }
@@ -63,7 +65,7 @@ public class TextureListener {
      * Runs this listener's callback.
      * @param state     the state of the event-driven texture
      */
-    public void run(EventDrivenTexture.TextureState state) {
+    public void run(V state) {
         requireNonNull(state, "State cannot be null");
         ACTION.accept(state);
     }

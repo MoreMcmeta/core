@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.api.TextureListener;
 import io.github.soir20.moremcmeta.math.Point;
 import org.junit.Rule;
 import org.junit.Test;
@@ -130,7 +131,7 @@ public class SpriteUploadComponentTest {
         MockClosableImageFrame frame2 = new MockClosableImageFrame();
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         MockSprite sprite = new MockSprite(1);
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
         MockClosableImageFrame frame = new MockClosableImageFrame();

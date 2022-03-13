@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.api.TextureListener;
 import io.github.soir20.moremcmeta.math.Point;
 
 import java.util.stream.Stream;
@@ -27,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture that is not associated with an atlas sprite.
  * @author soir20
  */
-public class SingleUploadComponent implements TextureComponent {
+public class SingleUploadComponent implements GenericTextureComponent<EventDrivenTexture.TextureState> {
     private final TexturePreparer PREPARER;
 
     /**
@@ -43,15 +44,16 @@ public class SingleUploadComponent implements TextureComponent {
      * @return all the listeners for this component
      */
     @Override
-    public Stream<TextureListener> getListeners() {
-        TextureListener registrationListener = new TextureListener(TextureListener.Type.REGISTRATION,
+    public Stream<TextureListener<? super EventDrivenTexture.TextureState>> getListeners() {
+        TextureListener<EventDrivenTexture.TextureState> registrationListener = new TextureListener<>(
+                TextureListener.Type.REGISTRATION,
                 (state) -> {
                     ClosableImageFrame image = state.getImage();
                     PREPARER.prepare(state.getTexture().getId(), 0, image.getWidth(), image.getHeight());
                 });
 
         Point uploadPoint = new Point(0, 0);
-        TextureListener uploadListener = new TextureListener(
+        TextureListener<EventDrivenTexture.TextureState> uploadListener = new TextureListener<>(
                 TextureListener.Type.UPLOAD,
                 (state) -> {
                     state.getImage().lowerMipmapLevel(0);

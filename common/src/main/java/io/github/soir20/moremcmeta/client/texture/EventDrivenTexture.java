@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta.client.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.soir20.moremcmeta.api.TextureListener;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A flexible texture "shell" for mixing {@link TextureComponent}s. Listeners in each
+ * A flexible texture "shell" for mixing {@link GenericTextureComponent}s. Listeners in each
  * component provide texture implementation.
  *
  * No listeners are fired on the render thread. Wrap listener code with calls to
@@ -42,7 +43,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
-    private final Map<TextureListener.Type, List<TextureListener>> LISTENERS;
+    private final Map<TextureListener.Type, List<TextureListener<? super TextureState>>> LISTENERS;
     private final TextureState CURRENT_STATE;
     private boolean registered;
 
@@ -150,10 +151,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      *                      in the order given (by type)
      * @param image         initial image for this texture
      */
-    private EventDrivenTexture(List<? extends TextureListener> listeners, ClosableImageFrame image) {
+    private EventDrivenTexture(List<? extends TextureListener<? super TextureState>> listeners,
+                               ClosableImageFrame image) {
         super();
         LISTENERS = new EnumMap<>(TextureListener.Type.class);
-        for (TextureListener listener : listeners) {
+        for (TextureListener<? super TextureState> listener : listeners) {
             LISTENERS.putIfAbsent(listener.getType(), new ArrayList<>());
             LISTENERS.get(listener.getType()).add(listener);
         }
@@ -166,7 +168,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Builds an event-driven texture from components.
      */
     public static class Builder {
-        private final List<TextureComponent> COMPONENTS;
+        private final List<GenericTextureComponent<? super TextureState>> COMPONENTS;
         private ClosableImageFrame firstImage;
 
         /**
@@ -202,7 +204,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param component     component to add to the texture
          * @return this builder for chaining
          */
-        public Builder add(TextureComponent component) {
+        public Builder add(GenericTextureComponent<? super TextureState> component) {
             requireNonNull(component, "Component cannot be null");
             COMPONENTS.add(component);
             return this;
@@ -218,8 +220,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new IllegalStateException("Texture must have an image set");
             }
 
-            List<TextureListener> listeners = COMPONENTS.stream().flatMap(
-                    TextureComponent::getListeners
+            List<TextureListener<? super TextureState>> listeners = COMPONENTS.stream().flatMap(
+                    GenericTextureComponent::getListeners
             ).collect(Collectors.toList());
 
             return new EventDrivenTexture(listeners, firstImage);
@@ -229,6 +231,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
     /**
      * A mutable object to hold an event-driven texture's current state.
+     * @author soir20
      */
     public static class TextureState {
         private final EventDrivenTexture TEXTURE;

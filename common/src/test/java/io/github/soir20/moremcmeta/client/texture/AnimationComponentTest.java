@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
+import io.github.soir20.moremcmeta.api.TextureListener;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
 import org.junit.Rule;
 import org.junit.Test;
@@ -115,7 +116,7 @@ public class AnimationComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(new MockClosableImageFrame());
         builder.add(new AnimationComponent(makeFrameManager()));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(1, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -132,7 +133,7 @@ public class AnimationComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(new MockClosableImageFrame());
         builder.add(new AnimationComponent(makeFrameManager()));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(8, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -153,7 +154,7 @@ public class AnimationComponentTest {
         AtomicLong currentTime = new AtomicLong(800);
         builder.add(new AnimationComponent(800, () -> Optional.of(currentTime.incrementAndGet()),
                 frameManager));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(1, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -171,7 +172,7 @@ public class AnimationComponentTest {
         AtomicLong currentTime = new AtomicLong(-1);
         builder.add(new AnimationComponent(800, () -> Optional.of(currentTime.incrementAndGet()),
                 frameManager));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(1, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -189,7 +190,7 @@ public class AnimationComponentTest {
         AtomicLong currentTime = new AtomicLong(375);
         builder.add(new AnimationComponent(800, () -> Optional.of(currentTime.incrementAndGet()),
                 frameManager));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(9, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -207,7 +208,7 @@ public class AnimationComponentTest {
         AtomicLong currentTime = new AtomicLong(-375);
         builder.add(new AnimationComponent(800, () -> Optional.of(currentTime.incrementAndGet()),
                 frameManager));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(9, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -225,7 +226,7 @@ public class AnimationComponentTest {
         AtomicLong currentTime = new AtomicLong(375);
         builder.add(new AnimationComponent(Integer.MAX_VALUE, () -> Optional.of(currentTime.incrementAndGet()),
                 frameManager));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(9, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -243,7 +244,7 @@ public class AnimationComponentTest {
         AtomicLong currentTime = new AtomicLong(Long.MAX_VALUE);
         builder.add(new AnimationComponent(800, () -> Optional.of(currentTime.incrementAndGet()),
                 frameManager));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(6, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -257,7 +258,7 @@ public class AnimationComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setImage(new MockClosableImageFrame());
         builder.add(new AnimationComponent(makeFrameManager()));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD, (state) ->
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD, (state) ->
                 assertEquals(1, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -273,7 +274,7 @@ public class AnimationComponentTest {
         AnimationFrameManager<MockClosableImageFrame> frameManager = makeFrameManager();
         frameManager.tick(43);
         builder.add(new AnimationComponent(frameManager));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(3, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -289,7 +290,7 @@ public class AnimationComponentTest {
         AtomicLong currentTime = new AtomicLong(0);
         builder.add(new AnimationComponent(500, () -> Optional.of(currentTime.incrementAndGet()),
                 makeFrameManager()));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(1, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
@@ -307,7 +308,7 @@ public class AnimationComponentTest {
         AtomicLong currentTime = new AtomicLong(0);
         builder.add(new AnimationComponent(500, () -> Optional.of(currentTime.incrementAndGet()),
                 frameManager));
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.UPLOAD,
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> assertEquals(3, ((MockClosableImageFrame) state.getImage()).getFrameNumber())
         )));
         EventDrivenTexture texture = builder.build();
