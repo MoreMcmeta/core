@@ -27,18 +27,18 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the {@link CloseableImageInterpolator}. Use an online random number generator for
+ * Tests the {@link ImageInterpolator}. Use an online random number generator for
  * RGBA component values in new tests.
  * @author soir20
  */
-public class CloseableImageInterpolatorTest {
+public class ImageInterpolatorTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void construct_ImageGetterNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new CloseableImageInterpolator(null);
+        new ImageInterpolator(null);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class CloseableImageInterpolatorTest {
         endPixels[0][4] = toBinary(93, 209, 60, 223);
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
         expectedException.expect(NullPointerException.class);
@@ -86,7 +86,7 @@ public class CloseableImageInterpolatorTest {
         startPixels[0][4] = toBinary(216, 101, 41, 195);
         MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
         expectedException.expect(NullPointerException.class);
@@ -119,7 +119,7 @@ public class CloseableImageInterpolatorTest {
         endPixels[0][4] = toBinary(93, 209, 60, 223);
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) -> null);
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) -> null);
 
         expectedException.expect(NullPointerException.class);
         interpolator.interpolate(10, 5, start, end);
@@ -141,7 +141,7 @@ public class CloseableImageInterpolatorTest {
         int[][] interpolatedPixels = new int[width][height];
         MockCloseableImage interpolated = new MockCloseableImage(interpolatedPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) -> interpolated);
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) -> interpolated);
 
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 0, start, end);
@@ -163,7 +163,7 @@ public class CloseableImageInterpolatorTest {
         int[][] interpolatedPixels = new int[width][height];
         MockCloseableImage interpolated = new MockCloseableImage(interpolatedPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) -> interpolated);
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) -> interpolated);
 
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 10, start, end);
@@ -185,7 +185,7 @@ public class CloseableImageInterpolatorTest {
         int[][] interpolatedPixels = new int[width][height];
         MockCloseableImage interpolated = new MockCloseableImage(interpolatedPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) -> interpolated);
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) -> interpolated);
 
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 11, start, end);
@@ -222,10 +222,10 @@ public class CloseableImageInterpolatorTest {
         endPixels[0][4] = fourthColor;
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
-        CloseableImage output = interpolator.interpolate(10, 1, start, end);
+        Image output = interpolator.interpolate(10, 1, start, end);
 
         assertEquals(firstColor, output.getPixel(1, 2));
         assertEquals(secondColor, output.getPixel(4, 0));
@@ -261,10 +261,10 @@ public class CloseableImageInterpolatorTest {
         endPixels[0][4] = toBinary(150, 50, 100, 0);
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
-        CloseableImage output = interpolator.interpolate(10, 5, start, end);
+        Image output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(39, 64, 246, 0), output.getPixel(1, 2));
         assertEquals(toBinary(137, 137, 50, 0), output.getPixel(4, 0));
@@ -300,10 +300,10 @@ public class CloseableImageInterpolatorTest {
         endPixels[0][4] = toBinary(93, 209, 60, 223);
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
-        CloseableImage output = interpolator.interpolate(10, 2, start, end);
+        Image output = interpolator.interpolate(10, 2, start, end);
 
         assertEquals(toBinary(152, 150, 75, 197), output.getPixel(1, 2));
         assertEquals(toBinary(54, 223, 98, 100), output.getPixel(4, 0));
@@ -339,10 +339,10 @@ public class CloseableImageInterpolatorTest {
         endPixels[0][4] = toBinary(93, 209, 60, 223);
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
-        CloseableImage output = interpolator.interpolate(10, 5, start, end);
+        Image output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));
@@ -378,10 +378,10 @@ public class CloseableImageInterpolatorTest {
         endPixels[0][4] = toBinary(93, 209, 60, 223);
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
-        CloseableImage output = interpolator.interpolate(10, 8, start, end);
+        Image output = interpolator.interpolate(10, 8, start, end);
 
         assertEquals(toBinary(56, 173, 108, 197), output.getPixel(1, 2));
         assertEquals(toBinary(93, 150, 155, 100), output.getPixel(4, 0));
@@ -415,10 +415,10 @@ public class CloseableImageInterpolatorTest {
         endPixels[9][3] = toBinary(93, 209, 60, 223);
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
-        CloseableImage output = interpolator.interpolate(10, 5, start, end);
+        Image output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));
@@ -455,10 +455,10 @@ public class CloseableImageInterpolatorTest {
         endPixels[3][1] = toBinary(93, 209, 60, 223);
         MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+        ImageInterpolator interpolator = new ImageInterpolator((w, h) ->
                 new MockCloseableImage(new int[w][h], area));
 
-        CloseableImage output = interpolator.interpolate(10, 5, start, end);
+        Image output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));

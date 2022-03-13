@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.client.animation;
 
 import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.math.Point;
 
 import java.util.function.BiFunction;
@@ -30,8 +29,8 @@ import static java.util.Objects.requireNonNull;
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
  * @author soir20
  */
-public class CloseableImageInterpolator implements Interpolator<CloseableImage> {
-    private final BiFunction<Integer, Integer, ? extends CloseableImage> IMAGE_GETTER;
+public class ImageInterpolator implements Interpolator<Image> {
+    private final BiFunction<Integer, Integer, ? extends Image> IMAGE_GETTER;
 
     /**
      * Creates a new interpolator.
@@ -39,7 +38,7 @@ public class CloseableImageInterpolator implements Interpolator<CloseableImage> 
      *                         Colors are overwritten. The longest width and the longest height
      *                         are selected between the start and end images.
      */
-    public CloseableImageInterpolator(BiFunction<Integer, Integer, ? extends CloseableImage> imageGetter) {
+    public ImageInterpolator(BiFunction<Integer, Integer, ? extends Image> imageGetter) {
         IMAGE_GETTER = requireNonNull(imageGetter, "Image getter cannot be null");
     }
 
@@ -51,7 +50,7 @@ public class CloseableImageInterpolator implements Interpolator<CloseableImage> 
      * @param end       the image to end interpolation at (not returned)
      * @return  the interpolated frame at this step
      */
-    public CloseableImage interpolate(int steps, int step, CloseableImage start, CloseableImage end) {
+    public Image interpolate(int steps, int step, Image start, Image end) {
         if (step < 1 || step >= steps) {
             throw new IllegalArgumentException("Step must be between 1 and steps - 1 (inclusive)");
         }
@@ -70,11 +69,11 @@ public class CloseableImageInterpolator implements Interpolator<CloseableImage> 
      * @param end               end image (unchanged)
      * @return  the image with mixed colors (using the largest dimension in each direction)
      */
-    private CloseableImage mixImage(double startProportion, CloseableImage start, CloseableImage end) {
+    private Image mixImage(double startProportion, Image start, Image end) {
         int maxWidth = Math.max(start.getWidth(), end.getWidth());
         int maxHeight = Math.max(start.getHeight(), end.getHeight());
 
-        CloseableImage output = IMAGE_GETTER.apply(maxWidth, maxHeight);
+        Image output = IMAGE_GETTER.apply(maxWidth, maxHeight);
         requireNonNull(output, "Interpolated image was created as null");
 
         Image.VisibleArea points = output.getVisibleArea();
@@ -99,7 +98,7 @@ public class CloseableImageInterpolator implements Interpolator<CloseableImage> 
      * @param y         y-coordinate of the pixel
      * @return  the color of the pixel or a transparent pixel
      */
-    private int getPixel(CloseableImage image, int x, int y) {
+    private int getPixel(Image image, int x, int y) {
         if (x < image.getWidth() && y < image.getHeight()) {
             return image.getPixel(x, y);
         } else {

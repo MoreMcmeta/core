@@ -18,7 +18,9 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.animation.CloseableImageInterpolator;
+import io.github.soir20.moremcmeta.api.Frame;
+import io.github.soir20.moremcmeta.api.Image;
+import io.github.soir20.moremcmeta.client.animation.ImageInterpolator;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
 
@@ -31,7 +33,7 @@ import static java.util.Objects.requireNonNull;
  * An animation frame based on a {@link CloseableImage}.
  * @author soir20
  */
-public class ClosableImageFrame {
+public class ClosableImageFrame implements Frame {
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
@@ -239,7 +241,7 @@ public class ClosableImageFrame {
      * @author soir20
      */
     public static class Interpolator implements io.github.soir20.moremcmeta.client.animation.Interpolator<ClosableImageFrame> {
-        private final CloseableImageInterpolator INTERPOLATOR;
+        private final ImageInterpolator INTERPOLATOR;
         private final ClosableImageFrame FRAME;
         private int lastLevel;
 
@@ -261,7 +263,7 @@ public class ClosableImageFrame {
             );
             FRAME = new ClosableImageFrame(data, mipmaps, new SharedMipmapLevel(mipmaps.size() - 1));
 
-            INTERPOLATOR = new CloseableImageInterpolator((width, height) -> mipmaps.get(lastLevel));
+            INTERPOLATOR = new ImageInterpolator((width, height) -> mipmaps.get(lastLevel));
         }
 
         /**
@@ -286,8 +288,8 @@ public class ClosableImageFrame {
 
             for (int level = 0; level <= FRAME.getMipmapLevel(); level++) {
                 lastLevel = level;
-                CloseableImage startImage = start.getImage(level);
-                CloseableImage endImage = end.getImage(level);
+                Image startImage = start.getImage(level);
+                Image endImage = end.getImage(level);
 
                 // We don't need to do anything with the result because the mipmaps are altered directly
                 INTERPOLATOR.interpolate(steps, step, startImage, endImage);

@@ -20,14 +20,14 @@ package io.github.soir20.moremcmeta.client.adapter;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.animation.CloseableImageInterpolator;
+import io.github.soir20.moremcmeta.client.animation.ImageInterpolator;
 import io.github.soir20.moremcmeta.client.texture.CloseableImage;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * Wraps a {@link NativeImage} so it is compatible with the {@link CloseableImage} interface and
- * the {@link CloseableImageInterpolator}.
+ * the {@link ImageInterpolator}.
  * @author soir20
  */
 public class NativeImageAdapter implements CloseableImage {
