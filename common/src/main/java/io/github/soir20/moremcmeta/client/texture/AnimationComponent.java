@@ -32,7 +32,7 @@ import static java.util.Objects.requireNonNull;
 public class AnimationComponent implements TextureComponent {
     private final int SYNC_TICKS;
     private final Supplier<Optional<Long>> TIME_GETTER;
-    private final AnimationFrameManager<? extends RGBAImageFrame> FRAME_MANAGER;
+    private final AnimationFrameManager<? extends ClosableImageFrame> FRAME_MANAGER;
 
     private int ticks;
 
@@ -43,7 +43,7 @@ public class AnimationComponent implements TextureComponent {
      * @param frameManager      frame manager for the animation
      */
     public AnimationComponent(int syncTicks, Supplier<Optional<Long>> timeGetter,
-                              AnimationFrameManager<? extends RGBAImageFrame> frameManager) {
+                              AnimationFrameManager<? extends ClosableImageFrame> frameManager) {
         if (syncTicks <= 0) {
             throw new IllegalArgumentException("Sync ticks cannot be zero or negative");
         }
@@ -57,7 +57,7 @@ public class AnimationComponent implements TextureComponent {
      * Creates an animation component that does not sync to the current game time.
      * @param frameManager      frame manager for the animation
      */
-    public AnimationComponent(AnimationFrameManager<? extends RGBAImageFrame> frameManager) {
+    public AnimationComponent(AnimationFrameManager<? extends ClosableImageFrame> frameManager) {
         SYNC_TICKS = -1;
         TIME_GETTER = Optional::empty;
         FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");

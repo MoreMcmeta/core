@@ -21,10 +21,10 @@ import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.math.Point;
 
 /**
- * Mocks an {@link RGBAImage}. Keeps track of set pixel colors.
+ * Mocks an {@link CloseableImage}. Keeps track of set pixel colors.
  * @author soir20
  */
-public class MockRGBAImage implements RGBAImage {
+public class MockCloseableImage implements CloseableImage {
     public static final int DEFAULT_DIMENSION = 100;
 
     private final int[][] PIXELS;
@@ -34,28 +34,28 @@ public class MockRGBAImage implements RGBAImage {
     private Point uploadPoint;
     private boolean closed;
 
-    public MockRGBAImage() {
+    public MockCloseableImage() {
         PIXELS = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
         WIDTH = DEFAULT_DIMENSION;
         HEIGHT = DEFAULT_DIMENSION;
         VISIBLE_AREA = (new Image.VisibleArea.Builder()).build();
     }
 
-    public MockRGBAImage(int width, int height) {
+    public MockCloseableImage(int width, int height) {
         PIXELS = new int[width][height];
         WIDTH = width;
         HEIGHT = height;
         VISIBLE_AREA = (new Image.VisibleArea.Builder()).build();
     }
 
-    public MockRGBAImage(int[][] pixels, Image.VisibleArea visibleArea) {
+    public MockCloseableImage(int[][] pixels, Image.VisibleArea visibleArea) {
         PIXELS = pixels;
         WIDTH = pixels.length;
         HEIGHT = pixels[0].length;
         VISIBLE_AREA = visibleArea;
     }
 
-    public MockRGBAImage(int[][] pixels) {
+    public MockCloseableImage(int[][] pixels) {
         PIXELS = pixels;
         WIDTH = pixels.length;
         HEIGHT = pixels[0].length;

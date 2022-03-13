@@ -46,7 +46,7 @@ public class SingleUploadComponent implements TextureComponent {
     public Stream<TextureListener> getListeners() {
         TextureListener registrationListener = new TextureListener(TextureListener.Type.REGISTRATION,
                 (state) -> {
-                    RGBAImageFrame image = state.getImage();
+                    ClosableImageFrame image = state.getImage();
                     PREPARER.prepare(state.getTexture().getId(), 0, image.getWidth(), image.getHeight());
                 });
 

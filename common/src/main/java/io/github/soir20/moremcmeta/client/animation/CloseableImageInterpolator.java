@@ -18,7 +18,7 @@
 package io.github.soir20.moremcmeta.client.animation;
 
 import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.texture.RGBAImage;
+import io.github.soir20.moremcmeta.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.math.Point;
 
 import java.util.function.BiFunction;
@@ -30,8 +30,8 @@ import static java.util.Objects.requireNonNull;
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
  * @author soir20
  */
-public class RGBAInterpolator implements Interpolator<RGBAImage> {
-    private final BiFunction<Integer, Integer, ? extends RGBAImage> IMAGE_GETTER;
+public class CloseableImageInterpolator implements Interpolator<CloseableImage> {
+    private final BiFunction<Integer, Integer, ? extends CloseableImage> IMAGE_GETTER;
 
     /**
      * Creates a new interpolator.
@@ -39,7 +39,7 @@ public class RGBAInterpolator implements Interpolator<RGBAImage> {
      *                         Colors are overwritten. The longest width and the longest height
      *                         are selected between the start and end images.
      */
-    public RGBAInterpolator(BiFunction<Integer, Integer, ? extends RGBAImage> imageGetter) {
+    public CloseableImageInterpolator(BiFunction<Integer, Integer, ? extends CloseableImage> imageGetter) {
         IMAGE_GETTER = requireNonNull(imageGetter, "Image getter cannot be null");
     }
 
@@ -51,7 +51,7 @@ public class RGBAInterpolator implements Interpolator<RGBAImage> {
      * @param end       the image to end interpolation at (not returned)
      * @return  the interpolated frame at this step
      */
-    public RGBAImage interpolate(int steps, int step, RGBAImage start, RGBAImage end) {
+    public CloseableImage interpolate(int steps, int step, CloseableImage start, CloseableImage end) {
         if (step < 1 || step >= steps) {
             throw new IllegalArgumentException("Step must be between 1 and steps - 1 (inclusive)");
         }
@@ -70,11 +70,11 @@ public class RGBAInterpolator implements Interpolator<RGBAImage> {
      * @param end               end image (unchanged)
      * @return  the image with mixed colors (using the largest dimension in each direction)
      */
-    private RGBAImage mixImage(double startProportion, RGBAImage start, RGBAImage end) {
+    private CloseableImage mixImage(double startProportion, CloseableImage start, CloseableImage end) {
         int maxWidth = Math.max(start.getWidth(), end.getWidth());
         int maxHeight = Math.max(start.getHeight(), end.getHeight());
 
-        RGBAImage output = IMAGE_GETTER.apply(maxWidth, maxHeight);
+        CloseableImage output = IMAGE_GETTER.apply(maxWidth, maxHeight);
         requireNonNull(output, "Interpolated image was created as null");
 
         Image.VisibleArea points = output.getVisibleArea();
@@ -99,7 +99,7 @@ public class RGBAInterpolator implements Interpolator<RGBAImage> {
      * @param y         y-coordinate of the pixel
      * @return  the color of the pixel or a transparent pixel
      */
-    private int getPixel(RGBAImage image, int x, int y) {
+    private int getPixel(CloseableImage image, int x, int y) {
         if (x < image.getWidth() && y < image.getHeight()) {
             return image.getPixel(x, y);
         } else {

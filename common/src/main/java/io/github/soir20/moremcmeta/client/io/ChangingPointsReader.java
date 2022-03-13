@@ -18,7 +18,7 @@
 package io.github.soir20.moremcmeta.client.io;
 
 import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.texture.RGBAImage;
+import io.github.soir20.moremcmeta.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.math.Point;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Finds the pixels that change during an animation for an {@link RGBAImage}.
+ * Finds the pixels that change during an animation for an {@link CloseableImage}.
  * @author soir20
  */
 public class ChangingPointsReader {
@@ -43,7 +43,7 @@ public class ChangingPointsReader {
      * @param mipmap        number of mipmap levels to use. Must be greater than or equal to 0.
      * @return  pixels that change for every mipmap (starting with the default image)
      */
-    public List<Image.VisibleArea> read(RGBAImage image, int frameWidth, int frameHeight, int mipmap) {
+    public List<Image.VisibleArea> read(CloseableImage image, int frameWidth, int frameHeight, int mipmap) {
         requireNonNull(image, "Image cannot be null");
         if (frameWidth <= 0 || frameHeight <= 0) {
             throw new IllegalArgumentException("Frames must not be empty");

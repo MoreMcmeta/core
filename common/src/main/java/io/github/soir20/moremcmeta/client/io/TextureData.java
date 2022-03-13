@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.io;
 
-import io.github.soir20.moremcmeta.client.texture.RGBAImage;
+import io.github.soir20.moremcmeta.client.texture.CloseableImage;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  * @param <I> texture image type
  * @author soir20
  */
-public class TextureData<I extends RGBAImage> {
+public class TextureData<I extends CloseableImage> {
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final I IMAGE;

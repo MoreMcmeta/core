@@ -150,7 +150,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      *                      in the order given (by type)
      * @param image         initial image for this texture
      */
-    private EventDrivenTexture(List<? extends TextureListener> listeners, RGBAImageFrame image) {
+    private EventDrivenTexture(List<? extends TextureListener> listeners, ClosableImageFrame image) {
         super();
         LISTENERS = new EnumMap<>(TextureListener.Type.class);
         for (TextureListener listener : listeners) {
@@ -167,7 +167,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     public static class Builder {
         private final List<TextureComponent> COMPONENTS;
-        private RGBAImageFrame firstImage;
+        private ClosableImageFrame firstImage;
 
         /**
          * Creates a new event-driven texture builder.
@@ -180,7 +180,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Gets the initial image set in this builder if there is one.
          * @return the initial image for the texture, or an empty
          */
-        public Optional<RGBAImageFrame> getImage() {
+        public Optional<ClosableImageFrame> getImage() {
             return Optional.ofNullable(firstImage);
         }
 
@@ -191,7 +191,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param image     initial image for this texture
          * @return this builder for chaining
          */
-        public Builder setImage(RGBAImageFrame image) {
+        public Builder setImage(ClosableImageFrame image) {
             requireNonNull(image, "Image cannot be null");
             firstImage = image;
             return this;
@@ -232,7 +232,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     public static class TextureState {
         private final EventDrivenTexture TEXTURE;
-        private RGBAImageFrame image;
+        private ClosableImageFrame image;
         private boolean hasUpdatedSinceUpload;
 
         /**
@@ -249,7 +249,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * listeners are being fired.)
          * @return the texture's current image
          */
-        public RGBAImageFrame getImage() {
+        public ClosableImageFrame getImage() {
             markNeedsUpload();
             return image;
         }
@@ -267,7 +267,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * will be removed if upload listeners are being fired.)
          * @param newImage      the texture's new image
          */
-        public void replaceImage(RGBAImageFrame newImage) {
+        public void replaceImage(ClosableImageFrame newImage) {
             requireNonNull(newImage, "New image cannot be null");
             markNeedsUpload();
             image = newImage;

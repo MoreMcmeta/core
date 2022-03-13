@@ -19,7 +19,7 @@ package io.github.soir20.moremcmeta.client.io;
 
 import com.google.common.collect.ImmutableSet;
 import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.texture.MockRGBAImage;
+import io.github.soir20.moremcmeta.client.texture.MockCloseableImage;
 import io.github.soir20.moremcmeta.math.Point;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,21 +53,21 @@ public class ChangingPointsReaderTest {
     public void read_EmptyWidth_IllegalArgException() {
         ChangingPointsReader reader = new ChangingPointsReader();
         expectedException.expect(IllegalArgumentException.class);
-        reader.read(new MockRGBAImage(20, 20), 0, 5, 3);
+        reader.read(new MockCloseableImage(20, 20), 0, 5, 3);
     }
 
     @Test
     public void read_EmptyHeight_IllegalArgException() {
         ChangingPointsReader reader = new ChangingPointsReader();
         expectedException.expect(IllegalArgumentException.class);
-        reader.read(new MockRGBAImage(20, 20), 5, 0, 3);
+        reader.read(new MockCloseableImage(20, 20), 5, 0, 3);
     }
 
     @Test
     public void read_NegativeMipmapLevel_IllegalArgException() {
         ChangingPointsReader reader = new ChangingPointsReader();
         expectedException.expect(IllegalArgumentException.class);
-        reader.read(new MockRGBAImage(20, 20), 5, 5, -1);
+        reader.read(new MockCloseableImage(20, 20), 5, 5, -1);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class ChangingPointsReaderTest {
         image[2][6] = toBinary(201, 40, 58, 223);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(2, 3), new Point(2, 1));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -92,7 +92,7 @@ public class ChangingPointsReaderTest {
         }
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of();
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -106,7 +106,7 @@ public class ChangingPointsReaderTest {
         image[2][6] = toBinary(201, 40, 58, 0);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(2, 3));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -120,7 +120,7 @@ public class ChangingPointsReaderTest {
         image[2][6] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(2, 1), new Point(2, 3));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -134,7 +134,7 @@ public class ChangingPointsReaderTest {
         image[5][2] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(0, 3), new Point(0, 1),
                 new Point(0, 2));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
@@ -149,7 +149,7 @@ public class ChangingPointsReaderTest {
         image[9][2] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(4, 3), new Point(4, 1),
                 new Point(4, 2));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
@@ -164,7 +164,7 @@ public class ChangingPointsReaderTest {
         image[2][5] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(3, 0), new Point(1, 0),
                 new Point(2, 0));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
@@ -179,7 +179,7 @@ public class ChangingPointsReaderTest {
         image[2][9] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(3, 4), new Point(1, 4),
                 new Point(2, 4));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
@@ -194,7 +194,7 @@ public class ChangingPointsReaderTest {
         image[5][5] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(0, 0));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -208,7 +208,7 @@ public class ChangingPointsReaderTest {
         image[5][9] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(0, 4));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -222,7 +222,7 @@ public class ChangingPointsReaderTest {
         image[9][5] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(4, 0));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -236,7 +236,7 @@ public class ChangingPointsReaderTest {
         image[9][9] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(4, 4));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -250,7 +250,7 @@ public class ChangingPointsReaderTest {
         image[10][1] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(2, 3), new Point(1, 4));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -264,7 +264,7 @@ public class ChangingPointsReaderTest {
         image[1][10] = toBinary(201, 40, 58, 17);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 2);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 2);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(2, 3), new Point(1, 4));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -277,7 +277,7 @@ public class ChangingPointsReaderTest {
         image[2][6] = toBinary(201, 40, 58, 223);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 0);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 0);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(2, 3), new Point(2, 1));
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -285,7 +285,7 @@ public class ChangingPointsReaderTest {
     @Test
     public void read_EmptyImage_EmptyAreasGenerated() {
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(0, 0), 5, 5, 3);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(0, 0), 5, 5, 3);
         Set<Point> expectedPoints = ImmutableSet.of();
         assertTrue(containsOnlyPoints(areas, expectedPoints));
     }
@@ -298,7 +298,7 @@ public class ChangingPointsReaderTest {
         image[2][6] = toBinary(201, 40, 58, 223);
 
         ChangingPointsReader reader = new ChangingPointsReader();
-        List<Image.VisibleArea> areas = reader.read(new MockRGBAImage(image), 5, 5, 3);
+        List<Image.VisibleArea> areas = reader.read(new MockCloseableImage(image), 5, 5, 3);
         Set<Point> expectedPoints = ImmutableSet.of(new Point(2, 3), new Point(2, 1));
         assertTrue(containsOnlyPoints(areas.get(0), expectedPoints));
         assertTrue(containsOnlyPoints(areas.get(1), mipmapPoints(expectedPoints, 1)));

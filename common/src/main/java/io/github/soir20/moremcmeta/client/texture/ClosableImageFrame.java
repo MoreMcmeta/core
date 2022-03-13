@@ -18,7 +18,7 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
+import io.github.soir20.moremcmeta.client.animation.CloseableImageInterpolator;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
 
@@ -28,17 +28,17 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 /**
- * An animation frame based on a {@link RGBAImage}.
+ * An animation frame based on a {@link CloseableImage}.
  * @author soir20
  */
-public class RGBAImageFrame {
+public class ClosableImageFrame {
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
     private final int Y_OFFSET;
     private final int FRAME_TIME;
     private final SharedMipmapLevel SHARED_MIPMAP_LEVEL;
-    private ImmutableList<? extends RGBAImage> mipmaps;
+    private ImmutableList<? extends CloseableImage> mipmaps;
 
     /**
      * Creates a new frame based on frame data.
@@ -47,8 +47,8 @@ public class RGBAImageFrame {
      * @param sharedMipmapLevel     mipmap level potentially shared with other frames. Upon the mipmap level being
      *                              lowered, this frame's mipmap level lowers, and its extra mipmaps close.
      */
-    public RGBAImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends RGBAImage> mipmaps,
-                          SharedMipmapLevel sharedMipmapLevel) {
+    public ClosableImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends CloseableImage> mipmaps,
+                              SharedMipmapLevel sharedMipmapLevel) {
         requireNonNull(frameData, "Frame data cannot be null");
         this.mipmaps = requireNonNull(mipmaps, "Mipmaps cannot be null");
         if (mipmaps.isEmpty()) {
@@ -87,7 +87,7 @@ public class RGBAImageFrame {
             int mipmappedX = point.getX() >> level;
             int mipmappedY = point.getY() >> level;
 
-            RGBAImage mipmap = mipmaps.get(level);
+            CloseableImage mipmap = mipmaps.get(level);
             int mipmappedWidth = mipmap.getWidth();
             int mipmappedHeight = mipmap.getHeight();
 
@@ -168,7 +168,7 @@ public class RGBAImageFrame {
      * @param level     the mipmap level
      * @return  the image at the given mipmap level
      */
-    public RGBAImage getImage(int level) {
+    public CloseableImage getImage(int level) {
         if (level >= mipmaps.size()) {
             throw new IllegalArgumentException("There is no mipmap of level " + level);
         }
@@ -177,12 +177,12 @@ public class RGBAImageFrame {
     }
 
     /**
-     * Represents a shared open/close status for multiple {@link RGBAImageFrame}s referencing the same mipmaps or
+     * Represents a shared open/close status for multiple {@link ClosableImageFrame}s referencing the same mipmaps or
      * that should have the same mipmap level. All subscribers run when the mipmap level is lowered.
      * @author soir20
      */
     public static final class SharedMipmapLevel {
-        private final List<RGBAImageFrame> SUBSCRIBERS;
+        private final List<ClosableImageFrame> SUBSCRIBERS;
         private int mipmapLevel;
 
         /**
@@ -199,10 +199,10 @@ public class RGBAImageFrame {
         }
 
         /**
-         * Adds an {@link RGBAImageFrame} whose mipmap level will be lowered when the shared level is lowered. This
+         * Adds an {@link ClosableImageFrame} whose mipmap level will be lowered when the shared level is lowered. This
          * frame's mipmap level will be lowered to the current shared level immediately.
          */
-        public void addSubscriber(RGBAImageFrame frame) {
+        public void addSubscriber(ClosableImageFrame frame) {
             requireNonNull(frame, "Frame cannot be null");
             frame.lowerMipmapLevel(mipmapLevel);
             SUBSCRIBERS.add(frame);
@@ -234,13 +234,13 @@ public class RGBAImageFrame {
     }
 
     /**
-     * Interpolates between {@link RGBAImageFrame}s. The frames returned by this interpolator
+     * Interpolates between {@link ClosableImageFrame}s. The frames returned by this interpolator
      * are <em>not</em> unique; the mipmaps are overwritten.
      * @author soir20
      */
-    public static class Interpolator implements io.github.soir20.moremcmeta.client.animation.Interpolator<RGBAImageFrame> {
-        private final RGBAInterpolator INTERPOLATOR;
-        private final RGBAImageFrame FRAME;
+    public static class Interpolator implements io.github.soir20.moremcmeta.client.animation.Interpolator<ClosableImageFrame> {
+        private final CloseableImageInterpolator INTERPOLATOR;
+        private final ClosableImageFrame FRAME;
         private int lastLevel;
 
         /**
@@ -249,7 +249,7 @@ public class RGBAImageFrame {
          *                              The mipmaps should contain only a copy of one animation frame
          *                              and be the same size as a mipmapped frame.
          */
-        public Interpolator(ImmutableList<? extends RGBAImage> mipmaps) {
+        public Interpolator(ImmutableList<? extends CloseableImage> mipmaps) {
             requireNonNull(mipmaps, "Mipmap list cannot be null");
             if (mipmaps.isEmpty()) {
                 throw new IllegalArgumentException("Mipmap list cannot be empty");
@@ -259,9 +259,9 @@ public class RGBAImageFrame {
                     mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(),
                     0, 0, 1
             );
-            FRAME = new RGBAImageFrame(data, mipmaps, new SharedMipmapLevel(mipmaps.size() - 1));
+            FRAME = new ClosableImageFrame(data, mipmaps, new SharedMipmapLevel(mipmaps.size() - 1));
 
-            INTERPOLATOR = new RGBAInterpolator((width, height) -> mipmaps.get(lastLevel));
+            INTERPOLATOR = new CloseableImageInterpolator((width, height) -> mipmaps.get(lastLevel));
         }
 
         /**
@@ -276,7 +276,7 @@ public class RGBAImageFrame {
          * @return  the interpolated frame at the given step
          */
         @Override
-        public RGBAImageFrame interpolate(int steps, int step, RGBAImageFrame start, RGBAImageFrame end) {
+        public ClosableImageFrame interpolate(int steps, int step, ClosableImageFrame start, ClosableImageFrame end) {
             requireNonNull(start, "Start frame cannot be null");
             requireNonNull(end, "End frame cannot be null");
 
@@ -286,8 +286,8 @@ public class RGBAImageFrame {
 
             for (int level = 0; level <= FRAME.getMipmapLevel(); level++) {
                 lastLevel = level;
-                RGBAImage startImage = start.getImage(level);
-                RGBAImage endImage = end.getImage(level);
+                CloseableImage startImage = start.getImage(level);
+                CloseableImage endImage = end.getImage(level);
 
                 // We don't need to do anything with the result because the mipmaps are altered directly
                 INTERPOLATOR.interpolate(steps, step, startImage, endImage);

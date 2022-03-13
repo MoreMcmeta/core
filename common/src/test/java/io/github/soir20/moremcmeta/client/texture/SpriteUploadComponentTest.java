@@ -41,16 +41,16 @@ public class SpriteUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SpriteUploadComponent(new MockSprite(new Point(2, 3)))).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
         texture.upload();
 
         assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(2, 3), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(1, 1), ((MockRGBAImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(2)).getLastUploadPoint());
+        assertEquals(new Point(2, 3), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
+        assertEquals(new Point(1, 1), ((MockCloseableImage) frame.getImage(1)).getLastUploadPoint());
+        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(2)).getLastUploadPoint());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class SpriteUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SpriteUploadComponent(new MockSprite(new Point(2, 3)))).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -66,9 +66,9 @@ public class SpriteUploadComponentTest {
         texture.upload();
 
         assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(2, 3), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(1, 1), ((MockRGBAImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(2)).getLastUploadPoint());
+        assertEquals(new Point(2, 3), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
+        assertEquals(new Point(1, 1), ((MockCloseableImage) frame.getImage(1)).getLastUploadPoint());
+        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(2)).getLastUploadPoint());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(new Point(2, 3));
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -85,9 +85,9 @@ public class SpriteUploadComponentTest {
 
         assertEquals(1, sprite.getBindCount());
         assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(2, 3), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(1, 1), ((MockRGBAImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(2)).getLastUploadPoint());
+        assertEquals(new Point(2, 3), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
+        assertEquals(new Point(1, 1), ((MockCloseableImage) frame.getImage(1)).getLastUploadPoint());
+        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(2)).getLastUploadPoint());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(new Point(2, 3));
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -105,9 +105,9 @@ public class SpriteUploadComponentTest {
 
         assertEquals(2, sprite.getBindCount());
         assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(2, 3), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(1, 1), ((MockRGBAImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(2)).getLastUploadPoint());
+        assertEquals(new Point(2, 3), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
+        assertEquals(new Point(1, 1), ((MockCloseableImage) frame.getImage(1)).getLastUploadPoint());
+        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(2)).getLastUploadPoint());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(1);
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -127,13 +127,13 @@ public class SpriteUploadComponentTest {
 
     @Test
     public void upload_SecondImage_MipmapLoweredToSprite() {
-        MockRGBAImageFrame frame2 = new MockRGBAImageFrame();
+        MockClosableImageFrame frame2 = new MockClosableImageFrame();
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         MockSprite sprite = new MockSprite(1);
         builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 

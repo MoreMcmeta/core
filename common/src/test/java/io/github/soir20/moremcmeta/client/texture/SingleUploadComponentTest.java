@@ -48,14 +48,14 @@ public class SingleUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
         texture.upload();
 
         assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
+        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class SingleUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -71,7 +71,7 @@ public class SingleUploadComponentTest {
         texture.upload();
 
         assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
+        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class SingleUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -90,12 +90,12 @@ public class SingleUploadComponentTest {
 
     @Test
     public void upload_SecondImage_MipmapLoweredTo0() {
-        MockRGBAImageFrame frame2 = new MockRGBAImageFrame();
+        MockClosableImageFrame frame2 = new MockClosableImageFrame();
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
+        MockClosableImageFrame frame = new MockClosableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 

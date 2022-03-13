@@ -22,29 +22,29 @@ import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
 
 /**
- * A fake {@link RGBAImageFrame}.
+ * A fake {@link ClosableImageFrame}.
  * @author soir20
  */
-public class MockRGBAImageFrame extends RGBAImageFrame {
+public class MockClosableImageFrame extends ClosableImageFrame {
     private final int FRAME_NUMBER;
     private int uploads;
 
-    public MockRGBAImageFrame() {
+    public MockClosableImageFrame() {
         this(0);
     }
 
-    public MockRGBAImageFrame(int frameNumber) {
+    public MockClosableImageFrame(int frameNumber) {
         super(new FrameReader.FrameData(10, 10, 0, 0, 1),
-                ImmutableList.of(new MockRGBAImage(), new MockRGBAImage(), new MockRGBAImage()),
+                ImmutableList.of(new MockCloseableImage(), new MockCloseableImage(), new MockCloseableImage()),
                 new SharedMipmapLevel(2));
         FRAME_NUMBER = frameNumber;
     }
 
-    public MockRGBAImageFrame(int width, int height) {
+    public MockClosableImageFrame(int width, int height) {
         this(width, height, 3);
     }
 
-    public MockRGBAImageFrame(int width, int height, int mipmap) {
+    public MockClosableImageFrame(int width, int height, int mipmap) {
         super(new FrameReader.FrameData(width, height, 0, 0, 1), createMipmaps(mipmap, width, height),
                 new SharedMipmapLevel(mipmap));
         FRAME_NUMBER = 0;
@@ -64,11 +64,11 @@ public class MockRGBAImageFrame extends RGBAImageFrame {
         return uploads;
     }
 
-    private static ImmutableList<RGBAImage> createMipmaps(int mipmap, int width, int height) {
-        ImmutableList.Builder<RGBAImage> builder = new ImmutableList.Builder<>();
+    private static ImmutableList<CloseableImage> createMipmaps(int mipmap, int width, int height) {
+        ImmutableList.Builder<CloseableImage> builder = new ImmutableList.Builder<>();
 
         for (int level = 0; level <= mipmap; level++) {
-            builder.add(new MockRGBAImage(width >> level, height >> level));
+            builder.add(new MockCloseableImage(width >> level, height >> level));
         }
 
         return builder.build();

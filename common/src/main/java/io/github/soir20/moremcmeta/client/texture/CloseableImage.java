@@ -24,7 +24,7 @@ import io.github.soir20.moremcmeta.api.Image;
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
  * @author soir20
  */
-public interface RGBAImage {
+public interface CloseableImage {
 
     /**
      * Gets the color of a pixel in this image.

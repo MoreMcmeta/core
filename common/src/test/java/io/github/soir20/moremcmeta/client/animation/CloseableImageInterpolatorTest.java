@@ -18,8 +18,8 @@
 package io.github.soir20.moremcmeta.client.animation;
 
 import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.texture.RGBAImage;
-import io.github.soir20.moremcmeta.client.texture.MockRGBAImage;
+import io.github.soir20.moremcmeta.client.texture.CloseableImage;
+import io.github.soir20.moremcmeta.client.texture.MockCloseableImage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,18 +27,18 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the {@link RGBAInterpolator}. Use an online random number generator for
+ * Tests the {@link CloseableImageInterpolator}. Use an online random number generator for
  * RGBA component values in new tests.
  * @author soir20
  */
-public class RGBAInterpolatorTest {
+public class CloseableImageInterpolatorTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void construct_ImageGetterNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new RGBAInterpolator(null);
+        new CloseableImageInterpolator(null);
     }
 
     @Test
@@ -58,10 +58,10 @@ public class RGBAInterpolatorTest {
         endPixels[4][0] = toBinary(106, 126, 174, 11);
         endPixels[2][3] = toBinary(0, 238, 24, 122);
         endPixels[0][4] = toBinary(93, 209, 60, 223);
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
         expectedException.expect(NullPointerException.class);
         interpolator.interpolate(10, 5, null, end);
@@ -84,10 +84,10 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = toBinary(41, 248, 80, 100);
         startPixels[2][3] = toBinary(19, 159, 70, 226);
         startPixels[0][4] = toBinary(216, 101, 41, 195);
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
         expectedException.expect(NullPointerException.class);
         interpolator.interpolate(10, 5, start, null);
@@ -110,16 +110,16 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = toBinary(41, 248, 80, 100);
         startPixels[2][3] = toBinary(19, 159, 70, 226);
         startPixels[0][4] = toBinary(216, 101, 41, 195);
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
         endPixels[1][2] = toBinary(25, 181, 119, 37);
         endPixels[4][0] = toBinary(106, 126, 174, 11);
         endPixels[2][3] = toBinary(0, 238, 24, 122);
         endPixels[0][4] = toBinary(93, 209, 60, 223);
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) -> null);
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) -> null);
 
         expectedException.expect(NullPointerException.class);
         interpolator.interpolate(10, 5, start, end);
@@ -133,15 +133,15 @@ public class RGBAInterpolatorTest {
         Image.VisibleArea area = (new Image.VisibleArea.Builder()).build();
 
         int[][] startPixels = new int[width][height];
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
         int[][] interpolatedPixels = new int[width][height];
-        MockRGBAImage interpolated = new MockRGBAImage(interpolatedPixels, area);
+        MockCloseableImage interpolated = new MockCloseableImage(interpolatedPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) -> interpolated);
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) -> interpolated);
 
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 0, start, end);
@@ -155,15 +155,15 @@ public class RGBAInterpolatorTest {
         Image.VisibleArea area = (new Image.VisibleArea.Builder()).build();
 
         int[][] startPixels = new int[width][height];
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
         int[][] interpolatedPixels = new int[width][height];
-        MockRGBAImage interpolated = new MockRGBAImage(interpolatedPixels, area);
+        MockCloseableImage interpolated = new MockCloseableImage(interpolatedPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) -> interpolated);
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) -> interpolated);
 
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 10, start, end);
@@ -177,15 +177,15 @@ public class RGBAInterpolatorTest {
         Image.VisibleArea area = (new Image.VisibleArea.Builder()).build();
 
         int[][] startPixels = new int[width][height];
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
         int[][] interpolatedPixels = new int[width][height];
-        MockRGBAImage interpolated = new MockRGBAImage(interpolatedPixels, area);
+        MockCloseableImage interpolated = new MockCloseableImage(interpolatedPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) -> interpolated);
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) -> interpolated);
 
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 11, start, end);
@@ -213,19 +213,19 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = secondColor;
         startPixels[2][3] = thirdColor;
         startPixels[0][4] = fourthColor;
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
         endPixels[1][2] = firstColor;
         endPixels[4][0] = secondColor;
         endPixels[2][3] = thirdColor;
         endPixels[0][4] = fourthColor;
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
-        RGBAImage output = interpolator.interpolate(10, 1, start, end);
+        CloseableImage output = interpolator.interpolate(10, 1, start, end);
 
         assertEquals(firstColor, output.getPixel(1, 2));
         assertEquals(secondColor, output.getPixel(4, 0));
@@ -252,19 +252,19 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = toBinary(25, 250, 50, 0);
         startPixels[2][3] = toBinary(250, 25, 50, 0);
         startPixels[0][4] = toBinary(25, 50, 30, 0);
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
         endPixels[1][2] = toBinary(54, 78, 243, 0);
         endPixels[4][0] = toBinary(250, 25, 50, 0);
         endPixels[2][3] = toBinary(25, 250, 50, 0);
         endPixels[0][4] = toBinary(150, 50, 100, 0);
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
-        RGBAImage output = interpolator.interpolate(10, 5, start, end);
+        CloseableImage output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(39, 64, 246, 0), output.getPixel(1, 2));
         assertEquals(toBinary(137, 137, 50, 0), output.getPixel(4, 0));
@@ -291,19 +291,19 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = toBinary(41, 248, 80, 100);
         startPixels[2][3] = toBinary(19, 159, 70, 226);
         startPixels[0][4] = toBinary(216, 101, 41, 195);
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
         endPixels[1][2] = toBinary(25, 181, 119, 37);
         endPixels[4][0] = toBinary(106, 126, 174, 11);
         endPixels[2][3] = toBinary(0, 238, 24, 122);
         endPixels[0][4] = toBinary(93, 209, 60, 223);
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
-        RGBAImage output = interpolator.interpolate(10, 2, start, end);
+        CloseableImage output = interpolator.interpolate(10, 2, start, end);
 
         assertEquals(toBinary(152, 150, 75, 197), output.getPixel(1, 2));
         assertEquals(toBinary(54, 223, 98, 100), output.getPixel(4, 0));
@@ -330,19 +330,19 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = toBinary(41, 248, 80, 100);
         startPixels[2][3] = toBinary(19, 159, 70, 226);
         startPixels[0][4] = toBinary(216, 101, 41, 195);
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
         endPixels[1][2] = toBinary(25, 181, 119, 37);
         endPixels[4][0] = toBinary(106, 126, 174, 11);
         endPixels[2][3] = toBinary(0, 238, 24, 122);
         endPixels[0][4] = toBinary(93, 209, 60, 223);
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
-        RGBAImage output = interpolator.interpolate(10, 5, start, end);
+        CloseableImage output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));
@@ -369,19 +369,19 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = toBinary(41, 248, 80, 100);
         startPixels[2][3] = toBinary(19, 159, 70, 226);
         startPixels[0][4] = toBinary(216, 101, 41, 195);
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
         endPixels[1][2] = toBinary(25, 181, 119, 37);
         endPixels[4][0] = toBinary(106, 126, 174, 11);
         endPixels[2][3] = toBinary(0, 238, 24, 122);
         endPixels[0][4] = toBinary(93, 209, 60, 223);
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
-        RGBAImage output = interpolator.interpolate(10, 8, start, end);
+        CloseableImage output = interpolator.interpolate(10, 8, start, end);
 
         assertEquals(toBinary(56, 173, 108, 197), output.getPixel(1, 2));
         assertEquals(toBinary(93, 150, 155, 100), output.getPixel(4, 0));
@@ -406,19 +406,19 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = toBinary(41, 248, 80, 100);
         startPixels[2][3] = toBinary(19, 159, 70, 226);
         startPixels[0][6] = toBinary(216, 101, 41, 195);
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[10][4];
         endPixels[1][2] = toBinary(25, 181, 119, 37);
         endPixels[4][0] = toBinary(106, 126, 174, 11);
         endPixels[2][3] = toBinary(0, 238, 24, 122);
         endPixels[9][3] = toBinary(93, 209, 60, 223);
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
-        RGBAImage output = interpolator.interpolate(10, 5, start, end);
+        CloseableImage output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));
@@ -446,19 +446,19 @@ public class RGBAInterpolatorTest {
         startPixels[4][0] = toBinary(41, 248, 80, 100);
         startPixels[2][3] = toBinary(19, 159, 70, 226);
         startPixels[0][2] = toBinary(216, 101, 41, 195);
-        MockRGBAImage start = new MockRGBAImage(startPixels, area);
+        MockCloseableImage start = new MockCloseableImage(startPixels, area);
 
         int[][] endPixels = new int[width][height];
         endPixels[1][2] = toBinary(25, 181, 119, 37);
         endPixels[4][0] = toBinary(106, 126, 174, 11);
         endPixels[2][3] = toBinary(0, 238, 24, 122);
         endPixels[3][1] = toBinary(93, 209, 60, 223);
-        MockRGBAImage end = new MockRGBAImage(endPixels, area);
+        MockCloseableImage end = new MockCloseableImage(endPixels, area);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator((w, h) ->
-                new MockRGBAImage(new int[w][h], area));
+        CloseableImageInterpolator interpolator = new CloseableImageInterpolator((w, h) ->
+                new MockCloseableImage(new int[w][h], area));
 
-        RGBAImage output = interpolator.interpolate(10, 5, start, end);
+        CloseableImage output = interpolator.interpolate(10, 5, start, end);
 
         assertEquals(toBinary(104, 162, 92, 197), output.getPixel(1, 2));
         assertEquals(toBinary(73, 187, 127, 100), output.getPixel(4, 0));

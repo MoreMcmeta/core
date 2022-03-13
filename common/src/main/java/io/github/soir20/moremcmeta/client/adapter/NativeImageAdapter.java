@@ -20,17 +20,17 @@ package io.github.soir20.moremcmeta.client.adapter;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
-import io.github.soir20.moremcmeta.client.texture.RGBAImage;
+import io.github.soir20.moremcmeta.client.animation.CloseableImageInterpolator;
+import io.github.soir20.moremcmeta.client.texture.CloseableImage;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Wraps a {@link NativeImage} so it is compatible with the {@link RGBAImage} interface and
- * the {@link RGBAInterpolator}.
+ * Wraps a {@link NativeImage} so it is compatible with the {@link CloseableImage} interface and
+ * the {@link CloseableImageInterpolator}.
  * @author soir20
  */
-public class NativeImageAdapter implements RGBAImage {
+public class NativeImageAdapter implements CloseableImage {
     private final NativeImage IMAGE;
     private final int X_OFFSET;
     private final int Y_OFFSET;

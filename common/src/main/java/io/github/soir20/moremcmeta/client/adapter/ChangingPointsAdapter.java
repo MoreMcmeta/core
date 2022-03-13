@@ -20,7 +20,7 @@ package io.github.soir20.moremcmeta.client.adapter;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.client.io.ChangingPointsReader;
-import io.github.soir20.moremcmeta.client.texture.RGBAImage;
+import io.github.soir20.moremcmeta.client.texture.CloseableImage;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class ChangingPointsAdapter {
      */
     public List<Image.VisibleArea> read(NativeImage image, int frameWidth, int frameHeight, int mipmap) {
         requireNonNull(image, "Image cannot be null");
-        RGBAImage wrappedImage = new NativeImageAdapter(image, mipmap);
+        CloseableImage wrappedImage = new NativeImageAdapter(image, mipmap);
         return READER.read(wrappedImage, frameWidth, frameHeight, mipmap);
     }
 

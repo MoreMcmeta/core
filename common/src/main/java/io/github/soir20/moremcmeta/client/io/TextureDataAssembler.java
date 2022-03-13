@@ -28,8 +28,8 @@ import io.github.soir20.moremcmeta.client.resource.ModAnimationMetadataSection;
 import io.github.soir20.moremcmeta.client.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.client.texture.EventDrivenTexture;
-import io.github.soir20.moremcmeta.client.texture.RGBAImage;
-import io.github.soir20.moremcmeta.client.texture.RGBAImageFrame;
+import io.github.soir20.moremcmeta.client.texture.CloseableImage;
+import io.github.soir20.moremcmeta.client.texture.ClosableImageFrame;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
@@ -89,10 +89,10 @@ public class TextureDataAssembler {
 
         // Create frames
         List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(original, MAX_MIPMAP));
-        RGBAImageFrame.SharedMipmapLevel sharedMipmapLevel = new RGBAImageFrame.SharedMipmapLevel(MAX_MIPMAP);
-        ImmutableList<RGBAImageFrame> frames = getFrames(mipmaps, blur, clamp, sharedMipmapLevel, animationMetadata);
+        ClosableImageFrame.SharedMipmapLevel sharedMipmapLevel = new ClosableImageFrame.SharedMipmapLevel(MAX_MIPMAP);
+        ImmutableList<ClosableImageFrame> frames = getFrames(mipmaps, blur, clamp, sharedMipmapLevel, animationMetadata);
 
-        RGBAImageFrame firstFrame = frames.get(0);
+        ClosableImageFrame firstFrame = frames.get(0);
         int frameWidth = firstFrame.getWidth();
         int frameHeight = firstFrame.getHeight();
 
@@ -100,15 +100,15 @@ public class TextureDataAssembler {
 
         // Frame manager
         ImmutableList<NativeImageAdapter> interpolatedMipmaps;
-        AnimationFrameManager<RGBAImageFrame> frameManager;
+        AnimationFrameManager<ClosableImageFrame> frameManager;
         if (animationMetadata.isInterpolatedFrames()) {
              interpolatedMipmaps = getInterpolationMipmaps(mipmaps, frameWidth, frameHeight, blur, clamp, visibleAreas);
-            RGBAImageFrame.Interpolator interpolator = new RGBAImageFrame.Interpolator(interpolatedMipmaps);
+            ClosableImageFrame.Interpolator interpolator = new ClosableImageFrame.Interpolator(interpolatedMipmaps);
 
-            frameManager = new AnimationFrameManager<>(frames, RGBAImageFrame::getFrameTime, interpolator);
+            frameManager = new AnimationFrameManager<>(frames, ClosableImageFrame::getFrameTime, interpolator);
         } else {
             interpolatedMipmaps = ImmutableList.of();
-            frameManager = new AnimationFrameManager<>(frames, RGBAImageFrame::getFrameTime);
+            frameManager = new AnimationFrameManager<>(frames, ClosableImageFrame::getFrameTime);
         }
 
         // Resource cleanup
@@ -156,18 +156,18 @@ public class TextureDataAssembler {
      * @param animationMetadata     animation metadata for this texture
      * @return the frames based on the texture image in chronological order
      */
-    private ImmutableList<RGBAImageFrame> getFrames(List<NativeImage> mipmaps, boolean blur, boolean clamp,
-                                                    RGBAImageFrame.SharedMipmapLevel sharedMipmapLevel,
-                                                    AnimationMetadataSection animationMetadata) {
+    private ImmutableList<ClosableImageFrame> getFrames(List<NativeImage> mipmaps, boolean blur, boolean clamp,
+                                                        ClosableImageFrame.SharedMipmapLevel sharedMipmapLevel,
+                                                        AnimationMetadataSection animationMetadata) {
         int mipmap = mipmaps.size() - 1;
 
         List<Image.VisibleArea> visibleAreas = new ArrayList<>();
-        FrameReader<RGBAImageFrame> frameReader = new FrameReader<>((frameData) -> {
+        FrameReader<ClosableImageFrame> frameReader = new FrameReader<>((frameData) -> {
 
             /* The immutable list collector was marked as beta for a while,
                and the marking was removed in a later version. */
             @SuppressWarnings("UnstableApiUsage")
-            ImmutableList<RGBAImage> wrappedMipmaps = IntStream.rangeClosed(0, mipmap).mapToObj((level) -> {
+            ImmutableList<CloseableImage> wrappedMipmaps = IntStream.rangeClosed(0, mipmap).mapToObj((level) -> {
                 int width = frameData.getWidth() >> level;
                 int height = frameData.getHeight() >> level;
 
@@ -185,7 +185,7 @@ public class TextureDataAssembler {
                 );
             }).collect(ImmutableList.toImmutableList());
 
-            return new RGBAImageFrame(frameData, wrappedMipmaps, sharedMipmapLevel);
+            return new ClosableImageFrame(frameData, wrappedMipmaps, sharedMipmapLevel);
         });
 
         return frameReader.read(mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(), animationMetadata);
@@ -196,7 +196,7 @@ public class TextureDataAssembler {
      * @param frame        frame to retrieve the visible areas from
      * @return the visible areas ordered by increasing mipmap level, starting at 0
      */
-    private List<Image.VisibleArea> getVisibleAreas(RGBAImageFrame frame) {
+    private List<Image.VisibleArea> getVisibleAreas(ClosableImageFrame frame) {
         return IntStream.rangeClosed(0, frame.getMipmapLevel()).mapToObj(
                 (level) -> frame.getImage(level).getVisibleArea()
         ).toList();
