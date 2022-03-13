@@ -17,14 +17,9 @@
 
 package io.github.soir20.moremcmeta.api;
 
-import java.util.Set;
+@FunctionalInterface
+public interface MetadataParser {
 
-public interface MoreMcmetaPlugin {
-
-    String name();
-
-    MetadataParser parser();
-
-    Set<String> replacedDefaultPlugins();
+    ParsedMetadata parse(MetadataView metadata);
 
 }

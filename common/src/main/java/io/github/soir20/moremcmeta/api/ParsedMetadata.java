@@ -17,14 +17,40 @@
 
 package io.github.soir20.moremcmeta.api;
 
-import java.util.Set;
+import java.util.Optional;
 
-public interface MoreMcmetaPlugin {
+public interface ParsedMetadata {
+    default Optional<FrameSize> frameSize() {
+        return Optional.empty();
+    }
 
-    String name();
+    default Optional<Boolean> blur() {
+        return Optional.empty();
+    }
 
-    MetadataParser parser();
+    default Optional<Boolean> clamp() {
+        return Optional.empty();
+    }
 
-    Set<String> replacedDefaultPlugins();
+    default Optional<String> invalidReason() {
+        return Optional.empty();
+    }
 
+    final class FrameSize {
+        private final int WIDTH;
+        private final int HEIGHT;
+
+        public FrameSize(int width, int height) {
+            WIDTH = width;
+            HEIGHT = height;
+        }
+
+        public int width() {
+            return WIDTH;
+        }
+
+        public int height() {
+            return HEIGHT;
+        }
+    }
 }

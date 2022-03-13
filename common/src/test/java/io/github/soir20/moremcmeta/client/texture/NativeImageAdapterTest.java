@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public class NativeImageAdapterTest {
     public void constructFull_NullImage_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new NativeImageAdapter(null, 0, 0, 100, 100, 2,
-                false, false, false, (new RGBAImage.VisibleArea.Builder()).build());
+                false, false, false, (new Image.VisibleArea.Builder()).build());
     }
 
     @Test

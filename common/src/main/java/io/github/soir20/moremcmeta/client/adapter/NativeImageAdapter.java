@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta.client.adapter;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.client.animation.RGBAInterpolator;
 import io.github.soir20.moremcmeta.client.texture.RGBAImage;
 
@@ -39,7 +40,7 @@ public class NativeImageAdapter implements RGBAImage {
     private final boolean BLUR;
     private final boolean CLAMP;
     private final boolean AUTO_CLOSE;
-    private final VisibleArea VISIBLE_AREA;
+    private final Image.VisibleArea VISIBLE_AREA;
     private boolean closed;
 
     /**
@@ -57,7 +58,7 @@ public class NativeImageAdapter implements RGBAImage {
      */
     public NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
                               int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
-                              VisibleArea visibleArea) {
+                              Image.VisibleArea visibleArea) {
         IMAGE = requireNonNull(image, "Image cannot be null");
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
@@ -86,7 +87,7 @@ public class NativeImageAdapter implements RGBAImage {
         BLUR = false;
         CLAMP = false;
         AUTO_CLOSE = false;
-        VISIBLE_AREA = (new VisibleArea.Builder()).build();
+        VISIBLE_AREA = (new Image.VisibleArea.Builder()).build();
     }
 
     /**
@@ -143,7 +144,7 @@ public class NativeImageAdapter implements RGBAImage {
      * @throws IllegalStateException if this image has been closed
      */
     @Override
-    public VisibleArea getVisibleArea() {
+    public Image.VisibleArea getVisibleArea() {
         checkOpen();
         return VISIBLE_AREA;
     }

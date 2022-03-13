@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.client.adapter;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.client.io.ChangingPointsReader;
 import io.github.soir20.moremcmeta.client.texture.RGBAImage;
 
@@ -47,7 +48,7 @@ public class ChangingPointsAdapter {
      * @param mipmap        number of mipmap levels to use
      * @return  pixels that change for every mipmap (starting with the default image)
      */
-    public List<RGBAImage.VisibleArea> read(NativeImage image, int frameWidth, int frameHeight, int mipmap) {
+    public List<Image.VisibleArea> read(NativeImage image, int frameWidth, int frameHeight, int mipmap) {
         requireNonNull(image, "Image cannot be null");
         RGBAImage wrappedImage = new NativeImageAdapter(image, mipmap);
         return READER.read(wrappedImage, frameWidth, frameHeight, mipmap);

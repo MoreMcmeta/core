@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
+import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
 import org.junit.Rule;
@@ -1095,7 +1096,7 @@ public class RGBAImageFrameTest {
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(10, 10, 3);
 
         for (int level = 0; level <= 3; level++) {
-            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
+            Image.VisibleArea.Builder areaBuilder = new Image.VisibleArea.Builder();
             areaBuilder.addPixel(6 >> level, 7 >> level);
             frameBuilder.add(new MockRGBAImage(new int[10 >> level][10 >> level], areaBuilder.build()));
 
@@ -1119,7 +1120,7 @@ public class RGBAImageFrameTest {
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(10, 10, 2);
 
         for (int level = 0; level <= 2; level++) {
-            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
+            Image.VisibleArea.Builder areaBuilder = new Image.VisibleArea.Builder();
             areaBuilder.addPixel(6 >> level, 7 >> level);
             frameBuilder.add(new MockRGBAImage(new int[10 >> level][10 >> level], areaBuilder.build()));
 
@@ -1145,7 +1146,7 @@ public class RGBAImageFrameTest {
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(10, 10, 3);
 
         for (int level = 0; level <= 2; level++) {
-            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
+            Image.VisibleArea.Builder areaBuilder = new Image.VisibleArea.Builder();
             areaBuilder.addPixel(6 >> level, 7 >> level);
             frameBuilder.add(new MockRGBAImage(new int[10 >> level][10 >> level], areaBuilder.build()));
 
@@ -1171,7 +1172,7 @@ public class RGBAImageFrameTest {
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(5, 5, 3);
 
         for (int level = 0; level <= 2; level++) {
-            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
+            Image.VisibleArea.Builder areaBuilder = new Image.VisibleArea.Builder();
             areaBuilder.addPixel(3 >> level, 2 >> level);
             frameBuilder.add(new MockRGBAImage(new int[5 >> level][5 >> level], areaBuilder.build()));
 
@@ -1197,7 +1198,7 @@ public class RGBAImageFrameTest {
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(5, 10, 2);
 
         for (int level = 0; level <= 2; level++) {
-            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
+            Image.VisibleArea.Builder areaBuilder = new Image.VisibleArea.Builder();
             areaBuilder.addPixel(3 >> level, 2 >> level);
             frameBuilder.add(new MockRGBAImage(new int[5 >> level][5 >> level], areaBuilder.build()));
 
@@ -1221,7 +1222,7 @@ public class RGBAImageFrameTest {
         MockRGBAImageFrame endFrame = new MockRGBAImageFrame(5, 10, 2);
 
         for (int level = 0; level <= 2; level++) {
-            RGBAImage.VisibleArea.Builder areaBuilder = new RGBAImage.VisibleArea.Builder();
+            Image.VisibleArea.Builder areaBuilder = new Image.VisibleArea.Builder();
             areaBuilder.addPixel(3 >> level, 2 >> level);
             frameBuilder.add(new MockRGBAImage(new int[10 >> level][10 >> level], areaBuilder.build()));
 

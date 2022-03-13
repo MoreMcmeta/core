@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.math.Point;
 
 /**
@@ -29,7 +30,7 @@ public class MockRGBAImage implements RGBAImage {
     private final int[][] PIXELS;
     private final int WIDTH;
     private final int HEIGHT;
-    private final VisibleArea VISIBLE_AREA;
+    private final Image.VisibleArea VISIBLE_AREA;
     private Point uploadPoint;
     private boolean closed;
 
@@ -37,17 +38,17 @@ public class MockRGBAImage implements RGBAImage {
         PIXELS = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
         WIDTH = DEFAULT_DIMENSION;
         HEIGHT = DEFAULT_DIMENSION;
-        VISIBLE_AREA = (new VisibleArea.Builder()).build();
+        VISIBLE_AREA = (new Image.VisibleArea.Builder()).build();
     }
 
     public MockRGBAImage(int width, int height) {
         PIXELS = new int[width][height];
         WIDTH = width;
         HEIGHT = height;
-        VISIBLE_AREA = (new VisibleArea.Builder()).build();
+        VISIBLE_AREA = (new Image.VisibleArea.Builder()).build();
     }
 
-    public MockRGBAImage(int[][] pixels, VisibleArea visibleArea) {
+    public MockRGBAImage(int[][] pixels, Image.VisibleArea visibleArea) {
         PIXELS = pixels;
         WIDTH = pixels.length;
         HEIGHT = pixels[0].length;
@@ -58,7 +59,7 @@ public class MockRGBAImage implements RGBAImage {
         PIXELS = pixels;
         WIDTH = pixels.length;
         HEIGHT = pixels[0].length;
-        VISIBLE_AREA = (new VisibleArea.Builder()).build();
+        VISIBLE_AREA = (new Image.VisibleArea.Builder()).build();
     }
 
     @Override
@@ -98,7 +99,7 @@ public class MockRGBAImage implements RGBAImage {
     }
 
     @Override
-    public VisibleArea getVisibleArea() {
+    public Image.VisibleArea getVisibleArea() {
         if (closed) {
             throw new IllegalStateException("Mock image closed");
         }

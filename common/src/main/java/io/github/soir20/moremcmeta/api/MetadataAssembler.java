@@ -17,14 +17,5 @@
 
 package io.github.soir20.moremcmeta.api;
 
-import java.util.Set;
-
-public interface MoreMcmetaPlugin {
-
-    String name();
-
-    MetadataParser parser();
-
-    Set<String> replacedDefaultPlugins();
-
+public interface MetadataAssembler {
 }

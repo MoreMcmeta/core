@@ -17,14 +17,15 @@
 
 package io.github.soir20.moremcmeta.api;
 
-import java.util.Set;
+public interface Frame {
 
-public interface MoreMcmetaPlugin {
+    int getFrameTime();
 
-    String name();
+    int getWidth();
 
-    MetadataParser parser();
+    int getHeight();
 
-    Set<String> replacedDefaultPlugins();
+    int getMipmapLevel();
 
+    Image getImage(int level);
 }

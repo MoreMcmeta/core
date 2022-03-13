@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta.client.io;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
+import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.client.adapter.ChangingPointsAdapter;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.animation.AnimationFrameManager;
@@ -95,7 +96,7 @@ public class TextureDataAssembler {
         int frameWidth = firstFrame.getWidth();
         int frameHeight = firstFrame.getHeight();
 
-        List<RGBAImage.VisibleArea> visibleAreas = getVisibleAreas(firstFrame);
+        List<Image.VisibleArea> visibleAreas = getVisibleAreas(firstFrame);
 
         // Frame manager
         ImmutableList<NativeImageAdapter> interpolatedMipmaps;
@@ -160,7 +161,7 @@ public class TextureDataAssembler {
                                                     AnimationMetadataSection animationMetadata) {
         int mipmap = mipmaps.size() - 1;
 
-        List<RGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
+        List<Image.VisibleArea> visibleAreas = new ArrayList<>();
         FrameReader<RGBAImageFrame> frameReader = new FrameReader<>((frameData) -> {
 
             /* The immutable list collector was marked as beta for a while,
@@ -195,7 +196,7 @@ public class TextureDataAssembler {
      * @param frame        frame to retrieve the visible areas from
      * @return the visible areas ordered by increasing mipmap level, starting at 0
      */
-    private List<RGBAImage.VisibleArea> getVisibleAreas(RGBAImageFrame frame) {
+    private List<Image.VisibleArea> getVisibleAreas(RGBAImageFrame frame) {
         return IntStream.rangeClosed(0, frame.getMipmapLevel()).mapToObj(
                 (level) -> frame.getImage(level).getVisibleArea()
         ).toList();
@@ -213,7 +214,7 @@ public class TextureDataAssembler {
      */
     private ImmutableList<NativeImageAdapter> getInterpolationMipmaps(List<NativeImage> originals, int frameWidth,
                                                                       int frameHeight, boolean blur, boolean clamp,
-                                                                      List<RGBAImage.VisibleArea> visibleAreas) {
+                                                                      List<Image.VisibleArea> visibleAreas) {
         ImmutableList.Builder<NativeImageAdapter> images = new ImmutableList.Builder<>();
 
         for (int level = 0; level < originals.size(); level++) {
