@@ -17,11 +17,10 @@
 
 package io.github.soir20.moremcmeta.api;
 
-import com.google.common.collect.ImmutableList;
-
 @FunctionalInterface
 public interface MetadataAssembler {
 
-    Iterable<TextureComponent> assemble(ParsedMetadata metadata, ImmutableList<Frame> predefinedFrames);
+    Iterable<TextureComponent> assemble(ParsedMetadata metadata, ParsedMetadata.FrameSize frameSize,
+                                        boolean blur, boolean clamp);
 
 }

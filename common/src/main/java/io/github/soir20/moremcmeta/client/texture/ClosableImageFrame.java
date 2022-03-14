@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.api.Frame;
 import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.client.animation.ImageInterpolator;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
@@ -33,7 +32,7 @@ import static java.util.Objects.requireNonNull;
  * An animation frame based on a {@link CloseableImage}.
  * @author soir20
  */
-public class ClosableImageFrame implements Frame {
+public class ClosableImageFrame {
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;

@@ -17,15 +17,12 @@
 
 package io.github.soir20.moremcmeta.api;
 
-public interface Frame {
+import io.github.soir20.moremcmeta.math.Point;
 
-    int getFrameTime();
+public interface FrameTransform {
 
-    int getWidth();
+    ColorTransform transform();
 
-    int getHeight();
+    Iterable<Point> applyArea();
 
-    int getMipmapLevel();
-
-    Image getImage(int level);
 }

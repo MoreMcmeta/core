@@ -17,16 +17,16 @@
 
 package io.github.soir20.moremcmeta.api;
 
-import java.util.Set;
-
 public interface MoreMcmetaPlugin {
 
-    String name();
+    String displayName();
+
+    String sectionName();
 
     MetadataParser parser();
 
     MetadataAssembler assembler();
 
-    Set<String> replacedDefaultPlugins();
+    InitialTransform initialTransform();
 
 }

@@ -17,16 +17,9 @@
 
 package io.github.soir20.moremcmeta.api;
 
-import io.github.soir20.moremcmeta.client.texture.GenericTextureComponent;
+@FunctionalInterface
+public interface InitialTransform {
 
-import java.util.stream.Stream;
-
-public interface TextureComponent extends GenericTextureComponent<FrameView> {
-
-    /**
-     * Gets all listeners for this component.
-     * @return all of this component's listeners
-     */
-    Stream<TextureListener<? super FrameView>> getListeners();
+    FrameTransform transform(FrameView frame);
 
 }

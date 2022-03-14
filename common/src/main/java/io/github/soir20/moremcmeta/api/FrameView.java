@@ -17,11 +17,16 @@
 
 package io.github.soir20.moremcmeta.api;
 
-public interface TextureView {
+import java.util.OptionalInt;
 
-    Frame getFrame();
+public interface FrameView {
 
-    void replaceFrame(Frame newImage);
+    int color(int x, int y);
 
-    void markNeedsUpload();
+    int width();
+
+    int height();
+
+    OptionalInt index();
+
 }
