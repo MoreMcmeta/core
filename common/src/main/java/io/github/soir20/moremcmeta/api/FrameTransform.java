@@ -19,10 +19,23 @@ package io.github.soir20.moremcmeta.api;
 
 import io.github.soir20.moremcmeta.math.Point;
 
-public interface FrameTransform {
+import static java.util.Objects.requireNonNull;
 
-    ColorTransform transform();
+public final class FrameTransform {
+    private final ColorTransform TRANSFORM;
+    private final Iterable<Point> APPLY_AREA;
 
-    Iterable<Point> applyArea();
+    public FrameTransform(ColorTransform transform, Iterable<Point> applyArea) {
+        TRANSFORM = requireNonNull(transform, "Transform cannot be null");
+        APPLY_AREA = requireNonNull(applyArea, "Apply area cannot be null");
+    }
+
+    ColorTransform transform() {
+        return TRANSFORM;
+    }
+
+    Iterable<Point> applyArea() {
+        return APPLY_AREA;
+    }
 
 }
