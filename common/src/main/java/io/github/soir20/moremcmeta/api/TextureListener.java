@@ -27,7 +27,7 @@ import static java.util.Objects.requireNonNull;
  * A listener for an {@link EventDrivenTexture}'s events.
  * @author soir20
  */
-public class TextureListener<V> {
+public final class TextureListener<V> {
 
     /**
      * The available event types for listeners.
