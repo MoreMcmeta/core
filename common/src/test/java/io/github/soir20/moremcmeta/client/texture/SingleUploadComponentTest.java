@@ -49,7 +49,7 @@ public class SingleUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -64,7 +64,7 @@ public class SingleUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -80,7 +80,7 @@ public class SingleUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -91,12 +91,12 @@ public class SingleUploadComponentTest {
 
     @Test
     public void upload_SecondImage_MipmapLoweredTo0() {
-        MockClosableImageFrame frame2 = new MockClosableImageFrame();
+        MockCloseableImageFrame frame2 = new MockCloseableImageFrame();
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 

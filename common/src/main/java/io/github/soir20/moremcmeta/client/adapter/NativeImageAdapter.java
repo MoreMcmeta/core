@@ -19,15 +19,14 @@ package io.github.soir20.moremcmeta.client.adapter;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.animation.ImageInterpolator;
+import io.github.soir20.moremcmeta.client.animation.CloseableImageInterpolator;
 import io.github.soir20.moremcmeta.client.texture.CloseableImage;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * Wraps a {@link NativeImage} so it is compatible with the {@link CloseableImage} interface and
- * the {@link ImageInterpolator}.
+ * the {@link CloseableImageInterpolator}.
  * @author soir20
  */
 public class NativeImageAdapter implements CloseableImage {
@@ -40,7 +39,7 @@ public class NativeImageAdapter implements CloseableImage {
     private final boolean BLUR;
     private final boolean CLAMP;
     private final boolean AUTO_CLOSE;
-    private final Image.VisibleArea VISIBLE_AREA;
+    private final VisibleArea VISIBLE_AREA;
     private boolean closed;
 
     /**
@@ -58,7 +57,7 @@ public class NativeImageAdapter implements CloseableImage {
      */
     public NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
                               int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
-                              Image.VisibleArea visibleArea) {
+                              VisibleArea visibleArea) {
         IMAGE = requireNonNull(image, "Image cannot be null");
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
@@ -87,7 +86,7 @@ public class NativeImageAdapter implements CloseableImage {
         BLUR = false;
         CLAMP = false;
         AUTO_CLOSE = false;
-        VISIBLE_AREA = (new Image.VisibleArea.Builder()).build();
+        VISIBLE_AREA = (new VisibleArea.Builder()).build();
     }
 
     /**
@@ -144,7 +143,7 @@ public class NativeImageAdapter implements CloseableImage {
      * @throws IllegalStateException if this image has been closed
      */
     @Override
-    public Image.VisibleArea getVisibleArea() {
+    public VisibleArea getVisibleArea() {
         checkOpen();
         return VISIBLE_AREA;
     }

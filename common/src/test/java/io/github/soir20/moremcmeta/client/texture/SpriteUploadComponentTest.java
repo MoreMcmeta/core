@@ -42,7 +42,7 @@ public class SpriteUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SpriteUploadComponent(new MockSprite(new Point(2, 3)))).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -59,7 +59,7 @@ public class SpriteUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new SpriteUploadComponent(new MockSprite(new Point(2, 3)))).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -78,7 +78,7 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(new Point(2, 3));
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -97,7 +97,7 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(new Point(2, 3));
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -117,7 +117,7 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(1);
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 
@@ -128,13 +128,13 @@ public class SpriteUploadComponentTest {
 
     @Test
     public void upload_SecondImage_MipmapLoweredToSprite() {
-        MockClosableImageFrame frame2 = new MockClosableImageFrame();
+        MockCloseableImageFrame frame2 = new MockCloseableImageFrame();
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         MockSprite sprite = new MockSprite(1);
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockClosableImageFrame frame = new MockClosableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setImage(frame);
         EventDrivenTexture texture = builder.build();
 

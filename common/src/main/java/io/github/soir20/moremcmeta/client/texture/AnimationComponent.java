@@ -33,7 +33,7 @@ import static java.util.Objects.requireNonNull;
 public class AnimationComponent implements GenericTextureComponent<EventDrivenTexture.TextureState> {
     private final int SYNC_TICKS;
     private final Supplier<Optional<Long>> TIME_GETTER;
-    private final AnimationFrameManager<? extends ClosableImageFrame> FRAME_MANAGER;
+    private final AnimationFrameManager<? extends CloseableImageFrame> FRAME_MANAGER;
 
     private int ticks;
 
@@ -44,7 +44,7 @@ public class AnimationComponent implements GenericTextureComponent<EventDrivenTe
      * @param frameManager      frame manager for the animation
      */
     public AnimationComponent(int syncTicks, Supplier<Optional<Long>> timeGetter,
-                              AnimationFrameManager<? extends ClosableImageFrame> frameManager) {
+                              AnimationFrameManager<? extends CloseableImageFrame> frameManager) {
         if (syncTicks <= 0) {
             throw new IllegalArgumentException("Sync ticks cannot be zero or negative");
         }
@@ -58,7 +58,7 @@ public class AnimationComponent implements GenericTextureComponent<EventDrivenTe
      * Creates an animation component that does not sync to the current game time.
      * @param frameManager      frame manager for the animation
      */
-    public AnimationComponent(AnimationFrameManager<? extends ClosableImageFrame> frameManager) {
+    public AnimationComponent(AnimationFrameManager<? extends CloseableImageFrame> frameManager) {
         SYNC_TICKS = -1;
         TIME_GETTER = Optional::empty;
         FRAME_MANAGER = requireNonNull(frameManager, "Frame manager cannot be null");

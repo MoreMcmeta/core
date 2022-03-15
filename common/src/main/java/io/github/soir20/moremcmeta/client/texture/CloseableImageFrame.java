@@ -18,8 +18,7 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.api.Image;
-import io.github.soir20.moremcmeta.client.animation.ImageInterpolator;
+import io.github.soir20.moremcmeta.client.animation.CloseableImageInterpolator;
 import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
 
@@ -32,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  * An animation frame based on a {@link CloseableImage}.
  * @author soir20
  */
-public class ClosableImageFrame {
+public class CloseableImageFrame {
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
@@ -48,8 +47,8 @@ public class ClosableImageFrame {
      * @param sharedMipmapLevel     mipmap level potentially shared with other frames. Upon the mipmap level being
      *                              lowered, this frame's mipmap level lowers, and its extra mipmaps close.
      */
-    public ClosableImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends CloseableImage> mipmaps,
-                              SharedMipmapLevel sharedMipmapLevel) {
+    public CloseableImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends CloseableImage> mipmaps,
+                               SharedMipmapLevel sharedMipmapLevel) {
         requireNonNull(frameData, "Frame data cannot be null");
         this.mipmaps = requireNonNull(mipmaps, "Mipmaps cannot be null");
         if (mipmaps.isEmpty()) {
@@ -178,12 +177,12 @@ public class ClosableImageFrame {
     }
 
     /**
-     * Represents a shared open/close status for multiple {@link ClosableImageFrame}s referencing the same mipmaps or
+     * Represents a shared open/close status for multiple {@link CloseableImageFrame}s referencing the same mipmaps or
      * that should have the same mipmap level. All subscribers run when the mipmap level is lowered.
      * @author soir20
      */
     public static final class SharedMipmapLevel {
-        private final List<ClosableImageFrame> SUBSCRIBERS;
+        private final List<CloseableImageFrame> SUBSCRIBERS;
         private int mipmapLevel;
 
         /**
@@ -200,10 +199,10 @@ public class ClosableImageFrame {
         }
 
         /**
-         * Adds an {@link ClosableImageFrame} whose mipmap level will be lowered when the shared level is lowered. This
+         * Adds an {@link CloseableImageFrame} whose mipmap level will be lowered when the shared level is lowered. This
          * frame's mipmap level will be lowered to the current shared level immediately.
          */
-        public void addSubscriber(ClosableImageFrame frame) {
+        public void addSubscriber(CloseableImageFrame frame) {
             requireNonNull(frame, "Frame cannot be null");
             frame.lowerMipmapLevel(mipmapLevel);
             SUBSCRIBERS.add(frame);
@@ -235,13 +234,13 @@ public class ClosableImageFrame {
     }
 
     /**
-     * Interpolates between {@link ClosableImageFrame}s. The frames returned by this interpolator
+     * Interpolates between {@link CloseableImageFrame}s. The frames returned by this interpolator
      * are <em>not</em> unique; the mipmaps are overwritten.
      * @author soir20
      */
-    public static class Interpolator implements io.github.soir20.moremcmeta.client.animation.Interpolator<ClosableImageFrame> {
-        private final ImageInterpolator INTERPOLATOR;
-        private final ClosableImageFrame FRAME;
+    public static class Interpolator implements io.github.soir20.moremcmeta.client.animation.Interpolator<CloseableImageFrame> {
+        private final CloseableImageInterpolator INTERPOLATOR;
+        private final CloseableImageFrame FRAME;
         private int lastLevel;
 
         /**
@@ -260,9 +259,9 @@ public class ClosableImageFrame {
                     mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(),
                     0, 0, 1
             );
-            FRAME = new ClosableImageFrame(data, mipmaps, new SharedMipmapLevel(mipmaps.size() - 1));
+            FRAME = new CloseableImageFrame(data, mipmaps, new SharedMipmapLevel(mipmaps.size() - 1));
 
-            INTERPOLATOR = new ImageInterpolator((width, height) -> mipmaps.get(lastLevel));
+            INTERPOLATOR = new CloseableImageInterpolator((width, height) -> mipmaps.get(lastLevel));
         }
 
         /**
@@ -277,7 +276,7 @@ public class ClosableImageFrame {
          * @return  the interpolated frame at the given step
          */
         @Override
-        public ClosableImageFrame interpolate(int steps, int step, ClosableImageFrame start, ClosableImageFrame end) {
+        public CloseableImageFrame interpolate(int steps, int step, CloseableImageFrame start, CloseableImageFrame end) {
             requireNonNull(start, "Start frame cannot be null");
             requireNonNull(end, "End frame cannot be null");
 
@@ -287,8 +286,8 @@ public class ClosableImageFrame {
 
             for (int level = 0; level <= FRAME.getMipmapLevel(); level++) {
                 lastLevel = level;
-                Image startImage = start.getImage(level);
-                Image endImage = end.getImage(level);
+                CloseableImage startImage = start.getImage(level);
+                CloseableImage endImage = end.getImage(level);
 
                 // We don't need to do anything with the result because the mipmaps are altered directly
                 INTERPOLATOR.interpolate(steps, step, startImage, endImage);

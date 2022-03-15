@@ -22,29 +22,29 @@ import io.github.soir20.moremcmeta.client.io.FrameReader;
 import io.github.soir20.moremcmeta.math.Point;
 
 /**
- * A fake {@link ClosableImageFrame}.
+ * A fake {@link CloseableImageFrame}.
  * @author soir20
  */
-public class MockClosableImageFrame extends ClosableImageFrame {
+public class MockCloseableImageFrame extends CloseableImageFrame {
     private final int FRAME_NUMBER;
     private int uploads;
 
-    public MockClosableImageFrame() {
+    public MockCloseableImageFrame() {
         this(0);
     }
 
-    public MockClosableImageFrame(int frameNumber) {
+    public MockCloseableImageFrame(int frameNumber) {
         super(new FrameReader.FrameData(10, 10, 0, 0, 1),
                 ImmutableList.of(new MockCloseableImage(), new MockCloseableImage(), new MockCloseableImage()),
                 new SharedMipmapLevel(2));
         FRAME_NUMBER = frameNumber;
     }
 
-    public MockClosableImageFrame(int width, int height) {
+    public MockCloseableImageFrame(int width, int height) {
         this(width, height, 3);
     }
 
-    public MockClosableImageFrame(int width, int height, int mipmap) {
+    public MockCloseableImageFrame(int width, int height, int mipmap) {
         super(new FrameReader.FrameData(width, height, 0, 0, 1), createMipmaps(mipmap, width, height),
                 new SharedMipmapLevel(mipmap));
         FRAME_NUMBER = 0;

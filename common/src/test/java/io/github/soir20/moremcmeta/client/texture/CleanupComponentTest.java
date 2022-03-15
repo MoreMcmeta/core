@@ -45,7 +45,7 @@ public class CleanupComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new CleanupComponent(timesRan::incrementAndGet)).getListeners());
-        builder.setImage(new MockClosableImageFrame());
+        builder.setImage(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.close();
@@ -59,7 +59,7 @@ public class CleanupComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new CleanupComponent(timesRan::incrementAndGet)).getListeners());
-        builder.setImage(new MockClosableImageFrame());
+        builder.setImage(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.close();

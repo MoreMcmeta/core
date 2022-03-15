@@ -48,7 +48,7 @@ public class SingleUploadComponent implements GenericTextureComponent<EventDrive
         TextureListener<EventDrivenTexture.TextureState> registrationListener = new TextureListener<>(
                 TextureListener.Type.REGISTRATION,
                 (state) -> {
-                    ClosableImageFrame image = state.getImage();
+                    CloseableImageFrame image = state.getImage();
                     PREPARER.prepare(state.getTexture().getId(), 0, image.getWidth(), image.getHeight());
                 });
 

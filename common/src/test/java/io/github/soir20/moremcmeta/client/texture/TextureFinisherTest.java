@@ -85,10 +85,10 @@ public class TextureFinisherTest {
         locations.add(new ResourceLocation("textures/mat.png"));
 
         // Queue textures
-        Set<MockClosableImageFrame> frames = new HashSet<>();
+        Set<MockCloseableImageFrame> frames = new HashSet<>();
         for (ResourceLocation location : locations) {
             EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-            MockClosableImageFrame mockImage = new MockClosableImageFrame();
+            MockCloseableImageFrame mockImage = new MockCloseableImageFrame();
             frames.add(mockImage);
             builder.setImage(mockImage);
             finisher.queue(location, builder);
@@ -98,7 +98,7 @@ public class TextureFinisherTest {
         Map<ResourceLocation, EventDrivenTexture> textures = finisher.finish();
         textures.values().forEach(EventDrivenTexture::upload);
 
-        for (MockClosableImageFrame frame : frames) {
+        for (MockCloseableImageFrame frame : frames) {
             MockCloseableImage mockImage = (MockCloseableImage) frame.getImage(0);
             assertEquals(new Point(2, 3), mockImage.getLastUploadPoint());
             assertEquals(1, frame.getUploadCount());
@@ -119,10 +119,10 @@ public class TextureFinisherTest {
         locations.add(new ResourceLocation("textures/mat.png"));
 
         // Queue textures
-        Set<MockClosableImageFrame> frames = new HashSet<>();
+        Set<MockCloseableImageFrame> frames = new HashSet<>();
         for (ResourceLocation location : locations) {
             EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-            MockClosableImageFrame mockImage = new MockClosableImageFrame();
+            MockCloseableImageFrame mockImage = new MockCloseableImageFrame();
             frames.add(mockImage);
             builder.setImage(mockImage);
             finisher.queue(location, builder);
@@ -132,7 +132,7 @@ public class TextureFinisherTest {
         Map<ResourceLocation, EventDrivenTexture> textures = finisher.finish();
         textures.values().forEach(EventDrivenTexture::upload);
 
-        for (MockClosableImageFrame frame : frames) {
+        for (MockCloseableImageFrame frame : frames) {
             MockCloseableImage mockImage = (MockCloseableImage) frame.getImage(0);
             assertEquals(new Point(0, 0), mockImage.getLastUploadPoint());
             assertEquals(1, frame.getUploadCount());

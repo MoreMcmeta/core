@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.api.Image;
 import io.github.soir20.moremcmeta.math.Point;
 import org.junit.Test;
 
@@ -28,21 +27,21 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Tests the building and use of the {@link Image.VisibleArea} class.
+ * Tests the building and use of the {@link CloseableImage.VisibleArea} class.
  * @author soir20
  */
 public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_NoPoints_Empty() {
-        Image.VisibleArea.Builder builder = new Image.VisibleArea.Builder();
-        Image.VisibleArea area = builder.build();
+        CloseableImage.VisibleArea.Builder builder = new CloseableImage.VisibleArea.Builder();
+        CloseableImage.VisibleArea area = builder.build();
         assertFalse(area.iterator().hasNext());
     }
 
     @Test
     public void buildVisibleArea_OrderedPoints_AllAdded() {
-        Image.VisibleArea.Builder builder = new Image.VisibleArea.Builder();
+        CloseableImage.VisibleArea.Builder builder = new CloseableImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -60,7 +59,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        Image.VisibleArea area = builder.build();
+        CloseableImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -73,7 +72,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_UnorderedPoints_AllAdded() {
-        Image.VisibleArea.Builder builder = new Image.VisibleArea.Builder();
+        CloseableImage.VisibleArea.Builder builder = new CloseableImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(2, 2));
         points.add(new Point(0, 0));
@@ -91,7 +90,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        Image.VisibleArea area = builder.build();
+        CloseableImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -104,7 +103,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_NegativePoints_AllAdded() {
-        Image.VisibleArea.Builder builder = new Image.VisibleArea.Builder();
+        CloseableImage.VisibleArea.Builder builder = new CloseableImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(-2, 0));
         points.add(new Point(-2, 1));
@@ -121,7 +120,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        Image.VisibleArea area = builder.build();
+        CloseableImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -134,7 +133,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_DuplicatePoints_AreaDoesNotDuplicatePoints() {
-        Image.VisibleArea.Builder builder = new Image.VisibleArea.Builder();
+        CloseableImage.VisibleArea.Builder builder = new CloseableImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -158,7 +157,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        Image.VisibleArea area = builder.build();
+        CloseableImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -171,7 +170,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_SinglePixelFirstInRow_AllAdded() {
-        Image.VisibleArea.Builder builder = new Image.VisibleArea.Builder();
+        CloseableImage.VisibleArea.Builder builder = new CloseableImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -188,7 +187,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        Image.VisibleArea area = builder.build();
+        CloseableImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -201,7 +200,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_SinglePixelMiddleInRow_AllAdded() {
-        Image.VisibleArea.Builder builder = new Image.VisibleArea.Builder();
+        CloseableImage.VisibleArea.Builder builder = new CloseableImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -220,7 +219,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        Image.VisibleArea area = builder.build();
+        CloseableImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
@@ -233,7 +232,7 @@ public class VisibleAreaTest {
 
     @Test
     public void buildVisibleArea_SinglePixelLastInRow_AllAdded() {
-        Image.VisibleArea.Builder builder = new Image.VisibleArea.Builder();
+        CloseableImage.VisibleArea.Builder builder = new CloseableImage.VisibleArea.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 1));
@@ -252,7 +251,7 @@ public class VisibleAreaTest {
             builder.addPixel(point.getX(), point.getY());
         }
 
-        Image.VisibleArea area = builder.build();
+        CloseableImage.VisibleArea area = builder.build();
 
         List<Point> areaPoints = new ArrayList<>();
         for (Point point : area) {
