@@ -18,7 +18,7 @@
 package io.github.soir20.moremcmeta.api;
 
 @FunctionalInterface
-public interface MetadataAssembler {
+public interface ComponentProvider {
 
     Iterable<TextureComponent> assemble(ParsedMetadata metadata, ParsedMetadata.FrameSize frameSize,
                                         boolean blur, boolean clamp);

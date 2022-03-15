@@ -25,7 +25,7 @@ public interface MoreMcmetaPlugin {
 
     MetadataParser parser();
 
-    MetadataAssembler assembler();
+    ComponentProvider componentProvider();
 
     InitialTransform initialTransform();
 
