@@ -20,6 +20,6 @@ package io.github.soir20.moremcmeta.api;
 @FunctionalInterface
 public interface InitialTransform {
 
-    FrameTransform transform(FrameView frame);
+    FrameTransform transform(ParsedMetadata metadata, boolean blur, boolean clamp, FrameView frame);
 
 }
