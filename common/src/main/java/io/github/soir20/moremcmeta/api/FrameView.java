@@ -29,4 +29,6 @@ public interface FrameView {
 
     OptionalInt index();
 
+    int predefinedFrames();
+
 }

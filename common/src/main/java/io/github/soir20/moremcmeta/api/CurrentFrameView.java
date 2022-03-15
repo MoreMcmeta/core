@@ -23,6 +23,4 @@ public interface CurrentFrameView extends FrameView {
 
     void replaceWith(int index);
 
-    int predefinedFrames();
-
 }
