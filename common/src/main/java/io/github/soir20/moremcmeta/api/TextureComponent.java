@@ -21,12 +21,12 @@ import io.github.soir20.moremcmeta.client.texture.GenericTextureComponent;
 
 import java.util.stream.Stream;
 
-public interface TextureComponent extends GenericTextureComponent<FrameView> {
+public interface TextureComponent extends GenericTextureComponent<CurrentFrameView> {
 
     /**
      * Gets all listeners for this component.
      * @return all of this component's listeners
      */
-    Stream<TextureListener<? super FrameView>> getListeners();
+    Stream<TextureListener<? super CurrentFrameView>> getListeners();
 
 }
