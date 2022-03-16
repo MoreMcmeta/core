@@ -18,6 +18,8 @@
 package io.github.soir20.moremcmeta.client.animation;
 
 import com.google.common.collect.ImmutableList;
+import io.github.soir20.moremcmeta.impl.client.animation.AnimationFrameManager;
+import io.github.soir20.moremcmeta.impl.client.animation.Interpolator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

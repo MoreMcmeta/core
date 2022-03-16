@@ -17,7 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.api.TextureListener;
+import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
+import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

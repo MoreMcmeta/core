@@ -17,7 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.math.Point;
+import io.github.soir20.moremcmeta.api.math.Point;
+import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 
 /**
  * Mocks an {@link CloseableImage}. Keeps track of set pixel colors.

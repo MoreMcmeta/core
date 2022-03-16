@@ -19,6 +19,8 @@ package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.github.soir20.moremcmeta.impl.client.resource.ModAnimationMetadataSection;
+import io.github.soir20.moremcmeta.impl.client.resource.ModAnimationMetadataSectionSerializer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

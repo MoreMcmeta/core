@@ -19,6 +19,9 @@ package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonParseException;
+import io.github.soir20.moremcmeta.impl.client.resource.OrderedResourceRepository;
+import io.github.soir20.moremcmeta.impl.client.resource.ResourceCollection;
+import io.github.soir20.moremcmeta.impl.client.resource.TextureLoader;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;

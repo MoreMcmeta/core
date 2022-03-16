@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.impl.client.texture.Finisher;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;

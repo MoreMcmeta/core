@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.animation;
 
+import io.github.soir20.moremcmeta.impl.client.animation.WobbleFunction;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

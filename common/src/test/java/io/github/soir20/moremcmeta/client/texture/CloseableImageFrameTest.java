@@ -18,8 +18,10 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.io.FrameReader;
-import io.github.soir20.moremcmeta.math.Point;
+import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
+import io.github.soir20.moremcmeta.api.math.Point;
+import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
+import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

@@ -17,6 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.impl.client.texture.CustomTickable;
+import io.github.soir20.moremcmeta.impl.client.texture.LazyTextureManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;

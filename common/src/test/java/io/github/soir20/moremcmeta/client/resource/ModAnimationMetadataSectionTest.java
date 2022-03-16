@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.resource;
 
+import io.github.soir20.moremcmeta.impl.client.resource.ModAnimationMetadataSection;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

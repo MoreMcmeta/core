@@ -17,7 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.math.Point;
+import io.github.soir20.moremcmeta.api.math.Point;
+import io.github.soir20.moremcmeta.impl.client.texture.Sprite;
 import net.minecraft.resources.ResourceLocation;
 
 /**

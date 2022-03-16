@@ -17,7 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.animation;
 
-import io.github.soir20.moremcmeta.client.texture.CloseableImage;
+import io.github.soir20.moremcmeta.impl.client.animation.CloseableImageInterpolator;
+import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.client.texture.MockCloseableImage;
 import org.junit.Rule;
 import org.junit.Test;

@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.client.adapter;
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.client.resource.MockResourceManager;
 import io.github.soir20.moremcmeta.client.texture.MockAnimatedTexture;
+import io.github.soir20.moremcmeta.impl.client.adapter.TextureManagerAdapter;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.Tickable;

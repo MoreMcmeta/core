@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.forge.client.event;
 
-import io.github.soir20.moremcmeta.client.texture.CustomTickable;
+import io.github.soir20.moremcmeta.impl.client.texture.CustomTickable;
 
 /**
  * A tick counter that represents a tickable item.

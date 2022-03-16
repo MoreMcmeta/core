@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.adapter;
 
+import io.github.soir20.moremcmeta.impl.client.adapter.ChangingPointsAdapter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

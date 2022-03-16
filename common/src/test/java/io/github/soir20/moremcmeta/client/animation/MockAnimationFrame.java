@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.animation;
 
-import io.github.soir20.moremcmeta.client.io.FrameReader;
+import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
 /**
  * Mocks an animation frame. Essentially a wrapper for frame data that can be validated.

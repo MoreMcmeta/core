@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.client.io;
 
 import io.github.soir20.moremcmeta.client.texture.MockCloseableImage;
+import io.github.soir20.moremcmeta.impl.client.io.TextureData;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 import org.junit.Rule;

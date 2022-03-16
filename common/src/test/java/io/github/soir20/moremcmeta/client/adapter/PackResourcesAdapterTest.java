@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.client.adapter;
 
 import io.github.soir20.moremcmeta.client.resource.MockPackResources;
+import io.github.soir20.moremcmeta.impl.client.adapter.PackResourcesAdapter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;

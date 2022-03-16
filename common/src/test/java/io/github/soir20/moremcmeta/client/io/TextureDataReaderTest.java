@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.io;
 
+import io.github.soir20.moremcmeta.impl.client.io.TextureDataReader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

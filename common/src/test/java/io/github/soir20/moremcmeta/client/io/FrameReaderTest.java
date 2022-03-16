@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta.client.io;
 
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.client.animation.MockAnimationFrame;
+import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 import net.minecraft.client.resources.metadata.animation.AnimationFrame;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import org.junit.Rule;

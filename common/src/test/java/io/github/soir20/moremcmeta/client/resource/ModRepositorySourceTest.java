@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.resource;
 
+import io.github.soir20.moremcmeta.impl.client.resource.ModRepositorySource;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import org.junit.Rule;

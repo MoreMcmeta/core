@@ -17,6 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.impl.client.texture.Sprite;
+import io.github.soir20.moremcmeta.impl.client.texture.SpriteFinder;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;

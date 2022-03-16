@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.client.resource;
 
+import io.github.soir20.moremcmeta.impl.client.resource.ResourceCollection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 

@@ -17,7 +17,8 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
+import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
+import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

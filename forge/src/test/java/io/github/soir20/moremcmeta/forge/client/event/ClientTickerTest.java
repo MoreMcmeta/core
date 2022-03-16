@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta.forge.client.event;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.github.soir20.moremcmeta.forge.impl.client.event.ClientTicker;
 import net.minecraftforge.event.TickEvent;
 import org.junit.After;
 import org.junit.Rule;
