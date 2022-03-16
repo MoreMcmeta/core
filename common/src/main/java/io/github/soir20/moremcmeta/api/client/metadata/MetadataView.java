@@ -18,9 +18,6 @@
 package io.github.soir20.moremcmeta.api.client.metadata;
 
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
 
 public interface MetadataView {
 
@@ -34,21 +31,29 @@ public interface MetadataView {
 
     Optional<String> stringValue(int index);
 
-    OptionalInt integerValue(String key);
+    Optional<Integer> integerValue(String key);
 
-    OptionalInt integerValue(int index);
+    Optional<Integer> integerValue(int index);
 
-    OptionalLong longValue(String key);
+    Optional<Integer> unsignedIntegerValue(String key);
 
-    OptionalLong longValue(int index);
+    Optional<Integer> unsignedIntegerValue(int index);
+
+    Optional<Long> longValue(String key);
+
+    Optional<Long> longValue(int index);
+
+    Optional<Long> unsignedLongValue(String key);
+
+    Optional<Long> unsignedLongValue(int index);
 
     Optional<Float> floatValue(String key);
 
     Optional<Float> floatValue(int index);
 
-    OptionalDouble doubleValue(String key);
+    Optional<Double> doubleValue(String key);
 
-    OptionalDouble doubleValue(int index);
+    Optional<Double> doubleValue(int index);
 
     Optional<Boolean> booleanValue(String key);
 
