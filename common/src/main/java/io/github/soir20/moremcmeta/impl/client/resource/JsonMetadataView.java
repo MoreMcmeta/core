@@ -26,33 +26,42 @@ import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
 
 public class JsonMetadataView implements MetadataView {
     private final Root ROOT;
-    private final Comparator<? super String> KEY_COMPARATOR;
+    private final List<String> KEYS;
     private final int SIZE;
 
     public JsonMetadataView(JsonObject root, Comparator<? super String> keyComparator) {
         ROOT = new Root(requireNonNull(root, "Root cannot be null"));
-        KEY_COMPARATOR = requireNonNull(keyComparator, "Key comparator cannot be null");
+        KEYS = root.keySet().stream().sorted(keyComparator).toList();
         SIZE = root.size();
     }
 
     public JsonMetadataView(JsonArray root) {
         ROOT = new Root(requireNonNull(root, "Array cannot be null"));
-        KEY_COMPARATOR = String::compareTo;
+        KEYS = IntStream.range(0, root.size()).mapToObj(String::valueOf).toList();
         SIZE = root.size();
     }
 
     @Override
     public int size() {
         return SIZE;
+    }
+
+    @Override
+    public Iterable<String> keys() {
+
+        // The list is created to be unmodifiable
+        return KEYS;
+
     }
 
     @Override
@@ -73,7 +82,7 @@ public class JsonMetadataView implements MetadataView {
         }
 
         return index < SIZE && ROOT.get(
-                (obj) -> objectElementByIndex(obj, index, KEY_COMPARATOR).isJsonPrimitive(),
+                (obj) -> objectElementByIndex(obj, index).isJsonPrimitive(),
                 (array) -> array.get(index).isJsonPrimitive()
         );
     }
@@ -225,7 +234,7 @@ public class JsonMetadataView implements MetadataView {
         }
 
         return ROOT.get(
-                (obj) -> convertToSubView(objectElementByIndex(obj, index, KEY_COMPARATOR)),
+                (obj) -> convertToSubView(objectElementByIndex(obj, index)),
                 (array) -> convertToSubView(array.get(index))
         );
     }
@@ -261,7 +270,7 @@ public class JsonMetadataView implements MetadataView {
 
         return ROOT.get(
                 (obj) -> {
-                    JsonPrimitive primitive = objectElementByIndex(obj, index, KEY_COMPARATOR).getAsJsonPrimitive();
+                    JsonPrimitive primitive = objectElementByIndex(obj, index).getAsJsonPrimitive();
                     return primitiveOfType(primitive, checkFunction, convertFunction);
                 },
                 (array) ->  primitiveOfType(array.get(index).getAsJsonPrimitive(), checkFunction, convertFunction)
@@ -277,10 +286,8 @@ public class JsonMetadataView implements MetadataView {
         return Optional.of(convertFunction.apply(primitive));
     }
 
-    private JsonElement objectElementByIndex(JsonObject obj, int index, Comparator<? super String> comparator) {
-        String[] keys = obj.keySet().toArray(new String[0]);
-        Arrays.sort(keys, comparator);
-        return obj.get(keys[index]);
+    private JsonElement objectElementByIndex(JsonObject obj, int index) {
+        return obj.get(KEYS.get(index));
     }
 
     private boolean isSignedInteger(BigDecimal num) {

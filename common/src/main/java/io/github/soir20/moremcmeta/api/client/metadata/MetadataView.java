@@ -23,6 +23,8 @@ public interface MetadataView {
 
     int size();
 
+    Iterable<String> keys();
+
     boolean hasValue(String key);
 
     boolean hasValue(int index);
