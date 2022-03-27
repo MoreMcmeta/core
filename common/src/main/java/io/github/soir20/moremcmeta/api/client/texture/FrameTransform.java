@@ -30,11 +30,11 @@ public final class FrameTransform {
         APPLY_AREA = requireNonNull(applyArea, "Apply area cannot be null");
     }
 
-    ColorTransform transform() {
+    public ColorTransform transform() {
         return TRANSFORM;
     }
 
-    Iterable<Point> applyArea() {
+    public Iterable<Point> applyArea() {
         return APPLY_AREA;
     }
 
