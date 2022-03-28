@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.client.io;
 
 import io.github.soir20.moremcmeta.impl.client.io.TextureDataReader;
+import io.github.soir20.moremcmeta.impl.client.io.TextureReader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,6 +26,7 @@ import org.junit.rules.ExpectedException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * Tests the {@link TextureDataReader}. This class uses some Minecraft IO functions, and it
@@ -37,15 +39,15 @@ public class TextureDataReaderTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void read_NullTextureStream_NullPointerException() throws IOException {
-        TextureDataReader reader = new TextureDataReader();
+    public void read_NullTextureStream_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
+        TextureDataReader reader = new TextureDataReader(List.of());
         expectedException.expect(NullPointerException.class);
         reader.read(null, new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
     }
 
     @Test
-    public void read_NullMetadataStream_NullPointerException() throws IOException {
-        TextureDataReader reader = new TextureDataReader();
+    public void read_NullMetadataStream_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
+        TextureDataReader reader = new TextureDataReader(List.of());
         expectedException.expect(NullPointerException.class);
         reader.read(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)), null);
     }

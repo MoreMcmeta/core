@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import io.github.soir20.moremcmeta.api.math.Point;
+import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.impl.client.texture.TextureFinisher;
@@ -27,6 +28,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -93,7 +95,8 @@ public class TextureFinisherTest {
             EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
             MockCloseableImageFrame mockImage = new MockCloseableImageFrame();
             frames.add(mockImage);
-            builder.setImage(mockImage);
+            builder.setPredefinedFrames(List.of(mockImage));
+            builder.setGeneratedFrame(new MockCloseableImageFrame());
             finisher.queue(location, builder);
         }
 
@@ -127,7 +130,8 @@ public class TextureFinisherTest {
             EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
             MockCloseableImageFrame mockImage = new MockCloseableImageFrame();
             frames.add(mockImage);
-            builder.setImage(mockImage);
+            builder.setPredefinedFrames(List.of(mockImage));
+            builder.setGeneratedFrame(new MockCloseableImageFrame());
             finisher.queue(location, builder);
         }
 

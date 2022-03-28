@@ -52,5 +52,19 @@ public interface ParsedMetadata {
         public int height() {
             return HEIGHT;
         }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof FrameSize otherSize)) {
+                return false;
+            }
+
+            return width() == otherSize.width() && height() == otherSize.height();
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * WIDTH + HEIGHT;
+        }
     }
 }

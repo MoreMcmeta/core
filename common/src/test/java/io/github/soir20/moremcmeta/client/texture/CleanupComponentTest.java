@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
@@ -47,7 +48,8 @@ public class CleanupComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new CleanupComponent(timesRan::incrementAndGet)).getListeners());
-        builder.setImage(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.close();
@@ -61,7 +63,8 @@ public class CleanupComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> (new CleanupComponent(timesRan::incrementAndGet)).getListeners());
-        builder.setImage(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.close();

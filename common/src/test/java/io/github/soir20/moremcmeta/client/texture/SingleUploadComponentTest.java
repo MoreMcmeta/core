@@ -25,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
@@ -52,7 +53,8 @@ public class SingleUploadComponentTest {
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.upload();
@@ -67,7 +69,8 @@ public class SingleUploadComponentTest {
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.upload();
@@ -83,7 +86,8 @@ public class SingleUploadComponentTest {
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         assertEquals(2, frame.getMipmapLevel());
@@ -95,11 +99,12 @@ public class SingleUploadComponentTest {
     public void upload_SecondImage_MipmapLoweredTo0() {
         MockCloseableImageFrame frame2 = new MockCloseableImageFrame();
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceWith(1))));
         builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame, frame2));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.upload();

@@ -67,11 +67,19 @@ public interface CloseableImage {
     int getHeight();
 
     /**
-     * Gets the visible area (iterable by point) of this image. Order of points is not guaranteed.
-     * @return  the visible area of this image
-     * @throws IllegalStateException if this image has been closed
+     * Copies another image's pixels into this image, starting at the top leftmost point (0, 0).
+     * The width of the copied area is the smallest of this image's width and the other image's
+     * width. Likewise, the height of the copied area is the smallest of this image's height and
+     * the other image's height. Pixels outside the copied area in this image are not changed.
+     * @param other     the other image to copy data form
      */
-    VisibleArea getVisibleArea();
+    default void copyFrom(CloseableImage other) {
+        for (int y = 0; y < Math.min(getWidth(), other.getHeight()); y++) {
+            for (int x = 0; x < Math.min(getHeight(), other.getWidth()); x++) {
+                setPixel(x, y, other.getPixel(x, y));
+            }
+        }
+    }
 
     /**
      * Uploads the top-left corner of this image at the given coordinates.

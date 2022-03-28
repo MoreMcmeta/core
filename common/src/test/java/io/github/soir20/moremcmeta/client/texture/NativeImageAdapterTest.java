@@ -37,7 +37,7 @@ public class NativeImageAdapterTest {
     public void constructFull_NullImage_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new NativeImageAdapter(null, 0, 0, 100, 100, 2,
-                false, false, false, (new CloseableImage.VisibleArea.Builder()).build());
+                false, false, false);
     }
 
     @Test

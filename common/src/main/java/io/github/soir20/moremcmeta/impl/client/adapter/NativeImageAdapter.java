@@ -19,14 +19,12 @@ package io.github.soir20.moremcmeta.impl.client.adapter;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.soir20.moremcmeta.impl.client.animation.CloseableImageInterpolator;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Wraps a {@link NativeImage} so it is compatible with the {@link CloseableImage} interface and
- * the {@link CloseableImageInterpolator}.
+ * Wraps a {@link NativeImage} so it is compatible with the {@link CloseableImage} interface.
  * @author soir20
  */
 public class NativeImageAdapter implements CloseableImage {
@@ -39,7 +37,6 @@ public class NativeImageAdapter implements CloseableImage {
     private final boolean BLUR;
     private final boolean CLAMP;
     private final boolean AUTO_CLOSE;
-    private final VisibleArea VISIBLE_AREA;
     private boolean closed;
 
     /**
@@ -53,11 +50,9 @@ public class NativeImageAdapter implements CloseableImage {
      * @param blur          whether to blur this image
      * @param clamp         whether to clamp this image
      * @param autoClose     whether to automatically close this image
-     * @param visibleArea   the visible portions of this image
      */
     public NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
-                              int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
-                              VisibleArea visibleArea) {
+                              int mipmapLevel, boolean blur, boolean clamp, boolean autoClose) {
         IMAGE = requireNonNull(image, "Image cannot be null");
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
@@ -67,7 +62,6 @@ public class NativeImageAdapter implements CloseableImage {
         BLUR = blur;
         CLAMP = clamp;
         AUTO_CLOSE = autoClose;
-        VISIBLE_AREA = requireNonNull(visibleArea, "Visible area cannot be null");
     }
 
     /**
@@ -86,7 +80,6 @@ public class NativeImageAdapter implements CloseableImage {
         BLUR = false;
         CLAMP = false;
         AUTO_CLOSE = false;
-        VISIBLE_AREA = (new VisibleArea.Builder()).build();
     }
 
     /**
@@ -135,17 +128,6 @@ public class NativeImageAdapter implements CloseableImage {
     public int getHeight() {
         checkOpen();
         return HEIGHT;
-    }
-
-    /**
-     * Gets the visible area (iterable by point) of this image.
-     * @return  the visible area of this image
-     * @throws IllegalStateException if this image has been closed
-     */
-    @Override
-    public VisibleArea getVisibleArea() {
-        checkOpen();
-        return VISIBLE_AREA;
     }
 
     /**

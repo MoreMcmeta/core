@@ -47,7 +47,7 @@ public class CloseableImageFrameTest {
     @Test
     public void construct_MipmapsNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new CloseableImageFrame(new FrameReader.FrameData(100, 100, 0, 0, 10),
+        new CloseableImageFrame(new FrameReader.FrameData(100, 100, 0, 0),
                 null, new CloseableImageFrame.SharedMipmapLevel(0));
     }
 
@@ -55,7 +55,7 @@ public class CloseableImageFrameTest {
     public void getMipmapLevel_NoMipmapsProvided_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
         new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 ImmutableList.of(), new CloseableImageFrame.SharedMipmapLevel(0)
         );
     }
@@ -64,7 +64,7 @@ public class CloseableImageFrameTest {
     public void construct_SharedLevelNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new CloseableImageFrame(
-                new FrameReader.FrameData(100, 100, 0, 0, 10),
+                new FrameReader.FrameData(100, 100, 0, 0),
                 ImmutableList.of(new MockCloseableImage()), null
         );
     }
@@ -74,7 +74,7 @@ public class CloseableImageFrameTest {
         ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(new MockCloseableImage(), new MockCloseableImage(),
                 new MockCloseableImage());
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 100, 0, 0, 10),
+                new FrameReader.FrameData(100, 100, 0, 0),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(1)
         );
 
@@ -88,7 +88,7 @@ public class CloseableImageFrameTest {
         ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(new MockCloseableImage(), new MockCloseableImage(),
                 new MockCloseableImage());
         new CloseableImageFrame(
-                new FrameReader.FrameData(100, 100, 0, 0, 10),
+                new FrameReader.FrameData(100, 100, 0, 0),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(1)
         );
 
@@ -102,35 +102,15 @@ public class CloseableImageFrameTest {
 
         expectedException.expect(IllegalArgumentException.class);
         new CloseableImageFrame(
-                new FrameReader.FrameData(100, 100, 0, 0, 10),
+                new FrameReader.FrameData(100, 100, 0, 0),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(3)
         );
     }
 
     @Test
-    public void getFrameTime_NotEmptyTime_SameTimeReturned() {
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 100, 0, 0, 10),
-                ImmutableList.of(new MockCloseableImage()), new CloseableImageFrame.SharedMipmapLevel(0)
-        );
-
-        assertEquals(10, frame.getFrameTime());
-    }
-
-    @Test
-    public void getFrameTime_EmptyTime_SameTimeReturned() {
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 100, 0, 0, FrameReader.FrameData.EMPTY_TIME),
-                ImmutableList.of(new MockCloseableImage()), new CloseableImageFrame.SharedMipmapLevel(0)
-        );
-
-        assertEquals(FrameReader.FrameData.EMPTY_TIME, frame.getFrameTime());
-    }
-
-    @Test
     public void getWidth_WidthProvided_SameWidthReturned() {
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 0, 0, 10),
+                new FrameReader.FrameData(100, 200, 0, 0),
                 ImmutableList.of(new MockCloseableImage()), new CloseableImageFrame.SharedMipmapLevel(0)
         );
 
@@ -140,7 +120,7 @@ public class CloseableImageFrameTest {
     @Test
     public void getHeight_HeightProvided_SameHeightReturned() {
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 0, 0, 10),
+                new FrameReader.FrameData(100, 200, 0, 0),
                 ImmutableList.of(new MockCloseableImage()), new CloseableImageFrame.SharedMipmapLevel(0)
         );
 
@@ -150,7 +130,7 @@ public class CloseableImageFrameTest {
     @Test
     public void getXOffset_XOffsetProvided_SameXOffsetReturned() {
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 ImmutableList.of(new MockCloseableImage()), new CloseableImageFrame.SharedMipmapLevel(0)
         );
 
@@ -160,7 +140,7 @@ public class CloseableImageFrameTest {
     @Test
     public void getYOffset_YOffsetProvided_SameYOffsetReturned() {
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 ImmutableList.of(new MockCloseableImage()), new CloseableImageFrame.SharedMipmapLevel(0)
         );
 
@@ -178,7 +158,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -196,7 +176,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -215,7 +195,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -234,7 +214,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -253,7 +233,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -272,7 +252,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -291,7 +271,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -310,7 +290,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -334,7 +314,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -358,7 +338,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -382,7 +362,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -406,7 +386,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -430,7 +410,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -454,7 +434,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -478,7 +458,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -502,7 +482,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -526,7 +506,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -550,7 +530,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -574,7 +554,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -598,7 +578,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -617,7 +597,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -640,7 +620,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -671,7 +651,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -694,7 +674,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -725,7 +705,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -748,7 +728,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -779,7 +759,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -800,7 +780,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -828,7 +808,7 @@ public class CloseableImageFrameTest {
         );
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1)
         );
 
@@ -859,7 +839,7 @@ public class CloseableImageFrameTest {
         );
         CloseableImageFrame.SharedMipmapLevel sharedLevel = new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
         new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, sharedLevel
         );
 
@@ -871,7 +851,7 @@ public class CloseableImageFrameTest {
                 new MockCloseableImage(0, 0)
         );
         CloseableImageFrame frame2 = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps2, sharedLevel
         );
 
@@ -894,7 +874,7 @@ public class CloseableImageFrameTest {
         );
         CloseableImageFrame.SharedMipmapLevel sharedLevel = new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, sharedLevel
         );
 
@@ -906,7 +886,7 @@ public class CloseableImageFrameTest {
                 new MockCloseableImage(0, 0)
         );
         CloseableImageFrame frame2 = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps2, sharedLevel
         );
 
@@ -924,319 +904,6 @@ public class CloseableImageFrameTest {
         }
 
         assertEquals(newLevel, mipmapsNotClosed);
-    }
-
-    @Test
-    public void constructInterpolator_NullMipmaps_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new CloseableImageFrame.Interpolator(null);
-    }
-
-    @Test
-    public void constructInterpolator_EmptyMipmaps_IllegalArgException() {
-        expectedException.expect(IllegalArgumentException.class);
-        new CloseableImageFrame.Interpolator(ImmutableList.of());
-    }
-
-    @Test
-    public void interpolate_NullStartFrame_NullPointerException() {
-        ImmutableList<CloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        expectedException.expect(NullPointerException.class);
-        interpolator.interpolate(10, 3, null, new MockCloseableImageFrame(10, 10));
-    }
-
-    @Test
-    public void interpolate_NullEndFrame_NullPointerException() {
-        ImmutableList<CloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        expectedException.expect(NullPointerException.class);
-        interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10), null);
-    }
-
-    @Test
-    public void interpolate_StepLessThanOne_IllegalArgException() {
-        ImmutableList<CloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        expectedException.expect(IllegalArgumentException.class);
-        interpolator.interpolate(10, 0, new MockCloseableImageFrame(10, 10),
-                new MockCloseableImageFrame(10, 10));
-    }
-
-    @Test
-    public void interpolate_StepEqualsSteps_IllegalArgException() {
-        ImmutableList<CloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        expectedException.expect(IllegalArgumentException.class);
-        interpolator.interpolate(10, 10, new MockCloseableImageFrame(10, 10),
-                new MockCloseableImageFrame(10, 10));
-    }
-
-    @Test
-    public void interpolate_StepGreaterThanSteps_IllegalArgException() {
-        ImmutableList<CloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        expectedException.expect(IllegalArgumentException.class);
-        interpolator.interpolate(10, 11, new MockCloseableImageFrame(10, 10),
-                new MockCloseableImageFrame(10, 10));
-    }
-
-    @Test
-    public void interpolate_StartFrameFewerMipmaps_ResultMipmapLowered() {
-        ImmutableList<CloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        CloseableImageFrame result = interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10, 2),
-                new MockCloseableImageFrame(10, 10, 3));
-        assertEquals(2, result.getMipmapLevel());
-    }
-
-    @Test
-    public void interpolate_StartFrameFewerMipmaps_ResultMipmapsClosed() {
-        ImmutableList<MockCloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10, 2),
-                new MockCloseableImageFrame(10, 10, 3));
-        assertTrue(frames.get(3).isClosed());
-    }
-
-    @Test
-    public void interpolate_StartFrameFewerMipmaps_SubsequentResultsLowered() {
-        ImmutableList<MockCloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10, 2),
-                new MockCloseableImageFrame(10, 10, 3));
-        CloseableImageFrame result2 = interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10, 3),
-                new MockCloseableImageFrame(10, 10, 3));
-        assertEquals(2, result2.getMipmapLevel());
-    }
-
-    @Test
-    public void interpolate_EndFrameFewerMipmaps_ResultMipmapLowered() {
-        ImmutableList<CloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        CloseableImageFrame result = interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10, 3),
-                new MockCloseableImageFrame(10, 10, 2));
-        assertEquals(2, result.getMipmapLevel());
-    }
-
-    @Test
-    public void interpolate_EndFrameFewerMipmaps_ResultMipmapsClosed() {
-        ImmutableList<MockCloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10, 3),
-                new MockCloseableImageFrame(10, 10, 2));
-        assertTrue(frames.get(3).isClosed());
-    }
-
-    @Test
-    public void interpolate_EndFrameFewerMipmaps_SubsequentResultsLowered() {
-        ImmutableList<MockCloseableImage> frames = ImmutableList.of(
-                new MockCloseableImage(10, 10),
-                new MockCloseableImage(5, 5),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1)
-        );
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frames);
-        interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10, 3),
-                new MockCloseableImageFrame(10, 10, 2));
-        CloseableImageFrame result2 = interpolator.interpolate(10, 3, new MockCloseableImageFrame(10, 10, 3),
-                new MockCloseableImageFrame(10, 10, 3));
-        assertEquals(2, result2.getMipmapLevel());
-    }
-
-    @Test
-    public void interpolate_SameMipmaps_CorrectInterpolation() {
-        ImmutableList.Builder<CloseableImage> frameBuilder = new ImmutableList.Builder<>();
-
-        MockCloseableImageFrame startFrame = new MockCloseableImageFrame(10, 10, 3);
-        MockCloseableImageFrame endFrame = new MockCloseableImageFrame(10, 10, 3);
-
-        for (int level = 0; level <= 3; level++) {
-            CloseableImage.VisibleArea.Builder areaBuilder = new CloseableImage.VisibleArea.Builder();
-            areaBuilder.addPixel(6 >> level, 7 >> level);
-            frameBuilder.add(new MockCloseableImage(new int[10 >> level][10 >> level], areaBuilder.build()));
-
-            startFrame.getImage(level).setPixel(6 >> level, 7 >> level, toBinary(251, 113, 66, 76));
-            endFrame.getImage(level).setPixel(6 >> level, 7 >> level, toBinary(138, 186, 178, 85));
-        }
-
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frameBuilder.build());
-        CloseableImageFrame frame = interpolator.interpolate(10, 3, startFrame, endFrame);
-        for (int level = 0; level <= 3; level++) {
-            int color = frame.getImage(level).getPixel(6 >> level, 7 >> level);
-            assertEquals(toBinary(217, 134, 99, 76), color);
-        }
-    }
-
-    @Test
-    public void interpolate_StartFrameMoreMipmaps_CorrectInterpolation() {
-        ImmutableList.Builder<CloseableImage> frameBuilder = new ImmutableList.Builder<>();
-
-        MockCloseableImageFrame startFrame = new MockCloseableImageFrame(10, 10, 3);
-        MockCloseableImageFrame endFrame = new MockCloseableImageFrame(10, 10, 2);
-
-        for (int level = 0; level <= 2; level++) {
-            CloseableImage.VisibleArea.Builder areaBuilder = new CloseableImage.VisibleArea.Builder();
-            areaBuilder.addPixel(6 >> level, 7 >> level);
-            frameBuilder.add(new MockCloseableImage(new int[10 >> level][10 >> level], areaBuilder.build()));
-
-            startFrame.getImage(level).setPixel(6 >> level, 7 >> level, toBinary(251, 113, 66, 76));
-            endFrame.getImage(level).setPixel(6 >> level, 7 >> level, toBinary(138, 186, 178, 85));
-        }
-
-        startFrame.getImage(3).setPixel(6 >> 4, 7 >> 4, toBinary(251, 113, 66, 76));
-
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frameBuilder.build());
-        CloseableImageFrame frame = interpolator.interpolate(10, 3, startFrame, endFrame);
-        for (int level = 0; level <= 2; level++) {
-            int color = frame.getImage(level).getPixel(6 >> level, 7 >> level);
-            assertEquals(toBinary(217, 134, 99, 76), color);
-        }
-    }
-
-    @Test
-    public void interpolate_EndFrameMoreMipmaps_CorrectInterpolation() {
-        ImmutableList.Builder<CloseableImage> frameBuilder = new ImmutableList.Builder<>();
-
-        MockCloseableImageFrame startFrame = new MockCloseableImageFrame(10, 10, 2);
-        MockCloseableImageFrame endFrame = new MockCloseableImageFrame(10, 10, 3);
-
-        for (int level = 0; level <= 2; level++) {
-            CloseableImage.VisibleArea.Builder areaBuilder = new CloseableImage.VisibleArea.Builder();
-            areaBuilder.addPixel(6 >> level, 7 >> level);
-            frameBuilder.add(new MockCloseableImage(new int[10 >> level][10 >> level], areaBuilder.build()));
-
-            startFrame.getImage(level).setPixel(6 >> level, 7 >> level, toBinary(251, 113, 66, 76));
-            endFrame.getImage(level).setPixel(6 >> level, 7 >> level, toBinary(138, 186, 178, 85));
-        }
-
-        endFrame.getImage(3).setPixel(6 >> 4, 7 >> 4, toBinary(251, 113, 66, 76));
-
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frameBuilder.build());
-        CloseableImageFrame frame = interpolator.interpolate(10, 3, startFrame, endFrame);
-        for (int level = 0; level <= 2; level++) {
-            int color = frame.getImage(level).getPixel(6 >> level, 7 >> level);
-            assertEquals(toBinary(217, 134, 99, 76), color);
-        }
-    }
-
-    @Test
-    public void interpolate_EmptyMipmap_CorrectInterpolation() {
-        ImmutableList.Builder<CloseableImage> frameBuilder = new ImmutableList.Builder<>();
-
-        MockCloseableImageFrame startFrame = new MockCloseableImageFrame(5, 5, 3);
-        MockCloseableImageFrame endFrame = new MockCloseableImageFrame(5, 5, 3);
-
-        for (int level = 0; level <= 2; level++) {
-            CloseableImage.VisibleArea.Builder areaBuilder = new CloseableImage.VisibleArea.Builder();
-            areaBuilder.addPixel(3 >> level, 2 >> level);
-            frameBuilder.add(new MockCloseableImage(new int[5 >> level][5 >> level], areaBuilder.build()));
-
-            startFrame.getImage(level).setPixel(3 >> level, 2 >> level, toBinary(251, 113, 66, 76));
-            endFrame.getImage(level).setPixel(3 >> level, 2 >> level, toBinary(138, 186, 178, 85));
-        }
-
-        frameBuilder.add(new MockCloseableImage(0, 0));
-
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frameBuilder.build());
-        CloseableImageFrame frame = interpolator.interpolate(10, 3, startFrame, endFrame);
-        for (int level = 0; level <= 2; level++) {
-            int color = frame.getImage(level).getPixel(3 >> level, 2 >> level);
-            assertEquals(toBinary(217, 134, 99, 76), color);
-        }
-    }
-
-    @Test
-    public void interpolate_StartOrEndLarger_CorrectInterpolation() {
-        ImmutableList.Builder<CloseableImage> frameBuilder = new ImmutableList.Builder<>();
-
-        MockCloseableImageFrame startFrame = new MockCloseableImageFrame(10, 5, 2);
-        MockCloseableImageFrame endFrame = new MockCloseableImageFrame(5, 10, 2);
-
-        for (int level = 0; level <= 2; level++) {
-            CloseableImage.VisibleArea.Builder areaBuilder = new CloseableImage.VisibleArea.Builder();
-            areaBuilder.addPixel(3 >> level, 2 >> level);
-            frameBuilder.add(new MockCloseableImage(new int[5 >> level][5 >> level], areaBuilder.build()));
-
-            startFrame.getImage(level).setPixel(3 >> level, 2 >> level, toBinary(251, 113, 66, 76));
-            endFrame.getImage(level).setPixel(3 >> level, 2 >> level, toBinary(138, 186, 178, 85));
-        }
-
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frameBuilder.build());
-        CloseableImageFrame frame = interpolator.interpolate(10, 3, startFrame, endFrame);
-        for (int level = 0; level <= 2; level++) {
-            int color = frame.getImage(level).getPixel(3 >> level, 2 >> level);
-            assertEquals(toBinary(217, 134, 99, 76), color);
-        }
-    }
-
-    @Test
-    public void interpolate_StartOrEndSmaller_CorrectInterpolation() {
-        ImmutableList.Builder<CloseableImage> frameBuilder = new ImmutableList.Builder<>();
-
-        MockCloseableImageFrame startFrame = new MockCloseableImageFrame(10, 5, 2);
-        MockCloseableImageFrame endFrame = new MockCloseableImageFrame(5, 10, 2);
-
-        for (int level = 0; level <= 2; level++) {
-            CloseableImage.VisibleArea.Builder areaBuilder = new CloseableImage.VisibleArea.Builder();
-            areaBuilder.addPixel(3 >> level, 2 >> level);
-            frameBuilder.add(new MockCloseableImage(new int[10 >> level][10 >> level], areaBuilder.build()));
-
-            startFrame.getImage(level).setPixel(3 >> level, 2 >> level, toBinary(251, 113, 66, 76));
-            endFrame.getImage(level).setPixel(3 >> level, 2 >> level, toBinary(138, 186, 178, 85));
-        }
-
-        CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(frameBuilder.build());
-        CloseableImageFrame frame = interpolator.interpolate(10, 3, startFrame, endFrame);
-        for (int level = 0; level <= 2; level++) {
-            int color = frame.getImage(level).getPixel(3 >> level, 2 >> level);
-            assertEquals(toBinary(217, 134, 99, 76), color);
-        }
     }
 
     @Test
@@ -1277,7 +944,7 @@ public class CloseableImageFrameTest {
         );
         CloseableImageFrame.SharedMipmapLevel sharedLevel = new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, sharedLevel
         );
 
@@ -1296,7 +963,7 @@ public class CloseableImageFrameTest {
         );
         CloseableImageFrame.SharedMipmapLevel sharedLevel = new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
         new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, sharedLevel
         );
 
@@ -1315,7 +982,7 @@ public class CloseableImageFrameTest {
         );
         CloseableImageFrame.SharedMipmapLevel sharedLevel = new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, sharedLevel
         );
 
@@ -1344,7 +1011,7 @@ public class CloseableImageFrameTest {
         sharedLevel.lowerMipmapLevel(mipmaps.size() - 2);
 
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, sharedLevel
         );
         sharedLevel.lowerMipmapLevel(mipmaps.size() - 3);
@@ -1391,7 +1058,7 @@ public class CloseableImageFrameTest {
         );
         CloseableImageFrame.SharedMipmapLevel sharedLevel = new CloseableImageFrame.SharedMipmapLevel(mipmaps.size() - 1);
         CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40, 10),
+                new FrameReader.FrameData(100, 200, 30, 40),
                 mipmaps, sharedLevel
         );
 
@@ -1400,10 +1067,6 @@ public class CloseableImageFrameTest {
 
         sharedLevel.lowerMipmapLevel(mipmaps.size() - 2);
         assertEquals(mipmaps.size() - 2, frame.getMipmapLevel());
-    }
-
-    private int toBinary(int r, int g, int b, int a) {
-        return a << 24 | r << 16 | g << 8 | b;
     }
 
 }

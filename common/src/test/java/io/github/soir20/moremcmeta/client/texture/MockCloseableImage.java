@@ -99,15 +99,6 @@ public class MockCloseableImage implements CloseableImage {
     }
 
     @Override
-    public VisibleArea getVisibleArea() {
-        if (closed) {
-            throw new IllegalStateException("Mock image closed");
-        }
-
-        return VISIBLE_AREA;
-    }
-
-    @Override
     public void upload(int uploadX, int uploadY) {
         if (closed) {
             throw new IllegalStateException("Mock image closed");

@@ -85,7 +85,7 @@ public abstract class MoreMcmeta {
     public void start() {
         Minecraft minecraft = Minecraft.getInstance();
         Logger logger = LogManager.getLogger();
-        getPlugins(logger);
+        Collection<MoreMcmetaPlugin> plugins = getPlugins(logger);
 
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, getMipmapLevelGetter(logger)));
@@ -96,7 +96,7 @@ public abstract class MoreMcmeta {
         );
 
         // Resource loaders
-        TextureDataReader reader = new TextureDataReader();
+        TextureDataReader reader = new TextureDataReader(plugins);
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(reader, logger);
 
         // Listener registration and resource manager replacement

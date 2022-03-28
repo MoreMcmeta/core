@@ -23,19 +23,17 @@ import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
  * Mocks an animation frame. Essentially a wrapper for frame data that can be validated.
  * @author soir20
  */
-public class MockAnimationFrame {
+public class MockFrame {
     private final int WIDTH;
     private final int HEIGHT;
     private final int X_OFFSET;
     private final int Y_OFFSET;
-    private final int TIME;
 
-    public MockAnimationFrame(FrameReader.FrameData frameData) {
+    public MockFrame(FrameReader.FrameData frameData) {
         WIDTH = frameData.getWidth();
         HEIGHT = frameData.getHeight();
         X_OFFSET = frameData.getXOffset();
         Y_OFFSET = frameData.getYOffset();
-        TIME = frameData.getTime();
     }
 
     public int getWidth() {
@@ -52,9 +50,5 @@ public class MockAnimationFrame {
 
     public int getYOffset() {
         return Y_OFFSET;
-    }
-
-    public int getFrameTime() {
-        return TIME;
     }
 }

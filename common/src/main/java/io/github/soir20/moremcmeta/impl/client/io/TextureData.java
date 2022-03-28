@@ -17,12 +17,13 @@
 
 package io.github.soir20.moremcmeta.impl.client.io;
 
+import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
+import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
@@ -32,89 +33,76 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureData<I extends CloseableImage> {
-    private final int FRAME_WIDTH;
-    private final int FRAME_HEIGHT;
+    private final ParsedMetadata.FrameSize FRAME_SIZE;
+    private final boolean BLUR;
+    private final boolean CLAMP;
     private final I IMAGE;
-    private final Map<Class<?>, Object> METADATA;
+    private final List<Pair<ParsedMetadata, ComponentProvider>> PARSED_SECTIONS;
 
     /**
      * Creates a new texture data container.
-     * @param frameWidth        width of a frame in the animation, or the width of the image if not animated
-     * @param frameHeight       height of a frame in the animation, or the height of the image if not animated
+     * @param frameSize         size of a frame in the image
+     * @param blur              whether to blur the image
+     * @param clamp             whether to clamp the image
      * @param image             texture image
+     * @param parsedSections    parsed metadata and component providers that will
+     *                          process the metadata
      */
-    public TextureData(int frameWidth, int frameHeight, I image) {
-        if (frameWidth < 0) {
-            throw new IllegalArgumentException("Frame width cannot be negative");
-        }
-
-        if (frameWidth > image.getWidth()) {
+    public TextureData(ParsedMetadata.FrameSize frameSize, boolean blur, boolean clamp, I image,
+                       List<Pair<ParsedMetadata, ComponentProvider>> parsedSections) {
+        if (frameSize.width() > image.getWidth()) {
             throw new IllegalArgumentException("Frame width cannot be larger than image width");
         }
 
-        if (frameHeight < 0) {
-            throw new IllegalArgumentException("Frame height cannot be negative");
-        }
-
-        if (frameHeight > image.getHeight()) {
+        if (frameSize.height() > image.getHeight()) {
             throw new IllegalArgumentException("Frame height cannot be larger than image height");
         }
 
-        FRAME_WIDTH = frameWidth;
-        FRAME_HEIGHT = frameHeight;
+        FRAME_SIZE = requireNonNull(frameSize, "Frame size cannot be null");
+        BLUR = blur;
+        CLAMP = clamp;
         IMAGE = requireNonNull(image, "Image cannot be null");
-        METADATA = new HashMap<>();
+        PARSED_SECTIONS = requireNonNull(ImmutableList.copyOf(parsedSections), "Parsed sections cannot be null");
     }
 
     /**
-     * Gets the width of an animation frame in the texture, or the width of the image if not animated.
-     * @return frame width
+     * Gets the size of a frame in the image.
+     * @return the size of a frame in the image
      */
-    public int getFrameWidth() {
-        return FRAME_WIDTH;
+    public ParsedMetadata.FrameSize frameSize() {
+        return FRAME_SIZE;
     }
 
     /**
-     * Gets the height of an animation frame in the texture, or the height of the image if not animated.
-     * @return frame height
+     * Gets whether the texture should be clamped.
+     * @return whether the texture should be clamped
      */
-    public int getFrameHeight() {
-        return FRAME_HEIGHT;
+    public boolean clamp() {
+        return CLAMP;
+    }
+
+    /**
+     * Gets whether the texture should be blurred.
+     * @return whether the texture should be blurred
+     */
+    public boolean blur() {
+        return BLUR;
     }
 
     /**
      * Gets the image for this texture, which includes all non-generated frames.
      * @return the image for this texture
      */
-    public I getImage() {
+    public I image() {
         return IMAGE;
     }
 
     /**
-     * Add metadata associated with the texture. If metadata already exists for a given class, that metadata
-     * is replaced.
-     * @param sectionClass      class of the metadata section
-     * @param section           an instance of the metadata section. If null, this method is a no-op,
-     *                          and any existing metadata remains.
-     * @param <T> type of metadata
+     * Gets parsed metadata and component providers that will process the metadata.
+     * @return parsed metadata sections and associated component providers
      */
-    public <T> void addMetadataSection(Class<T> sectionClass, @Nullable T section) {
-        requireNonNull(sectionClass, "Section class cannot be null");
-
-        if (section != null) {
-            METADATA.put(sectionClass, section);
-        }
-    }
-
-    /**
-     * Gets the metadata associated with the given metadata class, if any.
-     * @param sectionClass      class of metadata section
-     * @param <T> type of metadata section
-     * @return the associated metadata section, if present
-     */
-    public <T> Optional<T> getMetadata(Class<T> sectionClass) {
-        requireNonNull(sectionClass, "Section class cannot be null");
-        return Optional.ofNullable(sectionClass.cast(METADATA.get(sectionClass)));
+    public Iterable<Pair<ParsedMetadata, ComponentProvider>> parsedMetadata() {
+        return PARSED_SECTIONS;
     }
 
 }

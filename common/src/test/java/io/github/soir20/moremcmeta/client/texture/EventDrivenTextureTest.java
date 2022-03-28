@@ -17,7 +17,9 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
 import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
+import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,37 +42,86 @@ public class EventDrivenTextureTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void build_NullImage_NullPointerException() {
+    public void build_EmptyPredefinedFrames_IllegalArgException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
 
-        expectedException.expect(NullPointerException.class);
-        builder.setImage(null);
+        expectedException.expect(IllegalArgumentException.class);
+        builder.setPredefinedFrames(List.of());
     }
 
     @Test
-    public void build_NoImage_IllegalStateException() {
+    public void build_NullPredefinedFrames_NullPointerException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+
+        expectedException.expect(NullPointerException.class);
+        builder.setPredefinedFrames(null);
+    }
+
+    @Test
+    public void build_NoPredefinedFrames_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION, (state) -> {})));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
 
         expectedException.expect(IllegalStateException.class);
         builder.build();
     }
 
     @Test
-    public void build_SetImageTwice_HasLastImage() {
+    public void build_SetPredefinedFramesTwice_HasLastList() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setImage(new MockCloseableImageFrame(1));
-        builder.setImage(new MockCloseableImageFrame(2));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION,
-                (state) -> assertEquals(2, ((MockCloseableImageFrame) state.getImage()).getFrameNumber())
+                (state) -> assertEquals(2, state.predefinedFrames())
         )));
         builder.build().load(null);
     }
 
     @Test
+    public void build_NullGeneratedFrame_NullPointerException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+
+        expectedException.expect(NullPointerException.class);
+        builder.setPredefinedFrames(null);
+    }
+
+    @Test
+    public void build_NoGeneratedFrame_IllegalStateException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION, (state) -> {})));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+
+        expectedException.expect(IllegalStateException.class);
+        builder.build();
+    }
+
+    @Test
+    public void build_SetGeneratedFrameTwice_HasLastFrame() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame();
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        builder.setGeneratedFrame(generatedFrame);
+
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
+                (state) -> state.generateWith(new FrameTransform((x, y, color) -> 0, List.of()))
+        ), new TextureListener<>(TextureListener.Type.UPLOAD,
+                (state) -> state.uploadAt(new Point(0, 0))
+        )));
+        EventDrivenTexture texture = builder.build();
+        texture.upload();
+
+        assertEquals(1, generatedFrame.getUploadCount());
+    }
+
+    @Test
     public void build_NullComponent_NullPointerException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setImage(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
 
         expectedException.expect(NullPointerException.class);
         builder.add(null);
@@ -79,7 +130,8 @@ public class EventDrivenTextureTest {
     @Test
     public void build_NoListeners_NoException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setImage(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         builder.build();
     }
 
@@ -94,7 +146,8 @@ public class EventDrivenTextureTest {
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
                 (state) -> assertEquals(textureGetter[0], state.getTexture())
         )));
-        builder.setImage(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
         textureGetter[0] = texture;
 
@@ -112,7 +165,8 @@ public class EventDrivenTextureTest {
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
-        builder.setImage(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         // We have to bind once first because the texture is always uploaded on the first bind
@@ -122,65 +176,6 @@ public class EventDrivenTextureTest {
         texture.bind();
 
         assertEquals(2, timesUploaded.get());
-    }
-
-    @Test
-    public void runListeners_GetImage_MarkedForUpload() {
-        AtomicInteger timesUploaded = new AtomicInteger(0);
-
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                EventDrivenTexture.TextureState::getImage
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
-                (state) -> timesUploaded.incrementAndGet()
-        )));
-
-        builder.setImage(new MockCloseableImageFrame());
-        EventDrivenTexture texture = builder.build();
-
-        // We have to bind once first because the texture is always uploaded on the first bind
-        texture.bind();
-
-        texture.tick();
-        texture.bind();
-
-        assertEquals(2, timesUploaded.get());
-    }
-
-    @Test
-    public void runListeners_GetImageInUpload_MarkedForUpload() {
-        AtomicInteger timesUploaded = new AtomicInteger(0);
-
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
-                EventDrivenTexture.TextureState::getImage
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
-                (state) -> timesUploaded.incrementAndGet()
-        )));
-
-        builder.setImage(new MockCloseableImageFrame());
-        EventDrivenTexture texture = builder.build();
-
-        // We have to bind once first because the texture is always uploaded on the first bind
-        texture.bind();
-
-        texture.bind();
-
-        assertEquals(1, timesUploaded.get());
-    }
-
-    @Test
-    public void runListeners_SetImageNull_NullPointerException() {
-
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                (state) -> state.replaceImage(null)
-        )));
-        builder.setImage(new MockCloseableImageFrame());
-        EventDrivenTexture texture = builder.build();
-
-        expectedException.expect(NullPointerException.class);
-        texture.tick();
     }
 
     @Test
@@ -189,12 +184,13 @@ public class EventDrivenTextureTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                (state) -> state.replaceImage(new MockCloseableImageFrame(5))
+                (state) -> state.replaceWith(1)
         ), new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));
 
-        builder.setImage(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         // We have to bind once first because the texture is always uploaded on the first bind
@@ -208,15 +204,15 @@ public class EventDrivenTextureTest {
 
     @Test
     public void runListeners_SetImage_ImageReplaced() {
-
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                (state) -> state.replaceImage(new MockCloseableImageFrame(5))
+                (state) -> state.replaceWith(1)
         ), new TextureListener<>(TextureListener.Type.CLOSE,
-                (state) -> assertEquals(5, ((MockCloseableImageFrame) state.getImage()).getFrameNumber())
-        )));
+                (state) -> assertEquals(1, (int) state.index().orElseThrow()))
+        ));
 
-        builder.setImage(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.tick();
@@ -296,7 +292,8 @@ public class EventDrivenTextureTest {
     private void testExpectedOrder(Consumer<EventDrivenTexture> action, boolean flagForUpload,
                                    Integer[] expected) {
         EventDrivenTexture.Builder texture = new EventDrivenTexture.Builder();
-        texture.setImage(new MockCloseableImageFrame());
+        texture.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        texture.setGeneratedFrame(new MockCloseableImageFrame());
 
         int lastId = 0;
         TextureListener.Type[] types = {

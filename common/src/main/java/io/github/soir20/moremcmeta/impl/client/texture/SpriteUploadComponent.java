@@ -53,8 +53,8 @@ public class SpriteUploadComponent implements GenericTextureComponent<EventDrive
         TextureListener<EventDrivenTexture.TextureState> uploadListener = new TextureListener<>(
                 TextureListener.Type.UPLOAD,
                 (state) -> {
-                    state.getImage().lowerMipmapLevel(SPRITE.getMipmapLevel());
-                    state.getImage().uploadAt(uploadPoint);
+                    state.lowerMipmapLevel(SPRITE.getMipmapLevel());
+                    state.uploadAt(uploadPoint);
                 }
         );
 

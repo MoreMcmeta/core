@@ -19,27 +19,19 @@ package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
-import io.github.soir20.moremcmeta.impl.client.adapter.ChangingPointsAdapter;
+import com.mojang.datafixers.util.Pair;
+import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
-import io.github.soir20.moremcmeta.impl.client.animation.AnimationFrameManager;
-import io.github.soir20.moremcmeta.impl.client.animation.WobbleFunction;
-import io.github.soir20.moremcmeta.impl.client.resource.ModAnimationMetadataSection;
-import io.github.soir20.moremcmeta.impl.client.texture.AnimationComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
-import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
+import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
-import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
-import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
@@ -49,21 +41,10 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureDataAssembler {
-    private static final int TICKS_PER_MC_DAY = 24000;
-    private final ChangingPointsAdapter POINT_READER;
-    private final WobbleFunction WOBBLE_FUNCTION;
-
-    /**
-     * Creates a new texture data assembler.
-     */
-    public TextureDataAssembler() {
-        POINT_READER = new ChangingPointsAdapter();
-        WOBBLE_FUNCTION = new WobbleFunction();
-    }
 
     /**
      * Combines the texture image and metadata into a {@link EventDrivenTexture.Builder} that
-     * minimally needs an upload component. The image is guaranteed to be set in the builder.
+     * minimally needs an upload component.
      * @param data          texture data to assemble
      * @return texture data assembled as a texture builder
      */
@@ -73,44 +54,24 @@ public class TextureDataAssembler {
         Minecraft minecraft = Minecraft.getInstance();
         final int MAX_MIPMAP = minecraft.options.mipmapLevels;
 
-        NativeImage original = data.getImage().getImage();
-
-        /* Use defaults if no metadata was read.
-           The metadata parser can set these to null even if there was no error. */
-        AnimationMetadataSection animationMetadata = data.getMetadata(AnimationMetadataSection.class)
-                .orElse(AnimationMetadataSection.EMPTY);
-        ModAnimationMetadataSection modAnimationMetadata = data.getMetadata(ModAnimationMetadataSection.class)
-                .orElse(ModAnimationMetadataSection.EMPTY);
-
-        Optional<TextureMetadataSection> textureMetadata = data.getMetadata(TextureMetadataSection.class);
-        boolean blur = textureMetadata.map(TextureMetadataSection::isBlur).orElse(false);
-        boolean clamp = textureMetadata.map(TextureMetadataSection::isClamp).orElse(false);
+        NativeImage original = data.image().getImage();
+        int frameWidth = data.frameSize().width();
+        int frameHeight = data.frameSize().height();
+        boolean blur = data.blur();
+        boolean clamp = data.clamp();
 
         // Create frames
         List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(original, MAX_MIPMAP));
         CloseableImageFrame.SharedMipmapLevel sharedMipmapLevel = new CloseableImageFrame.SharedMipmapLevel(MAX_MIPMAP);
-        ImmutableList<CloseableImageFrame> frames = getFrames(mipmaps, blur, clamp, sharedMipmapLevel, animationMetadata);
-
-        CloseableImageFrame firstFrame = frames.get(0);
-        int frameWidth = firstFrame.getWidth();
-        int frameHeight = firstFrame.getHeight();
-
-        List<CloseableImage.VisibleArea> visibleAreas = getVisibleAreas(firstFrame);
-
-        // Frame manager
-        ImmutableList<NativeImageAdapter> interpolatedMipmaps;
-        AnimationFrameManager<CloseableImageFrame> frameManager;
-        if (animationMetadata.isInterpolatedFrames()) {
-             interpolatedMipmaps = getInterpolationMipmaps(mipmaps, frameWidth, frameHeight, blur, clamp, visibleAreas);
-            CloseableImageFrame.Interpolator interpolator = new CloseableImageFrame.Interpolator(interpolatedMipmaps);
-
-            frameManager = new AnimationFrameManager<>(frames, CloseableImageFrame::getFrameTime, interpolator);
-        } else {
-            interpolatedMipmaps = ImmutableList.of();
-            frameManager = new AnimationFrameManager<>(frames, CloseableImageFrame::getFrameTime);
-        }
+        ImmutableList<CloseableImageFrame> frames = getFrames(
+                mipmaps, frameWidth, frameHeight, blur, clamp, sharedMipmapLevel
+        );
+        CloseableImageFrame generatedFrame = createGeneratedFrame(
+                mipmaps, frameWidth, frameHeight, blur, clamp, sharedMipmapLevel
+        );
 
         // Resource cleanup
+        CloseableImageFrame firstFrame = frames.get(0);
         Runnable closeMipmaps = () -> {
 
             // The images are shared between all frames
@@ -118,29 +79,18 @@ public class TextureDataAssembler {
                 firstFrame.getImage(level).close();
             }
 
-            interpolatedMipmaps.forEach(NativeImageAdapter::close);
-        };
-
-        // Time retrieval
-        Supplier<Optional<Long>> timeGetter = () -> {
-            if (minecraft.level == null) {
-                return Optional.empty();
+            for (int level = 0; level <= generatedFrame.getMipmapLevel(); level++) {
+                generatedFrame.getImage(level).close();
             }
-
-            ClientLevel level = minecraft.level;
-            long time = WOBBLE_FUNCTION.calculate(level.dayTime(), level.getGameTime(), level.dimensionType().natural());
-            return Optional.of(time);
         };
 
         // Add components
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setImage(frameManager.getCurrentFrame())
-                .add(new CleanupComponent(closeMipmaps));
-
-        if (modAnimationMetadata.isDaytimeSynced()) {
-            builder.add(new AnimationComponent(TICKS_PER_MC_DAY, timeGetter, frameManager));
-        } else {
-            builder.add(new AnimationComponent(frameManager));
+        builder.setPredefinedFrames(frames).setGeneratedFrame(generatedFrame).add(new CleanupComponent(closeMipmaps));
+        for (Pair<ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
+            ParsedMetadata sectionData = metadata.getFirst();
+            ComponentProvider componentProvider = metadata.getSecond();
+            componentProvider.assemble(sectionData, data.frameSize(), data.blur(), data.clamp()).forEach(builder::add);
         }
 
         return builder;
@@ -149,71 +99,53 @@ public class TextureDataAssembler {
     /**
      * Gets all frames from the generated mipmaps and animation metadata.
      * @param mipmaps               mipmaps of the full texture image (with all frames)
+     * @param frameWidth            width of each frame in the image
+     * @param frameHeight           height of each frame in the image
      * @param blur                  whether to blur the texture
      * @param clamp                 whether to clamp the texture
      * @param sharedMipmapLevel     mipmap level shared between all frames
-     * @param animationMetadata     animation metadata for this texture
      * @return the frames based on the texture image in chronological order
      */
-    private ImmutableList<CloseableImageFrame> getFrames(List<NativeImage> mipmaps, boolean blur, boolean clamp,
-                                                         CloseableImageFrame.SharedMipmapLevel sharedMipmapLevel,
-                                                         AnimationMetadataSection animationMetadata) {
+    private ImmutableList<CloseableImageFrame> getFrames(List<NativeImage> mipmaps, int frameWidth, int frameHeight,
+                                                         boolean blur, boolean clamp,
+                                                         CloseableImageFrame.SharedMipmapLevel sharedMipmapLevel) {
         int mipmap = mipmaps.size() - 1;
 
-        List<CloseableImage.VisibleArea> visibleAreas = new ArrayList<>();
         FrameReader<CloseableImageFrame> frameReader = new FrameReader<>((frameData) -> {
 
             /* The immutable list collector was marked as beta for a while,
                and the marking was removed in a later version. */
-            @SuppressWarnings("UnstableApiUsage")
             ImmutableList<CloseableImage> wrappedMipmaps = IntStream.rangeClosed(0, mipmap).mapToObj((level) -> {
                 int width = frameData.getWidth() >> level;
                 int height = frameData.getHeight() >> level;
-
-                // Finding the visible areas is slow, so cache the results
-                if (visibleAreas.isEmpty()) {
-                    visibleAreas.addAll(POINT_READER.read(mipmaps.get(level), width, height, mipmap));
-                }
 
                 return new NativeImageAdapter(
                         mipmaps.get(level),
                         frameData.getXOffset() >> level, frameData.getYOffset() >> level,
                         width, height,
-                        level, blur, clamp, false,
-                        visibleAreas.get(level)
+                        level, blur, clamp, false
                 );
             }).collect(ImmutableList.toImmutableList());
 
             return new CloseableImageFrame(frameData, wrappedMipmaps, sharedMipmapLevel);
         });
 
-        return frameReader.read(mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(), animationMetadata);
+        return frameReader.read(mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(), frameWidth, frameHeight);
     }
 
     /**
-     * Gets the visible areas for all frames from a frame (since they should all have the same areas).
-     * @param frame        frame to retrieve the visible areas from
-     * @return the visible areas ordered by increasing mipmap level, starting at 0
-     */
-    private List<CloseableImage.VisibleArea> getVisibleAreas(CloseableImageFrame frame) {
-        return IntStream.rangeClosed(0, frame.getMipmapLevel()).mapToObj(
-                (level) -> frame.getImage(level).getVisibleArea()
-        ).toList();
-    }
-
-    /**
-     * Creates mipmapped images for interpolation.
+     * Creates a frame that will hold generated frames.
      * @param originals             the original mipmaps to copy from
      * @param frameWidth            the width of a single frame
      * @param frameHeight           the height of a single frame
      * @param blur                  whether the images are blurred
      * @param clamp                 whether the images are clamped
-     * @param visibleAreas          visible areas in ascending order of mipmap level
+     * @param sharedMipmapLevel     mipmap level shared between all frames
      * @return the adapters for the interpolation images
      */
-    private ImmutableList<NativeImageAdapter> getInterpolationMipmaps(List<NativeImage> originals, int frameWidth,
-                                                                      int frameHeight, boolean blur, boolean clamp,
-                                                                      List<CloseableImage.VisibleArea> visibleAreas) {
+    private CloseableImageFrame createGeneratedFrame(List<NativeImage> originals, int frameWidth,
+                                                     int frameHeight, boolean blur, boolean clamp,
+                                                     CloseableImageFrame.SharedMipmapLevel sharedMipmapLevel) {
         ImmutableList.Builder<NativeImageAdapter> images = new ImmutableList.Builder<>();
 
         for (int level = 0; level < originals.size(); level++) {
@@ -230,13 +162,16 @@ public class TextureDataAssembler {
                     0, 0,
                     mipmappedWidth, mipmappedHeight,
                     level,
-                    blur, clamp, false,
-                    visibleAreas.get(level)
+                    blur, clamp, false
             );
             images.add(adapter);
         }
 
-        return images.build();
+        return new CloseableImageFrame(
+                new FrameReader.FrameData(frameWidth, frameHeight, 0, 0),
+                images.build(),
+                sharedMipmapLevel
+        );
     }
 
     /**

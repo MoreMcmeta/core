@@ -103,8 +103,8 @@ public class SpriteFrameSizeFixPack implements PackResources {
 
         if (isKnownTexture && isVanillaMetadata) {
             TextureData<?> textureData = TEXTURES.get(textureLocation);
-            int frameWidth = textureData.getFrameWidth();
-            int frameHeight = textureData.getFrameHeight();
+            int frameWidth = textureData.frameSize().width();
+            int frameHeight = textureData.frameSize().height();
             return new ByteArrayInputStream(
                     makeEmptyAnimationJson(frameWidth, frameHeight).getBytes(StandardCharsets.UTF_8)
             );

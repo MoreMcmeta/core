@@ -34,6 +34,11 @@ public interface TextureReader<T> {
      * @return getter for retrieving an animated texture after all resources are loaded
      * @throws IOException  failure reading from either input stream
      */
-    T read(InputStream textureStream, InputStream metadataStream) throws IOException;
+    T read(InputStream textureStream, InputStream metadataStream) throws IOException, InvalidMetadataException;
 
+    class InvalidMetadataException extends Exception {
+        public InvalidMetadataException(String reason) {
+            super(reason);
+        }
+    }
 }

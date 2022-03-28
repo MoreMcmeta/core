@@ -19,7 +19,10 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
+import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
 import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
+import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
@@ -147,12 +150,12 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
     /**
      * Creates an event-driven texture with listeners.
-     * @param listeners     list of all listeners, which will execute
-     *                      in the order given (by type)
-     * @param image         initial image for this texture
+     * @param listeners                 list of all listeners, which will execute in the order given (by type)
+     * @param predefinedFrames          frames already existing in the original image
+     * @param generatedFrame            initial image for this texture
      */
     private EventDrivenTexture(List<? extends TextureListener<? super TextureState>> listeners,
-                               CloseableImageFrame image) {
+                               List<CloseableImageFrame> predefinedFrames, CloseableImageFrame generatedFrame) {
         super();
         LISTENERS = new EnumMap<>(TextureListener.Type.class);
         for (TextureListener<? super TextureState> listener : listeners) {
@@ -160,16 +163,17 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             LISTENERS.get(listener.getType()).add(listener);
         }
 
-        CURRENT_STATE = new TextureState(this);
-        CURRENT_STATE.replaceImage(image);
+        CURRENT_STATE = new TextureState(this, predefinedFrames, generatedFrame);
     }
 
     /**
      * Builds an event-driven texture from components.
+     * @author soir20
      */
     public static class Builder {
         private final List<GenericTextureComponent<? super TextureState>> COMPONENTS;
-        private CloseableImageFrame firstImage;
+        private List<CloseableImageFrame> predefinedFrames;
+        private CloseableImageFrame generatedFrame;
 
         /**
          * Creates a new event-driven texture builder.
@@ -178,24 +182,18 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             COMPONENTS = new ArrayList<>();
         }
 
-        /**
-         * Gets the initial image set in this builder if there is one.
-         * @return the initial image for the texture, or an empty
-         */
-        public Optional<CloseableImageFrame> getImage() {
-            return Optional.ofNullable(firstImage);
+        public Builder setPredefinedFrames(List<CloseableImageFrame> frames) {
+            requireNonNull(frames, "Predefined frames cannot be null");
+            if (frames.size() == 0) {
+                throw new IllegalArgumentException("Predefined frames cannot be empty");
+            }
+            predefinedFrames = frames;
+            return this;
         }
 
-        /**
-         * Sets the initial image for this texture. Required for building.
-         * Unless it is altered by a component prior to binding, this image
-         * will be available to upload listeners on the first binding.
-         * @param image     initial image for this texture
-         * @return this builder for chaining
-         */
-        public Builder setImage(CloseableImageFrame image) {
-            requireNonNull(image, "Image cannot be null");
-            firstImage = image;
+        public Builder setGeneratedFrame(CloseableImageFrame frame) {
+            requireNonNull(frame, "Generated frame cannot be null");
+            generatedFrame = frame;
             return this;
         }
 
@@ -216,15 +214,19 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @return the built event-driven texture
          */
         public EventDrivenTexture build() {
-            if (firstImage == null) {
-                throw new IllegalStateException("Texture must have an image set");
+            if (predefinedFrames == null) {
+                throw new IllegalStateException("Texture must have predefined frames");
+            }
+
+            if (generatedFrame == null) {
+                throw new IllegalStateException("Texture must have a generated frame");
             }
 
             List<TextureListener<? super TextureState>> listeners = COMPONENTS.stream().flatMap(
                     GenericTextureComponent::getListeners
             ).collect(Collectors.toList());
 
-            return new EventDrivenTexture(listeners, firstImage);
+            return new EventDrivenTexture(listeners, predefinedFrames, generatedFrame);
         }
 
     }
@@ -233,10 +235,69 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * A mutable object to hold an event-driven texture's current state.
      * @author soir20
      */
-    public static class TextureState {
+    public static class TextureState implements CurrentFrameView {
         private final EventDrivenTexture TEXTURE;
-        private CloseableImageFrame image;
+        private final List<CloseableImageFrame> PREDEFINED_FRAMES;
+        private final CloseableImageFrame GENERATED_FRAME;
+        private Integer currentFrameIndex;
+        private boolean needsCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
+
+        @Override
+        public void generateWith(FrameTransform transform) {
+            requireNonNull(transform, "Frame transform cannot be null");
+
+            markNeedsUpload();
+            CloseableImageFrame currentFrame = getCurrentFrame();
+            if (needsCopyToGenerated) {
+                for (int level = 0; level < currentFrame.getMipmapLevel(); level++) {
+                    GENERATED_FRAME.getImage(level).copyFrom(currentFrame.getImage(level));
+                }
+            }
+
+            currentFrameIndex = null;
+
+            transform.applyArea().forEach((point) -> {
+                for (int level = 0; level < GENERATED_FRAME.getMipmapLevel(); level++) {
+                    int x = point.getX();
+                    int y = point.getY();
+                    CloseableImage image = GENERATED_FRAME.getImage(level);
+                    int newColor = transform.transform().transform(x, y, image.getPixel(x, y));
+                    image.setPixel(x, y, newColor);
+                }
+            });
+        }
+
+        @Override
+        public void replaceWith(int index) {
+            if (index < 0 || index >= PREDEFINED_FRAMES.size()) {
+                throw new IllegalArgumentException("Tried to replace with negative or non-existent frame index");
+            }
+
+            markNeedsUpload();
+            needsCopyToGenerated = true;
+            currentFrameIndex = index;
+        }
+
+        @Override
+        public int width() {
+            return PREDEFINED_FRAMES.get(0).getWidth();
+        }
+
+        @Override
+        public int height() {
+            return PREDEFINED_FRAMES.get(0).getHeight();
+        }
+
+        @Override
+        public Optional<Integer> index() {
+            return Optional.ofNullable(currentFrameIndex);
+        }
+
+        @Override
+        public int predefinedFrames() {
+            return PREDEFINED_FRAMES.size();
+        }
 
         /**
          * Gets the event-driven texture.
@@ -246,15 +307,12 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             return TEXTURE;
         }
 
-        /**
-         * Gets the event-driven texture's current image. Automatically flags
-         * the texture for uploading. (This flag will be removed if upload
-         * listeners are being fired.)
-         * @return the texture's current image
-         */
-        public CloseableImageFrame getImage() {
-            markNeedsUpload();
-            return image;
+        public void uploadAt(Point uploadPoint) {
+            getCurrentFrame().uploadAt(uploadPoint);
+        }
+
+        public void lowerMipmapLevel(int newMipmapLevel) {
+            getCurrentFrame().lowerMipmapLevel(newMipmapLevel);
         }
 
         /**
@@ -265,24 +323,26 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         /**
-         * Completely replaces the event-driven texture's current image.
-         * Automatically flags the the texture for uploading. (This flag
-         * will be removed if upload listeners are being fired.)
-         * @param newImage      the texture's new image
+         * Creates a new texture state. Automatically flags the texture
+         * for upload on the first binding.
+         * @param texture               the event-driven texture
+         * @param predefinedFrames      frames already existing in the image
+         * @param generatedFrame        generated frame that holds images generated from the predefined frames
          */
-        public void replaceImage(CloseableImageFrame newImage) {
-            requireNonNull(newImage, "New image cannot be null");
-            markNeedsUpload();
-            image = newImage;
+        private TextureState(EventDrivenTexture texture, List<CloseableImageFrame> predefinedFrames,
+                             CloseableImageFrame generatedFrame) {
+            TEXTURE = texture;
+            PREDEFINED_FRAMES = predefinedFrames;
+            GENERATED_FRAME = generatedFrame;
+            replaceWith(0);
         }
 
         /**
-         * Creates a new texture state. Automatically flags the texture
-         * for upload on the first binding.
-         * @param texture     the event-driven texture
+         * Gets the event-driven texture's current image.
+         * @return the texture's current image
          */
-        private TextureState(EventDrivenTexture texture) {
-            TEXTURE = texture;
+        private CloseableImageFrame getCurrentFrame() {
+            return currentFrameIndex == null ? GENERATED_FRAME : PREDEFINED_FRAMES.get(currentFrameIndex);
         }
 
     }

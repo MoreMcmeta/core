@@ -25,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
@@ -45,7 +46,8 @@ public class SpriteUploadComponentTest {
         builder.add(() -> (new SpriteUploadComponent(new MockSprite(new Point(2, 3)))).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.upload();
@@ -62,7 +64,8 @@ public class SpriteUploadComponentTest {
         builder.add(() -> (new SpriteUploadComponent(new MockSprite(new Point(2, 3)))).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.upload();
@@ -81,7 +84,8 @@ public class SpriteUploadComponentTest {
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.tick();
@@ -100,7 +104,8 @@ public class SpriteUploadComponentTest {
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.tick();
@@ -120,7 +125,8 @@ public class SpriteUploadComponentTest {
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(frame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         assertEquals(2, frame.getMipmapLevel());
@@ -133,11 +139,11 @@ public class SpriteUploadComponentTest {
         MockCloseableImageFrame frame2 = new MockCloseableImageFrame();
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         MockSprite sprite = new MockSprite(1);
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
+        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceWith(1))));
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setImage(frame);
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), frame2));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
         texture.upload();

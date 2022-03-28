@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonParseException;
+import io.github.soir20.moremcmeta.impl.client.io.TextureReader;
 import io.github.soir20.moremcmeta.impl.client.resource.OrderedResourceRepository;
 import io.github.soir20.moremcmeta.impl.client.resource.ResourceCollection;
 import io.github.soir20.moremcmeta.impl.client.resource.TextureLoader;
@@ -194,32 +195,6 @@ public class TextureLoaderTest {
     }
 
     @Test
-    public void load_InvalidJson_LoadsValidTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
-                "textures/bat.png",
-                "textures/bat.png.moremcmeta",
-                "textures/creeper.png",
-                "textures/creeper.png.moremcmeta",
-                "textures/zombie.png",
-                "textures/zombie.png.moremcmeta"
-        ));
-
-        AtomicInteger texturesLoaded = new AtomicInteger();
-        TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadataStream) -> {
-                    if (texturesLoaded.getAndIncrement() < 1) {
-                        throw new JsonParseException("Dummy exception");
-                    }
-                    return 1;
-                },
-                LOGGER
-        );
-
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
-        assertEquals(2, locations.size());
-    }
-
-    @Test
     public void load_InvalidMetadata_LoadsValidTextures() {
         OrderedResourceRepository repository = makeMockRepository(Set.of(
                 "textures/bat.png",
@@ -234,7 +209,7 @@ public class TextureLoaderTest {
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadataStream) -> {
                     if (texturesLoaded.getAndIncrement() < 1) {
-                        throw new IllegalArgumentException("Dummy exception");
+                        throw new TextureReader.InvalidMetadataException("Dummy exception");
                     }
                     return 1;
                 },
