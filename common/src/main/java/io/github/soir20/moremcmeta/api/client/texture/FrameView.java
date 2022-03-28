@@ -17,17 +17,15 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
-import java.util.OptionalInt;
+import java.util.Optional;
 
 public interface FrameView {
-
-    int color(int x, int y);
 
     int width();
 
     int height();
 
-    OptionalInt index();
+    Optional<Integer> index();
 
     int predefinedFrames();
 
