@@ -27,11 +27,13 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -182,6 +184,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             COMPONENTS = new ArrayList<>();
         }
 
+        /**
+         * Sets the predefined frames already existing in the source image for this texture.
+         * @param frames        list of predefined frames. Must not be empty. The first frame
+         *                      will be used as the initial frame for the texture. While the
+         *                      pixels in the frames will not be modified, the frame's mipmap
+         *                      level may be altered.
+         * @return this builder for chaining
+         */
         public Builder setPredefinedFrames(List<CloseableImageFrame> frames) {
             requireNonNull(frames, "Predefined frames cannot be null");
             if (frames.size() == 0) {
@@ -191,6 +201,12 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             return this;
         }
 
+        /**
+         * Sets the frame to use as the generated frame.
+         * @param frame         frame to store generated images. Pixels will be overwritten
+         *                      and the frame's mipmap level may be lowered.
+         * @return this builder for chaining
+         */
         public Builder setGeneratedFrame(CloseableImageFrame frame) {
             requireNonNull(frame, "Generated frame cannot be null");
             generatedFrame = frame;
@@ -239,6 +255,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final EventDrivenTexture TEXTURE;
         private final List<CloseableImageFrame> PREDEFINED_FRAMES;
         private final CloseableImageFrame GENERATED_FRAME;
+        private final Queue<FrameTransform> TRANSFORMS;
         private Integer currentFrameIndex;
         private boolean needsCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
@@ -256,16 +273,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             }
 
             currentFrameIndex = null;
-
-            transform.applyArea().forEach((point) -> {
-                for (int level = 0; level < GENERATED_FRAME.getMipmapLevel(); level++) {
-                    int x = point.getX();
-                    int y = point.getY();
-                    CloseableImage image = GENERATED_FRAME.getImage(level);
-                    int newColor = transform.transform().transform(x, y, image.getPixel(x, y));
-                    image.setPixel(x, y, newColor);
-                }
-            });
+            TRANSFORMS.add(transform);
         }
 
         @Override
@@ -277,6 +285,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             markNeedsUpload();
             needsCopyToGenerated = true;
             currentFrameIndex = index;
+            TRANSFORMS.clear();
         }
 
         @Override
@@ -308,6 +317,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         public void uploadAt(Point uploadPoint) {
+            requireNonNull(uploadPoint, "Upload point cannot be null");
+            updateGeneratedFrame();
             getCurrentFrame().uploadAt(uploadPoint);
         }
 
@@ -334,6 +345,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             TEXTURE = texture;
             PREDEFINED_FRAMES = predefinedFrames;
             GENERATED_FRAME = generatedFrame;
+            TRANSFORMS = new ArrayDeque<>();
             replaceWith(0);
         }
 
@@ -343,6 +355,24 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         private CloseableImageFrame getCurrentFrame() {
             return currentFrameIndex == null ? GENERATED_FRAME : PREDEFINED_FRAMES.get(currentFrameIndex);
+        }
+
+        /**
+         * Applies all transformations to the generated frame.
+         */
+        private void updateGeneratedFrame() {
+            while (!TRANSFORMS.isEmpty()) {
+                FrameTransform transform = TRANSFORMS.remove();
+                transform.applyArea().forEach((point) -> {
+                    for (int level = 0; level < GENERATED_FRAME.getMipmapLevel(); level++) {
+                        int x = point.getX();
+                        int y = point.getY();
+                        CloseableImage image = GENERATED_FRAME.getImage(level);
+                        int newColor = transform.transform().transform(x, y, image.getPixel(x, y));
+                        image.setPixel(x, y, newColor);
+                    }
+                });
+            }
         }
 
     }
