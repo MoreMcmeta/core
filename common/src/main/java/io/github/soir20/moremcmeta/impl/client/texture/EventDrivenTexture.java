@@ -186,10 +186,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
         /**
          * Sets the predefined frames already existing in the source image for this texture.
-         * @param frames        list of predefined frames. Must not be empty. The first frame
-         *                      will be used as the initial frame for the texture. While the
-         *                      pixels in the frames will not be modified, the frame's mipmap
-         *                      level may be altered.
+         * @param frames        list of predefined frames. Must not be empty. Must all have the
+         *                      same mipmap level. The first frame will be used as the initial
+         *                      frame for the texture. While the pixels in the frames will not
+         *                      be modified, the frame's mipmap level may be altered.
          * @return this builder for chaining
          */
         public Builder setPredefinedFrames(List<CloseableImageFrame> frames) {
@@ -200,6 +200,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
             if (frames.stream().mapToInt(CloseableImageFrame::getMipmapLevel).distinct().count() > 1) {
                 throw new IllegalArgumentException("All predefined frames must have the same mipmap level");
+            }
+
+            if (frames.stream().mapToInt(CloseableImageFrame::getWidth).distinct().count() > 1) {
+                throw new IllegalArgumentException("All predefined frames must have the same width");
+            }
+
+            if (frames.stream().mapToInt(CloseableImageFrame::getHeight).distinct().count() > 1) {
+                throw new IllegalArgumentException("All predefined frames must have the same height");
             }
 
             predefinedFrames = frames;
@@ -231,7 +239,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
         /**
          * Builds the event-driven texture with the added components. Throws an
-         * {@link IllegalStateException} if no initial image has been set.
+         * {@link IllegalStateException} if no initial image has been set. The predefined
+         * frames and the generated frame must have the same mipmap level when this
+         * method is called.
          * @return the built event-driven texture
          */
         public EventDrivenTexture build() {
@@ -245,6 +255,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
             if (predefinedFrames.get(0).getMipmapLevel() != generatedFrame.getMipmapLevel()) {
                 throw new IllegalStateException("Predefined frames and generated frame must have same mipmap level");
+            }
+
+            if (predefinedFrames.get(0).getWidth() != generatedFrame.getWidth()) {
+                throw new IllegalStateException("Predefined frames and generated frame must have same width");
+            }
+
+            if (predefinedFrames.get(0).getHeight() != generatedFrame.getHeight()) {
+                throw new IllegalStateException("Predefined frames and generated frame must have same height");
             }
 
             List<TextureListener<? super TextureState>> listeners = COMPONENTS.stream().flatMap(
