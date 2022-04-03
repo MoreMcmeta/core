@@ -36,9 +36,20 @@ public interface TextureReader<T> {
      */
     T read(InputStream textureStream, InputStream metadataStream) throws IOException, InvalidMetadataException;
 
+    /**
+     * Signals that the metadata provided to the reader is invalid for some reason. It may be
+     * in an invalid format or have an incompatible combination of properties.
+     */
     class InvalidMetadataException extends Exception {
+
+        /**
+         * Creates a new exception with a detail message.
+         * @param reason    the reason the metadata is invalid
+         */
         public InvalidMetadataException(String reason) {
             super(reason);
         }
+
     }
+
 }
