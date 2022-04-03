@@ -187,9 +187,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         /**
          * Sets the predefined frames already existing in the source image for this texture.
          * @param frames        list of predefined frames. Must not be empty. Must all have the
-         *                      same mipmap level. The first frame will be used as the initial
-         *                      frame for the texture. While the pixels in the frames will not
-         *                      be modified, the frame's mipmap level may be altered.
+         *                      same mipmap level and size. The first frame will be used as the
+         *                      initial  frame for the texture. While the pixels in the frames
+         *                      will not be modified, the frame's mipmap level may be altered.
          * @return this builder for chaining
          */
         public Builder setPredefinedFrames(List<CloseableImageFrame> frames) {
@@ -239,9 +239,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
         /**
          * Builds the event-driven texture with the added components. Throws an
-         * {@link IllegalStateException} if no initial image has been set. The predefined
-         * frames and the generated frame must have the same mipmap level when this
-         * method is called.
+         * {@link IllegalStateException} if the predefined frames or generated
+         * frame is not present ot the predefined frames and the generated frame
+         * do not have the same mipmap level and size when this method is called.
          * @return the built event-driven texture
          */
         public EventDrivenTexture build() {
@@ -287,6 +287,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private boolean needsCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
 
+        /**
+         * Applies the provided transformation to the current frame to generate
+         * a new frame, which will become the current frame.
+         * @param transform     the transformation to apply to the current frame
+         */
         @Override
         public void generateWith(FrameTransform transform) {
             requireNonNull(transform, "Frame transform cannot be null");
@@ -303,6 +308,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             TRANSFORMS.add(transform);
         }
 
+        /**
+         * Replace the current frame with one of the predefined frames.
+         * @param index     the index of the predefined frame to make
+         *                  the current frame
+         */
         @Override
         public void replaceWith(int index) {
             if (index < 0 || index >= PREDEFINED_FRAMES.size()) {
@@ -315,21 +325,39 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             TRANSFORMS.clear();
         }
 
+        /**
+         * Gets the width of a frame. All frames have the same width.
+         * @return the width of a frame
+         */
         @Override
         public int width() {
             return PREDEFINED_FRAMES.get(0).getWidth();
         }
 
+        /**
+         * Gets the height of a frame. All frames have the same height.
+         * @return the height of a frame
+         */
         @Override
         public int height() {
             return PREDEFINED_FRAMES.get(0).getHeight();
         }
 
+        /**
+         * Gets the index of the current frame if it is a predefined frame.
+         * Otherwise, the frame is a generated frame, so empty is returned.
+         * @return the index of the predefined frame or empty if generated
+         */
         @Override
         public Optional<Integer> index() {
             return Optional.ofNullable(currentFrameIndex);
         }
 
+        /**
+         * Gets the number of predefined frames this texture has. A texture
+         * always has at least one predefined frame.
+         * @return the number of predefined frames for this texture
+         */
         @Override
         public int predefinedFrames() {
             return PREDEFINED_FRAMES.size();
@@ -343,12 +371,24 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             return TEXTURE;
         }
 
+        /**
+         * Uploads the current frame at the given point. This should only
+         * be called when the correct texture (usually this texture) is
+         * bound in OpenGL.
+         * @param uploadPoint   point to upload the frame at
+         */
         public void uploadAt(Point uploadPoint) {
             requireNonNull(uploadPoint, "Upload point cannot be null");
             updateGeneratedFrame();
             getCurrentFrame().uploadAt(uploadPoint);
         }
 
+        /**
+         * Lowers the mipmap level of all predefined and generated frames
+         * for this texture. The new mipmap level must be less than or
+         * equal to the current mipmap level of the frames.
+         * @param newMipmapLevel        new mipmap level of the frames
+         */
         public void lowerMipmapLevel(int newMipmapLevel) {
             for (CloseableImageFrame predefined_frame : PREDEFINED_FRAMES) {
                 predefined_frame.lowerMipmapLevel(newMipmapLevel);
