@@ -39,6 +39,7 @@ public interface TextureReader<T> {
     /**
      * Signals that the metadata provided to the reader is invalid for some reason. It may be
      * in an invalid format or have an incompatible combination of properties.
+     * @author soir20
      */
     class InvalidMetadataException extends Exception {
 
