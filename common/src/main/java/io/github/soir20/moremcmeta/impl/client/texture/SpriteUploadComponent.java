@@ -50,12 +50,14 @@ public class SpriteUploadComponent implements GenericTextureComponent<EventDrive
     public Stream<TextureListener<? super EventDrivenTexture.TextureState>> getListeners() {
         Point uploadPoint = SPRITE.getUploadPoint();
 
+        TextureListener<EventDrivenTexture.TextureState> registerListener = new TextureListener<>(
+                TextureListener.Type.REGISTRATION,
+                (state) -> state.lowerMipmapLevel(SPRITE.getMipmapLevel())
+        );
+
         TextureListener<EventDrivenTexture.TextureState> uploadListener = new TextureListener<>(
                 TextureListener.Type.UPLOAD,
-                (state) -> {
-                    state.lowerMipmapLevel(SPRITE.getMipmapLevel());
-                    state.uploadAt(uploadPoint);
-                }
+                (state) -> state.uploadAt(uploadPoint)
         );
 
         // We need this listener because atlas sprites will never be bound
@@ -64,9 +66,10 @@ public class SpriteUploadComponent implements GenericTextureComponent<EventDrive
                 (state) -> {
                     SPRITE.bind();
                     state.getTexture().upload();
-                });
+                }
+        );
 
-        return Stream.of(uploadListener, tickListener);
+        return Stream.of(registerListener, uploadListener, tickListener);
     }
 
 }

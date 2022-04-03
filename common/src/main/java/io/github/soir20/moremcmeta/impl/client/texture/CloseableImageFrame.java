@@ -21,9 +21,6 @@ import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -35,18 +32,14 @@ public class CloseableImageFrame {
     private final int HEIGHT;
     private final int X_OFFSET;
     private final int Y_OFFSET;
-    private final SharedMipmapLevel SHARED_MIPMAP_LEVEL;
     private ImmutableList<? extends CloseableImage> mipmaps;
 
     /**
      * Creates a new frame based on frame data.
      * @param frameData             general data associated with the frame
      * @param mipmaps               mipmapped images for this frame (starting with the original image)
-     * @param sharedMipmapLevel     mipmap level potentially shared with other frames. Upon the mipmap level being
-     *                              lowered, this frame's mipmap level lowers, and its extra mipmaps close.
      */
-    public CloseableImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends CloseableImage> mipmaps,
-                               SharedMipmapLevel sharedMipmapLevel) {
+    public CloseableImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends CloseableImage> mipmaps) {
         requireNonNull(frameData, "Frame data cannot be null");
         this.mipmaps = requireNonNull(mipmaps, "Mipmaps cannot be null");
         if (mipmaps.isEmpty()) {
@@ -57,8 +50,6 @@ public class CloseableImageFrame {
         HEIGHT = frameData.getHeight();
         X_OFFSET = frameData.getXOffset();
         Y_OFFSET = frameData.getYOffset();
-        SHARED_MIPMAP_LEVEL = requireNonNull(sharedMipmapLevel, "Shared mipmap level cannot be null");
-        SHARED_MIPMAP_LEVEL.addSubscriber(this);
     }
 
     /**
@@ -149,7 +140,6 @@ public class CloseableImageFrame {
         }
 
         mipmaps = mipmaps.subList(0, newMipmapLevel + 1);
-        SHARED_MIPMAP_LEVEL.lowerMipmapLevel(newMipmapLevel);
     }
 
     /**
@@ -163,63 +153,6 @@ public class CloseableImageFrame {
         }
 
         return mipmaps.get(level);
-    }
-
-    /**
-     * Represents a shared open/close status for multiple {@link CloseableImageFrame}s referencing the same mipmaps or
-     * that should have the same mipmap level. All subscribers run when the mipmap level is lowered.
-     * @author soir20
-     */
-    public static final class SharedMipmapLevel {
-        private final List<CloseableImageFrame> SUBSCRIBERS;
-        private int mipmapLevel;
-
-        /**
-         * Creates a new shared mipmap level.
-         * @param currentLevel      current mipmap level shared between all frames
-         */
-        public SharedMipmapLevel(int currentLevel) {
-            if (currentLevel < 0) {
-                throw new IllegalArgumentException("Mipmap level cannot be negative");
-            }
-
-            SUBSCRIBERS = new ArrayList<>();
-            mipmapLevel = currentLevel;
-        }
-
-        /**
-         * Adds an {@link CloseableImageFrame} whose mipmap level will be lowered when the shared level is lowered. This
-         * frame's mipmap level will be lowered to the current shared level immediately.
-         */
-        public void addSubscriber(CloseableImageFrame frame) {
-            requireNonNull(frame, "Frame cannot be null");
-            frame.lowerMipmapLevel(mipmapLevel);
-            SUBSCRIBERS.add(frame);
-        }
-
-        /**
-         * Lowers the shared mipmap level and runs all subscribers. It is not guaranteed subscribers will be run
-         * if the new mipmap level is the same as the current level.
-         * @param newMipmapLevel      new mipmap level of this shared level. Must be lower than or the same as the
-         *                            current level.
-         */
-        public void lowerMipmapLevel(int newMipmapLevel) {
-            if (newMipmapLevel == mipmapLevel) {
-                return;
-            }
-
-            if (newMipmapLevel > mipmapLevel) {
-                throw new IllegalArgumentException("New mipmap level cannot be greater than old one");
-            }
-
-            if (newMipmapLevel < 0) {
-                throw new IllegalArgumentException("New mipmap level cannot be negative");
-            }
-
-            mipmapLevel = newMipmapLevel;
-            SUBSCRIBERS.forEach((subscriber) -> subscriber.lowerMipmapLevel(newMipmapLevel));
-        }
-
     }
 
 }

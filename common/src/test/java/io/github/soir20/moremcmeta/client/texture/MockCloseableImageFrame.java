@@ -31,8 +31,7 @@ public class MockCloseableImageFrame extends CloseableImageFrame {
 
     public MockCloseableImageFrame() {
         super(new FrameReader.FrameData(10, 10, 0, 0),
-                ImmutableList.of(new MockCloseableImage(), new MockCloseableImage(), new MockCloseableImage()),
-                new SharedMipmapLevel(2));
+                ImmutableList.of(new MockCloseableImage(), new MockCloseableImage(), new MockCloseableImage()));
     }
 
     @Override

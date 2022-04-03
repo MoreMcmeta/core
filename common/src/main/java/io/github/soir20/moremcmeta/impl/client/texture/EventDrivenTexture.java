@@ -197,6 +197,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             if (frames.size() == 0) {
                 throw new IllegalArgumentException("Predefined frames cannot be empty");
             }
+
+            if (frames.stream().mapToInt(CloseableImageFrame::getMipmapLevel).distinct().count() > 1) {
+                throw new IllegalArgumentException("All predefined frames must have the same mipmap level");
+            }
+
             predefinedFrames = frames;
             return this;
         }
@@ -236,6 +241,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
             if (generatedFrame == null) {
                 throw new IllegalStateException("Texture must have a generated frame");
+            }
+
+            if (predefinedFrames.get(0).getMipmapLevel() != generatedFrame.getMipmapLevel()) {
+                throw new IllegalStateException("Predefined frames and generated frame must have same mipmap level");
             }
 
             List<TextureListener<? super TextureState>> listeners = COMPONENTS.stream().flatMap(
@@ -323,7 +332,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         public void lowerMipmapLevel(int newMipmapLevel) {
-            getCurrentFrame().lowerMipmapLevel(newMipmapLevel);
+            for (CloseableImageFrame predefined_frame : PREDEFINED_FRAMES) {
+                predefined_frame.lowerMipmapLevel(newMipmapLevel);
+            }
+
+            GENERATED_FRAME.lowerMipmapLevel(newMipmapLevel);
         }
 
         /**

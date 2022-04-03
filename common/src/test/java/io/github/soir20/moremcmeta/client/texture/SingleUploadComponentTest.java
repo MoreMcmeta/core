@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.SingleUploadComponent;
@@ -26,9 +25,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.List;
-import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link SingleUploadComponent}. Coverage here is somewhat low
@@ -78,41 +76,6 @@ public class SingleUploadComponentTest {
 
         assertEquals(2, frame.getUploadCount());
         assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
-    }
-
-    @Test
-    public void upload_OriginalImage_MipmapLoweredTo0() {
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
-
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        EventDrivenTexture texture = builder.build();
-
-        assertEquals(2, frame.getMipmapLevel());
-        texture.upload();
-        assertEquals(0, frame.getMipmapLevel());
-    }
-
-    @Test
-    public void upload_SecondImage_MipmapLoweredTo0() {
-        MockCloseableImageFrame frame2 = new MockCloseableImageFrame();
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceWith(1))));
-        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
-
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setPredefinedFrames(List.of(frame, frame2));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        EventDrivenTexture texture = builder.build();
-
-        texture.upload();
-        texture.tick();
-
-        assertEquals(2, frame2.getMipmapLevel());
-        texture.upload();
-        assertEquals(0, frame2.getMipmapLevel());
     }
 
 }

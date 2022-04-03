@@ -47,15 +47,15 @@ public class SingleUploadComponent implements GenericTextureComponent<EventDrive
     public Stream<TextureListener<? super EventDrivenTexture.TextureState>> getListeners() {
         TextureListener<EventDrivenTexture.TextureState> registrationListener = new TextureListener<>(
                 TextureListener.Type.REGISTRATION,
-                (state) -> PREPARER.prepare(state.getTexture().getId(), 0, state.width(), state.height()));
+                (state) -> {
+                    PREPARER.prepare(state.getTexture().getId(), 0, state.width(), state.height());
+                    state.lowerMipmapLevel(0);
+                });
 
         Point uploadPoint = new Point(0, 0);
         TextureListener<EventDrivenTexture.TextureState> uploadListener = new TextureListener<>(
                 TextureListener.Type.UPLOAD,
-                (state) -> {
-                    state.lowerMipmapLevel(0);
-                    state.uploadAt(uploadPoint);
-                }
+                (state) -> state.uploadAt(uploadPoint)
         );
 
         return Stream.of(registrationListener, uploadListener);

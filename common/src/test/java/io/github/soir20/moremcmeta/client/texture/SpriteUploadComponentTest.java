@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.SpriteUploadComponent;
@@ -26,9 +25,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.List;
-import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class SpriteUploadComponentTest {
     @Rule
@@ -119,39 +117,26 @@ public class SpriteUploadComponentTest {
     }
 
     @Test
-    public void upload_OriginalImage_MipmapLoweredToSprite() {
+    public void register_AllImages_MipmapLoweredToSprite() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         MockSprite sprite = new MockSprite(1);
         builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
 
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        EventDrivenTexture texture = builder.build();
-
-        assertEquals(2, frame.getMipmapLevel());
-        texture.upload();
-        assertEquals(1, frame.getMipmapLevel());
-    }
-
-    @Test
-    public void upload_SecondImage_MipmapLoweredToSprite() {
+        MockCloseableImageFrame frame1 = new MockCloseableImageFrame();
         MockCloseableImageFrame frame2 = new MockCloseableImageFrame();
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        MockSprite sprite = new MockSprite(1);
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK, (state) -> state.replaceWith(1))));
-        builder.add(() -> (new SpriteUploadComponent(sprite)).getListeners());
+        MockCloseableImageFrame frame3 = new MockCloseableImageFrame();
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), frame2));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        builder.setPredefinedFrames(List.of(frame1, frame2));
+        builder.setGeneratedFrame(frame3);
         EventDrivenTexture texture = builder.build();
 
-        texture.upload();
-        texture.tick();
-
-        // The frame automatically uploads on tick
+        assertEquals(2, frame1.getMipmapLevel());
+        assertEquals(2, frame2.getMipmapLevel());
+        assertEquals(2, frame3.getMipmapLevel());
+        texture.load(null);
+        assertEquals(1, frame1.getMipmapLevel());
         assertEquals(1, frame2.getMipmapLevel());
-
+        assertEquals(1, frame3.getMipmapLevel());
     }
 
 }

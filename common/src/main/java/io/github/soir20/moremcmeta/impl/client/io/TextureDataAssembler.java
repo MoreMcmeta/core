@@ -62,12 +62,11 @@ public class TextureDataAssembler {
 
         // Create frames
         List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(original, MAX_MIPMAP));
-        CloseableImageFrame.SharedMipmapLevel sharedMipmapLevel = new CloseableImageFrame.SharedMipmapLevel(MAX_MIPMAP);
         ImmutableList<CloseableImageFrame> frames = getFrames(
-                mipmaps, frameWidth, frameHeight, blur, clamp, sharedMipmapLevel
+                mipmaps, frameWidth, frameHeight, blur, clamp
         );
         CloseableImageFrame generatedFrame = createGeneratedFrame(
-                mipmaps, frameWidth, frameHeight, blur, clamp, sharedMipmapLevel
+                mipmaps, frameWidth, frameHeight, blur, clamp
         );
 
         // Resource cleanup
@@ -103,12 +102,10 @@ public class TextureDataAssembler {
      * @param frameHeight           height of each frame in the image
      * @param blur                  whether to blur the texture
      * @param clamp                 whether to clamp the texture
-     * @param sharedMipmapLevel     mipmap level shared between all frames
      * @return the frames based on the texture image in chronological order
      */
     private ImmutableList<CloseableImageFrame> getFrames(List<NativeImage> mipmaps, int frameWidth, int frameHeight,
-                                                         boolean blur, boolean clamp,
-                                                         CloseableImageFrame.SharedMipmapLevel sharedMipmapLevel) {
+                                                         boolean blur, boolean clamp) {
         int mipmap = mipmaps.size() - 1;
 
         FrameReader<CloseableImageFrame> frameReader = new FrameReader<>((frameData) -> {
@@ -127,7 +124,7 @@ public class TextureDataAssembler {
                 );
             }).collect(ImmutableList.toImmutableList());
 
-            return new CloseableImageFrame(frameData, wrappedMipmaps, sharedMipmapLevel);
+            return new CloseableImageFrame(frameData, wrappedMipmaps);
         });
 
         return frameReader.read(mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(), frameWidth, frameHeight);
@@ -140,12 +137,10 @@ public class TextureDataAssembler {
      * @param frameHeight           the height of a single frame
      * @param blur                  whether the images are blurred
      * @param clamp                 whether the images are clamped
-     * @param sharedMipmapLevel     mipmap level shared between all frames
      * @return the adapters for the interpolation images
      */
     private CloseableImageFrame createGeneratedFrame(List<NativeImage> originals, int frameWidth,
-                                                     int frameHeight, boolean blur, boolean clamp,
-                                                     CloseableImageFrame.SharedMipmapLevel sharedMipmapLevel) {
+                                                     int frameHeight, boolean blur, boolean clamp) {
         ImmutableList.Builder<NativeImageAdapter> images = new ImmutableList.Builder<>();
 
         for (int level = 0; level < originals.size(); level++) {
@@ -169,8 +164,7 @@ public class TextureDataAssembler {
 
         return new CloseableImageFrame(
                 new FrameReader.FrameData(frameWidth, frameHeight, 0, 0),
-                images.build(),
-                sharedMipmapLevel
+                images.build()
         );
     }
 
