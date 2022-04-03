@@ -284,7 +284,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final CloseableImageFrame GENERATED_FRAME;
         private final Queue<FrameTransform> TRANSFORMS;
         private Integer currentFrameIndex;
-        private boolean needsCopyToGenerated;
+        private Integer indexToCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
 
         /**
@@ -297,13 +297,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             requireNonNull(transform, "Frame transform cannot be null");
 
             markNeedsUpload();
-            CloseableImageFrame currentFrame = getCurrentFrame();
-            if (needsCopyToGenerated) {
-                for (int level = 0; level < currentFrame.getMipmapLevel(); level++) {
-                    GENERATED_FRAME.getImage(level).copyFrom(currentFrame.getImage(level));
-                }
-            }
-
             currentFrameIndex = null;
             TRANSFORMS.add(transform);
         }
@@ -319,9 +312,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new IllegalArgumentException("Tried to replace with negative or non-existent frame index");
             }
 
+            // If we are setting the current frame to itself, we don't need to upload again
+            if (index == currentFrameIndex) {
+                return;
+            }
+
             markNeedsUpload();
-            needsCopyToGenerated = true;
             currentFrameIndex = index;
+            indexToCopyToGenerated = index;
             TRANSFORMS.clear();
         }
 
@@ -379,7 +377,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public void uploadAt(Point uploadPoint) {
             requireNonNull(uploadPoint, "Upload point cannot be null");
-            updateGeneratedFrame();
+            if (getCurrentFrame() == GENERATED_FRAME) {
+                updateGeneratedFrame();
+            }
             getCurrentFrame().uploadAt(uploadPoint);
         }
 
@@ -432,6 +432,16 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Applies all transformations to the generated frame.
          */
         private void updateGeneratedFrame() {
+            if (indexToCopyToGenerated != null) {
+                CloseableImageFrame currentFrame = getCurrentFrame();
+                for (int level = 0; level < currentFrame.getMipmapLevel(); level++) {
+                    GENERATED_FRAME.getImage(level).copyFrom(currentFrame.getImage(level));
+                }
+
+                indexToCopyToGenerated = null;
+            }
+
+            // Apply transformations
             while (!TRANSFORMS.isEmpty()) {
                 FrameTransform transform = TRANSFORMS.remove();
 
