@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
+import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
@@ -143,16 +144,92 @@ public class CloseableImageFrame {
     }
 
     /**
-     * Gets the image associated with this frame at a certain mipmap level.
-     * @param level     the mipmap level
-     * @return  the image at the given mipmap level
+     * Copies pixels from another frame onto this frame. The other frame cannot
+     * have a lower mipmap level than this frame. The size of the copied area
+     * will be the smaller of the two frame widths and the smaller of the two
+     * frame heights.
+     * @param source     the source frame to copy from
      */
-    public CloseableImage getImage(int level) {
-        if (level >= mipmaps.size()) {
-            throw new IllegalArgumentException("There is no mipmap of level " + level);
+    public void copyFrom(CloseableImageFrame source) {
+        if (source.getMipmapLevel() < getMipmapLevel()) {
+            throw new IllegalArgumentException("Other frame cannot have lower mipmap level");
         }
 
-        return mipmaps.get(level);
+        for (int level = 0; level <= getMipmapLevel(); level++) {
+            mipmaps.get(level).copyFrom(source.mipmaps.get(level));
+        }
+    }
+
+    /**
+     * Applies the given transformation to this frame. The transform is applied
+     * directly to the topmost mipmap only. An equivalent transformation for all
+     * mipmaps will be computed. A {@link IllegalArgumentException} will be thrown
+     * upon attempting to apply the transformation to a point outside the frame
+     * bounds.
+     * @param transform     transform to apply
+     */
+    public void applyTransform(FrameTransform transform) {
+
+        // Apply transformation to the original image
+        transform.applyArea().forEach((point) -> {
+            int x = point.getX();
+            int y = point.getY();
+
+            CloseableImage topImage = mipmaps.get(0);
+            int newColor = transform.transform().transform(x, y, topImage.getPixel(x, y));
+            topImage.setPixel(x, y, newColor);
+        });
+
+        /* Update corresponding mipmap pixels.
+           Plugins have no knowledge of mipmaps, and giving them that
+           knowledge would require all of them to handle additional
+           complexity. Instead, we can efficiently calculate the mipmaps
+           ourselves. */
+        transform.applyArea().forEach((point) -> {
+            int x = point.getX();
+            int y = point.getY();
+            for (int level = 1; level <= getMipmapLevel(); level++) {
+                int cornerX = makeEven(x);
+                int cornerY = makeEven(y);
+
+                CloseableImage prevImage = mipmaps.get(level - 1);
+                int topLeft = prevImage.getPixel(cornerX, cornerY);
+                int topRight = prevImage.getPixel(cornerX + 1, cornerY);
+                int bottomLeft = prevImage.getPixel(cornerX, cornerY + 1);
+                int bottomRight = prevImage.getPixel(cornerX + 1, cornerY + 1);
+
+                int blended = ColorBlender.blend(
+                        topLeft,
+                        topRight,
+                        bottomLeft,
+                        bottomRight
+                );
+
+                mipmaps.get(level).setPixel(x >> level, y >> level, blended);
+            }
+        });
+
+    }
+
+    /**
+     * Closes all resources associated with this frame. Idempotent.
+     */
+    public void close() {
+        mipmaps.forEach(CloseableImage::close);
+    }
+
+    /**
+     * Convert a number to the closest even integer that is smaller than
+     * the given integer.
+     * @param num           number to make even
+     * @return the closest even integer smaller than num
+     */
+    private static int makeEven(int num) {
+
+            /* The last bit determines +1 or +0, so unset it. There is no
+               overflow for neither the integer minimum nor maximum. */
+        return num & ~1;
+
     }
 
 }

@@ -19,9 +19,11 @@ package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
+import io.github.soir20.moremcmeta.api.client.texture.FrameView;
+import io.github.soir20.moremcmeta.api.client.texture.InitialTransform;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
@@ -29,9 +31,11 @@ import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
@@ -63,33 +67,50 @@ public class TextureDataAssembler {
         // Create frames
         List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(original, MAX_MIPMAP));
         ImmutableList<CloseableImageFrame> frames = getFrames(
-                mipmaps, frameWidth, frameHeight, blur, clamp
+                mipmaps,
+                frameWidth,
+                frameHeight,
+                blur,
+                clamp
         );
         CloseableImageFrame generatedFrame = createGeneratedFrame(
-                mipmaps, frameWidth, frameHeight, blur, clamp
+                mipmaps,
+                frameWidth,
+                frameHeight,
+                blur,
+                clamp
         );
 
         // Resource cleanup
-        CloseableImageFrame firstFrame = frames.get(0);
         Runnable closeMipmaps = () -> {
-
-            // The images are shared between all frames
-            for (int level = 0; level <= firstFrame.getMipmapLevel(); level++) {
-                firstFrame.getImage(level).close();
-            }
-
-            for (int level = 0; level <= generatedFrame.getMipmapLevel(); level++) {
-                generatedFrame.getImage(level).close();
-            }
+            frames.forEach(CloseableImageFrame::close);
+            generatedFrame.close();
         };
 
         // Add components
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(frames).setGeneratedFrame(generatedFrame).add(new CleanupComponent(closeMipmaps));
-        for (Pair<ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            ParsedMetadata sectionData = metadata.getFirst();
-            ComponentProvider componentProvider = metadata.getSecond();
-            componentProvider.assemble(sectionData, data.frameSize(), data.blur(), data.clamp()).forEach(builder::add);
+        builder.setPredefinedFrames(frames)
+                .setGeneratedFrame(generatedFrame)
+                .add(new CleanupComponent(closeMipmaps));
+
+        for (Triple<ParsedMetadata, InitialTransform, ComponentProvider> metadata : data.parsedMetadata()) {
+            ParsedMetadata sectionData = metadata.getLeft();
+
+            applyInitialTransform(
+                    metadata.getMiddle(),
+                    frames,
+                    sectionData,
+                    blur,
+                    clamp
+            );
+
+            ComponentProvider componentProvider = metadata.getRight();
+            componentProvider.assemble(
+                    sectionData,
+                    data.frameSize(),
+                    blur,
+                    clamp
+            ).forEach(builder::add);
         }
 
         return builder;
@@ -181,6 +202,93 @@ public class TextureDataAssembler {
                 to.setPixelRGBA(xPos, yPos, from.getPixelRGBA(xPos, yPos));
             }
         }
+    }
+
+    /**
+     * Applies an initial transform to all predefined frames.
+     * @param transform     transform to apply
+     * @param frames        predefined frames
+     * @param metadata      metadata associated with the transform
+     * @param blur          whether to blur the texture
+     * @param clamp         whether to clamp the texture
+     */
+    private void applyInitialTransform(InitialTransform transform, List<CloseableImageFrame> frames,
+                                       ParsedMetadata metadata, boolean blur, boolean clamp) {
+        for (int index = 0; index < frames.size(); index++) {
+            CloseableImageFrame frame = frames.get(index);
+            PredefinedFrameView frameView = new PredefinedFrameView(
+                    frame.getWidth(),
+                    frame.getHeight(),
+                    index,
+                    frames.size()
+            );
+
+            FrameTransform frameTransform = transform.transform(metadata, blur, clamp, frameView);
+            frame.applyTransform(frameTransform);
+        }
+    }
+
+    /**
+     * {@link FrameView} implementation for a predefined frame.
+     * @author soir20
+     */
+    private static class PredefinedFrameView implements FrameView {
+        private final int WIDTH;
+        private final int HEIGHT;
+        private final int INDEX;
+        private final int NUM_FRAMES;
+
+        /**
+         * Creates a new view for a predefined frame.
+         * @param width         width of the frame
+         * @param height        height of the frame
+         * @param index         index of the frame among all frames
+         * @param numFrames     number of frames total
+         */
+        public PredefinedFrameView(int width, int height, int index, int numFrames) {
+            WIDTH = width;
+            HEIGHT = height;
+            INDEX = index;
+            NUM_FRAMES = numFrames;
+        }
+
+        /**
+         * Gets the width of the frame.
+         * @return width of the frame
+         */
+        @Override
+        public int width() {
+            return WIDTH;
+        }
+
+        /**
+         * Gets the height of the frame.
+         * @return height of the frame
+         */
+        @Override
+        public int height() {
+            return HEIGHT;
+        }
+
+        /**
+         * Gets the index of the frame. Always exists since it
+         * is a predefined frame by definition.
+         * @return index of the frame
+         */
+        @Override
+        public Optional<Integer> index() {
+            return Optional.of(INDEX);
+        }
+
+        /**
+         * Gets the total number of frames.
+         * @return total number of frames
+         */
+        @Override
+        public int predefinedFrames() {
+            return NUM_FRAMES;
+        }
+
     }
 
 }

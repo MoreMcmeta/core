@@ -434,71 +434,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private void updateGeneratedFrame() {
             if (indexToCopyToGenerated != null) {
                 CloseableImageFrame copyFrame = PREDEFINED_FRAMES.get(indexToCopyToGenerated);
-                for (int level = 0; level < copyFrame.getMipmapLevel(); level++) {
-                    GENERATED_FRAME.getImage(level).copyFrom(copyFrame.getImage(level));
-                }
+                GENERATED_FRAME.copyFrom(copyFrame);
 
                 indexToCopyToGenerated = null;
             }
 
-            // Apply transformations
             while (!TRANSFORMS.isEmpty()) {
-                FrameTransform transform = TRANSFORMS.remove();
-
-                // Apply transformation to the original image
-                transform.applyArea().forEach((point) -> {
-                    int x = point.getX();
-                    int y = point.getY();
-
-                    CloseableImage topImage = GENERATED_FRAME.getImage(0);
-                    int newColor = transform.transform().transform(x, y, topImage.getPixel(x, y));
-                    topImage.setPixel(x, y, newColor);
-                });
-
-                /* Update corresponding mipmap pixels.
-                   Plugins have no knowledge of mipmaps, and giving them that
-                   knowledge would require all of them to handle additional
-                   complexity. Instead, we can efficiently calculate the mipmaps
-                   ourselves. */
-                transform.applyArea().forEach((point) -> {
-                    int x = point.getX();
-                    int y = point.getY();
-                    for (int level = 1; level <= GENERATED_FRAME.getMipmapLevel(); level++) {
-                        int cornerX = makeEven(x);
-                        int cornerY = makeEven(y);
-
-                        CloseableImage prevImage = GENERATED_FRAME.getImage(level - 1);
-                        int topLeft = prevImage.getPixel(cornerX, cornerY);
-                        int topRight = prevImage.getPixel(cornerX + 1, cornerY);
-                        int bottomLeft = prevImage.getPixel(cornerX, cornerY + 1);
-                        int bottomRight = prevImage.getPixel(cornerX + 1, cornerY + 1);
-
-                        int blended = ColorBlender.blend(
-                                topLeft,
-                                topRight,
-                                bottomLeft,
-                                bottomRight
-                        );
-
-                        GENERATED_FRAME.getImage(level).setPixel(x >> level, y >> level, blended);
-                    }
-                });
-
+                GENERATED_FRAME.applyTransform(TRANSFORMS.remove());
             }
-        }
-
-        /**
-         * Convert a number to the closest even integer that is smaller than
-         * the given integer.
-         * @param num           number to make even
-         * @return the closest even integer smaller than num
-         */
-        private static int makeEven(int num) {
-
-            /* The last bit determines +1 or +0, so unset it. There is no
-               overflow for neither the integer minimum nor maximum. */
-            return num & ~1;
-
         }
 
     }
