@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.client.resource;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.JsonParseException;
 import io.github.soir20.moremcmeta.impl.client.io.TextureReader;
 import io.github.soir20.moremcmeta.impl.client.resource.OrderedResourceRepository;
 import io.github.soir20.moremcmeta.impl.client.resource.ResourceCollection;

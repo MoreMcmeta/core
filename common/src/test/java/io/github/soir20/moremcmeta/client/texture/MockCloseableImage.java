@@ -30,7 +30,6 @@ public class MockCloseableImage implements CloseableImage {
     private final int[][] PIXELS;
     private final int WIDTH;
     private final int HEIGHT;
-    private final VisibleArea VISIBLE_AREA;
     private Point uploadPoint;
     private boolean closed;
 
@@ -38,28 +37,18 @@ public class MockCloseableImage implements CloseableImage {
         PIXELS = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
         WIDTH = DEFAULT_DIMENSION;
         HEIGHT = DEFAULT_DIMENSION;
-        VISIBLE_AREA = (new VisibleArea.Builder()).build();
     }
 
     public MockCloseableImage(int width, int height) {
         PIXELS = new int[width][height];
         WIDTH = width;
         HEIGHT = height;
-        VISIBLE_AREA = (new VisibleArea.Builder()).build();
-    }
-
-    public MockCloseableImage(int[][] pixels, VisibleArea visibleArea) {
-        PIXELS = pixels;
-        WIDTH = pixels.length;
-        HEIGHT = pixels[0].length;
-        VISIBLE_AREA = visibleArea;
     }
 
     public MockCloseableImage(int[][] pixels) {
         PIXELS = pixels;
         WIDTH = pixels.length;
         HEIGHT = pixels[0].length;
-        VISIBLE_AREA = (new VisibleArea.Builder()).build();
     }
 
     @Override

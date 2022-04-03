@@ -23,7 +23,6 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Keeps track of the {@link ResourceLocation}s of textures that would have been added to a real texture manager.
@@ -51,10 +50,6 @@ public class MockManager<R> implements Manager<R> {
     @Override
     public void unregister(ResourceLocation textureLocation) {
         TEXTURES.remove(textureLocation);
-    }
-
-    public Set<ResourceLocation> getLocations() {
-        return TEXTURES.keySet();
     }
 
     public void tick() {

@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.client.texture;
 
 import io.github.soir20.moremcmeta.api.math.Point;
-import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.impl.client.texture.TextureFinisher;
