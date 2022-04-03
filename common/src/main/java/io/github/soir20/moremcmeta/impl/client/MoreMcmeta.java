@@ -132,6 +132,11 @@ public abstract class MoreMcmeta {
 
     }
 
+    /**
+     * Gets all loaded MoreMcmeta plugins from other mods.
+     * @param logger    logger to report errors
+     * @return all loaded plugins
+     */
     protected abstract Collection<MoreMcmetaPlugin> getPlugins(Logger logger);
 
     /**
