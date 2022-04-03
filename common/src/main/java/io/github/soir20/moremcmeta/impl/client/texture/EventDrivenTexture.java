@@ -433,9 +433,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         private void updateGeneratedFrame() {
             if (indexToCopyToGenerated != null) {
-                CloseableImageFrame currentFrame = getCurrentFrame();
-                for (int level = 0; level < currentFrame.getMipmapLevel(); level++) {
-                    GENERATED_FRAME.getImage(level).copyFrom(currentFrame.getImage(level));
+                CloseableImageFrame copyFrame = PREDEFINED_FRAMES.get(indexToCopyToGenerated);
+                for (int level = 0; level < copyFrame.getMipmapLevel(); level++) {
+                    GENERATED_FRAME.getImage(level).copyFrom(copyFrame.getImage(level));
                 }
 
                 indexToCopyToGenerated = null;
