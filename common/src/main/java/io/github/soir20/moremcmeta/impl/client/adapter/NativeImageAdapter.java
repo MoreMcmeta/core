@@ -54,6 +54,27 @@ public class NativeImageAdapter implements CloseableImage {
     public NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
                               int mipmapLevel, boolean blur, boolean clamp, boolean autoClose) {
         IMAGE = requireNonNull(image, "Image cannot be null");
+
+        if (xOffset < 0) {
+            throw new IllegalArgumentException("X offset cannot be negative");
+        }
+
+        if (yOffset < 0) {
+            throw new IllegalArgumentException("Y offset cannot be negative");
+        }
+
+        if (width < 0) {
+            throw new IllegalArgumentException("Width cannot be negative");
+        }
+
+        if (height < 0) {
+            throw new IllegalArgumentException("Height cannot be negative");
+        }
+
+        if (mipmapLevel < 0) {
+            throw new IllegalArgumentException("Mipmap level cannot be negative");
+        }
+
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
         WIDTH = width;
@@ -72,6 +93,11 @@ public class NativeImageAdapter implements CloseableImage {
      */
     public NativeImageAdapter(NativeImage image, int mipmapLevel) {
         IMAGE = requireNonNull(image, "Image cannot be null");
+
+        if (mipmapLevel < 0) {
+            throw new IllegalArgumentException("Mipmap level cannot be negative");
+        }
+
         X_OFFSET = 0;
         Y_OFFSET = 0;
         WIDTH = image.getWidth();
@@ -92,6 +118,7 @@ public class NativeImageAdapter implements CloseableImage {
     @Override
     public int getPixel(int x, int y) {
         checkOpen();
+        checkInBounds(x, y);
         return IMAGE.getPixelRGBA(x + X_OFFSET, y + Y_OFFSET);
     }
 
@@ -105,6 +132,7 @@ public class NativeImageAdapter implements CloseableImage {
     @Override
     public void setPixel(int x, int y, int color) {
         checkOpen();
+        checkInBounds(x, y);
         IMAGE.setPixelRGBA(x + X_OFFSET, y + Y_OFFSET, color);
     }
 
@@ -188,6 +216,19 @@ public class NativeImageAdapter implements CloseableImage {
     private void checkOpen() {
         if (closed) {
             throw new IllegalStateException("Image is closed");
+        }
+    }
+
+    /**
+     * Throws an {@link IllegalArgumentException} if the point is outside the image bounds.
+     * @param x     x coordinate to check
+     * @param y     y coordinate to check
+     */
+    private void checkInBounds(int x, int y) {
+        if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
+            throw new IllegalArgumentException(String.format(
+                    "Tried to access point outside %sx%s image: (%s, %s)", WIDTH, HEIGHT, x, y
+            ));
         }
     }
 
