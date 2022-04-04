@@ -47,8 +47,24 @@ public class CloseableImageFrame {
             throw new IllegalArgumentException("At least one mipmap must be provided");
         }
 
-        WIDTH = frameData.getWidth();
-        HEIGHT = frameData.getHeight();
+        int frameWidth = frameData.getWidth();
+        int frameHeight = frameData.getHeight();
+
+        for (int level = 0; level < mipmaps.size(); level++) {
+            CloseableImage image = mipmaps.get(level);
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+
+            if (imageWidth != frameWidth >> level || imageHeight != frameHeight >> level) {
+                throw new IllegalArgumentException(String.format(
+                        "Mipmap %s of size %sx%s conflicts with frame size %sx%s",
+                        level, imageWidth, imageHeight, frameWidth, frameHeight
+                ));
+            }
+        }
+
+        WIDTH = frameWidth;
+        HEIGHT = frameHeight;
         X_OFFSET = frameData.getXOffset();
         Y_OFFSET = frameData.getYOffset();
     }
