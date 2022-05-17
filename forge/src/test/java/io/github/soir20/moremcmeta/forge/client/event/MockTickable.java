@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package forge.client.event;
+package io.github.soir20.moremcmeta.forge.client.event;
 
 import io.github.soir20.moremcmeta.client.texture.CustomTickable;
 
