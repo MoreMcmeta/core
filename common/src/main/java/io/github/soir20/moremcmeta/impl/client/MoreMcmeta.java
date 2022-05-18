@@ -31,10 +31,10 @@ import io.github.soir20.moremcmeta.impl.client.resource.SpriteFrameSizeFixPack;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.impl.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
-import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
 import io.github.soir20.moremcmeta.impl.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.impl.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.impl.client.texture.TextureFinisher;
+import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
@@ -82,10 +82,13 @@ public abstract class MoreMcmeta {
      * Begins the startup process, creating necessary objects and registering the
      * resource reload listener.
      */
-    public void start() {
+    public void start() throws MoreMcmetaPlugin.PluginException {
         Minecraft minecraft = Minecraft.getInstance();
         Logger logger = LogManager.getLogger();
+
+        // Fetch and validate plugins
         Collection<MoreMcmetaPlugin> plugins = getPlugins(logger);
+        validatePlugins(plugins);
 
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, getMipmapLevelGetter(logger)));
@@ -192,6 +195,62 @@ public abstract class MoreMcmeta {
      * @param texManager        the manager to begin ticking
      */
     protected abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
+
+    /**
+     * Validates all the registered plugins, both individually and for conflicts.
+     * @param plugins   plugins to validate
+     * @throws MoreMcmetaPlugin.PluginException if a plugin is not valid or plugins conflict
+     */
+    private void validatePlugins(Collection<MoreMcmetaPlugin> plugins) throws MoreMcmetaPlugin.PluginException {
+
+        // Validate individual plugins
+        for (MoreMcmetaPlugin plugin : plugins) {
+            validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
+            validatePluginItem(plugin.sectionName(), "section name", plugin.displayName());
+            validatePluginItem(plugin.parser(), "parser", plugin.displayName());
+            validatePluginItem(plugin.initialTransform(), "initial transform", plugin.displayName());
+            validatePluginItem(plugin.componentProvider(), "component provider", plugin.displayName());
+        }
+
+        // Check that no two plugins have the same section name
+        Map<String, List<MoreMcmetaPlugin>> pluginsBySectionName = plugins
+                .stream()
+                .collect(Collectors.groupingBy(MoreMcmetaPlugin::sectionName));
+        Optional<Map.Entry<String, List<MoreMcmetaPlugin>>> conflictingPlugins = pluginsBySectionName
+                .entrySet()
+                .stream()
+                .filter((entry) -> entry.getValue().size() > 1)
+                .findFirst();
+
+        if (conflictingPlugins.isEmpty()) {
+            return;
+        }
+
+        // Report section name and plugin display names to help diagnose the issue
+        String conflictingSectionName = conflictingPlugins.get().getKey();
+        List<String> conflictingPluginNames = conflictingPlugins.get().getValue()
+                .stream()
+                .map(MoreMcmetaPlugin::displayName)
+                .toList();
+
+        throw new MoreMcmetaPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
+                + " have conflicting section name: " + conflictingSectionName);
+    }
+
+    /**
+     * Validates that an individual item in a plugin is present (non-null).
+     * @param item          item to validate
+     * @param itemName      display name of the item
+     * @param pluginName    display name of the plugin
+     * @throws MoreMcmetaPlugin.IncompletePluginException if the item is not present
+     */
+    private void validatePluginItem(Object item, String itemName, String pluginName)
+            throws MoreMcmetaPlugin.IncompletePluginException {
+
+        if (item == null) {
+            throw new MoreMcmetaPlugin.IncompletePluginException("Plugin " + pluginName + " is missing " + itemName);
+        }
+    }
 
     /**
      * Gets the repository containing all the game's resources except the pack this mod adds.

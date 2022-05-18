@@ -33,4 +33,52 @@ public interface MoreMcmetaPlugin {
 
     ComponentProvider componentProvider();
 
+    /**
+     * Signals that there is some issue with the registered plugins.
+     * @author soir20
+     */
+    class PluginException extends RuntimeException {
+
+        /**
+         * Creates a new exception with a detail message.
+         * @param reason    the reason the plugins are not valid
+         */
+        public PluginException(String reason) {
+            super(reason);
+        }
+
+    }
+
+    /**
+     * Signals that one of the provided plugins is not valid for some reason.
+     * @author soir20
+     */
+    class IncompletePluginException extends PluginException {
+
+        /**
+         * Creates a new exception with a detail message.
+         * @param reason    the reason the plugin is invalid
+         */
+        public IncompletePluginException(String reason) {
+            super(reason);
+        }
+
+    }
+
+    /**
+     * Signals that at least two of the provided plugins conflict with each other.
+     * @author soir20
+     */
+    class ConflictingPluginsException extends PluginException {
+
+        /**
+         * Creates a new exception with a detail message.
+         * @param reason    the reason the plugins are conflicting
+         */
+        public ConflictingPluginsException(String reason) {
+            super(reason);
+        }
+
+    }
+
 }
