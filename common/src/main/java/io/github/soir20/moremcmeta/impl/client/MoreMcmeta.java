@@ -99,7 +99,7 @@ public abstract class MoreMcmeta {
         TextureDataReader reader = new TextureDataReader(plugins);
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(reader, logger);
 
-        // Listener registration and resource manager replacement
+        // Listener registration and add resource pack
         onResourceManagerInitialized((client) -> {
             if (!(client.getResourceManager() instanceof ReloadableResourceManager rscManager)) {
                 logger.error("Reload listener was not added because resource manager is not reloadable");
