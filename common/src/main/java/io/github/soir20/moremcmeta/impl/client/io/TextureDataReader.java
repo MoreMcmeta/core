@@ -85,6 +85,10 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
 
         for (String section : metadata.keys()) {
             MoreMcmetaPlugin plugin = SECTION_TO_PLUGIN.get(section);
+            if (plugin == null) {
+                continue;
+            }
+
             ParsedMetadata sectionData = plugin.parser().parse(metadata);
             parsedSections.add(Triple.of(sectionData, plugin.initialTransform(), plugin.componentProvider()));
 
