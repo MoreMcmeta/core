@@ -87,7 +87,7 @@ public abstract class MoreMcmeta {
         Logger logger = LogManager.getLogger();
 
         // Fetch and validate plugins
-        Collection<MoreMcmetaPlugin> plugins = getPlugins(logger);
+        Collection<MoreMcmetaPlugin> plugins = fetchPlugins(logger);
         validatePlugins(plugins);
 
         // Texture manager
@@ -140,7 +140,7 @@ public abstract class MoreMcmeta {
      * @param logger    logger to report errors
      * @return all loaded plugins
      */
-    protected abstract Collection<MoreMcmetaPlugin> getPlugins(Logger logger);
+    protected abstract Collection<MoreMcmetaPlugin> fetchPlugins(Logger logger);
 
     /**
      * Gets the function that converts atlas sprites to their mipmap level.

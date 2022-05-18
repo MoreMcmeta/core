@@ -70,7 +70,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     }
 
     @Override
-    protected Collection<MoreMcmetaPlugin> getPlugins(Logger logger) {
+    protected Collection<MoreMcmetaPlugin> fetchPlugins(Logger logger) {
         List<MoreMcmetaPlugin> plugins = new ArrayList<>();
         FabricLoader.getInstance().getEntrypointContainers(MODID, MoreMcmetaPlugin.class).forEach((entrypoint) -> {
             try {

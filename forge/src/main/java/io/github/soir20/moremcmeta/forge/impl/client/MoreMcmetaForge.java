@@ -86,7 +86,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     }
 
     @Override
-    protected Collection<MoreMcmetaPlugin> getPlugins(Logger logger) {
+    protected Collection<MoreMcmetaPlugin> fetchPlugins(Logger logger) {
         List<MoreMcmetaPlugin> plugins = new ArrayList<>();
         FMLJavaModLoadingContext.get().getModEventBus().post(new MoreMcmetaPluginRegisterEvent(plugins));
         return plugins;
