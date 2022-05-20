@@ -22,6 +22,7 @@ import io.github.soir20.moremcmeta.impl.client.texture.Sprite;
 import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
@@ -61,7 +62,7 @@ public class AtlasAdapter implements Atlas {
     /**
      * Gets a sprite from its location.
      * @param location      the location of the sprite without its extension
-     *                      or the textures directory prefix
+     *                      or the texture's directory prefix
      * @return the sprite if found
      */
     @Override
@@ -70,12 +71,33 @@ public class AtlasAdapter implements Atlas {
             return Optional.empty();
         }
 
-        TextureAtlasSprite sprite = ATLAS.getSprite(location);
-        if (sprite == null) {
+        ResourceLocation properSpriteName = makeSpriteName(location);
+
+        TextureAtlasSprite sprite = ATLAS.getSprite(properSpriteName);
+        if (sprite == null || sprite.getName() == MissingTextureAtlasSprite.getLocation()) {
+            sprite = ATLAS.getSprite(location);
+        }
+
+        // Check the original location in case another mod added it by that name
+        if (sprite == null || sprite.getName() == MissingTextureAtlasSprite.getLocation()) {
             return Optional.empty();
         }
 
         return Optional.of(new SpriteAdapter(sprite, MIPMAP_LEVEL_GETTER.applyAsInt(sprite)));
+    }
+
+    /**
+     * Converts a standard texture location (with textures/ prefix and .png suffix) to a
+     * sprite name.
+     * @param location      the location to convert
+     * @return that location as the name of a sprite in a texture atlas
+     */
+    private static ResourceLocation makeSpriteName(ResourceLocation location) {
+        String originalPath = location.getPath();
+        String cutPath = originalPath
+                .replace("textures/", "")
+                .replace(".png", "");
+        return new ResourceLocation(location.getNamespace(), cutPath);
     }
 
     /**
