@@ -21,7 +21,7 @@ package io.github.soir20.moremcmeta.api.math;
  * A pair of coordinates in a plane.
  * @author soir20
  */
-public class Point {
+public final class Point {
     private final int X_POS;
     private final int Y_POS;
 
