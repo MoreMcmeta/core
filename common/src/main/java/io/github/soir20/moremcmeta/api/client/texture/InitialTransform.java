@@ -22,6 +22,6 @@ import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 @FunctionalInterface
 public interface InitialTransform {
 
-    FrameTransform transform(ParsedMetadata metadata, boolean blur, boolean clamp, FrameView frame);
+    void transform(ParsedMetadata metadata, boolean blur, boolean clamp, FrameGroup<MutableFrameView> frame);
 
 }

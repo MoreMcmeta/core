@@ -21,9 +21,10 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
-import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.InitialTransform;
+import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
@@ -33,6 +34,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import org.apache.commons.lang3.tuple.Triple;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -214,42 +216,66 @@ public class TextureDataAssembler {
      */
     private void applyInitialTransform(InitialTransform transform, List<CloseableImageFrame> frames,
                                        ParsedMetadata metadata, boolean blur, boolean clamp) {
+        List<PredefinedFrameView> frameViews = new ArrayList<>();
+
         for (int index = 0; index < frames.size(); index++) {
             CloseableImageFrame frame = frames.get(index);
-            PredefinedFrameView frameView = new PredefinedFrameView(
-                    frame.getWidth(),
-                    frame.getHeight(),
+            frameViews.add(new PredefinedFrameView(
+                    frame,
                     index,
                     frames.size()
-            );
+            ));
+        }
 
-            FrameTransform frameTransform = transform.transform(metadata, blur, clamp, frameView);
-            frame.applyTransform(frameTransform);
+        transform.transform(metadata, blur, clamp, new PredefinedFrameGroup(frameViews));
+
+        frameViews.forEach(PredefinedFrameView::invalidate);
+    }
+
+    private static class PredefinedFrameGroup implements FrameGroup<MutableFrameView> {
+        private final List<? extends MutableFrameView> FRAMES;
+
+        public PredefinedFrameGroup(List<? extends MutableFrameView> frames) {
+            FRAMES = frames;
+        }
+
+        @Override
+        public MutableFrameView frame(int index) {
+            if (index < 0 || index >= FRAMES.size()) {
+                throw new FrameGroupIndexOutOfBoundsException(index);
+            }
+
+            return FRAMES.get(index);
+        }
+
+        @Override
+        public int frames() {
+            return FRAMES.size();
         }
     }
 
     /**
-     * {@link FrameView} implementation for a predefined frame.
+     * {@link MutableFrameView} implementation for a predefined frame.
      * @author soir20
      */
-    private static class PredefinedFrameView implements FrameView {
-        private final int WIDTH;
-        private final int HEIGHT;
+    private static class PredefinedFrameView implements MutableFrameView {
+        private final CloseableImageFrame FRAME;
         private final int INDEX;
         private final int NUM_FRAMES;
 
+        private boolean valid;
+
         /**
          * Creates a new view for a predefined frame.
-         * @param width         width of the frame
-         * @param height        height of the frame
+         * @param frame         the original frame
          * @param index         index of the frame among all frames
          * @param numFrames     number of frames total
          */
-        public PredefinedFrameView(int width, int height, int index, int numFrames) {
-            WIDTH = width;
-            HEIGHT = height;
+        public PredefinedFrameView(CloseableImageFrame frame, int index, int numFrames) {
+            FRAME = frame;
             INDEX = index;
             NUM_FRAMES = numFrames;
+            valid = true;
         }
 
         /**
@@ -258,7 +284,8 @@ public class TextureDataAssembler {
          */
         @Override
         public int width() {
-            return WIDTH;
+            checkValid();
+            return FRAME.getWidth();
         }
 
         /**
@@ -267,7 +294,8 @@ public class TextureDataAssembler {
          */
         @Override
         public int height() {
-            return HEIGHT;
+            checkValid();
+            return FRAME.getHeight();
         }
 
         /**
@@ -277,6 +305,7 @@ public class TextureDataAssembler {
          */
         @Override
         public Optional<Integer> index() {
+            checkValid();
             return Optional.of(INDEX);
         }
 
@@ -286,7 +315,28 @@ public class TextureDataAssembler {
          */
         @Override
         public int predefinedFrames() {
+            checkValid();
             return NUM_FRAMES;
+        }
+
+        /**
+         * Modifies this frame with the given function over the given apply area.
+         * @param transform     transformation to apply to this frame
+         */
+        @Override
+        public void transform(FrameTransform transform) {
+            checkValid();
+            FRAME.applyTransform(transform);
+        }
+
+        public void invalidate() {
+            valid = false;
+        }
+
+        public void checkValid() {
+            if (!valid) {
+                throw new IllegalFrameReference();
+            }
         }
 
     }

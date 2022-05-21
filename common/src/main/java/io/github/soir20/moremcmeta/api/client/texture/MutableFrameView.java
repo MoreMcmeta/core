@@ -17,30 +17,8 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
-import java.util.Optional;
+public interface MutableFrameView extends FrameView {
 
-public interface FrameView {
-
-    int width();
-
-    int height();
-
-    Optional<Integer> index();
-
-    int predefinedFrames();
-
-    /**
-     * Indicates that a {@link FrameView} was used after it became invalid.
-     * @author soir20
-     */
-    class IllegalFrameReference extends IllegalStateException {
-
-        /**
-         * Creates a new exception to indicate that a reference to a frame view is invalid.
-         */
-        public IllegalFrameReference() {
-            super("Cannot use frame view beyond intended point");
-        }
-    }
+    void transform(FrameTransform transform);
 
 }
