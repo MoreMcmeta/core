@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture to an atlas sprite.
  * @author soir20
  */
-public class SpriteUploadComponent implements GenericTextureComponent<EventDrivenTexture.TextureState> {
+public class SpriteUploadComponent implements GenericTextureComponent<EventDrivenTexture.TextureAndFrameView> {
     private final Sprite SPRITE;
 
     /**
@@ -47,21 +47,21 @@ public class SpriteUploadComponent implements GenericTextureComponent<EventDrive
      * @return all the listeners for this component
      */
     @Override
-    public Stream<TextureListener<? super EventDrivenTexture.TextureState>> getListeners() {
+    public Stream<TextureListener<? super EventDrivenTexture.TextureAndFrameView>> getListeners() {
         Point uploadPoint = SPRITE.getUploadPoint();
 
-        TextureListener<EventDrivenTexture.TextureState> registerListener = new TextureListener<>(
+        TextureListener<EventDrivenTexture.TextureAndFrameView> registerListener = new TextureListener<>(
                 TextureListener.Type.REGISTRATION,
                 (state) -> state.lowerMipmapLevel(SPRITE.getMipmapLevel())
         );
 
-        TextureListener<EventDrivenTexture.TextureState> uploadListener = new TextureListener<>(
+        TextureListener<EventDrivenTexture.TextureAndFrameView> uploadListener = new TextureListener<>(
                 TextureListener.Type.UPLOAD,
                 (state) -> state.uploadAt(uploadPoint)
         );
 
         // We need this listener because atlas sprites will never be bound
-        TextureListener<EventDrivenTexture.TextureState> tickListener = new TextureListener<>(
+        TextureListener<EventDrivenTexture.TextureAndFrameView> tickListener = new TextureListener<>(
                 TextureListener.Type.TICK,
                 (state) -> {
                     SPRITE.bind();

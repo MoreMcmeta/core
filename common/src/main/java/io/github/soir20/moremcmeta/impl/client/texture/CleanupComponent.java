@@ -27,7 +27,7 @@ import static java.util.Objects.requireNonNull;
  * Cleans up images when an {@link EventDrivenTexture} closes.
  * @author soir20
  */
-public class CleanupComponent implements GenericTextureComponent<EventDrivenTexture.TextureState> {
+public class CleanupComponent implements GenericTextureComponent<EventDrivenTexture.TextureAndFrameView> {
     private final Runnable CLOSE_ACTION;
 
     /**
@@ -43,7 +43,7 @@ public class CleanupComponent implements GenericTextureComponent<EventDrivenText
      * @return the cleanup listener
      */
     @Override
-    public Stream<TextureListener<? super EventDrivenTexture.TextureState>> getListeners() {
+    public Stream<TextureListener<? super EventDrivenTexture.TextureAndFrameView>> getListeners() {
         return Stream.of(new TextureListener<>(TextureListener.Type.CLOSE, (state) -> CLOSE_ACTION.run()));
     }
 

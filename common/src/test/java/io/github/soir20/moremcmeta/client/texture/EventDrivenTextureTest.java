@@ -160,7 +160,7 @@ public class EventDrivenTextureTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                EventDrivenTexture.TextureState::markNeedsUpload
+                EventDrivenTexture.TextureAndFrameView::markNeedsUpload
         ), new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> timesUploaded.incrementAndGet()
         )));

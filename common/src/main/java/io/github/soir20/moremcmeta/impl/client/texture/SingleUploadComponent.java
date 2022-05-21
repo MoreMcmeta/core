@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture that is not associated with an atlas sprite.
  * @author soir20
  */
-public class SingleUploadComponent implements GenericTextureComponent<EventDrivenTexture.TextureState> {
+public class SingleUploadComponent implements GenericTextureComponent<EventDrivenTexture.TextureAndFrameView> {
     private final TexturePreparer PREPARER;
 
     /**
@@ -44,8 +44,8 @@ public class SingleUploadComponent implements GenericTextureComponent<EventDrive
      * @return all the listeners for this component
      */
     @Override
-    public Stream<TextureListener<? super EventDrivenTexture.TextureState>> getListeners() {
-        TextureListener<EventDrivenTexture.TextureState> registrationListener = new TextureListener<>(
+    public Stream<TextureListener<? super EventDrivenTexture.TextureAndFrameView>> getListeners() {
+        TextureListener<EventDrivenTexture.TextureAndFrameView> registrationListener = new TextureListener<>(
                 TextureListener.Type.REGISTRATION,
                 (state) -> {
                     PREPARER.prepare(state.getTexture().getId(), 0, state.width(), state.height());
@@ -53,7 +53,7 @@ public class SingleUploadComponent implements GenericTextureComponent<EventDrive
                 });
 
         Point uploadPoint = new Point(0, 0);
-        TextureListener<EventDrivenTexture.TextureState> uploadListener = new TextureListener<>(
+        TextureListener<EventDrivenTexture.TextureAndFrameView> uploadListener = new TextureListener<>(
                 TextureListener.Type.UPLOAD,
                 (state) -> state.uploadAt(uploadPoint)
         );

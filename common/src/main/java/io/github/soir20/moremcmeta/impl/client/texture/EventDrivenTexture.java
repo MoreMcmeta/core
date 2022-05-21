@@ -48,7 +48,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
-    private final Map<TextureListener.Type, List<TextureListener<? super TextureState>>> LISTENERS;
+    private final Map<TextureListener.Type, List<TextureListener<? super TextureAndFrameView>>> LISTENERS;
     private final TextureState CURRENT_STATE;
     private boolean registered;
 
@@ -147,7 +147,12 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     private void runListeners(TextureListener.Type type) {
         LISTENERS.putIfAbsent(type, new ArrayList<>());
-        LISTENERS.get(type).forEach((listener) -> listener.run(CURRENT_STATE));
+
+        LISTENERS.get(type).forEach((listener) -> {
+            TextureAndFrameView view = new TextureAndFrameView(CURRENT_STATE);
+            listener.run(view);
+            view.invalidate();
+        });
     }
 
     /**
@@ -156,11 +161,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * @param predefinedFrames          frames already existing in the original image
      * @param generatedFrame            initial image for this texture
      */
-    private EventDrivenTexture(List<? extends TextureListener<? super TextureState>> listeners,
+    private EventDrivenTexture(List<? extends TextureListener<? super TextureAndFrameView>> listeners,
                                List<CloseableImageFrame> predefinedFrames, CloseableImageFrame generatedFrame) {
         super();
         LISTENERS = new EnumMap<>(TextureListener.Type.class);
-        for (TextureListener<? super TextureState> listener : listeners) {
+        for (TextureListener<? super TextureAndFrameView> listener : listeners) {
             LISTENERS.putIfAbsent(listener.getType(), new ArrayList<>());
             LISTENERS.get(listener.getType()).add(listener);
         }
@@ -173,7 +178,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * @author soir20
      */
     public static class Builder {
-        private final List<GenericTextureComponent<? super TextureState>> COMPONENTS;
+        private final List<GenericTextureComponent<? super TextureAndFrameView>> COMPONENTS;
         private List<CloseableImageFrame> predefinedFrames;
         private CloseableImageFrame generatedFrame;
 
@@ -231,7 +236,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param component     component to add to the texture
          * @return this builder for chaining
          */
-        public Builder add(GenericTextureComponent<? super TextureState> component) {
+        public Builder add(GenericTextureComponent<? super TextureAndFrameView> component) {
             requireNonNull(component, "Component cannot be null");
             COMPONENTS.add(component);
             return this;
@@ -265,7 +270,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new IllegalStateException("Predefined frames and generated frame must have same height");
             }
 
-            List<TextureListener<? super TextureState>> listeners = COMPONENTS.stream().flatMap(
+            List<TextureListener<? super TextureAndFrameView>> listeners = COMPONENTS.stream().flatMap(
                     GenericTextureComponent::getListeners
             ).collect(Collectors.toList());
 
@@ -275,10 +280,148 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     }
 
     /**
+     * Provides a view of the current state of the texture and the current frame.
+     * @author soir20
+     */
+    public static class TextureAndFrameView implements CurrentFrameView {
+        private final TextureState STATE;
+        private boolean valid;
+
+        /**
+         * Applies the provided transformation to the current frame to generate
+         * a new frame, which will become the current frame.
+         * @param transform     the transformation to apply to the current frame
+         */
+        @Override
+        public void generateWith(FrameTransform transform) {
+            checkValid();
+            STATE.generateWith(transform);
+        }
+
+        /**
+         * Replace the current frame with one of the predefined frames.
+         * @param index     the index of the predefined frame to make
+         *                  the current frame
+         */
+        @Override
+        public void replaceWith(int index) {
+            checkValid();
+            STATE.replaceWith(index);
+        }
+
+        /**
+         * Gets the width of a frame. All frames have the same width.
+         * @return the width of a frame
+         */
+        @Override
+        public int width() {
+            checkValid();
+            return STATE.width();
+        }
+
+        /**
+         * Gets the height of a frame. All frames have the same height.
+         * @return the height of a frame
+         */
+        @Override
+        public int height() {
+            checkValid();
+            return STATE.height();
+        }
+
+        /**
+         * Gets the index of the current frame if it is a predefined frame.
+         * Otherwise, the frame is a generated frame, so empty is returned.
+         * @return the index of the predefined frame or empty if generated
+         */
+        @Override
+        public Optional<Integer> index() {
+            checkValid();
+            return STATE.index();
+        }
+
+        /**
+         * Gets the number of predefined frames this texture has. A texture
+         * always has at least one predefined frame.
+         * @return the number of predefined frames for this texture
+         */
+        @Override
+        public int predefinedFrames() {
+            checkValid();
+            return STATE.predefinedFrames();
+        }
+
+        /**
+         * Gets the event-driven texture.
+         * @return the event-driven texture
+         */
+        public EventDrivenTexture getTexture() {
+            checkValid();
+            return STATE.getTexture();
+        }
+
+        /**
+         * Uploads the current frame at the given point. This should only
+         * be called when the correct texture (usually this texture) is
+         * bound in OpenGL.
+         * @param uploadPoint   point to upload the frame at
+         */
+        public void uploadAt(Point uploadPoint) {
+            checkValid();
+            STATE.uploadAt(uploadPoint);
+        }
+
+        /**
+         * Lowers the mipmap level of all predefined and generated frames
+         * for this texture. The new mipmap level must be less than or
+         * equal to the current mipmap level of the frames.
+         * @param newMipmapLevel        new mipmap level of the frames
+         */
+        public void lowerMipmapLevel(int newMipmapLevel) {
+            checkValid();
+            STATE.lowerMipmapLevel(newMipmapLevel);
+        }
+
+        /**
+         * Flags the texture as needing an upload.
+         */
+        public void markNeedsUpload() {
+            checkValid();
+            STATE.markNeedsUpload();
+        }
+
+        /**
+         * Creates an ephemeral wrapper for a texture state.
+         * @param state     texture state to wrap
+         */
+        private TextureAndFrameView(TextureState state) {
+            STATE = state;
+            valid = true;
+        }
+
+        /**
+         * Checks that this wrapper is still valid and throws an exception if not.
+         */
+        private void checkValid() {
+            if (!valid) {
+                throw new IllegalFrameReference();
+            }
+        }
+
+        /**
+         * Makes this wrapper no longer usable.
+         */
+        private void invalidate() {
+            valid = false;
+        }
+
+    }
+
+    /**
      * A mutable object to hold an event-driven texture's current state.
      * @author soir20
      */
-    public static class TextureState implements CurrentFrameView {
+    private static class TextureState {
         private final EventDrivenTexture TEXTURE;
         private final List<CloseableImageFrame> PREDEFINED_FRAMES;
         private final CloseableImageFrame GENERATED_FRAME;
@@ -292,7 +435,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * a new frame, which will become the current frame.
          * @param transform     the transformation to apply to the current frame
          */
-        @Override
         public void generateWith(FrameTransform transform) {
             requireNonNull(transform, "Frame transform cannot be null");
 
@@ -306,7 +448,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param index     the index of the predefined frame to make
          *                  the current frame
          */
-        @Override
         public void replaceWith(int index) {
             if (index < 0 || index >= PREDEFINED_FRAMES.size()) {
                 throw new IllegalArgumentException("Tried to replace with negative or non-existent frame index");
@@ -327,7 +468,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Gets the width of a frame. All frames have the same width.
          * @return the width of a frame
          */
-        @Override
         public int width() {
             return PREDEFINED_FRAMES.get(0).getWidth();
         }
@@ -336,7 +476,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Gets the height of a frame. All frames have the same height.
          * @return the height of a frame
          */
-        @Override
         public int height() {
             return PREDEFINED_FRAMES.get(0).getHeight();
         }
@@ -346,7 +485,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Otherwise, the frame is a generated frame, so empty is returned.
          * @return the index of the predefined frame or empty if generated
          */
-        @Override
         public Optional<Integer> index() {
             return Optional.ofNullable(currentFrameIndex);
         }
@@ -356,7 +494,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * always has at least one predefined frame.
          * @return the number of predefined frames for this texture
          */
-        @Override
         public int predefinedFrames() {
             return PREDEFINED_FRAMES.size();
         }
