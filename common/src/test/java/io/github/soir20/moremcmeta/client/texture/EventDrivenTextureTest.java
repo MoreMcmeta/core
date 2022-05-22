@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
 import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
@@ -31,7 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link EventDrivenTexture}.
@@ -107,7 +107,7 @@ public class EventDrivenTextureTest {
 
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
-                (state) -> state.generateWith(new FrameTransform((x, y, color) -> 0, List.of()))
+                (state) -> state.generateWith((x, y, color) -> 0, List.of())
         ), new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> state.uploadAt(new Point(0, 0))
         )));

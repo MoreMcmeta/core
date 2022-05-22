@@ -17,9 +17,11 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
+import io.github.soir20.moremcmeta.api.math.Point;
+
 public interface CurrentFrameView extends FrameView {
 
-    void generateWith(FrameTransform transform);
+    void generateWith(ColorTransform transform, Iterable<Point> applyArea);
 
     void replaceWith(int index);
 

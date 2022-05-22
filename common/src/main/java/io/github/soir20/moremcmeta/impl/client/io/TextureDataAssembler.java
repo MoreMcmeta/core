@@ -20,11 +20,12 @@ package io.github.soir20.moremcmeta.impl.client.io;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
-import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
 import io.github.soir20.moremcmeta.api.client.texture.InitialTransform;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
+import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
@@ -322,11 +323,12 @@ public class TextureDataAssembler {
         /**
          * Modifies this frame with the given function over the given apply area.
          * @param transform     transformation to apply to this frame
+         * @param applyArea     area to apply the transformation to
          */
         @Override
-        public void transform(FrameTransform transform) {
+        public void transform(ColorTransform transform, Iterable<Point> applyArea) {
             checkValid();
-            FRAME.applyTransform(transform);
+            FRAME.applyTransform(transform, applyArea);
         }
 
         public void invalidate() {

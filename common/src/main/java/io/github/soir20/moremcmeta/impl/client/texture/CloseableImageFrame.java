@@ -18,7 +18,7 @@
 package io.github.soir20.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
+import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
@@ -183,16 +183,17 @@ public class CloseableImageFrame {
      * upon attempting to apply the transformation to a point outside the frame
      * bounds.
      * @param transform     transform to apply
+     * @param applyArea     area to apply the transformation to
      */
-    public void applyTransform(FrameTransform transform) {
+    public void applyTransform(ColorTransform transform, Iterable<Point> applyArea) {
 
         // Apply transformation to the original image
-        transform.applyArea().forEach((point) -> {
+        applyArea.forEach((point) -> {
             int x = point.getX();
             int y = point.getY();
 
             CloseableImage topImage = mipmaps.get(0);
-            int newColor = transform.transform().transform(x, y, topImage.getPixel(x, y));
+            int newColor = transform.transform(x, y, topImage.getPixel(x, y));
             topImage.setPixel(x, y, newColor);
         });
 
@@ -201,7 +202,7 @@ public class CloseableImageFrame {
            knowledge would require all of them to handle additional
            complexity. Instead, we can efficiently calculate the mipmaps
            ourselves. */
-        transform.applyArea().forEach((point) -> {
+        applyArea.forEach((point) -> {
             int x = point.getX();
             int y = point.getY();
             for (int level = 1; level <= getMipmapLevel(); level++) {

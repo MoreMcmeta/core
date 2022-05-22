@@ -19,8 +19,9 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Pair;
+import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
-import io.github.soir20.moremcmeta.api.client.texture.FrameTransform;
 import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
 import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -291,11 +292,12 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Applies the provided transformation to the current frame to generate
          * a new frame, which will become the current frame.
          * @param transform     the transformation to apply to the current frame
+         * @param applyArea     area to apply the transformation to
          */
         @Override
-        public void generateWith(FrameTransform transform) {
+        public void generateWith(ColorTransform transform, Iterable<Point> applyArea) {
             checkValid();
-            STATE.generateWith(transform);
+            STATE.generateWith(transform, applyArea);
         }
 
         /**
@@ -425,7 +427,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final EventDrivenTexture TEXTURE;
         private final List<CloseableImageFrame> PREDEFINED_FRAMES;
         private final CloseableImageFrame GENERATED_FRAME;
-        private final Queue<FrameTransform> TRANSFORMS;
+        private final Queue<Pair<ColorTransform, Iterable<Point>>> TRANSFORMS;
         private Integer currentFrameIndex;
         private Integer indexToCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
@@ -434,13 +436,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Applies the provided transformation to the current frame to generate
          * a new frame, which will become the current frame.
          * @param transform     the transformation to apply to the current frame
+         * @param applyArea     area to apply the transformation to
          */
-        public void generateWith(FrameTransform transform) {
+        public void generateWith(ColorTransform transform, Iterable<Point> applyArea) {
             requireNonNull(transform, "Frame transform cannot be null");
 
             markNeedsUpload();
             currentFrameIndex = null;
-            TRANSFORMS.add(transform);
+            TRANSFORMS.add(Pair.of(transform, applyArea));
         }
 
         /**
@@ -577,7 +580,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             }
 
             while (!TRANSFORMS.isEmpty()) {
-                GENERATED_FRAME.applyTransform(TRANSFORMS.remove());
+                Pair<ColorTransform, Iterable<Point>> transform = TRANSFORMS.remove();
+                GENERATED_FRAME.applyTransform(transform.getFirst(), transform.getSecond());
             }
         }
 

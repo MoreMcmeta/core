@@ -17,8 +17,10 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
+import io.github.soir20.moremcmeta.api.math.Point;
+
 public interface MutableFrameView extends FrameView {
 
-    void transform(FrameTransform transform);
+    void transform(ColorTransform transform, Iterable<Point> applyArea);
 
 }
