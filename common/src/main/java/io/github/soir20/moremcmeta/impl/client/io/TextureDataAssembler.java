@@ -228,15 +228,15 @@ public class TextureDataAssembler {
             ));
         }
 
-        transform.transform(metadata, blur, clamp, new PredefinedFrameGroup(frameViews));
+        transform.transform(metadata, blur, clamp, new MutableFrameGroupImpl(frameViews));
 
         frameViews.forEach(MutableFrameViewImpl::invalidate);
     }
 
-    private static class PredefinedFrameGroup implements FrameGroup<MutableFrameView> {
+    private static class MutableFrameGroupImpl implements FrameGroup<MutableFrameView> {
         private final List<? extends MutableFrameView> FRAMES;
 
-        public PredefinedFrameGroup(List<? extends MutableFrameView> frames) {
+        public MutableFrameGroupImpl(List<? extends MutableFrameView> frames) {
             FRAMES = frames;
         }
 
