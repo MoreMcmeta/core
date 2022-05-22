@@ -217,11 +217,11 @@ public class TextureDataAssembler {
      */
     private void applyInitialTransform(InitialTransform transform, List<CloseableImageFrame> frames,
                                        ParsedMetadata metadata, boolean blur, boolean clamp) {
-        List<PredefinedFrameView> frameViews = new ArrayList<>();
+        List<MutableFrameViewImpl> frameViews = new ArrayList<>();
 
         for (int index = 0; index < frames.size(); index++) {
             CloseableImageFrame frame = frames.get(index);
-            frameViews.add(new PredefinedFrameView(
+            frameViews.add(new MutableFrameViewImpl(
                     frame,
                     index,
                     frames.size()
@@ -230,7 +230,7 @@ public class TextureDataAssembler {
 
         transform.transform(metadata, blur, clamp, new PredefinedFrameGroup(frameViews));
 
-        frameViews.forEach(PredefinedFrameView::invalidate);
+        frameViews.forEach(MutableFrameViewImpl::invalidate);
     }
 
     private static class PredefinedFrameGroup implements FrameGroup<MutableFrameView> {
@@ -259,7 +259,7 @@ public class TextureDataAssembler {
      * {@link MutableFrameView} implementation for a predefined frame.
      * @author soir20
      */
-    private static class PredefinedFrameView implements MutableFrameView {
+    private static class MutableFrameViewImpl implements MutableFrameView {
         private final CloseableImageFrame FRAME;
         private final int INDEX;
         private final int NUM_FRAMES;
@@ -272,7 +272,7 @@ public class TextureDataAssembler {
          * @param index         index of the frame among all frames
          * @param numFrames     number of frames total
          */
-        public PredefinedFrameView(CloseableImageFrame frame, int index, int numFrames) {
+        public MutableFrameViewImpl(CloseableImageFrame frame, int index, int numFrames) {
             FRAME = frame;
             INDEX = index;
             NUM_FRAMES = numFrames;
