@@ -20,6 +20,6 @@ package io.github.soir20.moremcmeta.api.client.texture;
 @FunctionalInterface
 public interface ColorTransform {
 
-    int transform(int x, int y, int color);
+    int transform(int x, int y);
 
 }

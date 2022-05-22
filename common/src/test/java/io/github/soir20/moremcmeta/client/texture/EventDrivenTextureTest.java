@@ -107,7 +107,7 @@ public class EventDrivenTextureTest {
 
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
-                (state) -> state.generateWith((x, y, color) -> 0, List.of())
+                (state) -> state.generateWith((x, y) -> 0, List.of())
         ), new TextureListener<>(TextureListener.Type.UPLOAD,
                 (state) -> state.uploadAt(new Point(0, 0))
         )));

@@ -21,6 +21,8 @@ import java.util.Optional;
 
 public interface FrameView {
 
+    int color(int x, int y);
+
     int width();
 
     int height();
@@ -28,6 +30,22 @@ public interface FrameView {
     Optional<Integer> index();
 
     int predefinedFrames();
+
+    /**
+     * Indicates that a point outside a frame's bounds was accessed.
+     * @author soir20
+     */
+    class PixelOutOfBoundsException extends RuntimeException {
+
+        /**
+         * Creates a new exception to indicate that a point outside a frame's bounds was accessed.
+         * @param x     x coordinate of the point accessed
+         * @param y     y coordinate of the point accessed
+         */
+        public PixelOutOfBoundsException(int x, int y) {
+            super("Point (" + x + ", " + y + ") is outside the frame");
+        }
+    }
 
     /**
      * Indicates that a {@link FrameView} was used after it became invalid.

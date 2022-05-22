@@ -70,6 +70,16 @@ public class CloseableImageFrame {
     }
 
     /**
+     * Gets the color of the given pixel in the top-level mipmap of this frame.
+     * @param x     x coordinate of the pixel (from the top left)
+     * @param y     y coordinate of the pixel (from the top left)
+     * @return the color of the pixel at the given coordinate
+     */
+    public int color(int x, int y) {
+        return mipmaps.get(0).getPixel(x, y);
+    }
+
+    /**
      * Uploads this frame at a given position in the active texture.
      * @param point     point to upload the top-left corner of this frame at
      */
@@ -192,9 +202,8 @@ public class CloseableImageFrame {
             int x = point.getX();
             int y = point.getY();
 
-            CloseableImage topImage = mipmaps.get(0);
-            int newColor = transform.transform(x, y, topImage.getPixel(x, y));
-            topImage.setPixel(x, y, newColor);
+            int newColor = transform.transform(x, y);
+            mipmaps.get(0).setPixel(x, y, newColor);
         });
 
         /* Update corresponding mipmap pixels.

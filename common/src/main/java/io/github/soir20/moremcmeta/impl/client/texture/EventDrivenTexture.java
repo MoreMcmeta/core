@@ -312,6 +312,23 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         /**
+         * Gets the color of the given pixel in the current frame.
+         * @param x     x coordinate of the pixel (from the top left)
+         * @param y     y coordinate of the pixel (from the top left)
+         * @return the color of the pixel at the given coordinate
+         */
+        @Override
+        public int color(int x, int y) {
+            checkValid();
+
+            if (x < 0 || y < 0 || x >= STATE.width() || y >= STATE.height()) {
+                throw new PixelOutOfBoundsException(x, y);
+            }
+
+            return STATE.color(x, y);
+        }
+
+        /**
          * Gets the width of a frame. All frames have the same width.
          * @return the width of a frame
          */
@@ -465,6 +482,16 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             currentFrameIndex = index;
             indexToCopyToGenerated = index;
             TRANSFORMS.clear();
+        }
+
+        /**
+         * Gets the color of the given pixel in the current frame.
+         * @param x     x coordinate of the pixel (from the top left)
+         * @param y     y coordinate of the pixel (from the top left)
+         * @return the color of the pixel at the given coordinate
+         */
+        public int color(int x, int y) {
+            return getCurrentFrame().color(x, y);
         }
 
         /**

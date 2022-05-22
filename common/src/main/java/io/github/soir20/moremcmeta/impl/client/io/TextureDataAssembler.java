@@ -280,6 +280,22 @@ public class TextureDataAssembler {
         }
 
         /**
+         * Gets the color of the given pixel in the current frame.
+         * @param x     x coordinate of the pixel (from the top left)
+         * @param y     y coordinate of the pixel (from the top left)
+         * @return the color of the pixel at the given coordinate
+         */
+        @Override
+        public int color(int x, int y) {
+            checkValid();
+            if (x < 0 || y < 0 || x >= FRAME.getWidth() || y >= FRAME.getHeight()) {
+                throw new PixelOutOfBoundsException(x, y);
+            }
+
+            return FRAME.color(x, y);
+        }
+
+        /**
          * Gets the width of the frame.
          * @return width of the frame
          */
