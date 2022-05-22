@@ -34,6 +34,7 @@ public class CloseableImageFrame {
     private final int X_OFFSET;
     private final int Y_OFFSET;
     private ImmutableList<? extends CloseableImage> mipmaps;
+    private boolean closed;
 
     /**
      * Creates a new frame based on frame data.
@@ -67,6 +68,7 @@ public class CloseableImageFrame {
         HEIGHT = frameHeight;
         X_OFFSET = frameData.getXOffset();
         Y_OFFSET = frameData.getYOffset();
+        closed = false;
     }
 
     /**
@@ -74,16 +76,21 @@ public class CloseableImageFrame {
      * @param x     x coordinate of the pixel (from the top left)
      * @param y     y coordinate of the pixel (from the top left)
      * @return the color of the pixel at the given coordinate
+     * @throws IllegalStateException if this frame has been closed
      */
     public int color(int x, int y) {
+        checkClosed();
         return mipmaps.get(0).getPixel(x, y);
     }
 
     /**
      * Uploads this frame at a given position in the active texture.
      * @param point     point to upload the top-left corner of this frame at
+     * @throws IllegalStateException if this frame has been closed
      */
     public void uploadAt(Point point) {
+        checkClosed();
+
         requireNonNull(point, "Point cannot be null");
 
         if (point.getX() < 0 || point.getY() < 0) {
@@ -107,48 +114,61 @@ public class CloseableImageFrame {
     /**
      * Gets the width of this frame in pixels.
      * @return  the width of this frame in pixels
+     * @throws IllegalStateException if this frame has been closed
      */
     public int getWidth() {
+        checkClosed();
         return WIDTH;
     }
 
     /**
      * Gets the height of this frame in pixels.
      * @return  the height of this frame in pixels
+     * @throws IllegalStateException if this frame has been closed
      */
     public int getHeight() {
+        checkClosed();
         return HEIGHT;
     }
 
     /**
      * Gets the x-offset of the top-left corner of this frame in pixels.
      * @return  the x-offset of this frame in pixels
+     * @throws IllegalStateException if this frame has been closed
      */
     public int getXOffset() {
+        checkClosed();
         return X_OFFSET;
     }
 
     /**
      * Gets the y-offset of the top-left corner of this frame in pixels.
      * @return  the y-offset of this frame in pixels
+     * @throws IllegalStateException if this frame has been closed
      */
     public int getYOffset() {
+        checkClosed();
         return Y_OFFSET;
     }
 
     /**
      * Gets the mipmap level of this frame.
      * @return the mipmap level of this frame
+     * @throws IllegalStateException if this frame has been closed
      */
     public int getMipmapLevel() {
+        checkClosed();
         return mipmaps.size() - 1;
     }
 
     /**
      * Lowers the mipmap level of this frame, closing all mipmaps above the provided level.
      * @param newMipmapLevel        the maximum new mipmap level
+     * @throws IllegalStateException if this frame has been closed
      */
     public void lowerMipmapLevel(int newMipmapLevel) {
+        checkClosed();
+
         if (newMipmapLevel == getMipmapLevel()) {
             return;
         }
@@ -175,8 +195,11 @@ public class CloseableImageFrame {
      * will be the smaller of the two frame widths and the smaller of the two
      * frame heights.
      * @param source     the source frame to copy from
+     * @throws IllegalStateException if this frame has been closed
      */
     public void copyFrom(CloseableImageFrame source) {
+        checkClosed();
+
         if (source.getMipmapLevel() < getMipmapLevel()) {
             throw new IllegalArgumentException("Other frame cannot have lower mipmap level");
         }
@@ -194,8 +217,10 @@ public class CloseableImageFrame {
      * bounds.
      * @param transform     transform to apply
      * @param applyArea     area to apply the transformation to
+     * @throws IllegalStateException if this frame has been closed
      */
     public void applyTransform(ColorTransform transform, Iterable<Point> applyArea) {
+        checkClosed();
 
         // Apply transformation to the original image
         applyArea.forEach((point) -> {
@@ -241,7 +266,18 @@ public class CloseableImageFrame {
      * Closes all resources associated with this frame. Idempotent.
      */
     public void close() {
+        closed = true;
         mipmaps.forEach(CloseableImage::close);
+    }
+
+    /**
+     * Checks if this frame is closed and throws an exception if so; otherwise, does nothing.
+     * @throws IllegalStateException if this frame has been closed
+     */
+    private void checkClosed() {
+        if (closed) {
+            throw new IllegalStateException("Frame is closed");
+        }
     }
 
     /**
