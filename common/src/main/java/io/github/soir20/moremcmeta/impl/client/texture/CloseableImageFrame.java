@@ -79,7 +79,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public int color(int x, int y) {
-        checkClosed();
+        checkOpen();
         return mipmaps.get(0).getPixel(x, y);
     }
 
@@ -89,7 +89,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public void uploadAt(Point point) {
-        checkClosed();
+        checkOpen();
 
         requireNonNull(point, "Point cannot be null");
 
@@ -117,7 +117,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public int getWidth() {
-        checkClosed();
+        checkOpen();
         return WIDTH;
     }
 
@@ -127,7 +127,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public int getHeight() {
-        checkClosed();
+        checkOpen();
         return HEIGHT;
     }
 
@@ -137,7 +137,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public int getXOffset() {
-        checkClosed();
+        checkOpen();
         return X_OFFSET;
     }
 
@@ -147,7 +147,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public int getYOffset() {
-        checkClosed();
+        checkOpen();
         return Y_OFFSET;
     }
 
@@ -157,7 +157,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public int getMipmapLevel() {
-        checkClosed();
+        checkOpen();
         return mipmaps.size() - 1;
     }
 
@@ -167,7 +167,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public void lowerMipmapLevel(int newMipmapLevel) {
-        checkClosed();
+        checkOpen();
 
         if (newMipmapLevel == getMipmapLevel()) {
             return;
@@ -198,7 +198,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public void copyFrom(CloseableImageFrame source) {
-        checkClosed();
+        checkOpen();
 
         if (source.getMipmapLevel() < getMipmapLevel()) {
             throw new IllegalArgumentException("Other frame cannot have lower mipmap level");
@@ -220,7 +220,7 @@ public class CloseableImageFrame {
      * @throws IllegalStateException if this frame has been closed
      */
     public void applyTransform(ColorTransform transform, Iterable<Point> applyArea) {
-        checkClosed();
+        checkOpen();
 
         // Apply transformation to the original image
         applyArea.forEach((point) -> {
@@ -274,7 +274,7 @@ public class CloseableImageFrame {
      * Checks if this frame is closed and throws an exception if so; otherwise, does nothing.
      * @throws IllegalStateException if this frame has been closed
      */
-    private void checkClosed() {
+    private void checkOpen() {
         if (closed) {
             throw new IllegalStateException("Frame is closed");
         }
