@@ -474,7 +474,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             }
 
             // If we are setting the current frame to itself, we don't need to upload again
-            if (index == currentFrameIndex) {
+            if (currentFrameIndex != null && index == currentFrameIndex) {
                 return;
             }
 
