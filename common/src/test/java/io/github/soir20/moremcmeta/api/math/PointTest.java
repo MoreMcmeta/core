@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.api.client.math;
+package io.github.soir20.moremcmeta.api.math;
 
 import io.github.soir20.moremcmeta.api.math.Point;
 import org.junit.Test;
