@@ -212,11 +212,11 @@ public abstract class MoreMcmeta {
         DEFAULT_PLUGINS.forEach((defaultPlugin) -> {
 
             // Disable default plugin if there is a user-provided plugin with the same section name
-            if (!sections.contains(defaultPlugin.sectionName())) {
-                plugins.add(defaultPlugin);
-            } else {
+            if (sections.contains(defaultPlugin.sectionName())) {
                 logger.info("Disabled default plugin " + defaultPlugin.displayName()
                         + " as a replacement plugin was provided");
+            } else {
+                plugins.add(defaultPlugin);
             }
 
         });
