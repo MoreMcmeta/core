@@ -18,11 +18,10 @@
 package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
-import io.github.soir20.moremcmeta.api.client.texture.InitialTransform;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
-import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class TextureData<I extends CloseableImage> {
     private final boolean BLUR;
     private final boolean CLAMP;
     private final I IMAGE;
-    private final List<Triple<ParsedMetadata, InitialTransform, ComponentProvider>> PARSED_SECTIONS;
+    private final List<Pair<ParsedMetadata, ComponentProvider>> PARSED_SECTIONS;
 
     /**
      * Creates a new texture data container.
@@ -50,7 +49,7 @@ public class TextureData<I extends CloseableImage> {
      *                          process the metadata
      */
     public TextureData(ParsedMetadata.FrameSize frameSize, boolean blur, boolean clamp, I image,
-                       List<Triple<ParsedMetadata, InitialTransform, ComponentProvider>> parsedSections) {
+                       List<Pair<ParsedMetadata, ComponentProvider>> parsedSections) {
         if (frameSize.width() > image.getWidth()) {
             throw new IllegalArgumentException("Frame width cannot be larger than image width");
         }
@@ -99,12 +98,11 @@ public class TextureData<I extends CloseableImage> {
     }
 
     /**
-     * Gets parsed metadata, initial transforms, and component providers that
+     * Gets parsed metadata and component providers that
      * will process the metadata.
      * @return parsed metadata sections and associated component providers
-     *         and transforms
      */
-    public Iterable<Triple<ParsedMetadata, InitialTransform, ComponentProvider>> parsedMetadata() {
+    public Iterable<Pair<ParsedMetadata, ComponentProvider>> parsedMetadata() {
         return PARSED_SECTIONS;
     }
 

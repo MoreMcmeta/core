@@ -22,7 +22,7 @@ import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 @FunctionalInterface
 public interface ComponentProvider {
 
-    Iterable<TextureComponent> assemble(ParsedMetadata metadata, ParsedMetadata.FrameSize frameSize,
-                                        boolean blur, boolean clamp);
+    Iterable<TextureComponent> assemble(ParsedMetadata metadata, boolean blur, boolean clamp,
+                                        FrameGroup<MutableFrameView> frame);
 
 }

@@ -19,12 +19,13 @@ package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
-import io.github.soir20.moremcmeta.api.client.texture.InitialTransform;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
+import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
@@ -33,7 +34,6 @@ import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
-import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,21 +96,13 @@ public class TextureDataAssembler {
                 .setGeneratedFrame(generatedFrame)
                 .add(new CleanupComponent(closeMipmaps));
 
-        for (Triple<ParsedMetadata, InitialTransform, ComponentProvider> metadata : data.parsedMetadata()) {
-            ParsedMetadata sectionData = metadata.getLeft();
+        for (Pair<ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
+            ParsedMetadata sectionData = metadata.getFirst();
 
-            applyInitialTransform(
-                    metadata.getMiddle(),
+            assembleComponents(
+                    metadata.getSecond(),
                     frames,
                     sectionData,
-                    blur,
-                    clamp
-            );
-
-            ComponentProvider componentProvider = metadata.getRight();
-            componentProvider.assemble(
-                    sectionData,
-                    data.frameSize(),
                     blur,
                     clamp
             ).forEach(builder::add);
@@ -208,15 +200,18 @@ public class TextureDataAssembler {
     }
 
     /**
-     * Applies an initial transform to all predefined frames.
-     * @param transform     transform to apply
+     * Creates texture components based on the given frames and provider.
+     * @param provider      component provider
      * @param frames        predefined frames
      * @param metadata      metadata associated with the transform
      * @param blur          whether to blur the texture
      * @param clamp         whether to clamp the texture
+     * @return assembled components
      */
-    private void applyInitialTransform(InitialTransform transform, List<CloseableImageFrame> frames,
-                                       ParsedMetadata metadata, boolean blur, boolean clamp) {
+    private Iterable<TextureComponent> assembleComponents(ComponentProvider provider,
+                                                          List<CloseableImageFrame> frames,
+                                                          ParsedMetadata metadata,
+                                                          boolean blur, boolean clamp) {
         List<MutableFrameViewImpl> frameViews = new ArrayList<>();
 
         for (int index = 0; index < frames.size(); index++) {
@@ -228,9 +223,16 @@ public class TextureDataAssembler {
             ));
         }
 
-        transform.transform(metadata, blur, clamp, new MutableFrameGroupImpl(frameViews));
+        Iterable<TextureComponent> components = provider.assemble(
+                metadata,
+                blur,
+                clamp,
+                new MutableFrameGroupImpl(frameViews)
+        );
 
         frameViews.forEach(MutableFrameViewImpl::invalidate);
+
+        return components;
     }
 
     private static class MutableFrameGroupImpl implements FrameGroup<MutableFrameView> {

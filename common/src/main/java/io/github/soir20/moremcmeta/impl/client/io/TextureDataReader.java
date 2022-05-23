@@ -20,16 +20,15 @@ package io.github.soir20.moremcmeta.impl.client.io;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaPlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
-import io.github.soir20.moremcmeta.api.client.texture.InitialTransform;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.resource.JsonMetadataView;
 import net.minecraft.util.GsonHelper;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.Triple;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
         NativeImage image = NativeImage.read(textureStream);
 
         MetadataView metadata = readMetadata(metadataStream);
-        List<Triple<ParsedMetadata, InitialTransform, ComponentProvider>> parsedSections = new ArrayList<>();
+        List<Pair<ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
         Optional<ParsedMetadata.FrameSize> frameSizeOptional = Optional.empty();
         Optional<Boolean> blurOptional = Optional.empty();
         Optional<Boolean> clampOptional = Optional.empty();
@@ -90,7 +89,7 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
             }
 
             ParsedMetadata sectionData = plugin.parser().parse(metadata);
-            parsedSections.add(Triple.of(sectionData, plugin.initialTransform(), plugin.componentProvider()));
+            parsedSections.add(Pair.of(sectionData, plugin.componentProvider()));
 
             frameSizeOptional = getIfCompatible(frameSizeOptional, sectionData.frameSize(), "frame size");
             blurOptional = getIfCompatible(blurOptional, sectionData.blur(), "blur");

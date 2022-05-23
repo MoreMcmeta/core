@@ -19,7 +19,6 @@ package io.github.soir20.moremcmeta.api.client;
 
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
-import io.github.soir20.moremcmeta.api.client.texture.InitialTransform;
 
 public interface MoreMcmetaPlugin {
 
@@ -28,8 +27,6 @@ public interface MoreMcmetaPlugin {
     String sectionName();
 
     MetadataParser parser();
-
-    InitialTransform initialTransform();
 
     ComponentProvider componentProvider();
 

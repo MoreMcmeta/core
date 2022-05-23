@@ -208,7 +208,6 @@ public abstract class MoreMcmeta {
             validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
             validatePluginItem(plugin.sectionName(), "section name", plugin.displayName());
             validatePluginItem(plugin.parser(), "parser", plugin.displayName());
-            validatePluginItem(plugin.initialTransform(), "initial transform", plugin.displayName());
             validatePluginItem(plugin.componentProvider(), "component provider", plugin.displayName());
         }
 
