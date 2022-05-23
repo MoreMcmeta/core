@@ -89,6 +89,8 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
             }
 
             ParsedMetadata sectionData = plugin.parser().parse(metadata);
+            requireNonNull(sectionData, "Plugin " + plugin.displayName()
+                    + " returned null for parsed metadata");
             parsedSections.add(Pair.of(sectionData, plugin.componentProvider()));
 
             frameSizeOptional = getIfCompatible(frameSizeOptional, sectionData.frameSize(), "frame size");
