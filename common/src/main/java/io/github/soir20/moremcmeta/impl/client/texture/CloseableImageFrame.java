@@ -31,8 +31,6 @@ import static java.util.Objects.requireNonNull;
 public class CloseableImageFrame {
     private final int WIDTH;
     private final int HEIGHT;
-    private final int X_OFFSET;
-    private final int Y_OFFSET;
     private ImmutableList<? extends CloseableImage> mipmaps;
     private boolean closed;
 
@@ -66,8 +64,6 @@ public class CloseableImageFrame {
 
         WIDTH = frameWidth;
         HEIGHT = frameHeight;
-        X_OFFSET = frameData.getXOffset();
-        Y_OFFSET = frameData.getYOffset();
         closed = false;
     }
 
@@ -129,26 +125,6 @@ public class CloseableImageFrame {
     public int getHeight() {
         checkOpen();
         return HEIGHT;
-    }
-
-    /**
-     * Gets the x-offset of the top-left corner of this frame in pixels.
-     * @return  the x-offset of this frame in pixels
-     * @throws IllegalStateException if this frame has been closed
-     */
-    public int getXOffset() {
-        checkOpen();
-        return X_OFFSET;
-    }
-
-    /**
-     * Gets the y-offset of the top-left corner of this frame in pixels.
-     * @return  the y-offset of this frame in pixels
-     * @throws IllegalStateException if this frame has been closed
-     */
-    public int getYOffset() {
-        checkOpen();
-        return Y_OFFSET;
     }
 
     /**

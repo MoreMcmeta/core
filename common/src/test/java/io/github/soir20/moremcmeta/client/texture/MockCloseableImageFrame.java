@@ -32,14 +32,14 @@ public class MockCloseableImageFrame extends CloseableImageFrame {
 
     public MockCloseableImageFrame() {
         this(ImmutableList.of(
-                new MockCloseableImage(),
-                new MockCloseableImage(),
-                new MockCloseableImage()
+                new MockCloseableImage(100, 100),
+                new MockCloseableImage(50, 50),
+                new MockCloseableImage(25, 25)
         ));
     }
 
     private MockCloseableImageFrame(ImmutableList<MockCloseableImage> mipmaps) {
-        super(new FrameReader.FrameData(10, 10, 0, 0), mipmaps);
+        super(new FrameReader.FrameData(100, 100, 0, 0), mipmaps);
         MIPMAPS = mipmaps;
     }
 
