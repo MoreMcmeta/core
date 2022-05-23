@@ -58,7 +58,7 @@ public class SingleUploadComponentTest {
         texture.upload();
 
         assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
+        assertEquals(new Point(0, 0), frame.getMipmap(0).getLastUploadPoint());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class SingleUploadComponentTest {
         texture.upload();
 
         assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
+        assertEquals(new Point(0, 0), frame.getMipmap(0).getLastUploadPoint());
     }
 
 }

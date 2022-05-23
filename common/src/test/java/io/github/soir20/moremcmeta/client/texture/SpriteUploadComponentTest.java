@@ -51,9 +51,9 @@ public class SpriteUploadComponentTest {
         texture.upload();
 
         assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(2, 3), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(1, 1), ((MockCloseableImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(2)).getLastUploadPoint());
+        assertEquals(new Point(2, 3), frame.getMipmap(0).getLastUploadPoint());
+        assertEquals(new Point(1, 1), frame.getMipmap(1).getLastUploadPoint());
+        assertEquals(new Point(0, 0), frame.getMipmap(2).getLastUploadPoint());
     }
 
     @Test
@@ -70,9 +70,9 @@ public class SpriteUploadComponentTest {
         texture.upload();
 
         assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(2, 3), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(1, 1), ((MockCloseableImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(2)).getLastUploadPoint());
+        assertEquals(new Point(2, 3), frame.getMipmap(0).getLastUploadPoint());
+        assertEquals(new Point(1, 1), frame.getMipmap(1).getLastUploadPoint());
+        assertEquals(new Point(0, 0), frame.getMipmap(2).getLastUploadPoint());
     }
 
     @Test
@@ -90,9 +90,9 @@ public class SpriteUploadComponentTest {
 
         assertEquals(1, sprite.getBindCount());
         assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(2, 3), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(1, 1), ((MockCloseableImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(2)).getLastUploadPoint());
+        assertEquals(new Point(2, 3), frame.getMipmap(0).getLastUploadPoint());
+        assertEquals(new Point(1, 1), frame.getMipmap(1).getLastUploadPoint());
+        assertEquals(new Point(0, 0), frame.getMipmap(2).getLastUploadPoint());
     }
 
     @Test
@@ -111,9 +111,9 @@ public class SpriteUploadComponentTest {
 
         assertEquals(2, sprite.getBindCount());
         assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(2, 3), ((MockCloseableImage) frame.getImage(0)).getLastUploadPoint());
-        assertEquals(new Point(1, 1), ((MockCloseableImage) frame.getImage(1)).getLastUploadPoint());
-        assertEquals(new Point(0, 0), ((MockCloseableImage) frame.getImage(2)).getLastUploadPoint());
+        assertEquals(new Point(2, 3), frame.getMipmap(0).getLastUploadPoint());
+        assertEquals(new Point(1, 1), frame.getMipmap(1).getLastUploadPoint());
+        assertEquals(new Point(0, 0), frame.getMipmap(2).getLastUploadPoint());
     }
 
     @Test

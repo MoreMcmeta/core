@@ -119,44 +119,6 @@ public class CloseableImageFrameTest {
     }
 
     @Test
-    public void getMipmap_MipmapAtArrayLength_IllegalArgException() {
-        ImmutableList<CloseableImage> mipmaps = ImmutableList.of(
-                new MockCloseableImage(),
-                new MockCloseableImage(),
-                new MockCloseableImage(),
-                new MockCloseableImage(),
-                new MockCloseableImage()
-        );
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
-        );
-
-        expectedException.expect(IllegalArgumentException.class);
-        frame.getImage(5);
-    }
-
-    @Test
-    public void getMipmap_MipmapBeyondArrayLength_IllegalArgException() {
-        ImmutableList<CloseableImage> mipmaps = ImmutableList.of(
-                new MockCloseableImage(),
-                new MockCloseableImage(),
-                new MockCloseableImage(),
-                new MockCloseableImage(),
-                new MockCloseableImage()
-        );
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
-        );
-
-        expectedException.expect(IllegalArgumentException.class);
-        frame.getImage(6);
-    }
-
-    @Test
     public void upload_NullPoint_NullPointerException() {
         ImmutableList<CloseableImage> mipmaps = ImmutableList.of(
                 new MockCloseableImage(),
@@ -563,37 +525,6 @@ public class CloseableImageFrameTest {
     }
 
     @Test
-    public void lowerMipmapLevel_ZeroLevel_ClosedMipmapsNoLongerProvided() {
-        ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
-                new MockCloseableImage(8, 8),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1),
-                new MockCloseableImage(0, 0),
-                new MockCloseableImage(0, 0)
-        );
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
-        );
-
-        int newLevel = 0;
-        frame.lowerMipmapLevel(newLevel);
-
-        int mipmapsNotClosed = mipmaps.size() - 1;
-
-        for (int level = newLevel + 1; level < mipmaps.size(); level++) {
-            try {
-                frame.getImage(level);
-            } catch (IllegalArgumentException err) {
-                mipmapsNotClosed--;
-            }
-        }
-
-        assertEquals(0, mipmapsNotClosed);
-    }
-
-    @Test
     public void lowerMipmapLevel_LessThanMaxLevel_MipmapsClosed() {
         ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
                 new MockCloseableImage(8, 8),
@@ -614,91 +545,6 @@ public class CloseableImageFrameTest {
         for (int level = newLevel + 1; level < mipmaps.size(); level++) {
             assertTrue(mipmaps.get(level).isClosed());
         }
-    }
-
-    @Test
-    public void lowerMipmapLevel_LessThanMaxLevel_ClosedMipmapsNoLongerProvided() {
-        ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
-                new MockCloseableImage(8, 8),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1),
-                new MockCloseableImage(0, 0),
-                new MockCloseableImage(0, 0)
-        );
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
-        );
-
-        int newLevel = 2;
-        frame.lowerMipmapLevel(newLevel);
-
-        int mipmapsNotClosed = mipmaps.size() - 1;
-
-        for (int level = newLevel + 1; level < mipmaps.size(); level++) {
-            try {
-                frame.getImage(level);
-            } catch (IllegalArgumentException err) {
-                mipmapsNotClosed--;
-            }
-        }
-
-        assertEquals(newLevel, mipmapsNotClosed);
-    }
-
-    @Test
-    public void lowerMipmapLevel_MaxLevel_NothingClosed() {
-        ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
-                new MockCloseableImage(8, 8),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1),
-                new MockCloseableImage(0, 0),
-                new MockCloseableImage(0, 0)
-        );
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
-        );
-
-        int newLevel = mipmaps.size() - 1;
-        frame.lowerMipmapLevel(newLevel);
-
-        for (int level = 0; level < mipmaps.size(); level++) {
-            assertFalse(mipmaps.get(level).isClosed());
-        }
-    }
-
-    @Test
-    public void lowerMipmapLevel_MaxLevel_MipmapsStillProvided() {
-        ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
-                new MockCloseableImage(8, 8),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1),
-                new MockCloseableImage(0, 0),
-                new MockCloseableImage(0, 0)
-        );
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
-        );
-
-        int newLevel = mipmaps.size() - 1;
-        frame.lowerMipmapLevel(newLevel);
-
-        int mipmapsNotClosed = mipmaps.size() - 1;
-
-        for (int level = 0; level < mipmaps.size(); level++) {
-            try {
-                frame.getImage(level);
-            } catch (IllegalArgumentException err) {
-                mipmapsNotClosed--;
-            }
-        }
-
-        assertEquals(mipmaps.size() - 1, mipmapsNotClosed);
     }
 
     @Test
@@ -747,37 +593,6 @@ public class CloseableImageFrameTest {
             for (int level = 0; level < mipmaps.size(); level++) {
                 assertFalse(mipmaps.get(level).isClosed());
             }
-        }
-    }
-
-    @Test
-    public void lowerMipmapLevel_MoreThanMaxLevel_MipmapsStillProvided() {
-        ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
-                new MockCloseableImage(8, 8),
-                new MockCloseableImage(2, 2),
-                new MockCloseableImage(1, 1),
-                new MockCloseableImage(0, 0),
-                new MockCloseableImage(0, 0)
-        );
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
-        );
-
-        int newLevel = mipmaps.size();
-
-        try {
-            frame.lowerMipmapLevel(newLevel);
-        } catch (IllegalArgumentException ignored) {
-
-        } finally {
-
-            // No exceptions should be thrown here
-            for (int level = 0; level < mipmaps.size(); level++) {
-                frame.getImage(level);
-            }
-
         }
     }
 

@@ -104,7 +104,7 @@ public class TextureFinisherTest {
         textures.values().forEach(EventDrivenTexture::upload);
 
         for (MockCloseableImageFrame frame : frames) {
-            MockCloseableImage mockImage = (MockCloseableImage) frame.getImage(0);
+            MockCloseableImage mockImage = frame.getMipmap(0);
             assertEquals(new Point(2, 3), mockImage.getLastUploadPoint());
             assertEquals(1, frame.getUploadCount());
         }
@@ -139,7 +139,7 @@ public class TextureFinisherTest {
         textures.values().forEach(EventDrivenTexture::upload);
 
         for (MockCloseableImageFrame frame : frames) {
-            MockCloseableImage mockImage = (MockCloseableImage) frame.getImage(0);
+            MockCloseableImage mockImage = frame.getMipmap(0);
             assertEquals(new Point(0, 0), mockImage.getLastUploadPoint());
             assertEquals(1, frame.getUploadCount());
         }

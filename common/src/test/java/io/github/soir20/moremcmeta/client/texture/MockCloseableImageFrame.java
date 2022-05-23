@@ -27,11 +27,20 @@ import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
  * @author soir20
  */
 public class MockCloseableImageFrame extends CloseableImageFrame {
+    private final ImmutableList<MockCloseableImage> MIPMAPS;
     private int uploads;
 
     public MockCloseableImageFrame() {
-        super(new FrameReader.FrameData(10, 10, 0, 0),
-                ImmutableList.of(new MockCloseableImage(), new MockCloseableImage(), new MockCloseableImage()));
+        this(ImmutableList.of(
+                new MockCloseableImage(),
+                new MockCloseableImage(),
+                new MockCloseableImage()
+        ));
+    }
+
+    private MockCloseableImageFrame(ImmutableList<MockCloseableImage> mipmaps) {
+        super(new FrameReader.FrameData(10, 10, 0, 0), mipmaps);
+        MIPMAPS = mipmaps;
     }
 
     @Override
@@ -42,6 +51,10 @@ public class MockCloseableImageFrame extends CloseableImageFrame {
 
     public int getUploadCount() {
         return uploads;
+    }
+
+    public MockCloseableImage getMipmap(int mipmap) {
+        return MIPMAPS.get(mipmap);
     }
 
 }
