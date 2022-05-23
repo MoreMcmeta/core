@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
@@ -76,6 +77,8 @@ import static java.util.Objects.requireNonNull;
 public abstract class MoreMcmeta {
     public static final String MODID = "moremcmeta";
 
+    private final Collection<MoreMcmetaPlugin> DEFAULT_PLUGINS = Set.of();
+
     private Map<ResourceLocation, TextureData<NativeImageAdapter>> lastTextures;
 
     /**
@@ -88,6 +91,7 @@ public abstract class MoreMcmeta {
 
         // Fetch and validate plugins
         Collection<MoreMcmetaPlugin> plugins = fetchPlugins(logger);
+        addDefaultPlugins(plugins, logger);
         validatePlugins(plugins);
 
         // Texture manager
@@ -195,6 +199,28 @@ public abstract class MoreMcmeta {
      * @param texManager        the manager to begin ticking
      */
     protected abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
+
+    /**
+     * Adds the default plugins to the main collection of plugins.
+     * @param plugins       main collection of plugins (with user-provided plugins)
+     */
+    private void addDefaultPlugins(Collection<MoreMcmetaPlugin> plugins, Logger logger) {
+        Set<String> sections = plugins.stream()
+                .map(MoreMcmetaPlugin::sectionName)
+                .collect(Collectors.toSet());
+
+        DEFAULT_PLUGINS.forEach((defaultPlugin) -> {
+
+            // Disable default plugin if there is a user-provided plugin with the same section name
+            if (!sections.contains(defaultPlugin.sectionName())) {
+                plugins.add(defaultPlugin);
+            } else {
+                logger.info("Disabled default plugin " + defaultPlugin.displayName()
+                        + " as a replacement plugin was provided");
+            }
+
+        });
+    }
 
     /**
      * Validates all the registered plugins, both individually and for conflicts.
