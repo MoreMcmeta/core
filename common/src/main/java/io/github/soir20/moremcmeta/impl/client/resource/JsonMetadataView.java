@@ -65,18 +65,18 @@ public class JsonMetadataView implements MetadataView {
     }
 
     @Override
-    public boolean hasValue(String key) {
+    public boolean hasKey(String key) {
         requireNonNull(key, "Key cannot be null");
 
         int keyAsIndex = strAsIndex(key);
         return ROOT.get(
-                (obj) -> obj.has(key) && obj.get(key).isJsonPrimitive(),
-                (array) -> keyAsIndex >= 0 && keyAsIndex < SIZE && array.get(keyAsIndex).isJsonPrimitive()
+                (obj) -> obj.has(key),
+                (array) -> keyAsIndex >= 0 && keyAsIndex < SIZE
         );
     }
 
     @Override
-    public boolean hasValue(int index) {
+    public boolean hasKey(int index) {
         if (index < 0) {
             throw new IllegalArgumentException("Index cannot be negative");
         }
@@ -263,7 +263,7 @@ public class JsonMetadataView implements MetadataView {
                                              Function<JsonPrimitive, T> convertFunction) {
         requireNonNull(key, "Key cannot be null");
 
-        if (!hasValue(key)) {
+        if (!hasKey(key)) {
             return Optional.empty();
         }
 
@@ -276,7 +276,7 @@ public class JsonMetadataView implements MetadataView {
 
     private <T> Optional<T> primitiveFromIndex(int index, Function<JsonPrimitive, Boolean> checkFunction,
                                                Function<JsonPrimitive, T> convertFunction) {
-        if (!hasValue(index)) {
+        if (!hasKey(index)) {
             return Optional.empty();
         }
 

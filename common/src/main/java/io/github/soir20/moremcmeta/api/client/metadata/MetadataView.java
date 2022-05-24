@@ -44,31 +44,29 @@ public interface MetadataView {
     Iterable<String> keys();
 
     /**
-     * Checks if this view has a data value (not a sub-view) for a top-level key with the
-     * given name. The value associated with the key may be of any type.
+     * Checks if this view has a data value or sub-view for a top-level key with the
+     * given name.
      * @param key       the key to check for
-     * @return true if the view has a data value for this key or false if it does not have a
-     *         data value for this key
+     * @return true if the view has a data value or sub-view for this key or false otherwise
      */
-    boolean hasValue(String key);
+    boolean hasKey(String key);
 
     /**
-     * Checks if this view has a data value (not a sub-view) for a top-level key at the
-     * given index (starting at 0). The value associated with the key may be of any type.
+     * Checks if this view has a data value or sub-view for a top-level key at the
+     * given index (starting at 0).
      * @param index       the index of the key to check for
-     * @return true if the view has a data value for this key or false if it does not have a
-     *         data value for this key
+     * @return true if the view has a data value or sub-view for this key or false otherwise
      */
-    boolean hasValue(int index);
+    boolean hasKey(int index);
 
     /**
      * Retrieves the value of a string for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid string, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not a string.
      *
      * Any value that is not a sub-view can be converted to a string, so this method will return a
-     * string whenever {@link #hasValue(String)} returns true.
+     * string whenever {@link #hasKey(String)} returns true.
      * @param key       the key whose string value to retrieve
      * @return An {@link Optional} containing the string value or {@link Optional#empty()} if there is
      *         string value associated with the key. The string inside the {@link Optional} will never
@@ -79,11 +77,11 @@ public interface MetadataView {
     /**
      * Retrieves the value of a string for the key at the given index if any exists. If there is no such
      * key or the key's associated value is not a valid string, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not a string.
      *
      * Any value that is not a sub-view can be converted to a string, so this method will return a
-     * string whenever {@link #hasValue(int)} returns true.
+     * string whenever {@link #hasKey(int)} returns true.
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the string value or {@link Optional#empty()} if there is
      *         string value associated with the key. The string inside the {@link Optional} will never
@@ -94,7 +92,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a signed 32-bit integer for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid signed 32-bit integer, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not an integer.
      * @param key       the key whose signed 32-bit integer value to retrieve
      * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
@@ -106,7 +104,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a signed 32-bit integer for the key at the given index if any exists. If there is no
      * such key or the key's associated value is not a valid signed 32-bit integer, this method returns
-     * {@link Optional#empty()}. {@link #hasValue(int)} can be used to determine whether the key is present or
+     * {@link Optional#empty()}. {@link #hasKey(int)} can be used to determine whether the key is present or
      * the value is not an integer.
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
@@ -119,7 +117,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of an unsigned 32-bit integer for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid unsigned 32-bit integer, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not an integer.
      * @param key       the key whose unsigned 32-bit integer value to retrieve
      * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
@@ -131,7 +129,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of an unsigned 32-bit integer for the key at the given index if any exists. If there is
      * no such key or the key's associated value is not a valid unsigned 32-bit integer, this method returns
-     * {@link Optional#empty()}. {@link #hasValue(int)} can be used to determine whether the key is present
+     * {@link Optional#empty()}. {@link #hasKey(int)} can be used to determine whether the key is present
      * or the value is not an integer.
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
@@ -143,7 +141,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a signed 64-bit long for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid signed 64-bit long, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not a long.
      * @param key       the key whose signed 64-bit long value to retrieve
      * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
@@ -155,7 +153,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a signed 64-bit long for the key at the given index if any exists. If there is
      * no such key or the key's associated value is not a valid signed 64-bit long, this method returns
-     * {@link Optional#empty()}. {@link #hasValue(int)} can be used to determine whether the key is present
+     * {@link Optional#empty()}. {@link #hasKey(int)} can be used to determine whether the key is present
      * or the value is not a long.
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
@@ -167,7 +165,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of an unsigned 64-bit long for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid unsigned 64-bit long, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not a long.
      * @param key       the key whose unsigned 64-bit long value to retrieve
      * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
@@ -179,7 +177,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of an unsigned 64-bit long for the key at the given index if any exists. If there is
      * no such key or the key's associated value is not a valid unsigned 64-bit long, this method returns
-     * {@link Optional#empty()}. {@link #hasValue(int)} can be used to determine whether the key is present
+     * {@link Optional#empty()}. {@link #hasKey(int)} can be used to determine whether the key is present
      * or the value is not a long.
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
@@ -191,7 +189,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a float for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid float, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not a float.
      * @param key       the key whose float value to retrieve
      * @return An {@link Optional} containing the float value or {@link Optional#empty()} if there is
@@ -203,7 +201,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a float for the key at the given index if any exists. If there is no such
      * key or the key's associated value is not a valid float, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(int)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(int)} can be used to determine whether the key is present or the value is
      * not a float.
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the float value or {@link Optional#empty()} if there is
@@ -215,7 +213,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a double for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid double, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not a double.
      * @param key       the key whose double value to retrieve
      * @return An {@link Optional} containing the double value or {@link Optional#empty()} if there is
@@ -227,7 +225,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a double for the key at the given index if any exists. If there is no such
      * key or the key's associated value is not a valid double, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(int)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(int)} can be used to determine whether the key is present or the value is
      * not a double.
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the double value or {@link Optional#empty()} if there is
@@ -239,7 +237,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a boolean for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid boolean, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not a boolean.
      *
      * A value is considered true if it is equivalent to the string "true" (case-insensitive). Otherwise,
@@ -254,7 +252,7 @@ public interface MetadataView {
     /**
      * Retrieves the value of a boolean for the key at the given index if any exists. If there is no such
      * key or the key's associated value is not a valid boolean, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(int)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(int)} can be used to determine whether the key is present or the value is
      * not a boolean.
      *
      * A value is considered true if it is equivalent to the string "true" (case-insensitive). Otherwise,
@@ -269,7 +267,7 @@ public interface MetadataView {
     /**
      * Retrieves the sub-view for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid sub-view, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(String)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
      * not a sub-view.
      * @param key       the key whose sub-view to retrieve
      * @return An {@link Optional} containing the sub-view or {@link Optional#empty()} if there is
@@ -281,7 +279,7 @@ public interface MetadataView {
     /**
      * Retrieves a sub-view for the key at the given index if any exists. If there is no such
      * key or the key's associated value is not a valid sub-view, this method returns {@link Optional#empty()}.
-     * {@link #hasValue(int)} can be used to determine whether the key is present or the value is
+     * {@link #hasKey(int)} can be used to determine whether the key is present or the value is
      * not a sub-view.
      * @param index       the index of the key whose sub-view value to retrieve
      * @return An {@link Optional} containing the sub-view or {@link Optional#empty()} if there is
