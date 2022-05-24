@@ -17,9 +17,26 @@
 
 package io.github.soir20.moremcmeta.api.client.metadata;
 
+import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
+
+/**
+ * Parses immutable texture metadata into data in a more usable form. The {@link ParsedMetadata} returned
+ * by the parser will later be given to the same plugin's {@link ComponentProvider}.
+ * @author soir20
+ * @since 4.0
+ */
 @FunctionalInterface
 public interface MetadataParser {
 
+    /**
+     * Converts the original metadata into a more usable form.
+     * @param metadata      the original, immutable metadata. This metadata contains all metadata for
+     *                      the texture, not just the metadata in this plugin's section name. The actual
+     *                      metadata attributes themselves are stored within their section names. That is,
+     *                      to access an attribute, a {@link MetadataView} for the section must be accessed
+     *                      first.
+     * @return an object with parsed data. Must not be null.
+     */
     ParsedMetadata parse(MetadataView metadata);
 
 }
