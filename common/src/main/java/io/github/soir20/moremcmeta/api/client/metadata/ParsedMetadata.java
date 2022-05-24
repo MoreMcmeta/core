@@ -17,6 +17,8 @@
 
 package io.github.soir20.moremcmeta.api.client.metadata;
 
+import io.github.soir20.moremcmeta.api.math.NegativeDimensionException;
+
 import java.util.Optional;
 
 /**
@@ -81,8 +83,17 @@ public interface ParsedMetadata {
          * Creates a new object representing a frame size.
          * @param width     width of a frame
          * @param height    height of a frame
+         * @throws NegativeDimensionException if the width or the height is negative
          */
         public FrameSize(int width, int height) {
+            if (width < 0) {
+                throw new NegativeDimensionException(width);
+            }
+
+            if (height < 0) {
+                throw new NegativeDimensionException(height);
+            }
+
             WIDTH = width;
             HEIGHT = height;
         }
