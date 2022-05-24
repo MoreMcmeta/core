@@ -89,12 +89,18 @@ public class JsonMetadataView implements MetadataView {
 
     @Override
     public Optional<String> stringValue(String key) {
-        return primitiveFromKey(key, JsonPrimitive::isString, JsonPrimitive::getAsString);
+
+        // The Gson implementation can convert any primitive to a string, even if isString() is false
+        return primitiveFromKey(key, JsonPrimitive::isJsonPrimitive, JsonPrimitive::getAsString);
+
     }
 
     @Override
     public Optional<String> stringValue(int index) {
-        return primitiveFromIndex(index, JsonPrimitive::isString, JsonPrimitive::getAsString);
+
+        // The Gson implementation can convert any primitive to a string, even if isString() is false
+        return primitiveFromIndex(index, JsonPrimitive::isJsonPrimitive, JsonPrimitive::getAsString);
+
     }
 
     @Override
@@ -195,12 +201,18 @@ public class JsonMetadataView implements MetadataView {
 
     @Override
     public Optional<Boolean> booleanValue(String key) {
-        return primitiveFromKey(key, JsonPrimitive::isBoolean, JsonPrimitive::getAsBoolean);
+
+        // The Gson implementation can convert any primitive to a boolean, even if isString() is false
+        return primitiveFromKey(key, JsonPrimitive::isJsonPrimitive, JsonPrimitive::getAsBoolean);
+
     }
 
     @Override
     public Optional<Boolean> booleanValue(int index) {
-        return primitiveFromIndex(index, JsonPrimitive::isBoolean, JsonPrimitive::getAsBoolean);
+
+        // The Gson implementation can convert any primitive to a boolean, even if isString() is false
+        return primitiveFromIndex(index, JsonPrimitive::isJsonPrimitive, JsonPrimitive::getAsBoolean);
+
     }
 
     @Override
