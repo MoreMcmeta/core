@@ -77,14 +77,7 @@ public class JsonMetadataView implements MetadataView {
 
     @Override
     public boolean hasKey(int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException("Index cannot be negative");
-        }
-
-        return index < SIZE && ROOT.get(
-                (obj) -> objectElementByIndex(obj, index).isJsonPrimitive(),
-                (array) -> array.get(index).isJsonPrimitive()
-        );
+        return index >= 0 && index < SIZE;
     }
 
     @Override
