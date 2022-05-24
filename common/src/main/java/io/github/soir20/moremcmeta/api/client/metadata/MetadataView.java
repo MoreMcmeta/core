@@ -53,7 +53,8 @@ public interface MetadataView {
 
     /**
      * Checks if this view has a data value or sub-view for a top-level key at the
-     * given index (starting at 0).
+     * given index (starting at 0). Returns false for any positive or negative index out of
+     * bounds.
      * @param index       the index of the key to check for
      * @return true if the view has a data value or sub-view for this key or false otherwise
      */
@@ -86,6 +87,7 @@ public interface MetadataView {
      * @return An {@link Optional} containing the string value or {@link Optional#empty()} if there is
      *         string value associated with the key. The string inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<String> stringValue(int index);
 
@@ -110,6 +112,7 @@ public interface MetadataView {
      * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
      *         integer value associated with the key. The integer inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<Integer> integerValue(int index);
 
@@ -135,6 +138,7 @@ public interface MetadataView {
      * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
      *         integer value associated with the key. The integer inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<Integer> unsignedIntegerValue(int index);
 
@@ -159,6 +163,7 @@ public interface MetadataView {
      * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
      *         long value associated with the key. The long inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<Long> longValue(int index);
 
@@ -183,6 +188,7 @@ public interface MetadataView {
      * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
      *         long value associated with the key. The long inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<Long> unsignedLongValue(int index);
 
@@ -207,6 +213,7 @@ public interface MetadataView {
      * @return An {@link Optional} containing the float value or {@link Optional#empty()} if there is
      *         float value associated with the key. The float inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<Float> floatValue(int index);
 
@@ -231,6 +238,7 @@ public interface MetadataView {
      * @return An {@link Optional} containing the double value or {@link Optional#empty()} if there is
      *         double value associated with the key. The double inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<Double> doubleValue(int index);
 
@@ -261,6 +269,7 @@ public interface MetadataView {
      * @return An {@link Optional} containing the boolean value or {@link Optional#empty()} if there is
      *         boolean value associated with the key. The boolean inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<Boolean> booleanValue(int index);
 
@@ -285,7 +294,25 @@ public interface MetadataView {
      * @return An {@link Optional} containing the sub-view or {@link Optional#empty()} if there is
      *         sub-view associated with the key. The sub-view inside the {@link Optional} will never
      *         be null.
+     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<MetadataView> subView(int index);
+
+    /**
+     * Indicates that an illegal index was used to access a key in a {@link MetadataView}.
+     * @author soir20
+     * @since 4.0
+     */
+    class KeyIndexOutOfBoundsException extends IndexOutOfBoundsException {
+
+        /**
+         * Creates a new exception to indicate that an illegal index was used to access a key.
+         * @param index     the illegal index used
+         */
+        public KeyIndexOutOfBoundsException(int index) {
+            super("Key index out of range: " + index);
+        }
+
+    }
 
 }

@@ -230,12 +230,8 @@ public class JsonMetadataView implements MetadataView {
 
     @Override
     public Optional<MetadataView> subView(int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException("Index cannot be negative");
-        }
-
-        if (index >= SIZE) {
-            return Optional.empty();
+        if (!hasKey(index)) {
+            throw new KeyIndexOutOfBoundsException(index);
         }
 
         return ROOT.get(
@@ -270,7 +266,7 @@ public class JsonMetadataView implements MetadataView {
     private <T> Optional<T> primitiveFromIndex(int index, Function<JsonPrimitive, Boolean> checkFunction,
                                                Function<JsonPrimitive, T> convertFunction) {
         if (!hasKey(index)) {
-            return Optional.empty();
+            throw new KeyIndexOutOfBoundsException(index);
         }
 
         return ROOT.get(
