@@ -19,21 +19,77 @@ package io.github.soir20.moremcmeta.api.client.texture;
 
 import java.util.Optional;
 
+/**
+ * A view of information about a texture frame without any underlying implementation detail. This interface
+ * specifies an immutable view of a frame, but sub-interfaces may specify additional methods that make the
+ * view mutable. A view may have a limited lifetime, after which {@link IllegalFrameReference} exceptions
+ * are thrown when the view's methods are called, specified by its implementation.
+ * @author soir20
+ * @since 4.0
+ */
 public interface FrameView {
 
+    /**
+     * Gets the color at a specific pixel in this frame. The top-left corner of the frame is at (0, 0), and
+     * only positive coordinate values are within bounds.
+     * @param x     x-coordinate of the pixel
+     * @param y     y-coordinate of the pixel
+     * @return the color of the pixel in AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB format (32 bits)
+     * @throws PixelOutOfBoundsException if the requested pixel is outside the frame's bounds
+     * @throws IllegalFrameReference if this view is no longer valid
+     */
     int color(int x, int y);
 
+    /**
+     * Gets the width of the frame.
+     * @return width of the frame
+     * @throws IllegalFrameReference if this view is no longer valid
+     */
     int width();
 
+    /**
+     * Gets the height of the frame.
+     * @return height of the frame
+     * @throws IllegalFrameReference if this view is no longer valid
+     */
     int height();
 
+    /**
+     * Gets the index of the frame if it is a predefined frame.
+     * @return the index of the predefined frame or {@link Optional#empty()} if it is not a predefined frame
+     * @throws IllegalFrameReference if this view is no longer valid
+     */
     Optional<Integer> index();
 
+    /**
+     * Gets the total number of predefined frames associated with the same texture as this frame.
+     * @return number of predefined frames associated with the same texture, including this frame if
+     *         it is a predefined frame
+     * @throws IllegalFrameReference if this view is no longer valid
+     */
     int predefinedFrames();
+
+    /**
+     * Indicates that an illegal predefined frame index was accessed.
+     * @author soir20
+     * @since 4.0
+     */
+    class FrameIndexOutOfBoundsException extends IndexOutOfBoundsException {
+
+        /**
+         * Creates an exception to indicate that a frame with a certain index does not
+         * exist.
+         * @param index     the illegal index accessed
+         */
+        public FrameIndexOutOfBoundsException(int index) {
+            super("Frame index out of range: " + index);
+        }
+    }
 
     /**
      * Indicates that a point outside a frame's bounds was accessed.
      * @author soir20
+     * @since 4.0
      */
     class PixelOutOfBoundsException extends RuntimeException {
 
@@ -50,6 +106,7 @@ public interface FrameView {
     /**
      * Indicates that a {@link FrameView} was used after it became invalid.
      * @author soir20
+     * @since 4.0
      */
     class IllegalFrameReference extends IllegalStateException {
 
@@ -58,22 +115,6 @@ public interface FrameView {
          */
         public IllegalFrameReference() {
             super("Cannot use frame view beyond intended point");
-        }
-    }
-
-    /**
-     * Indicates that an illegal predefined frame index was accessed.
-     * @author soir20
-     */
-    class FrameIndexOutOfBoundsException extends IndexOutOfBoundsException {
-
-        /**
-         * Creates an exception to indicate that a frame with a certain index does not
-         * exist.
-         * @param index     the illegal index accessed
-         */
-        public FrameIndexOutOfBoundsException(int index) {
-            super("Frame index out of range: " + index);
         }
     }
 
