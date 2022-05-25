@@ -24,6 +24,7 @@ import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
+import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
@@ -243,7 +244,7 @@ public class TextureDataAssembler {
         @Override
         public MutableFrameView frame(int index) {
             if (index < 0 || index >= FRAMES.size()) {
-                throw new FrameGroupIndexOutOfBoundsException(index);
+                throw new FrameView.FrameIndexOutOfBoundsException(index);
             }
 
             return FRAMES.get(index);

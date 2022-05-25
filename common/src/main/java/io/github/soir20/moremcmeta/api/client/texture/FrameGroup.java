@@ -23,20 +23,4 @@ public interface FrameGroup<F extends FrameView> {
 
     int frames();
 
-    /**
-     * Indicates that an illegal frame index was accessed.
-     * @author soir20
-     */
-    class FrameGroupIndexOutOfBoundsException extends IndexOutOfBoundsException {
-
-        /**
-         * Creates an exception to indicate that a frame with a certain index does not
-         * exist.
-         * @param index     the illegal index accessed
-         */
-        public FrameGroupIndexOutOfBoundsException(int index) {
-            super("Frame index out of range: " + index);
-        }
-    }
-
 }

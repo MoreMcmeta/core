@@ -61,4 +61,20 @@ public interface FrameView {
         }
     }
 
+    /**
+     * Indicates that an illegal predefined frame index was accessed.
+     * @author soir20
+     */
+    class FrameIndexOutOfBoundsException extends IndexOutOfBoundsException {
+
+        /**
+         * Creates an exception to indicate that a frame with a certain index does not
+         * exist.
+         * @param index     the illegal index accessed
+         */
+        public FrameIndexOutOfBoundsException(int index) {
+            super("Frame index out of range: " + index);
+        }
+    }
+
 }
