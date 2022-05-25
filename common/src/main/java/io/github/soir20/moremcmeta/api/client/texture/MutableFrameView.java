@@ -19,8 +19,22 @@ package io.github.soir20.moremcmeta.api.client.texture;
 
 import io.github.soir20.moremcmeta.api.math.Point;
 
+/**
+ * A {@link FrameView} that represents a predefined frame whose pixels can be modified.
+ * @author soir20
+ * @since 4.0
+ */
 public interface MutableFrameView extends FrameView {
 
+    /**
+     * Modifies the predefined frame by applying the given {@link ColorTransform} over
+     * the given area.
+     * @param transform     the transformation to apply to the given points
+     * @param applyArea     the points to apply the transformation to
+     * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.PixelOutOfBoundsException if a pixel
+     *         in the `applyArea` is out of the frame's bounds
+     * @throws IllegalFrameReference if this view is no longer valid
+     */
     void transform(ColorTransform transform, Iterable<Point> applyArea);
 
 }
