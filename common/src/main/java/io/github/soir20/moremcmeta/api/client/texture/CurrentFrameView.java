@@ -44,6 +44,8 @@ public interface CurrentFrameView extends FrameView {
      * {@link #generateWith(ColorTransform, Iterable)} by any plugin will generate a frame based
      * on this predefined frame, unless another predefined frame is made the current frame.
      * @param index     the index of the predefined frame to make current
+     * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.FrameIndexOutOfBoundsException if the
+     *         provided index is outside the range of legal frame indices
      */
     void replaceWith(int index);
 

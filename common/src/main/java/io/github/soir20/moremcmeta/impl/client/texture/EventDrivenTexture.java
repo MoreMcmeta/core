@@ -22,6 +22,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
+import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
 import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -470,7 +471,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public void replaceWith(int index) {
             if (index < 0 || index >= PREDEFINED_FRAMES.size()) {
-                throw new IllegalArgumentException("Tried to replace with negative or non-existent frame index");
+                throw new FrameView.FrameIndexOutOfBoundsException(index);
             }
 
             // If we are setting the current frame to itself, we don't need to upload again
