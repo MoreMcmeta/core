@@ -17,10 +17,27 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
+/**
+ * An ordered collection of {@link FrameView}s, which are accessible by index.
+ * @param <F> type of {@link FrameView} available from this group
+ * @author soir20
+ * @since 4.0
+ */
 public interface FrameGroup<F extends FrameView> {
 
+    /**
+     * Gets a frame in this group by its index.
+     * @param index     index of the frame to retrieve
+     * @return the frame at this index in the group
+     * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.FrameIndexOutOfBoundsException if the
+     *         provided index is outside the range of legal frame indices
+     */
     F frame(int index);
 
+    /**
+     * Gets the number of frames in this group.
+     * @return number of frames in this group
+     */
     int frames();
 
 }
