@@ -225,8 +225,6 @@ public class TextureDataAssembler {
 
         Iterable<TextureComponent> components = provider.assemble(
                 metadata,
-                blur,
-                clamp,
                 new MutableFrameGroupImpl(frameViews)
         );
 
