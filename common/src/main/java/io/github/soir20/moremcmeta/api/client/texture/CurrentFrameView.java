@@ -36,6 +36,7 @@ public interface CurrentFrameView extends FrameView {
      * @param applyArea     the points to apply the transformation to
      * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.PixelOutOfBoundsException if a pixel
      *         in the `applyArea` is out of the frame's bounds
+     * @throws IllegalFrameReference if this view is no longer valid
      */
     void generateWith(ColorTransform transform, Iterable<Point> applyArea);
 
@@ -46,6 +47,7 @@ public interface CurrentFrameView extends FrameView {
      * @param index     the index of the predefined frame to make current
      * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.FrameIndexOutOfBoundsException if the
      *         provided index is outside the range of legal frame indices
+     * @throws IllegalFrameReference if this view is no longer valid
      */
     void replaceWith(int index);
 

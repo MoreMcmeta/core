@@ -24,14 +24,17 @@ import java.util.Optional;
  * specifies an immutable view of a frame, but sub-interfaces may specify additional methods that make the
  * view mutable. A view may have a limited lifetime, after which {@link IllegalFrameReference} exceptions
  * are thrown when the view's methods are called, specified by its implementation.
+ *
+ * Note about coordinate points: The top-left corner of the frame is considered to be at (0, 0), and
+ * only positive coordinate values are within bounds. That is, the bottom right corner of the frame is at
+ * (width - 1, height - 1).
  * @author soir20
  * @since 4.0
  */
 public interface FrameView {
 
     /**
-     * Gets the color at a specific pixel in this frame. The top-left corner of the frame is at (0, 0), and
-     * only positive coordinate values are within bounds.
+     * Gets the color at a specific pixel in this frame.
      * @param x     x-coordinate of the pixel
      * @param y     y-coordinate of the pixel
      * @return the color of the pixel in AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB format (32 bits)
