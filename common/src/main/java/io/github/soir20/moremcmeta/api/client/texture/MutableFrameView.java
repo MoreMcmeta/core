@@ -22,7 +22,7 @@ import io.github.soir20.moremcmeta.api.math.Point;
 /**
  * A {@link FrameView} that represents a predefined frame whose pixels can be modified.
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 public interface MutableFrameView extends FrameView {
 

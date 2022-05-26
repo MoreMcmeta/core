@@ -27,7 +27,7 @@ import java.util.Optional;
  * No underlying file format or file location for this metadata is guaranteed. Arrays in the underlying
  * format are treated as views with the keys "0", "1", etc. for each item in the array.
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 public interface MetadataView {
 
@@ -301,7 +301,7 @@ public interface MetadataView {
     /**
      * Indicates that an illegal index was used to access a key in a {@link MetadataView}.
      * @author soir20
-     * @since 4.0
+     * @since 4.0.0
      */
     final class KeyIndexOutOfBoundsException extends IndexOutOfBoundsException {
 

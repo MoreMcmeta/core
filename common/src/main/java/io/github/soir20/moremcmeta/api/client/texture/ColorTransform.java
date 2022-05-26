@@ -20,7 +20,7 @@ package io.github.soir20.moremcmeta.api.client.texture;
 /**
  * Calculates a new RGBA color for an individual pixel in a frame.
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 @FunctionalInterface
 public interface ColorTransform {

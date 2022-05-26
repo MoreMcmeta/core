@@ -29,7 +29,7 @@ import java.util.Optional;
  * only positive coordinate values are within bounds. That is, the bottom right corner of the frame is at
  * (width - 1, height - 1).
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 public interface FrameView {
 
@@ -75,7 +75,7 @@ public interface FrameView {
     /**
      * Indicates that an illegal predefined frame index was accessed.
      * @author soir20
-     * @since 4.0
+     * @since 4.0.0
      */
     final class FrameIndexOutOfBoundsException extends IndexOutOfBoundsException {
 
@@ -92,7 +92,7 @@ public interface FrameView {
     /**
      * Indicates that a point outside a frame's bounds was accessed.
      * @author soir20
-     * @since 4.0
+     * @since 4.0.0
      */
     final class PixelOutOfBoundsException extends RuntimeException {
 
@@ -109,7 +109,7 @@ public interface FrameView {
     /**
      * Indicates that a {@link FrameView} was used after it became invalid.
      * @author soir20
-     * @since 4.0
+     * @since 4.0.0
      */
     final class IllegalFrameReference extends IllegalStateException {
 

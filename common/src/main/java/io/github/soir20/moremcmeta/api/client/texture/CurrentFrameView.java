@@ -24,7 +24,7 @@ import io.github.soir20.moremcmeta.api.math.Point;
  * immutable, but a frame can be generated from a predefined frame or an already-generated
  * frame.
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 public interface CurrentFrameView extends FrameView {
 

@@ -23,7 +23,7 @@ import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
  * Creates {@link TextureComponent}s from initial texture and frame information. Applies initial
  * transformations to the predefined frames.
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 @FunctionalInterface
 public interface ComponentProvider {

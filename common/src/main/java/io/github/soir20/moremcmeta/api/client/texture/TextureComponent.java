@@ -20,7 +20,7 @@ package io.github.soir20.moremcmeta.api.client.texture;
 /**
  * Responds to basic events for a particular texture.
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 public interface TextureComponent<V> {
 

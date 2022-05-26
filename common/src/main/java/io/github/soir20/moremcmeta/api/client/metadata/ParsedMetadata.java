@@ -24,7 +24,7 @@ import java.util.Optional;
 /**
  * Contains data parsed by the {@link MetadataParser}.
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 public interface ParsedMetadata {
 
@@ -73,7 +73,7 @@ public interface ParsedMetadata {
     /**
      * Holds the frame width and height as a single object.
      * @author soir20
-     * @since 4.0
+     * @since 4.0.0
      */
     final class FrameSize {
         private final int WIDTH;

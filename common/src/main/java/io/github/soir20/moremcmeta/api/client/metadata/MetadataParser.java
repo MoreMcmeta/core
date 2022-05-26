@@ -23,7 +23,7 @@ import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
  * Parses immutable texture metadata into data in a more usable form. The {@link ParsedMetadata} returned
  * by the parser will later be given to the same plugin's {@link ComponentProvider}.
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 @FunctionalInterface
 public interface MetadataParser {

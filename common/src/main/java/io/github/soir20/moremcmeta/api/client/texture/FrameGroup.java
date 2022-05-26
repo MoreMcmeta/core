@@ -21,7 +21,7 @@ package io.github.soir20.moremcmeta.api.client.texture;
  * An ordered collection of {@link FrameView}s, which are accessible by index.
  * @param <F> type of {@link FrameView} available from this group
  * @author soir20
- * @since 4.0
+ * @since 4.0.0
  */
 public interface FrameGroup<F extends FrameView> {
 
