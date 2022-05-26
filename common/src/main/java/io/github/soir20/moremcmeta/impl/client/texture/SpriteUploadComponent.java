@@ -17,10 +17,7 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
-import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
 import io.github.soir20.moremcmeta.api.math.Point;
-
-import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -28,8 +25,9 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture to an atlas sprite.
  * @author soir20
  */
-public class SpriteUploadComponent implements GenericTextureComponent<EventDrivenTexture.TextureAndFrameView> {
+public class SpriteUploadComponent implements CoreTextureComponent {
     private final Sprite SPRITE;
+    private final Point UPLOAD_POINT;
 
     /**
      * Creates a new component for uploading a texture to an atlas sprite.
@@ -39,37 +37,38 @@ public class SpriteUploadComponent implements GenericTextureComponent<EventDrive
      */
     public SpriteUploadComponent(Sprite sprite) {
         SPRITE = requireNonNull(sprite, "Sprite cannot be null");
+        UPLOAD_POINT = SPRITE.getUploadPoint();
     }
 
     /**
-     * Gets the listeners for this component. Sprite will be bound and uploaded
-     * on every tick, in addition to regularly-triggered uploads.
-     * @return all the listeners for this component
+     * Releases unnecessary memory by lowering the frame's mipmap level to be the same as the sprite.
+     * @param currentFrame      view of the texture's current frame
      */
     @Override
-    public Stream<TextureListener<? super EventDrivenTexture.TextureAndFrameView>> getListeners() {
-        Point uploadPoint = SPRITE.getUploadPoint();
+    public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        currentFrame.lowerMipmapLevel(SPRITE.getMipmapLevel());
+    }
 
-        TextureListener<EventDrivenTexture.TextureAndFrameView> registerListener = new TextureListener<>(
-                TextureListener.Type.REGISTRATION,
-                (state) -> state.lowerMipmapLevel(SPRITE.getMipmapLevel())
-        );
+    /**
+     * Uploads the texture when it needs to be uploaded.
+     * @param currentFrame      view of the texture's current frame
+     */
+    @Override
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        currentFrame.uploadAt(UPLOAD_POINT);
+    }
 
-        TextureListener<EventDrivenTexture.TextureAndFrameView> uploadListener = new TextureListener<>(
-                TextureListener.Type.UPLOAD,
-                (state) -> state.uploadAt(uploadPoint)
-        );
+    /**
+     * Uploads the texture to the atlas on tick since the sprite will never be bound.
+     * @param currentFrame      view of the texture's current frame
+     */
+    @Override
+    public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
 
         // We need this listener because atlas sprites will never be bound
-        TextureListener<EventDrivenTexture.TextureAndFrameView> tickListener = new TextureListener<>(
-                TextureListener.Type.TICK,
-                (state) -> {
-                    SPRITE.bind();
-                    state.getTexture().upload();
-                }
-        );
+        SPRITE.bind();
+        currentFrame.getTexture().upload();
 
-        return Stream.of(registerListener, uploadListener, tickListener);
     }
 
 }

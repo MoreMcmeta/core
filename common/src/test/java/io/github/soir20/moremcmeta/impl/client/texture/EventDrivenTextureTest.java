@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
-import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
+import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -36,6 +35,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link EventDrivenTexture}.
  * @author soir20
  */
+@SuppressWarnings("resource")
 public class EventDrivenTextureTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -59,7 +59,7 @@ public class EventDrivenTextureTest {
     @Test
     public void build_NoPredefinedFrames_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION, (state) -> {})));
+        builder.add(new TextureComponent<>() {});
         builder.setGeneratedFrame(new MockCloseableImageFrame());
 
         expectedException.expect(IllegalStateException.class);
@@ -72,9 +72,12 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION,
-                (state) -> assertEquals(2, state.predefinedFrames())
-        )));
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                assertEquals(2, currentFrame.predefinedFrames());
+            }
+        });
         builder.build().load(null);
     }
 
@@ -89,7 +92,7 @@ public class EventDrivenTextureTest {
     @Test
     public void build_NoGeneratedFrame_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.REGISTRATION, (state) -> {})));
+        builder.add(new TextureComponent<>() {});
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
 
         expectedException.expect(IllegalStateException.class);
@@ -105,11 +108,14 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(generatedFrame);
 
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.UPLOAD,
-                (state) -> state.generateWith((x, y) -> 0, List.of())
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
-                (state) -> state.uploadAt(new Point(0, 0))
-        )));
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith((x, y) -> 0, List.of());
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+
         EventDrivenTexture texture = builder.build();
         texture.upload();
 
@@ -142,9 +148,12 @@ public class EventDrivenTextureTest {
         final Object[] textureGetter = new Object[1];
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                (state) -> assertEquals(textureGetter[0], state.getTexture())
-        )));
+        builder.add(new TextureComponent<>() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                assertEquals(textureGetter[0], currentFrame.getTexture());
+            }
+        });
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
@@ -158,11 +167,17 @@ public class EventDrivenTextureTest {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                EventDrivenTexture.TextureAndFrameView::markNeedsUpload
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
-                (state) -> timesUploaded.incrementAndGet()
-        )));
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.markNeedsUpload();
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                timesUploaded.incrementAndGet();
+            }
+        });
 
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.setGeneratedFrame(new MockCloseableImageFrame());
@@ -182,11 +197,17 @@ public class EventDrivenTextureTest {
         AtomicInteger timesUploaded = new AtomicInteger(0);
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                (state) -> state.replaceWith(1)
-        ), new TextureListener<>(TextureListener.Type.UPLOAD,
-                (state) -> timesUploaded.incrementAndGet()
-        )));
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(1);
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                timesUploaded.incrementAndGet();
+            }
+        });
 
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
         builder.setGeneratedFrame(new MockCloseableImageFrame());
@@ -204,11 +225,17 @@ public class EventDrivenTextureTest {
     @Test
     public void runListeners_SetImage_ImageReplaced() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener<>(TextureListener.Type.TICK,
-                (state) -> state.replaceWith(1)
-        ), new TextureListener<>(TextureListener.Type.CLOSE,
-                (state) -> assertEquals(1, (int) state.index().orElseThrow()))
-        ));
+        builder.add(new TextureComponent<>() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(1);
+            }
+
+            @Override
+            public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                assertEquals(1, (int) currentFrame.index().orElseThrow());
+            }
+        });
 
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
         builder.setGeneratedFrame(new MockCloseableImageFrame());
@@ -232,26 +259,26 @@ public class EventDrivenTextureTest {
     }
 
     @Test
-    public void bind_FirstBind_BindAndUploadFiredInOrder() {
-        Integer[] expected = {4, 5, 6, 7, 8, 9};
+    public void bind_FirstBind_UploadFiredInOrder() {
+        Integer[] expected = {4, 5, 6};
         testExpectedOrder(EventDrivenTexture::bind, false, expected);
     }
 
     @Test
-    public void bind_SecondBindUploadNotNeeded_BindFiredInOrder() {
-        Integer[] expected = {4, 5, 6, 7, 8, 9, 4, 5, 6};
+    public void bind_SecondBindUploadNotNeeded_UploadFiredInOrderOnce() {
+        Integer[] expected = {4, 5, 6};
         testExpectedOrder((texture) -> {texture.bind(); texture.bind();}, false, expected);
     }
 
     @Test
-    public void bind_SecondBindUploadNeeded_BindAndUploadFiredInOrder() {
-        Integer[] expected = {4, 5, 6, 7, 8, 9, 4, 5, 6, 7, 8, 9};
-        testExpectedOrder((texture) -> {texture.bind(); texture.bind();}, true, expected);
+    public void bind_SecondBindUploadNeeded_UploadFiredInOrder() {
+        Integer[] expected = {4, 5, 6, 7, 8, 9, 4, 5, 6};
+        testExpectedOrder((texture) -> {texture.bind(); texture.tick(); texture.bind();}, true, expected);
     }
 
     @Test
     public void upload_FirstUpload_UploadFiredInOrder() {
-        Integer[] expected = {7, 8, 9};
+        Integer[] expected = {4, 5, 6};
         testExpectedOrder(EventDrivenTexture::upload, false, expected);
     }
 
@@ -259,32 +286,32 @@ public class EventDrivenTextureTest {
     public void upload_SecondUploadNotNeeded_UploadFiredInOrder() {
 
         // The upload method should run regardless of whether an upload is needed
-        Integer[] expected = {7, 8, 9, 7, 8, 9};
+        Integer[] expected = {4, 5, 6, 4, 5, 6};
         testExpectedOrder((texture) -> {texture.upload(); texture.upload();}, false, expected);
 
     }
 
     @Test
     public void tick_FirstTick_TickFiredInOrder() {
-        Integer[] expected = {10, 11, 12};
+        Integer[] expected = {7, 8, 9};
         testExpectedOrder(EventDrivenTexture::tick, false, expected);
     }
 
     @Test
     public void tick_SecondTick_TickFiredInOrder() {
-        Integer[] expected = {10, 11, 12, 10, 11, 12};
+        Integer[] expected = {7, 8, 9, 7, 8, 9};
         testExpectedOrder((texture) -> { texture.tick(); texture.tick(); }, false, expected);
     }
 
     @Test
     public void close_FirstClose_CloseFiredInOrder() {
-        Integer[] expected = {13, 14, 15};
+        Integer[] expected = {10, 11, 12};
         testExpectedOrder(EventDrivenTexture::close, false, expected);
     }
 
     @Test
     public void close_SecondClose_CloseFiredInOrder() {
-        Integer[] expected = {13, 14, 15, 13, 14, 15};
+        Integer[] expected = {10, 11, 12, 10, 11, 12};
         testExpectedOrder((texture) -> { texture.close(); texture.close(); }, false, expected);
     }
 
@@ -294,28 +321,40 @@ public class EventDrivenTextureTest {
         texture.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         texture.setGeneratedFrame(new MockCloseableImageFrame());
 
-        int lastId = 0;
-        TextureListener.Type[] types = {
-                TextureListener.Type.REGISTRATION,
-                TextureListener.Type.BIND,
-                TextureListener.Type.UPLOAD,
-                TextureListener.Type.TICK,
-                TextureListener.Type.CLOSE
-        };
+        final int REG_ID_BASE = 1;
+        final int UPLOAD_ID_BASE = 4;
+        final int TICK_ID_BASE = 7;
+        final int CLOSE_ID_BASE = 10;
 
         List<Integer> execOrder = new ArrayList<>();
 
-        for (TextureListener.Type type : types) {
-            for (int index = 0; index < 3; index++) {
-                lastId++;
-                final int listenerId = lastId;
-                texture.add(() -> Stream.of(new TextureListener<>(type,
-                        (state) -> {
-                            if (flagForUpload) state.markNeedsUpload();
-                            execOrder.add(listenerId);
-                        }
-                )));
-            }
+        for (int index = 0; index < 3; index++) {
+            int finalIndex = index;
+            texture.add(new CoreTextureComponent() {
+                @Override
+                public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(TICK_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(CLOSE_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(REG_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(UPLOAD_ID_BASE + finalIndex);
+                }
+            });
         }
 
         action.accept(texture.build());

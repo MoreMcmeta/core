@@ -17,17 +17,13 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
-import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
-
-import java.util.stream.Stream;
-
 import static java.util.Objects.requireNonNull;
 
 /**
  * Cleans up images when an {@link EventDrivenTexture} closes.
  * @author soir20
  */
-public class CleanupComponent implements GenericTextureComponent<EventDrivenTexture.TextureAndFrameView> {
+public class CleanupComponent implements CoreTextureComponent {
     private final Runnable CLOSE_ACTION;
 
     /**
@@ -39,12 +35,12 @@ public class CleanupComponent implements GenericTextureComponent<EventDrivenText
     }
 
     /**
-     * Gets all the listeners for this component.
-     * @return the cleanup listener
+     * Cleans up resources associated with the texture when it is closed.
+     * @param currentFrame      view of the texture's current frame
      */
     @Override
-    public Stream<TextureListener<? super EventDrivenTexture.TextureAndFrameView>> getListeners() {
-        return Stream.of(new TextureListener<>(TextureListener.Type.CLOSE, (state) -> CLOSE_ACTION.run()));
+    public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        CLOSE_ACTION.run();
     }
 
 }

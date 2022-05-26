@@ -33,6 +33,7 @@ import static org.junit.Assert.assertEquals;
  * test coverage.
  * @author soir20
  */
+@SuppressWarnings("resource")
 public class SingleUploadComponentTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -46,7 +47,7 @@ public class SingleUploadComponentTest {
     @Test
     public void upload_FirstUpload_FrameUploadedAtOrigin() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
+        builder.add(new SingleUploadComponent((id, mipmap, width, height) -> {}));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setPredefinedFrames(List.of(frame));
@@ -62,7 +63,7 @@ public class SingleUploadComponentTest {
     @Test
     public void upload_SecondUpload_FrameUploadedAtOriginAgain() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
+        builder.add(new SingleUploadComponent((id, mipmap, width, height) -> {}));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame();
         builder.setPredefinedFrames(List.of(frame));

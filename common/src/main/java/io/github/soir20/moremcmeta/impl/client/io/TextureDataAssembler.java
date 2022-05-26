@@ -23,6 +23,7 @@ import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
@@ -103,9 +104,7 @@ public class TextureDataAssembler {
             assembleComponents(
                     metadata.getSecond(),
                     frames,
-                    sectionData,
-                    blur,
-                    clamp
+                    sectionData
             ).forEach(builder::add);
         }
 
@@ -205,14 +204,11 @@ public class TextureDataAssembler {
      * @param provider      component provider
      * @param frames        predefined frames
      * @param metadata      metadata associated with the transform
-     * @param blur          whether to blur the texture
-     * @param clamp         whether to clamp the texture
      * @return assembled components
      */
-    private Iterable<TextureComponent> assembleComponents(ComponentProvider provider,
-                                                          List<CloseableImageFrame> frames,
-                                                          ParsedMetadata metadata,
-                                                          boolean blur, boolean clamp) {
+    private Iterable<TextureComponent<CurrentFrameView>> assembleComponents(ComponentProvider provider,
+                                                                            List<CloseableImageFrame> frames,
+                                                                            ParsedMetadata metadata) {
         List<MutableFrameViewImpl> frameViews = new ArrayList<>();
 
         for (int index = 0; index < frames.size(); index++) {
@@ -224,7 +220,7 @@ public class TextureDataAssembler {
             ));
         }
 
-        Iterable<TextureComponent> components = provider.assemble(
+        Iterable<TextureComponent<CurrentFrameView>> components = provider.assemble(
                 metadata,
                 new MutableFrameGroupImpl(frameViews)
         );

@@ -17,10 +17,7 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
-import io.github.soir20.moremcmeta.api.client.texture.TextureListener;
 import io.github.soir20.moremcmeta.api.math.Point;
-
-import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -28,7 +25,8 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture that is not associated with an atlas sprite.
  * @author soir20
  */
-public class SingleUploadComponent implements GenericTextureComponent<EventDrivenTexture.TextureAndFrameView> {
+public class SingleUploadComponent implements CoreTextureComponent {
+    private static final Point UPLOAD_POINT = new Point(0, 0);
     private final TexturePreparer PREPARER;
 
     /**
@@ -40,25 +38,22 @@ public class SingleUploadComponent implements GenericTextureComponent<EventDrive
     }
 
     /**
-     * Gets the listeners for this component.
-     * @return all the listeners for this component
+     * Prepares an OpenGL image for the texture when it is registered.
+     * @param currentFrame      view of the texture's current frame
      */
     @Override
-    public Stream<TextureListener<? super EventDrivenTexture.TextureAndFrameView>> getListeners() {
-        TextureListener<EventDrivenTexture.TextureAndFrameView> registrationListener = new TextureListener<>(
-                TextureListener.Type.REGISTRATION,
-                (state) -> {
-                    PREPARER.prepare(state.getTexture().getId(), 0, state.width(), state.height());
-                    state.lowerMipmapLevel(0);
-                });
+    public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        PREPARER.prepare(currentFrame.getTexture().getId(), 0, currentFrame.width(), currentFrame.height());
+        currentFrame.lowerMipmapLevel(0);
+    }
 
-        Point uploadPoint = new Point(0, 0);
-        TextureListener<EventDrivenTexture.TextureAndFrameView> uploadListener = new TextureListener<>(
-                TextureListener.Type.UPLOAD,
-                (state) -> state.uploadAt(uploadPoint)
-        );
-
-        return Stream.of(registrationListener, uploadListener);
+    /**
+     * Uploads the texture when it needs to be uploaded.
+     * @param currentFrame      view of the texture's current frame
+     */
+    @Override
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        currentFrame.uploadAt(UPLOAD_POINT);
     }
 
 }

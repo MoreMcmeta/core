@@ -45,7 +45,7 @@ public class CleanupComponentTest {
         AtomicInteger timesRan = new AtomicInteger(0);
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new CleanupComponent(timesRan::incrementAndGet)).getListeners());
+        builder.add(new CleanupComponent(timesRan::incrementAndGet));
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
@@ -60,7 +60,7 @@ public class CleanupComponentTest {
         AtomicInteger timesRan = new AtomicInteger(0);
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new CleanupComponent(timesRan::incrementAndGet)).getListeners());
+        builder.add(new CleanupComponent(timesRan::incrementAndGet));
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();

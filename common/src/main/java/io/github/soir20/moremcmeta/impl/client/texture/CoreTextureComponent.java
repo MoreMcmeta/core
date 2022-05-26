@@ -15,31 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.soir20.moremcmeta.api.client.texture;
+package io.github.soir20.moremcmeta.impl.client.texture;
+
+import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
+import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 
 /**
- * Responds to basic events for a particular texture.
+ * Responds to events relevant to MoreMcmeta's internal implementation for a particular texture.
  * @author soir20
- * @since 4.0
  */
-public interface TextureComponent<V> {
+public interface CoreTextureComponent extends TextureComponent<EventDrivenTexture.TextureAndFrameView> {
 
     /**
-     * Responds to the tick event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
+     * Responds to the registration event of the associated texture. Note that the lifetime of the
+     * {@link CurrentFrameView} provided to this method is limited to the call of this method. Attempting
+     * to retain and use a {@link CurrentFrameView} at a later point will cause a
+     * {@link io.github.soir20.moremcmeta.api.client.texture.FrameView.IllegalFrameReference} exception to be thrown.
+     * @param currentFrame      view of the texture's current frame
+     */
+    default void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {}
+
+    /**
+     * Responds to the upload event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
      * provided to this method is limited to the call of this method. Attempting to retain and use a
      * {@link CurrentFrameView} at a later point will cause a
      * {@link io.github.soir20.moremcmeta.api.client.texture.FrameView.IllegalFrameReference} exception to be thrown.
      * @param currentFrame      view of the texture's current frame
      */
-    default void onTick(V currentFrame) {}
-
-    /**
-     * Responds to the close event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
-     * provided to this method is limited to the call of this method. Attempting to retain and use a
-     * {@link CurrentFrameView} at a later point will cause a
-     * {@link io.github.soir20.moremcmeta.api.client.texture.FrameView.IllegalFrameReference} exception to be thrown.
-     * @param currentFrame      view of the texture's current frame
-     */
-    default void onClose(V currentFrame) {}
+    default void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {}
 
 }

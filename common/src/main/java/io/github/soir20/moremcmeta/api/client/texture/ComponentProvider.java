@@ -37,6 +37,6 @@ public interface ComponentProvider {
      * @return texture components for this texture. Neither the {@link Iterable} nor the individual
      *         components may be null.
      */
-    Iterable<TextureComponent> assemble(ParsedMetadata metadata, FrameGroup<MutableFrameView> frames);
+    Iterable<TextureComponent<CurrentFrameView>> assemble(ParsedMetadata metadata, FrameGroup<MutableFrameView> frames);
 
 }
