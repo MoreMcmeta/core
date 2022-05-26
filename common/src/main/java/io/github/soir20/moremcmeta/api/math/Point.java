@@ -56,7 +56,7 @@ public final class Point {
      * Determines if another object is the same as this point. Two points
      * are equal if their x and y coordinates are the same.
      * @param other     the other object to compare this point with
-     * @return whether the this point and the other object are equal
+     * @return whether this point and the other object are equal
      */
     @Override
     public boolean equals(Object other) {
