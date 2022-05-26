@@ -25,6 +25,7 @@ import java.util.NoSuchElementException;
 /**
  * Represents a rectangular area, all of whose points can be iterated.
  * @author soir20
+ * @since 4.0
  */
 public final class Rectangle implements Iterable<Point> {
     private final int X_START;
@@ -74,6 +75,7 @@ public final class Rectangle implements Iterable<Point> {
      * Indicates that a rectangle was created that contains points that cannot be represented with
      * two 32-bit integers.
      * @author soir20
+     * @since 4.0
      */
     public static final class RectangleOverflowException extends RuntimeException {
 

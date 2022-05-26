@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.api.math;
 /**
  * Indicates that a negative integer was used to represent a dimension/measurement.
  * @author soir20
+ * @since 4.0
  */
 public final class NegativeDimensionException extends IllegalArgumentException {
 

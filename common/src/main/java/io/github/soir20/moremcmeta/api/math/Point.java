@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.api.math;
 /**
  * A pair of coordinates in a plane.
  * @author soir20
+ * @since 4.0
  */
 public final class Point {
     private final int X_POS;
