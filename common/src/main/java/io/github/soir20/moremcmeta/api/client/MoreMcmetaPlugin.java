@@ -20,19 +20,44 @@ package io.github.soir20.moremcmeta.api.client;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 
+/**
+ * A user-provided plugin that interacts with the MoreMcmeta loader.
+ * @author soir20
+ * @since 4.0.0
+ */
 public interface MoreMcmetaPlugin {
 
+    /**
+     * Gets the display name for the plugin that will be used in logs.
+     * @return plugin's display name
+     */
     String displayName();
 
+    /**
+     * Gets the section name the plugin is tied to. If the section name is present in a
+     * texture's metadata, the plugin is applied to that texture. If the section name is
+     * not present, the plugin is not applied to that texture. Two installed plugins may
+     * not have the same section name.
+     * @return plugin's section name
+     */
     String sectionName();
 
+    /**
+     * Gets the {@link MetadataParser} for this plugin.
+     * @return plugin's metadata parser
+     */
     MetadataParser parser();
 
+    /**
+     * Gets the {@link ComponentProvider} for this plugin.
+     * @return plugin's component provider
+     */
     ComponentProvider componentProvider();
 
     /**
      * Signals that one of the provided plugins is not valid for some reason.
      * @author soir20
+     * @since 4.0.0
      */
     final class IncompletePluginException extends PluginException {
 
@@ -49,6 +74,7 @@ public interface MoreMcmetaPlugin {
     /**
      * Signals that at least two of the provided plugins conflict with each other.
      * @author soir20
+     * @since 4.0.0
      */
     final class ConflictingPluginsException extends PluginException {
 
