@@ -77,7 +77,7 @@ public interface FrameView {
      * @author soir20
      * @since 4.0
      */
-    class FrameIndexOutOfBoundsException extends IndexOutOfBoundsException {
+    final class FrameIndexOutOfBoundsException extends IndexOutOfBoundsException {
 
         /**
          * Creates an exception to indicate that a frame with a certain index does not
@@ -94,7 +94,7 @@ public interface FrameView {
      * @author soir20
      * @since 4.0
      */
-    class PixelOutOfBoundsException extends RuntimeException {
+    final class PixelOutOfBoundsException extends RuntimeException {
 
         /**
          * Creates a new exception to indicate that a point outside a frame's bounds was accessed.
@@ -111,7 +111,7 @@ public interface FrameView {
      * @author soir20
      * @since 4.0
      */
-    class IllegalFrameReference extends IllegalStateException {
+    final class IllegalFrameReference extends IllegalStateException {
 
         /**
          * Creates a new exception to indicate that a reference to a frame view is invalid.

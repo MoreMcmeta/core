@@ -303,7 +303,7 @@ public interface MetadataView {
      * @author soir20
      * @since 4.0
      */
-    class KeyIndexOutOfBoundsException extends IndexOutOfBoundsException {
+    final class KeyIndexOutOfBoundsException extends IndexOutOfBoundsException {
 
         /**
          * Creates a new exception to indicate that an illegal index was used to access a key.
