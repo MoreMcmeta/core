@@ -623,6 +623,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
     }
 
+    /**
+     * Represents types of {@link CoreTextureComponent} listeners.
+     * @author soir20
+     */
     private enum ListenerType {
         REGISTRATION,
         UPLOAD,
