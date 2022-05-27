@@ -25,13 +25,26 @@ import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Forge event to register plugins at the appropriate time. Dispatched on the mod event bus.
+ * @author soir20
+ * @since 4.0.0
+ */
 public class MoreMcmetaClientPluginRegisterEvent extends Event implements IModBusEvent {
     private final Collection<MoreMcmetaClientPlugin> PLUGINS;
 
+    /**
+     * Creates a new plugin registration event.
+     * @param resultContainer       collection that will be updated with registered plugins
+     */
     public MoreMcmetaClientPluginRegisterEvent(Collection<MoreMcmetaClientPlugin> resultContainer) {
         PLUGINS = requireNonNull(resultContainer, "Queue cannot be null");
     }
 
+    /**
+     * Registers a client plugin.
+     * @param plugin        the plugin to register
+     */
     public void registerPlugin(MoreMcmetaClientPlugin plugin) {
         requireNonNull(plugin, "Plugin cannot be null");
         PLUGINS.add(plugin);
