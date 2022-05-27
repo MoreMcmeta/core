@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.impl.client;
 
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.PackResourcesAdapter;
@@ -77,7 +77,7 @@ import static java.util.Objects.requireNonNull;
 public abstract class MoreMcmeta {
     public static final String MODID = "moremcmeta";
 
-    private final Collection<MoreMcmetaPlugin> DEFAULT_PLUGINS = Set.of();
+    private final Collection<MoreMcmetaClientPlugin> DEFAULT_PLUGINS = Set.of();
 
     private Map<ResourceLocation, TextureData<NativeImageAdapter>> lastTextures;
 
@@ -85,12 +85,14 @@ public abstract class MoreMcmeta {
      * Begins the startup process, creating necessary objects and registering the
      * resource reload listener.
      */
-    public void start() throws MoreMcmetaPlugin.PluginException {
+    public void start() throws MoreMcmetaClientPlugin.IncompletePluginException,
+            MoreMcmetaClientPlugin.ConflictingPluginsException {
+
         Minecraft minecraft = Minecraft.getInstance();
         Logger logger = LogManager.getLogger();
 
         // Fetch and validate plugins
-        Collection<MoreMcmetaPlugin> plugins = fetchPlugins(logger);
+        Collection<MoreMcmetaClientPlugin> plugins = fetchPlugins(logger);
         addDefaultPlugins(plugins, logger);
         validatePlugins(plugins);
 
@@ -144,7 +146,7 @@ public abstract class MoreMcmeta {
      * @param logger    logger to report errors
      * @return all loaded plugins
      */
-    protected abstract Collection<MoreMcmetaPlugin> fetchPlugins(Logger logger);
+    protected abstract Collection<MoreMcmetaClientPlugin> fetchPlugins(Logger logger);
 
     /**
      * Gets the function that converts atlas sprites to their mipmap level.
@@ -204,9 +206,9 @@ public abstract class MoreMcmeta {
      * Adds the default plugins to the main collection of plugins.
      * @param plugins       main collection of plugins (with user-provided plugins)
      */
-    private void addDefaultPlugins(Collection<MoreMcmetaPlugin> plugins, Logger logger) {
+    private void addDefaultPlugins(Collection<MoreMcmetaClientPlugin> plugins, Logger logger) {
         Set<String> sections = plugins.stream()
-                .map(MoreMcmetaPlugin::sectionName)
+                .map(MoreMcmetaClientPlugin::sectionName)
                 .collect(Collectors.toSet());
 
         DEFAULT_PLUGINS.forEach((defaultPlugin) -> {
@@ -225,12 +227,15 @@ public abstract class MoreMcmeta {
     /**
      * Validates all the registered plugins, both individually and for conflicts.
      * @param plugins   plugins to validate
-     * @throws MoreMcmetaPlugin.PluginException if a plugin is not valid or plugins conflict
+     * @throws MoreMcmetaClientPlugin.IncompletePluginException if a plugin is not valid
+     * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins conflict
      */
-    private void validatePlugins(Collection<MoreMcmetaPlugin> plugins) throws MoreMcmetaPlugin.PluginException {
+    private void validatePlugins(Collection<MoreMcmetaClientPlugin> plugins)
+            throws MoreMcmetaClientPlugin.IncompletePluginException,
+            MoreMcmetaClientPlugin.ConflictingPluginsException {
 
         // Validate individual plugins
-        for (MoreMcmetaPlugin plugin : plugins) {
+        for (MoreMcmetaClientPlugin plugin : plugins) {
             validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
             validatePluginItem(plugin.sectionName(), "section name", plugin.displayName());
             validatePluginItem(plugin.parser(), "parser", plugin.displayName());
@@ -238,10 +243,10 @@ public abstract class MoreMcmeta {
         }
 
         // Check that no two plugins have the same section name
-        Map<String, List<MoreMcmetaPlugin>> pluginsBySectionName = plugins
+        Map<String, List<MoreMcmetaClientPlugin>> pluginsBySectionName = plugins
                 .stream()
-                .collect(Collectors.groupingBy(MoreMcmetaPlugin::sectionName));
-        Optional<Map.Entry<String, List<MoreMcmetaPlugin>>> conflictingPlugins = pluginsBySectionName
+                .collect(Collectors.groupingBy(MoreMcmetaClientPlugin::sectionName));
+        Optional<Map.Entry<String, List<MoreMcmetaClientPlugin>>> conflictingPlugins = pluginsBySectionName
                 .entrySet()
                 .stream()
                 .filter((entry) -> entry.getValue().size() > 1)
@@ -255,10 +260,10 @@ public abstract class MoreMcmeta {
         String conflictingSectionName = conflictingPlugins.get().getKey();
         List<String> conflictingPluginNames = conflictingPlugins.get().getValue()
                 .stream()
-                .map(MoreMcmetaPlugin::displayName)
+                .map(MoreMcmetaClientPlugin::displayName)
                 .toList();
 
-        throw new MoreMcmetaPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
+        throw new MoreMcmetaClientPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
                 + " have conflicting section name: " + conflictingSectionName);
     }
 
@@ -267,13 +272,13 @@ public abstract class MoreMcmeta {
      * @param item          item to validate
      * @param itemName      display name of the item
      * @param pluginName    display name of the plugin
-     * @throws MoreMcmetaPlugin.IncompletePluginException if the item is not present
+     * @throws MoreMcmetaClientPlugin.IncompletePluginException if the item is not present
      */
     private void validatePluginItem(Object item, String itemName, String pluginName)
-            throws MoreMcmetaPlugin.IncompletePluginException {
+            throws MoreMcmetaClientPlugin.IncompletePluginException {
 
         if (item == null) {
-            throw new MoreMcmetaPlugin.IncompletePluginException("Plugin " + pluginName + " is missing " + itemName);
+            throw new MoreMcmetaClientPlugin.IncompletePluginException("Plugin " + pluginName + " is missing " + itemName);
         }
     }
 

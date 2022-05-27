@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
@@ -49,13 +49,13 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureDataReader implements TextureReader<TextureData<NativeImageAdapter>> {
-    private final Map<String, MoreMcmetaPlugin> SECTION_TO_PLUGIN;
+    private final Map<String, MoreMcmetaClientPlugin> SECTION_TO_PLUGIN;
 
     /**
      * Creates a new reader that is aware of the given plugins, if any.
      * @param plugins       plugins that the reader should use to parse texture data
      */
-    public TextureDataReader(Iterable<MoreMcmetaPlugin> plugins) {
+    public TextureDataReader(Iterable<MoreMcmetaClientPlugin> plugins) {
         SECTION_TO_PLUGIN = new HashMap<>();
         plugins.forEach((plugin) -> SECTION_TO_PLUGIN.put(plugin.sectionName(), plugin));
     }
@@ -83,7 +83,7 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
         Optional<Boolean> clampOptional = Optional.empty();
 
         for (String section : metadata.keys()) {
-            MoreMcmetaPlugin plugin = SECTION_TO_PLUGIN.get(section);
+            MoreMcmetaClientPlugin plugin = SECTION_TO_PLUGIN.get(section);
             if (plugin == null) {
                 continue;
             }

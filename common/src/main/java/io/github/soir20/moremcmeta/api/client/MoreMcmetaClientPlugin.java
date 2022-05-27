@@ -25,7 +25,7 @@ import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
  * @author soir20
  * @since 4.0.0
  */
-public interface MoreMcmetaPlugin {
+public interface MoreMcmetaClientPlugin {
 
     /**
      * Gets the display name for the plugin that will be used in logs.

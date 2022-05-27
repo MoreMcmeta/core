@@ -22,10 +22,10 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
-import io.github.soir20.moremcmeta.forge.api.client.MoreMcmetaPluginRegisterEvent;
+import io.github.soir20.moremcmeta.forge.api.client.MoreMcmetaClientPluginRegisterEvent;
 import io.github.soir20.moremcmeta.forge.impl.client.event.ClientTicker;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.LazyTextureManager;
@@ -86,9 +86,9 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     }
 
     @Override
-    protected Collection<MoreMcmetaPlugin> fetchPlugins(Logger logger) {
-        List<MoreMcmetaPlugin> plugins = new ArrayList<>();
-        FMLJavaModLoadingContext.get().getModEventBus().post(new MoreMcmetaPluginRegisterEvent(plugins));
+    protected Collection<MoreMcmetaClientPlugin> fetchPlugins(Logger logger) {
+        List<MoreMcmetaClientPlugin> plugins = new ArrayList<>();
+        FMLJavaModLoadingContext.get().getModEventBus().post(new MoreMcmetaClientPluginRegisterEvent(plugins));
         return plugins;
     }
 

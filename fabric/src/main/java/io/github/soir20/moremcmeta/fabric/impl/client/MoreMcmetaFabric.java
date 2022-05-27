@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
 import io.github.soir20.moremcmeta.fabric.impl.client.adapter.SimpleReloadListenerAdapter;
@@ -60,6 +60,7 @@ import java.util.function.ToIntFunction;
  */
 @SuppressWarnings("unused")
 public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer {
+    private static final String PLUGIN_ENTRYPOINT = MODID + "-client";
 
     /**
      * Begins the startup process on the client.
@@ -70,16 +71,18 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     }
 
     @Override
-    protected Collection<MoreMcmetaPlugin> fetchPlugins(Logger logger) {
-        List<MoreMcmetaPlugin> plugins = new ArrayList<>();
-        FabricLoader.getInstance().getEntrypointContainers(MODID, MoreMcmetaPlugin.class).forEach((entrypoint) -> {
-            try {
-                plugins.add(entrypoint.getEntrypoint());
-            } catch (Throwable err) {
-                logger.error("Mod {} provided broken plugin to {}: {}",
-                        entrypoint.getProvider().getMetadata().getId(), MODID, err);
-            }
-        });
+    protected Collection<MoreMcmetaClientPlugin> fetchPlugins(Logger logger) {
+        List<MoreMcmetaClientPlugin> plugins = new ArrayList<>();
+        FabricLoader.getInstance()
+                .getEntrypointContainers(PLUGIN_ENTRYPOINT, MoreMcmetaClientPlugin.class)
+                .forEach((entrypoint) -> {
+                    try {
+                        plugins.add(entrypoint.getEntrypoint());
+                    } catch (Throwable err) {
+                        logger.error("Mod {} provided broken plugin to {}: {}",
+                                entrypoint.getProvider().getMetadata().getId(), MODID, err);
+                    }
+                });
         return plugins;
     }
 

@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.forge.api.client;
 
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
 
@@ -25,14 +25,14 @@ import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
-public class MoreMcmetaPluginRegisterEvent extends Event implements IModBusEvent {
-    private final Collection<MoreMcmetaPlugin> PLUGINS;
+public class MoreMcmetaClientPluginRegisterEvent extends Event implements IModBusEvent {
+    private final Collection<MoreMcmetaClientPlugin> PLUGINS;
 
-    public MoreMcmetaPluginRegisterEvent(Collection<MoreMcmetaPlugin> resultContainer) {
+    public MoreMcmetaClientPluginRegisterEvent(Collection<MoreMcmetaClientPlugin> resultContainer) {
         PLUGINS = requireNonNull(resultContainer, "Queue cannot be null");
     }
 
-    public void registerPlugin(MoreMcmetaPlugin plugin) {
+    public void registerPlugin(MoreMcmetaClientPlugin plugin) {
         requireNonNull(plugin, "Plugin cannot be null");
         PLUGINS.add(plugin);
     }
