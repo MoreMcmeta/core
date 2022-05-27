@@ -322,8 +322,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
         /**
          * Gets the color of the given pixel in the current frame.
-         * @param x     x coordinate of the pixel (from the top left)
-         * @param y     y coordinate of the pixel (from the top left)
+         * @param x     x-coordinate of the pixel (from the top left)
+         * @param y     y-coordinate of the pixel (from the top left)
          * @return the color of the pixel at the given coordinate
          */
         @Override
@@ -495,8 +495,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
         /**
          * Gets the color of the given pixel in the current frame.
-         * @param x     x coordinate of the pixel (from the top left)
-         * @param y     y coordinate of the pixel (from the top left)
+         * @param x     x-coordinate of the pixel (from the top left)
+         * @param y     y-coordinate of the pixel (from the top left)
          * @return the color of the pixel at the given coordinate
          */
         public int color(int x, int y) {

@@ -162,8 +162,8 @@ public class AtlasAdapter implements Atlas {
         }
 
         /**
-         * Gets a sprite's x and y coordinates of its top left corner in its texture atlas.
-         * @return the x and y coordinates of the sprite's top left corner
+         * Gets a sprite's x and y-coordinates of its top left corner in its texture atlas.
+         * @return the x and y-coordinates of the sprite's top left corner
          */
         private Point findUploadPoint() {
             String spriteStr = SPRITE.toString();

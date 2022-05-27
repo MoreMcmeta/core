@@ -35,8 +35,8 @@ public final class Rectangle implements Iterable<Point> {
 
     /**
      * Creates a new rectangular area.
-     * @param topLeftX      x coordinate of the top-left point of the rectangle
-     * @param topLeftY      y coordinate of the top-right point of the rectangle
+     * @param topLeftX      x-coordinate of the top-left point of the rectangle
+     * @param topLeftY      y-coordinate of the top-right point of the rectangle
      * @param width         width of the rectangle
      * @param height        height of the rectangle
      * @throws NegativeDimensionException if width or height is negative
@@ -82,8 +82,8 @@ public final class Rectangle implements Iterable<Point> {
         /**
          * Creates a new exception to indicate that a rectangle was created that contains points
          * that cannot be represented with two 32-bit integers.
-         * @param x         x coordinate of the top-left corner of the rectangle
-         * @param y         y coordinate of the top-right corner of the rectangle
+         * @param x         x-coordinate of the top-left corner of the rectangle
+         * @param y         y-coordinate of the top-right corner of the rectangle
          * @param width     width of the rectangle
          * @param height    height of the rectangle
          */

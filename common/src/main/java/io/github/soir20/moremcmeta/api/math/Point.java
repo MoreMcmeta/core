@@ -38,7 +38,7 @@ public final class Point {
 
     /**
      * Gets the horizontal coordinate of the point.
-     * @return x coordinate of the point
+     * @return x-coordinate of the point
      */
     public int getX() {
         return X_POS;
@@ -46,7 +46,7 @@ public final class Point {
 
     /**
      * Gets the vertical coordinate of the point.
-     * @return y coordinate of the point
+     * @return y-coordinate of the point
      */
     public int getY() {
         return Y_POS;
@@ -54,7 +54,7 @@ public final class Point {
 
     /**
      * Determines if another object is the same as this point. Two points
-     * are equal if their x and y coordinates are the same.
+     * are equal if their x and y-coordinates are the same.
      * @param other     the other object to compare this point with
      * @return whether this point and the other object are equal
      */

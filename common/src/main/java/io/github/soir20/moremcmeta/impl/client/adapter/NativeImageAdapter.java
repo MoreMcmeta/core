@@ -221,8 +221,8 @@ public class NativeImageAdapter implements CloseableImage {
 
     /**
      * Throws an {@link IllegalArgumentException} if the point is outside the image bounds.
-     * @param x     x coordinate to check
-     * @param y     y coordinate to check
+     * @param x     x-coordinate to check
+     * @param y     y-coordinate to check
      */
     private void checkInBounds(int x, int y) {
         if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {

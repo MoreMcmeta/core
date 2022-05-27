@@ -69,8 +69,8 @@ public class CloseableImageFrame {
 
     /**
      * Gets the color of the given pixel in the top-level mipmap of this frame.
-     * @param x     x coordinate of the pixel (from the top left)
-     * @param y     y coordinate of the pixel (from the top left)
+     * @param x     x-coordinate of the pixel (from the top left)
+     * @param y     y-coordinate of the pixel (from the top left)
      * @return the color of the pixel at the given coordinate
      * @throws IllegalStateException if this frame has been closed
      */

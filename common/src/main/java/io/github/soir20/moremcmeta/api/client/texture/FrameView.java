@@ -98,8 +98,8 @@ public interface FrameView {
 
         /**
          * Creates a new exception to indicate that a point outside a frame's bounds was accessed.
-         * @param x     x coordinate of the point accessed
-         * @param y     y coordinate of the point accessed
+         * @param x     x-coordinate of the point accessed
+         * @param y     y-coordinate of the point accessed
          */
         public PixelOutOfBoundsException(int x, int y) {
             super("Point (" + x + ", " + y + ") is outside the frame");
