@@ -77,7 +77,7 @@ public final class Rectangle implements Iterable<Point> {
      * @author soir20
      * @since 4.0.0
      */
-    public static final class RectangleOverflowException extends RuntimeException {
+    public static final class RectangleOverflowException extends IllegalArgumentException {
 
         /**
          * Creates a new exception to indicate that a rectangle was created that contains points
