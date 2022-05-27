@@ -29,7 +29,9 @@ import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 public interface ComponentProvider {
 
     /**
-     * Assembles initial data about a texture into {@link TextureComponent}s.
+     * Assembles initial data about a texture into {@link TextureComponent}s. **This method may be
+     * called from multiple threads concurrently. If there is any state shared between calls, it must
+     * be synchronized properly for concurrent usage.**
      * @param metadata      metadata parsed earlier by this plugin's
      *                      {@link io.github.soir20.moremcmeta.api.client.metadata.MetadataParser}.
      * @param frames        all the predefined frames, which are mutable to allow for initial

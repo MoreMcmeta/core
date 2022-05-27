@@ -28,28 +28,35 @@ import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 public interface MoreMcmetaClientPlugin {
 
     /**
-     * Gets the display name for the plugin that will be used in logs.
+     * Gets the display name for the plugin that will be used in logs. **This method may be called from
+     * multiple threads concurrently. If there is any state shared between calls, it must be synchronized
+     * properly for concurrent usage.**
      * @return plugin's display name
      */
     String displayName();
 
     /**
-     * Gets the section name the plugin is tied to. If the section name is present in a
-     * texture's metadata, the plugin is applied to that texture. If the section name is
-     * not present, the plugin is not applied to that texture. Two installed plugins may
-     * not have the same section name.
+     * Gets the section name the plugin is tied to. If the section name is present in a texture's metadata,
+     * the plugin is applied to that texture. If the section name is not present, the plugin is not applied
+     * to that texture. Two installed plugins may not have the same section name. **This method may be
+     * called from multiple threads concurrently. If there is any state shared between calls, it must be
+     * synchronized properly for concurrent usage.**
      * @return plugin's section name
      */
     String sectionName();
 
     /**
-     * Gets the {@link MetadataParser} for this plugin.
+     * Gets the {@link MetadataParser} for this plugin. **This method may be called from multiple threads
+     * concurrently. If there is any state shared between calls, it must be synchronized properly for
+     * concurrent usage.**
      * @return plugin's metadata parser
      */
     MetadataParser parser();
 
     /**
-     * Gets the {@link ComponentProvider} for this plugin.
+     * Gets the {@link ComponentProvider} for this plugin. **This method may be called from multiple
+     * threads concurrently. If there is any state shared between calls, it must be synchronized properly
+     * for concurrent usage.**
      * @return plugin's component provider
      */
     ComponentProvider componentProvider();

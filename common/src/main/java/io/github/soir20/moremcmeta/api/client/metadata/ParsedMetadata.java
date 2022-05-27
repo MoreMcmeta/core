@@ -22,7 +22,9 @@ import io.github.soir20.moremcmeta.api.math.NegativeDimensionException;
 import java.util.Optional;
 
 /**
- * Contains data parsed by the {@link MetadataParser}.
+ * Contains data parsed by the {@link MetadataParser}. **There may be multiple instances being used
+ * by different threads concurrently. If there is any state shared between instances, it must be
+ * synchronized properly for concurrent usage.**
  * @author soir20
  * @since 4.0.0
  */
