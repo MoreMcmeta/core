@@ -20,6 +20,8 @@ package io.github.soir20.moremcmeta.api.client;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A user-provided plugin that interacts with the MoreMcmeta loader.
  *
@@ -112,7 +114,7 @@ class PluginException extends RuntimeException {
      * @param reason    the reason the plugins are not valid
      */
     public PluginException(String reason) {
-        super(reason);
+        super(requireNonNull(reason, "Plugin exception reason cannot be null"));
     }
 
 }

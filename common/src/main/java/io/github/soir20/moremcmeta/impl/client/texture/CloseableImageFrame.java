@@ -176,6 +176,8 @@ public class CloseableImageFrame {
     public void copyFrom(CloseableImageFrame source) {
         checkOpen();
 
+        requireNonNull(source, "Source cannot be null");
+
         if (source.getMipmapLevel() < getMipmapLevel()) {
             throw new IllegalArgumentException("Other frame cannot have lower mipmap level");
         }
@@ -197,6 +199,9 @@ public class CloseableImageFrame {
      */
     public void applyTransform(ColorTransform transform, Iterable<Point> applyArea) {
         checkOpen();
+
+        requireNonNull(transform, "Transform cannot be null");
+        requireNonNull(applyArea, "Apply area cannot be null");
 
         // Apply transformation to the original image
         applyArea.forEach((point) -> {

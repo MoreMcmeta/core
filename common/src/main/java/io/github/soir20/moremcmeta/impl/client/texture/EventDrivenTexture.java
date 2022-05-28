@@ -467,6 +467,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public void generateWith(ColorTransform transform, Iterable<Point> applyArea) {
             requireNonNull(transform, "Frame transform cannot be null");
+            requireNonNull(applyArea, "Apply area cannot be null");
 
             markNeedsUpload();
             currentFrameIndex = null;
