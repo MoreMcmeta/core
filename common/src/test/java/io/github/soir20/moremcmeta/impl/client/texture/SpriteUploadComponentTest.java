@@ -26,7 +26,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings("resource")
 public class SpriteUploadComponentTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

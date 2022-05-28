@@ -33,7 +33,6 @@ import static org.junit.Assert.assertEquals;
  * test coverage.
  * @author soir20
  */
-@SuppressWarnings("resource")
 public class SingleUploadComponentTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

@@ -36,7 +36,6 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link EventDrivenTexture}.
  * @author soir20
  */
-@SuppressWarnings("resource")
 public class EventDrivenTextureTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
