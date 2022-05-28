@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
+import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
 import org.junit.Rule;
@@ -111,7 +112,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
-                currentFrame.generateWith((x, y) -> 0, List.of());
+                currentFrame.generateWith((x, y) -> new Color(0), List.of());
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
