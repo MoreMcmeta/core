@@ -79,7 +79,7 @@ public class LazyTextureManagerTest {
         wrapper.register(new ResourceLocation("bat.png"), tickable);
         wrapper.tick();
 
-        assertEquals(0, tickable.getTicks());
+        assertEquals(0, tickable.ticks());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class LazyTextureManagerTest {
                 texManager, new MockFinisher<>());
 
         wrapper.register(location, new MockAnimatedTexture());
-        assertNull(texManager.getTexture(location));
+        assertNull(texManager.texture(location));
     }
 
     @Test
@@ -113,9 +113,9 @@ public class LazyTextureManagerTest {
         wrapper.register(location3, 2);
 
         wrapper.finishQueued();
-        assertTrue(texManager.getTexture(location1) instanceof MockAnimatedTexture);
-        assertTrue(texManager.getTexture(location2) instanceof MockAnimatedTexture);
-        assertTrue(texManager.getTexture(location3) instanceof MockAnimatedTexture);
+        assertTrue(texManager.texture(location1) instanceof MockAnimatedTexture);
+        assertTrue(texManager.texture(location2) instanceof MockAnimatedTexture);
+        assertTrue(texManager.texture(location3) instanceof MockAnimatedTexture);
     }
 
     @Test
@@ -158,9 +158,9 @@ public class LazyTextureManagerTest {
         wrapper.finishQueued();
         wrapper.unregister(location1);
 
-        assertNull(texManager.getTexture(location1));
-        assertNotNull(texManager.getTexture(location2));
-        assertNotNull(texManager.getTexture(location3));
+        assertNull(texManager.texture(location1));
+        assertNotNull(texManager.texture(location2));
+        assertNotNull(texManager.texture(location3));
     }
 
     @Test

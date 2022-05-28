@@ -102,7 +102,7 @@ public class TextureLoader<R> {
             ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(METADATA_EXTENSION, IMAGE_EXTENSION));
 
-            Optional<R> texture = getTexture(resourceRepository, textureLocation, metadataLocation);
+            Optional<R> texture = texture(resourceRepository, textureLocation, metadataLocation);
 
             // Keep track of which textures are created
             texture.ifPresent(tex -> textures.put(textureLocation, tex));
@@ -119,10 +119,10 @@ public class TextureLoader<R> {
      * @param metadataLocation     file location of texture's metadata for this mod (not .mcmeta)
      * @return the texture, or empty if the file is not found
      */
-    private Optional<R> getTexture(OrderedResourceRepository resourceRepository,
-                                   ResourceLocation textureLocation,
-                                   ResourceLocation metadataLocation) {
-        PackType resourceType = resourceRepository.getResourceType();
+    private Optional<R> texture(OrderedResourceRepository resourceRepository,
+                                ResourceLocation textureLocation,
+                                ResourceLocation metadataLocation) {
+        PackType resourceType = resourceRepository.resourceType();
 
         try {
             ResourceCollection resources = resourceRepository.getFirstCollectionWith(textureLocation);

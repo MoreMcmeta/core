@@ -60,7 +60,7 @@ public class OrderedResourceRepository {
      * Gets the type of resources in this repository (client or server).
      * @return the type of resources in this repository
      */
-    public PackType getResourceType() {
+    public PackType resourceType() {
         return RESOURCE_TYPE;
     }
 
@@ -108,7 +108,7 @@ public class OrderedResourceRepository {
         requireNonNull(fileFilter, "Path filter cannot be null");
 
         return COLLECTIONS.stream().flatMap(
-                (collection) -> collection.getNamespaces(RESOURCE_TYPE).stream().flatMap(
+                (collection) -> collection.namespaces(RESOURCE_TYPE).stream().flatMap(
                         (namespace) -> collection.getResources(RESOURCE_TYPE, namespace, pathStart, fileFilter).stream()
                 )
         ).collect(Collectors.toSet());

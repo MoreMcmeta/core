@@ -60,7 +60,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
                                   OrderedResourceRepository resourceRepository) {
         requireNonNull(textures, "Textures cannot be null");
         RESOURCE_REPOSITORY = requireNonNull(resourceRepository, "Packs cannot be null");
-        if (RESOURCE_REPOSITORY.getResourceType() != PackType.CLIENT_RESOURCES) {
+        if (RESOURCE_REPOSITORY.resourceType() != PackType.CLIENT_RESOURCES) {
             throw new IllegalArgumentException("Resource repository must have client resources");
         }
 
@@ -97,7 +97,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
             throw new IOException("MoreMcmeta's internal pack only contains client resources");
         }
 
-        ResourceLocation textureLocation = getTextureLocation(location);
+        ResourceLocation textureLocation = textureLocation(location);
         boolean isKnownTexture = TEXTURES.containsKey(textureLocation);
         boolean isVanillaMetadata = location.getPath().endsWith(VANILLA_METADATA_EXTENSION);
 
@@ -181,7 +181,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
             return false;
         }
 
-        return TEXTURES.containsKey(getTextureLocation(location));
+        return TEXTURES.containsKey(textureLocation(location));
     }
 
     /**
@@ -231,7 +231,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
      * @return location of the texture associated with the metadata or the same location
      *         if it is not the location of vanilla metadata
      */
-    private ResourceLocation getTextureLocation(ResourceLocation location) {
+    private ResourceLocation textureLocation(ResourceLocation location) {
         return new ResourceLocation(
                 location.getNamespace(), location.getPath().replace(VANILLA_METADATA_EXTENSION, "")
         );

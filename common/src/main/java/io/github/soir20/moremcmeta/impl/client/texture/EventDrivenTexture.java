@@ -203,15 +203,15 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new IllegalArgumentException("Predefined frames cannot be empty");
             }
 
-            if (frames.stream().mapToInt(CloseableImageFrame::getMipmapLevel).distinct().count() > 1) {
+            if (frames.stream().mapToInt(CloseableImageFrame::mipmapLevel).distinct().count() > 1) {
                 throw new IllegalArgumentException("All predefined frames must have the same mipmap level");
             }
 
-            if (frames.stream().mapToInt(CloseableImageFrame::getWidth).distinct().count() > 1) {
+            if (frames.stream().mapToInt(CloseableImageFrame::width).distinct().count() > 1) {
                 throw new IllegalArgumentException("All predefined frames must have the same width");
             }
 
-            if (frames.stream().mapToInt(CloseableImageFrame::getHeight).distinct().count() > 1) {
+            if (frames.stream().mapToInt(CloseableImageFrame::height).distinct().count() > 1) {
                 throw new IllegalArgumentException("All predefined frames must have the same height");
             }
 
@@ -273,15 +273,15 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new IllegalStateException("Texture must have a generated frame");
             }
 
-            if (predefinedFrames.get(0).getMipmapLevel() != generatedFrame.getMipmapLevel()) {
+            if (predefinedFrames.get(0).mipmapLevel() != generatedFrame.mipmapLevel()) {
                 throw new IllegalStateException("Predefined frames and generated frame must have same mipmap level");
             }
 
-            if (predefinedFrames.get(0).getWidth() != generatedFrame.getWidth()) {
+            if (predefinedFrames.get(0).width() != generatedFrame.width()) {
                 throw new IllegalStateException("Predefined frames and generated frame must have same width");
             }
 
-            if (predefinedFrames.get(0).getHeight() != generatedFrame.getHeight()) {
+            if (predefinedFrames.get(0).height() != generatedFrame.height()) {
                 throw new IllegalStateException("Predefined frames and generated frame must have same height");
             }
 
@@ -384,9 +384,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Gets the event-driven texture.
          * @return the event-driven texture
          */
-        public EventDrivenTexture getTexture() {
+        public EventDrivenTexture texture() {
             checkValid();
-            return STATE.getTexture();
+            return STATE.texture();
         }
 
         /**
@@ -502,7 +502,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @return the color of the pixel at the given coordinate
          */
         public Color color(int x, int y) {
-            return new Color(getCurrentFrame().color(x, y));
+            return new Color(currentFrame().color(x, y));
         }
 
         /**
@@ -510,7 +510,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @return the width of a frame
          */
         public int width() {
-            return PREDEFINED_FRAMES.get(0).getWidth();
+            return PREDEFINED_FRAMES.get(0).width();
         }
 
         /**
@@ -518,7 +518,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @return the height of a frame
          */
         public int height() {
-            return PREDEFINED_FRAMES.get(0).getHeight();
+            return PREDEFINED_FRAMES.get(0).height();
         }
 
         /**
@@ -543,7 +543,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Gets the event-driven texture.
          * @return the event-driven texture
          */
-        public EventDrivenTexture getTexture() {
+        public EventDrivenTexture texture() {
             return TEXTURE;
         }
 
@@ -555,10 +555,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public void uploadAt(Point uploadPoint) {
             requireNonNull(uploadPoint, "Upload point cannot be null");
-            if (getCurrentFrame() == GENERATED_FRAME) {
+            if (currentFrame() == GENERATED_FRAME) {
                 updateGeneratedFrame();
             }
-            getCurrentFrame().uploadAt(uploadPoint);
+            currentFrame().uploadAt(uploadPoint);
         }
 
         /**
@@ -602,7 +602,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Gets the event-driven texture's current image.
          * @return the texture's current image
          */
-        private CloseableImageFrame getCurrentFrame() {
+        private CloseableImageFrame currentFrame() {
             return currentFrameIndex == null ? GENERATED_FRAME : PREDEFINED_FRAMES.get(currentFrameIndex);
         }
 

@@ -302,19 +302,19 @@ public class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         expectedException.expect(NullPointerException.class);
-        adapter.getNamespaces(null);
+        adapter.namespaces(null);
     }
 
     @Test
     public void getNamespaces_ClientType_ClientNamespaces() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        assertEquals(Set.of("minecraft", "sea", "moremcmeta"), adapter.getNamespaces(PackType.CLIENT_RESOURCES));
+        assertEquals(Set.of("minecraft", "sea", "moremcmeta"), adapter.namespaces(PackType.CLIENT_RESOURCES));
     }
 
     @Test
     public void getNamespaces_ServerType_ServerNamespaces() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        assertEquals(Set.of("minecraft", "sea"), adapter.getNamespaces(PackType.SERVER_DATA));
+        assertEquals(Set.of("minecraft", "sea"), adapter.namespaces(PackType.SERVER_DATA));
     }
 
     private PackResourcesAdapter makeAdapterWithResources() {

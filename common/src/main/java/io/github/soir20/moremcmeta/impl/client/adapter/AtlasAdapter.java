@@ -66,7 +66,7 @@ public class AtlasAdapter implements Atlas {
      * @return the sprite if found
      */
     @Override
-    public Optional<Sprite> getSprite(ResourceLocation location) {
+    public Optional<Sprite> sprite(ResourceLocation location) {
         if (ATLAS == null) {
             return Optional.empty();
         }
@@ -138,7 +138,7 @@ public class AtlasAdapter implements Atlas {
          * @return the sprite's name
          */
         @Override
-        public ResourceLocation getName() {
+        public ResourceLocation name() {
             return SPRITE.getName();
         }
 
@@ -148,7 +148,7 @@ public class AtlasAdapter implements Atlas {
          * @return the sprite's upload point
          */
         @Override
-        public Point getUploadPoint() {
+        public Point uploadPoint() {
             return UPLOAD_POINT;
         }
 
@@ -157,7 +157,7 @@ public class AtlasAdapter implements Atlas {
          * @return the mipmap level of the sprite
          */
         @Override
-        public int getMipmapLevel() {
+        public int mipmapLevel() {
             return MIPMAP_LEVEL;
         }
 

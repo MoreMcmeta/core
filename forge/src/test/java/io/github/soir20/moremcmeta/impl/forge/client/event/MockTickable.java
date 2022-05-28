@@ -31,7 +31,7 @@ public class MockTickable implements CustomTickable {
         ticks++;
     }
 
-    public int getTicks() {
+    public int ticks() {
         return ticks;
     }
 

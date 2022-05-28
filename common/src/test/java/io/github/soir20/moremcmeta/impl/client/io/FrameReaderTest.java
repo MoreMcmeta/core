@@ -92,10 +92,10 @@ public class FrameReaderTest {
         List<MockFrame> frames = frameReader.read(100, 70, frameWidth, frameHeight);
         assertEquals(6, frames.size());
         for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
-            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
-            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
-            assertEquals(frameWidth * (frameIndex % 3), frames.get(frameIndex).getXOffset());
-            assertEquals(frameHeight * (frameIndex / 3), frames.get(frameIndex).getYOffset());
+            assertEquals(frameWidth, frames.get(frameIndex).width());
+            assertEquals(frameHeight, frames.get(frameIndex).height());
+            assertEquals(frameWidth * (frameIndex % 3), frames.get(frameIndex).xOffset());
+            assertEquals(frameHeight * (frameIndex / 3), frames.get(frameIndex).yOffset());
         }
     }
 
@@ -108,10 +108,10 @@ public class FrameReaderTest {
         List<MockFrame> frames = frameReader.read(70, 100, frameWidth, frameHeight);
         assertEquals(6, frames.size());
         for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
-            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
-            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
-            assertEquals(frameWidth * (frameIndex % 2), frames.get(frameIndex).getXOffset());
-            assertEquals(frameHeight * (frameIndex / 2), frames.get(frameIndex).getYOffset());
+            assertEquals(frameWidth, frames.get(frameIndex).width());
+            assertEquals(frameHeight, frames.get(frameIndex).height());
+            assertEquals(frameWidth * (frameIndex % 2), frames.get(frameIndex).xOffset());
+            assertEquals(frameHeight * (frameIndex / 2), frames.get(frameIndex).yOffset());
         }
     }
 
@@ -145,10 +145,10 @@ public class FrameReaderTest {
 
         List<MockFrame> frames = frameReader.read(100, 100, 100, 100);
         assertEquals(1, frames.size());
-        assertEquals(100, frames.get(0).getWidth());
-        assertEquals(100, frames.get(0).getHeight());
-        assertEquals(0, frames.get(0).getXOffset());
-        assertEquals(0, frames.get(0).getYOffset());
+        assertEquals(100, frames.get(0).width());
+        assertEquals(100, frames.get(0).height());
+        assertEquals(0, frames.get(0).xOffset());
+        assertEquals(0, frames.get(0).yOffset());
     }
 
     @Test
@@ -160,10 +160,10 @@ public class FrameReaderTest {
         List<MockFrame> frames = frameReader.read(frameWidth * 5, frameHeight, frameWidth, frameHeight);
         assertEquals(5, frames.size());
         for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
-            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
-            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
-            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).getXOffset());
-            assertEquals(0, frames.get(frameIndex).getYOffset());
+            assertEquals(frameWidth, frames.get(frameIndex).width());
+            assertEquals(frameHeight, frames.get(frameIndex).height());
+            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).xOffset());
+            assertEquals(0, frames.get(frameIndex).yOffset());
         }
     }
 
@@ -176,10 +176,10 @@ public class FrameReaderTest {
         List<MockFrame> frames = frameReader.read(frameWidth, frameHeight * 5, frameWidth, frameHeight);
         assertEquals(5, frames.size());
         for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
-            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
-            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
-            assertEquals(0, frames.get(frameIndex).getXOffset());
-            assertEquals(frameHeight * frameIndex, frames.get(frameIndex).getYOffset());
+            assertEquals(frameWidth, frames.get(frameIndex).width());
+            assertEquals(frameHeight, frames.get(frameIndex).height());
+            assertEquals(0, frames.get(frameIndex).xOffset());
+            assertEquals(frameHeight * frameIndex, frames.get(frameIndex).yOffset());
         }
     }
 
@@ -192,10 +192,10 @@ public class FrameReaderTest {
         List<MockFrame> frames = frameReader.read(frameWidth * 5, frameHeight, frameWidth, frameHeight);
         assertEquals(5, frames.size());
         for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
-            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
-            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
-            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).getXOffset());
-            assertEquals(0, frames.get(frameIndex).getYOffset());
+            assertEquals(frameWidth, frames.get(frameIndex).width());
+            assertEquals(frameHeight, frames.get(frameIndex).height());
+            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).xOffset());
+            assertEquals(0, frames.get(frameIndex).yOffset());
         }
     }
 
@@ -208,10 +208,10 @@ public class FrameReaderTest {
         List<MockFrame> frames = frameReader.read(frameWidth * 5, frameHeight, frameWidth, frameHeight);
         assertEquals(5, frames.size());
         for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
-            assertEquals(frameWidth, frames.get(frameIndex).getWidth());
-            assertEquals(frameHeight, frames.get(frameIndex).getHeight());
-            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).getXOffset());
-            assertEquals(0, frames.get(frameIndex).getYOffset());
+            assertEquals(frameWidth, frames.get(frameIndex).width());
+            assertEquals(frameHeight, frames.get(frameIndex).height());
+            assertEquals(frameWidth * frameIndex, frames.get(frameIndex).xOffset());
+            assertEquals(0, frames.get(frameIndex).yOffset());
         }
     }
 
@@ -226,25 +226,25 @@ public class FrameReaderTest {
         private final int Y_OFFSET;
 
         public MockFrame(FrameReader.FrameData frameData) {
-            WIDTH = frameData.getWidth();
-            HEIGHT = frameData.getHeight();
-            X_OFFSET = frameData.getXOffset();
-            Y_OFFSET = frameData.getYOffset();
+            WIDTH = frameData.width();
+            HEIGHT = frameData.height();
+            X_OFFSET = frameData.xOffset();
+            Y_OFFSET = frameData.yOffset();
         }
 
-        public int getWidth() {
+        public int width() {
             return WIDTH;
         }
 
-        public int getHeight() {
+        public int height() {
             return HEIGHT;
         }
 
-        public int getXOffset() {
+        public int xOffset() {
             return X_OFFSET;
         }
 
-        public int getYOffset() {
+        public int yOffset() {
             return Y_OFFSET;
         }
 

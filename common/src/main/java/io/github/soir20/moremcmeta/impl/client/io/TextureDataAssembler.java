@@ -64,7 +64,7 @@ public class TextureDataAssembler {
         Minecraft minecraft = Minecraft.getInstance();
         final int MAX_MIPMAP = minecraft.options.mipmapLevels;
 
-        NativeImage original = data.image().getImage();
+        NativeImage original = data.image().image();
         int frameWidth = data.frameSize().width();
         int frameHeight = data.frameSize().height();
         boolean blur = data.blur();
@@ -130,12 +130,12 @@ public class TextureDataAssembler {
             /* The immutable list collector was marked as beta for a while,
                and the marking was removed in a later version. */
             ImmutableList<CloseableImage> wrappedMipmaps = IntStream.rangeClosed(0, mipmap).mapToObj((level) -> {
-                int width = frameData.getWidth() >> level;
-                int height = frameData.getHeight() >> level;
+                int width = frameData.width() >> level;
+                int height = frameData.height() >> level;
 
                 return new NativeImageAdapter(
                         mipmaps.get(level),
-                        frameData.getXOffset() >> level, frameData.getYOffset() >> level,
+                        frameData.xOffset() >> level, frameData.yOffset() >> level,
                         width, height,
                         level, blur, clamp, false
                 );
@@ -286,7 +286,7 @@ public class TextureDataAssembler {
         @Override
         public Color color(int x, int y) {
             checkValid();
-            if (x < 0 || y < 0 || x >= FRAME.getWidth() || y >= FRAME.getHeight()) {
+            if (x < 0 || y < 0 || x >= FRAME.width() || y >= FRAME.height()) {
                 throw new PixelOutOfBoundsException(x, y);
             }
 
@@ -300,7 +300,7 @@ public class TextureDataAssembler {
         @Override
         public int width() {
             checkValid();
-            return FRAME.getWidth();
+            return FRAME.width();
         }
 
         /**
@@ -310,7 +310,7 @@ public class TextureDataAssembler {
         @Override
         public int height() {
             checkValid();
-            return FRAME.getHeight();
+            return FRAME.height();
         }
 
         /**

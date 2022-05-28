@@ -63,25 +63,25 @@ public class OrderedResourceRepositoryTest {
     }
 
     @Test
-    public void getResourceType_ClientType_ReturnsClient() {
+    public void resourceType_ClientType_ReturnsClient() {
         List<ResourceCollection> collections = new ArrayList<>();
         collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
         collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
         collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
-        assertEquals(PackType.CLIENT_RESOURCES, repository.getResourceType());
+        assertEquals(PackType.CLIENT_RESOURCES, repository.resourceType());
     }
 
     @Test
-    public void getResourceType_ServerType_ReturnsServer() {
+    public void resourceType_ServerType_ReturnsServer() {
         List<ResourceCollection> collections = new ArrayList<>();
         collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
         collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
         collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
-        assertEquals(PackType.SERVER_DATA, repository.getResourceType());
+        assertEquals(PackType.SERVER_DATA, repository.resourceType());
     }
 
     @Test

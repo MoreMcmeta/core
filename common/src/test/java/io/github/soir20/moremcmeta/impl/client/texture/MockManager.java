@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
-import io.github.soir20.moremcmeta.impl.client.texture.Manager;
 import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.resources.ResourceLocation;
 
@@ -56,7 +55,7 @@ public class MockManager<R> implements Manager<R> {
         ANIMATED_TEXTURES.values().forEach(Tickable::tick);
     }
 
-    public R getTexture(ResourceLocation location) {
+    public R texture(ResourceLocation location) {
         return TEXTURES.get(location);
     }
 }

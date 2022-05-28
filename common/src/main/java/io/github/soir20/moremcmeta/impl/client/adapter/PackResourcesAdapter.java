@@ -97,7 +97,7 @@ public class PackResourcesAdapter implements ResourceCollection {
      * @return the unique namespaces of all resources in this pack
      */
     @Override
-    public Set<String> getNamespaces(PackType resourceType) {
+    public Set<String> namespaces(PackType resourceType) {
         requireNonNull(resourceType, "Resource type cannot be null");
         return ORIGINAL.getNamespaces(resourceType);
     }

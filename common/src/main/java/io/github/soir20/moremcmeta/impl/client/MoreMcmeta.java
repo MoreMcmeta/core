@@ -97,10 +97,10 @@ public abstract class MoreMcmeta {
         validatePlugins(plugins);
 
         // Texture manager
-        SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, getMipmapLevelGetter(logger)));
-        TextureFinisher finisher = new TextureFinisher(spriteFinder, getPreparer());
+        SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
+        TextureFinisher finisher = new TextureFinisher(spriteFinder, preparer());
         LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager = new LazyTextureManager<>(
-                new TextureManagerAdapter(minecraft::getTextureManager, getUnregisterAction()),
+                new TextureManagerAdapter(minecraft::getTextureManager, unregisterAction()),
                 finisher
         );
 
@@ -118,7 +118,7 @@ public abstract class MoreMcmeta {
             PackRepository packRepository = client.getResourcePackRepository();
             ModRepositorySource source = new ModRepositorySource(() -> {
                 OrderedResourceRepository repository = getResourceRepository(packRepository,
-                        ModRepositorySource.getPackId());
+                        ModRepositorySource.packId());
 
                 lastTextures = loadData(repository, loader);
 
@@ -152,19 +152,19 @@ public abstract class MoreMcmeta {
      * Gets the function that converts atlas sprites to their mipmap level.
      * @return the mipmap level getter
      */
-    protected abstract ToIntFunction<TextureAtlasSprite> getMipmapLevelGetter(Logger logger);
+    protected abstract ToIntFunction<TextureAtlasSprite> mipmapLevelGetter(Logger logger);
 
     /**
      * Gets the OpenGL preparer for new textures on this loader.
      * @return the OpenGL preparer for this loader
      */
-    protected abstract TexturePreparer getPreparer();
+    protected abstract TexturePreparer preparer();
 
     /**
      * Gets the action that should be executed to unregister a texture on a specific mod loader.
      * @return the action that will unregister textures
      */
-    protected abstract BiConsumer<TextureManager, ResourceLocation> getUnregisterAction();
+    protected abstract BiConsumer<TextureManager, ResourceLocation> unregisterAction();
 
     /**
      * Executes a callback when the vanilla resource manager is initialized in a mod loader.
@@ -194,7 +194,7 @@ public abstract class MoreMcmeta {
      * @param logger     a logger to write output
      * @return the current reload instance
      */
-    protected abstract Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger);
+    protected abstract Optional<ReloadInstance> reloadInstance(LoadingOverlay overlay, Logger logger);
 
     /**
      * Begins ticking the {@link LazyTextureManager} on a mod loader.
@@ -342,7 +342,7 @@ public abstract class MoreMcmeta {
      * @param logger    a logger to write output
      * @return the loading overlay if there is one
      */
-    private Optional<LoadingOverlay> getLoadingOverlay(Logger logger) {
+    private Optional<LoadingOverlay> loadingOverlay(Logger logger) {
         Overlay currentOverlay = Minecraft.getInstance().getOverlay();
 
         if (!(currentOverlay instanceof LoadingOverlay)) {
@@ -359,12 +359,12 @@ public abstract class MoreMcmeta {
      */
     private void addCompletedReloadCallback(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager,
                                             Logger logger) {
-        Optional<LoadingOverlay> overlay = getLoadingOverlay(logger);
+        Optional<LoadingOverlay> overlay = loadingOverlay(logger);
         if (overlay.isEmpty()) {
             return;
         }
 
-        Optional<ReloadInstance> reloadInstance = getReloadInstance(overlay.get(), logger);
+        Optional<ReloadInstance> reloadInstance = reloadInstance(overlay.get(), logger);
         reloadInstance.ifPresent((instance) -> instance.done().thenRun(manager::finishQueued));
     }
 

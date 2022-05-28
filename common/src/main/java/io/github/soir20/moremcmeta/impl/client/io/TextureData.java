@@ -50,11 +50,11 @@ public class TextureData<I extends CloseableImage> {
      */
     public TextureData(ParsedMetadata.FrameSize frameSize, boolean blur, boolean clamp, I image,
                        List<Pair<ParsedMetadata, ComponentProvider>> parsedSections) {
-        if (frameSize.width() > image.getWidth()) {
+        if (frameSize.width() > image.width()) {
             throw new IllegalArgumentException("Frame width cannot be larger than image width");
         }
 
-        if (frameSize.height() > image.getHeight()) {
+        if (frameSize.height() > image.height()) {
             throw new IllegalArgumentException("Frame height cannot be larger than image height");
         }
 

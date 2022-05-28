@@ -48,11 +48,11 @@ public class MockCloseableImageFrame extends CloseableImageFrame {
         uploads++;
     }
 
-    public int getUploadCount() {
+    public int uploadCount() {
         return uploads;
     }
 
-    public MockCloseableImage getMipmap(int mipmap) {
+    public MockCloseableImage mipmap(int mipmap) {
         return MIPMAPS.get(mipmap);
     }
 

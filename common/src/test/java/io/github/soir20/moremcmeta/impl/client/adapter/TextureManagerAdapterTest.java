@@ -154,7 +154,7 @@ public class TextureManagerAdapterTest {
         texManager.register(new ResourceLocation("dummy.png"), texture);
 
         adapter.tick();
-        assertEquals(0, texture.getTicks());
+        assertEquals(0, texture.ticks());
     }
 
     @Test
@@ -166,7 +166,7 @@ public class TextureManagerAdapterTest {
         texManager.register(new ResourceLocation("dummy.png"), texture);
 
         adapter.tick();
-        assertEquals(1, texture.getTicks());
+        assertEquals(1, texture.ticks());
     }
 
     private static final class MockTickableAnimatedTexture extends MockAnimatedTexture implements Tickable {}

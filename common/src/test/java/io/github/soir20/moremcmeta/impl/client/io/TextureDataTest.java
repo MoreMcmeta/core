@@ -140,7 +140,7 @@ public class TextureDataTest {
     }
 
     @Test
-    public void getFrameSize_WidthProvided_RetrievesWidth() {
+    public void frameSize_WidthProvided_RetrievesWidth() {
         TextureData<MockCloseableImage> data = new TextureData<>(
                 new ParsedMetadata.FrameSize(10, 20),
                 false,
@@ -152,7 +152,7 @@ public class TextureDataTest {
     }
 
     @Test
-    public void getFrameSize_HeightProvided_RetrievesHeight() {
+    public void frameSize_HeightProvided_RetrievesHeight() {
         TextureData<MockCloseableImage> data = new TextureData<>(
                 new ParsedMetadata.FrameSize(10, 20),
                 false,
@@ -164,7 +164,7 @@ public class TextureDataTest {
     }
 
     @Test
-    public void getImage_ImageProvided_RetrievesSameImage() {
+    public void image_ImageProvided_RetrievesSameImage() {
         MockCloseableImage image = new MockCloseableImage(100, 100);
         TextureData<MockCloseableImage> data = new TextureData<>(
                 new ParsedMetadata.FrameSize(10, 20),

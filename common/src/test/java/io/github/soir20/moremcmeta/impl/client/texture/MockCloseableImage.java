@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.impl.client.texture;
 
 import io.github.soir20.moremcmeta.api.math.Point;
-import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 
 /**
  * Mocks an {@link CloseableImage}. Keeps track of set pixel colors.
@@ -52,7 +51,7 @@ public class MockCloseableImage implements CloseableImage {
     }
 
     @Override
-    public int getPixel(int x, int y) {
+    public int color(int x, int y) {
         if (closed) {
             throw new IllegalStateException("Mock image closed");
         }
@@ -61,7 +60,7 @@ public class MockCloseableImage implements CloseableImage {
     }
 
     @Override
-    public void setPixel(int x, int y, int color) {
+    public void setColor(int x, int y, int color) {
         if (closed) {
             throw new IllegalStateException("Mock image closed");
         }
@@ -70,7 +69,7 @@ public class MockCloseableImage implements CloseableImage {
     }
 
     @Override
-    public int getWidth() {
+    public int width() {
         if (closed) {
             throw new IllegalStateException("Mock image closed");
         }
@@ -79,7 +78,7 @@ public class MockCloseableImage implements CloseableImage {
     }
 
     @Override
-    public int getHeight() {
+    public int height() {
         if (closed) {
             throw new IllegalStateException("Mock image closed");
         }
@@ -105,7 +104,7 @@ public class MockCloseableImage implements CloseableImage {
         return closed;
     }
 
-    public Point getLastUploadPoint() {
+    public Point lastUploadPoint() {
         return uploadPoint;
     }
 

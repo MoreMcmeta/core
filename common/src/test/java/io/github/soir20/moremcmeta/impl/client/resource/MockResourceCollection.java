@@ -82,7 +82,7 @@ public class MockResourceCollection implements ResourceCollection {
     }
 
     @Override
-    public Set<String> getNamespaces(PackType resourceType) {
+    public Set<String> namespaces(PackType resourceType) {
         if (resourceType == PackType.CLIENT_RESOURCES) {
             return CLIENT_RESOURCES.stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet());
         }

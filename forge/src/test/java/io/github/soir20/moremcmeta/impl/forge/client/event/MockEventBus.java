@@ -49,7 +49,7 @@ public class MockEventBus implements IEventBus {
         LISTENERS.remove(object);
     }
 
-    public List<Object> getListeners() {
+    public List<Object> listeners() {
         return LISTENERS;
     }
 

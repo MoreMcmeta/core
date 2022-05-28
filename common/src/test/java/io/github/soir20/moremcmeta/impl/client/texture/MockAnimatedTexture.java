@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
-import io.github.soir20.moremcmeta.impl.client.texture.CustomTickable;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -33,7 +32,7 @@ public class MockAnimatedTexture extends AbstractTexture implements CustomTickab
         ticks++;
     }
 
-    public int getTicks() {
+    public int ticks() {
         return ticks;
     }
 

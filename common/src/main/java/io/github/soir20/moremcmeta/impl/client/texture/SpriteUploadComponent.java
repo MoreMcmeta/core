@@ -37,7 +37,7 @@ public class SpriteUploadComponent implements CoreTextureComponent {
      */
     public SpriteUploadComponent(Sprite sprite) {
         SPRITE = requireNonNull(sprite, "Sprite cannot be null");
-        UPLOAD_POINT = SPRITE.getUploadPoint();
+        UPLOAD_POINT = SPRITE.uploadPoint();
     }
 
     /**
@@ -46,7 +46,7 @@ public class SpriteUploadComponent implements CoreTextureComponent {
      */
     @Override
     public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
-        currentFrame.lowerMipmapLevel(SPRITE.getMipmapLevel());
+        currentFrame.lowerMipmapLevel(SPRITE.mipmapLevel());
     }
 
     /**
@@ -67,7 +67,7 @@ public class SpriteUploadComponent implements CoreTextureComponent {
 
         // We need this listener because atlas sprites will never be bound
         SPRITE.bind();
-        currentFrame.getTexture().upload();
+        currentFrame.texture().upload();
 
     }
 

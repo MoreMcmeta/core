@@ -119,7 +119,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture texture = builder.build();
         texture.upload();
 
-        assertEquals(1, generatedFrame.getUploadCount());
+        assertEquals(1, generatedFrame.uploadCount());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class EventDrivenTextureTest {
         builder.add(new TextureComponent<>() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
-                assertEquals(textureGetter[0], currentFrame.getTexture());
+                assertEquals(textureGetter[0], currentFrame.texture());
             }
         });
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));

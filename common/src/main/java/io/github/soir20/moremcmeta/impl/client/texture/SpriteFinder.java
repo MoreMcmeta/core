@@ -73,7 +73,7 @@ public class SpriteFinder {
             Atlas atlas = ATLAS_GETTER.apply(atlasLocation);
             requireNonNull(atlas, "Atlas getter cannot supply null");
 
-            Optional<Sprite> sprite = atlas.getSprite(location);
+            Optional<Sprite> sprite = atlas.sprite(location);
             if (sprite.isPresent()) {
                 return sprite;
             }

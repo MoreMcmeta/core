@@ -58,7 +58,7 @@ public class TextureManagerAdapter implements Manager<AbstractTexture> {
     public void register(ResourceLocation location, AbstractTexture texture) {
         requireNonNull(location, "Location cannot be null");
         requireNonNull(texture, "Texture cannot be null");
-        getManager().register(location, texture);
+        manager().register(location, texture);
     }
 
     /**
@@ -68,7 +68,7 @@ public class TextureManagerAdapter implements Manager<AbstractTexture> {
     @Override
     public void unregister(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
-        UNREGISTER_ACTION.accept(getManager(), location);
+        UNREGISTER_ACTION.accept(manager(), location);
     }
 
     /**
@@ -76,7 +76,7 @@ public class TextureManagerAdapter implements Manager<AbstractTexture> {
      */
     @Override
     public void tick() {
-        getManager().tick();
+        manager().tick();
     }
 
     /**
@@ -84,7 +84,7 @@ public class TextureManagerAdapter implements Manager<AbstractTexture> {
      * if the texture manager is being used too early and does not exist yet.
      * @return Minecraft's texture manager
      */
-    private TextureManager getManager() {
+    private TextureManager manager() {
         return requireNonNull(MANAGER_GETTER.get(), "Supplied manager cannot be null");
     }
 

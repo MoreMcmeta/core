@@ -116,7 +116,7 @@ public class FrameReader<F> {
          * Gets the width of this frame.
          * @return  the width of the frame in pixels
          */
-        public int getWidth() {
+        public int width() {
             return WIDTH;
         }
 
@@ -124,7 +124,7 @@ public class FrameReader<F> {
          * Gets the height of this frame.
          * @return  the height of the frame in pixels
          */
-        public int getHeight() {
+        public int height() {
             return HEIGHT;
         }
 
@@ -132,7 +132,7 @@ public class FrameReader<F> {
          * Gets the x-offset of this frame.
          * @return  the x-offset of this frame in pixels
          */
-        public int getXOffset() {
+        public int xOffset() {
             return X_OFFSET;
         }
 
@@ -140,7 +140,7 @@ public class FrameReader<F> {
          * Gets the y-offset of this frame.
          * @return  the y-offset of this frame in pixels
          */
-        public int getYOffset() {
+        public int yOffset() {
             return Y_OFFSET;
         }
 

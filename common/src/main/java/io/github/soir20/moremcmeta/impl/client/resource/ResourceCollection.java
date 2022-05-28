@@ -65,6 +65,6 @@ public interface ResourceCollection {
      * @param resourceType      the type of resources to search
      * @return the unique namespaces of all resources in this collection
      */
-    Set<String> getNamespaces(PackType resourceType);
+    Set<String> namespaces(PackType resourceType);
 
 }

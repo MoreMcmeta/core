@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.impl.client.texture;
 
 import io.github.soir20.moremcmeta.api.math.Point;
-import io.github.soir20.moremcmeta.impl.client.texture.Sprite;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -59,21 +58,21 @@ public class MockSprite implements Sprite {
     }
 
     @Override
-    public ResourceLocation getName() {
+    public ResourceLocation name() {
         return NAME;
     }
 
     @Override
-    public Point getUploadPoint() {
+    public Point uploadPoint() {
         return UPLOAD_POINT;
     }
 
     @Override
-    public int getMipmapLevel() {
+    public int mipmapLevel() {
         return MIPMAP_LEVEL;
     }
 
-    public int getBindCount() {
+    public int bindCount() {
         return timesBound;
     }
 }

@@ -49,10 +49,10 @@ public class SpriteUploadComponentTest {
 
         texture.upload();
 
-        assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(2, 3), frame.getMipmap(0).getLastUploadPoint());
-        assertEquals(new Point(1, 1), frame.getMipmap(1).getLastUploadPoint());
-        assertEquals(new Point(0, 0), frame.getMipmap(2).getLastUploadPoint());
+        assertEquals(1, frame.uploadCount());
+        assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
+        assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
+        assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
     }
 
     @Test
@@ -68,10 +68,10 @@ public class SpriteUploadComponentTest {
         texture.upload();
         texture.upload();
 
-        assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(2, 3), frame.getMipmap(0).getLastUploadPoint());
-        assertEquals(new Point(1, 1), frame.getMipmap(1).getLastUploadPoint());
-        assertEquals(new Point(0, 0), frame.getMipmap(2).getLastUploadPoint());
+        assertEquals(2, frame.uploadCount());
+        assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
+        assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
+        assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
     }
 
     @Test
@@ -87,11 +87,11 @@ public class SpriteUploadComponentTest {
 
         texture.tick();
 
-        assertEquals(1, sprite.getBindCount());
-        assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(2, 3), frame.getMipmap(0).getLastUploadPoint());
-        assertEquals(new Point(1, 1), frame.getMipmap(1).getLastUploadPoint());
-        assertEquals(new Point(0, 0), frame.getMipmap(2).getLastUploadPoint());
+        assertEquals(1, sprite.bindCount());
+        assertEquals(1, frame.uploadCount());
+        assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
+        assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
+        assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
     }
 
     @Test
@@ -108,11 +108,11 @@ public class SpriteUploadComponentTest {
         texture.tick();
         texture.tick();
 
-        assertEquals(2, sprite.getBindCount());
-        assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(2, 3), frame.getMipmap(0).getLastUploadPoint());
-        assertEquals(new Point(1, 1), frame.getMipmap(1).getLastUploadPoint());
-        assertEquals(new Point(0, 0), frame.getMipmap(2).getLastUploadPoint());
+        assertEquals(2, sprite.bindCount());
+        assertEquals(2, frame.uploadCount());
+        assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
+        assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
+        assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
     }
 
     @Test
@@ -129,13 +129,13 @@ public class SpriteUploadComponentTest {
         builder.setGeneratedFrame(frame3);
         EventDrivenTexture texture = builder.build();
 
-        assertEquals(2, frame1.getMipmapLevel());
-        assertEquals(2, frame2.getMipmapLevel());
-        assertEquals(2, frame3.getMipmapLevel());
+        assertEquals(2, frame1.mipmapLevel());
+        assertEquals(2, frame2.mipmapLevel());
+        assertEquals(2, frame3.mipmapLevel());
         texture.load(null);
-        assertEquals(1, frame1.getMipmapLevel());
-        assertEquals(1, frame2.getMipmapLevel());
-        assertEquals(1, frame3.getMipmapLevel());
+        assertEquals(1, frame1.mipmapLevel());
+        assertEquals(1, frame2.mipmapLevel());
+        assertEquals(1, frame3.mipmapLevel());
     }
 
 }

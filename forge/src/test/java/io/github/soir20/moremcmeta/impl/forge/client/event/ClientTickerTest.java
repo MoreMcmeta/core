@@ -100,7 +100,7 @@ public class ClientTickerTest {
                 () -> true
         );
 
-        assertEquals(1, EVENT_BUS.getListeners().size());
+        assertEquals(1, EVENT_BUS.listeners().size());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class ClientTickerTest {
                 () -> true
         );
 
-        assertEquals(1, EVENT_BUS.getListeners().size());
+        assertEquals(1, EVENT_BUS.listeners().size());
     }
 
     @Test
@@ -148,9 +148,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
 
-        assertEquals(2, firstTickable.getTicks());
-        assertEquals(1, secondTickable.getTicks());
-        assertEquals(1, thirdTickable.getTicks());
+        assertEquals(2, firstTickable.ticks());
+        assertEquals(1, secondTickable.ticks());
+        assertEquals(1, thirdTickable.ticks());
     }
 
     @Test
@@ -168,9 +168,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
 
-        assertEquals(1, firstTickable.getTicks());
-        assertEquals(1, secondTickable.getTicks());
-        assertEquals(1, thirdTickable.getTicks());
+        assertEquals(1, firstTickable.ticks());
+        assertEquals(1, secondTickable.ticks());
+        assertEquals(1, thirdTickable.ticks());
     }
 
     @Test
@@ -188,9 +188,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
 
-        assertEquals(0, firstTickable.getTicks());
-        assertEquals(0, secondTickable.getTicks());
-        assertEquals(0, thirdTickable.getTicks());
+        assertEquals(0, firstTickable.ticks());
+        assertEquals(0, secondTickable.ticks());
+        assertEquals(0, thirdTickable.ticks());
     }
 
     @Test
@@ -208,9 +208,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.END));
 
-        assertEquals(0, firstTickable.getTicks());
-        assertEquals(0, secondTickable.getTicks());
-        assertEquals(0, thirdTickable.getTicks());
+        assertEquals(0, firstTickable.ticks());
+        assertEquals(0, secondTickable.ticks());
+        assertEquals(0, thirdTickable.ticks());
     }
 
     @Test
@@ -228,9 +228,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.END));
 
-        assertEquals(0, firstTickable.getTicks());
-        assertEquals(0, secondTickable.getTicks());
-        assertEquals(0, thirdTickable.getTicks());
+        assertEquals(0, firstTickable.ticks());
+        assertEquals(0, secondTickable.ticks());
+        assertEquals(0, thirdTickable.ticks());
     }
 
     @Test
@@ -248,9 +248,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.END));
 
-        assertEquals(1, firstTickable.getTicks());
-        assertEquals(1, secondTickable.getTicks());
-        assertEquals(1, thirdTickable.getTicks());
+        assertEquals(1, firstTickable.ticks());
+        assertEquals(1, secondTickable.ticks());
+        assertEquals(1, thirdTickable.ticks());
     }
 
     @Test
@@ -268,9 +268,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.END));
 
-        assertEquals(0, firstTickable.getTicks());
-        assertEquals(0, secondTickable.getTicks());
-        assertEquals(0, thirdTickable.getTicks());
+        assertEquals(0, firstTickable.ticks());
+        assertEquals(0, secondTickable.ticks());
+        assertEquals(0, thirdTickable.ticks());
     }
 
     @Test
@@ -288,9 +288,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
 
-        assertEquals(0, firstTickable.getTicks());
-        assertEquals(0, secondTickable.getTicks());
-        assertEquals(0, thirdTickable.getTicks());
+        assertEquals(0, firstTickable.ticks());
+        assertEquals(0, secondTickable.ticks());
+        assertEquals(0, thirdTickable.ticks());
     }
 
     @Test
@@ -308,9 +308,9 @@ public class ClientTickerTest {
 
         ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
 
-        assertEquals(0, firstTickable.getTicks());
-        assertEquals(0, secondTickable.getTicks());
-        assertEquals(0, thirdTickable.getTicks());
+        assertEquals(0, firstTickable.ticks());
+        assertEquals(0, secondTickable.ticks());
+        assertEquals(0, thirdTickable.ticks());
     }
 
     @Test
@@ -328,7 +328,7 @@ public class ClientTickerTest {
 
         ticker.stopTicking();
 
-        assertEquals(0, EVENT_BUS.getListeners().size());
+        assertEquals(0, EVENT_BUS.listeners().size());
     }
 
     @Test
@@ -348,7 +348,7 @@ public class ClientTickerTest {
 
         ticker.stopTicking();
 
-        assertEquals(0, EVENT_BUS.getListeners().size());
+        assertEquals(0, EVENT_BUS.listeners().size());
     }
 
     @Test
@@ -367,6 +367,6 @@ public class ClientTickerTest {
         ticker.stopTicking();
         ticker.stopTicking();
 
-        assertEquals(0, EVENT_BUS.getListeners().size());
+        assertEquals(0, EVENT_BUS.listeners().size());
     }
 }

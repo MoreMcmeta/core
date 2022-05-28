@@ -34,6 +34,6 @@ public interface Atlas {
      * @param location      the location of the sprite
      * @return the sprite at the given location if present
      */
-    Optional<Sprite> getSprite(ResourceLocation location);
+    Optional<Sprite> sprite(ResourceLocation location);
 
 }

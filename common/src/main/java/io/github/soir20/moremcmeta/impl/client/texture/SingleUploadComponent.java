@@ -43,7 +43,7 @@ public class SingleUploadComponent implements CoreTextureComponent {
      */
     @Override
     public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
-        PREPARER.prepare(currentFrame.getTexture().getId(), 0, currentFrame.width(), currentFrame.height());
+        PREPARER.prepare(currentFrame.texture().getId(), 0, currentFrame.width(), currentFrame.height());
         currentFrame.lowerMipmapLevel(0);
     }
 

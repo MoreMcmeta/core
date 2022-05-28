@@ -96,7 +96,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * Gets the function that converts atlas sprites to their mipmap level.
      * @return the mipmap level getter
      */
-    protected ToIntFunction<TextureAtlasSprite> getMipmapLevelGetter(Logger logger) {
+    protected ToIntFunction<TextureAtlasSprite> mipmapLevelGetter(Logger logger) {
         return (sprite) -> {
             try {
                 NativeImage[] mipmaps = ObfuscationReflectionHelper.getPrivateValue(TextureAtlasSprite.class,
@@ -124,7 +124,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * Gets the OpenGL preparer for new textures on this loader.
      * @return the OpenGL preparer for this loader
      */
-    protected TexturePreparer getPreparer() {
+    protected TexturePreparer preparer() {
         return (glId, mipmap, width, height) -> {
             if (!RenderSystem.isOnRenderThreadOrInit()) {
                 RenderSystem.recordRenderCall(() -> TextureUtil.m_85287_(glId, mipmap, width, height));
@@ -139,7 +139,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @return the action that will unregister textures
      */
     @Override
-    protected BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
+    protected BiConsumer<TextureManager, ResourceLocation> unregisterAction() {
 
         // Forge already fixes the bug that prevents texture removal
         return TextureManager::release;
@@ -184,7 +184,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @return the current reload instance
      */
     @Override
-    protected Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger) {
+    protected Optional<ReloadInstance> reloadInstance(LoadingOverlay overlay, Logger logger) {
         try {
             return Optional.ofNullable(
                     ObfuscationReflectionHelper.getPrivateValue(LoadingOverlay.class, overlay, "f_96164_")

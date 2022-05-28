@@ -36,18 +36,18 @@ public interface Sprite {
      * Gets the name of this sprite (without an extension).
      * @return the sprite's name
      */
-    ResourceLocation getName();
+    ResourceLocation name();
 
     /**
      * Gets the position of the sprite's top-left corner on its atlas.
      * @return the sprite's upload point
      */
-    Point getUploadPoint();
+    Point uploadPoint();
 
     /**
      * Gets the mipmap level of the sprite.
      * @return the mipmap level of the sprite
      */
-    int getMipmapLevel();
+    int mipmapLevel();
 
 }

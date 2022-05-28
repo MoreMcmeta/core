@@ -40,7 +40,7 @@ public final class Point {
      * Gets the horizontal coordinate of the point.
      * @return x-coordinate of the point
      */
-    public int getX() {
+    public int x() {
         return X_POS;
     }
 
@@ -48,7 +48,7 @@ public final class Point {
      * Gets the vertical coordinate of the point.
      * @return y-coordinate of the point
      */
-    public int getY() {
+    public int y() {
         return Y_POS;
     }
 

@@ -55,7 +55,7 @@ public class ModRepositorySource implements RepositorySource {
         requireNonNull(packConstructor, "Pack constructor cannot be null");
 
         Pack pack = new Pack(
-                getPackId(),
+                packId(),
                 true,
                 PACK_GETTER,
                 new TextComponent("MoreMcmeta Internal"),
@@ -73,7 +73,7 @@ public class ModRepositorySource implements RepositorySource {
      * Gets the ID used as the unique identifier for the mod's resource pack/
      * @return the mod's resource pack ID
      */
-    public static String getPackId() {
+    public static String packId() {
         return "__moremcmeta-internal__";
     }
 

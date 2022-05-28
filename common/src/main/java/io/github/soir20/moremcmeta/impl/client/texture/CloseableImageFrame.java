@@ -46,13 +46,13 @@ public class CloseableImageFrame {
             throw new IllegalArgumentException("At least one mipmap must be provided");
         }
 
-        int frameWidth = frameData.getWidth();
-        int frameHeight = frameData.getHeight();
+        int frameWidth = frameData.width();
+        int frameHeight = frameData.height();
 
         for (int level = 0; level < mipmaps.size(); level++) {
             CloseableImage image = mipmaps.get(level);
-            int imageWidth = image.getWidth();
-            int imageHeight = image.getHeight();
+            int imageWidth = image.width();
+            int imageHeight = image.height();
 
             if (imageWidth != frameWidth >> level || imageHeight != frameHeight >> level) {
                 throw new IllegalArgumentException(String.format(
@@ -76,7 +76,7 @@ public class CloseableImageFrame {
      */
     public int color(int x, int y) {
         checkOpen();
-        return mipmaps.get(0).getPixel(x, y);
+        return mipmaps.get(0).color(x, y);
     }
 
     /**
@@ -89,17 +89,17 @@ public class CloseableImageFrame {
 
         requireNonNull(point, "Point cannot be null");
 
-        if (point.getX() < 0 || point.getY() < 0) {
+        if (point.x() < 0 || point.y() < 0) {
             throw new IllegalArgumentException("Point coordinates must be greater than zero");
         }
 
         for (int level = 0; level < mipmaps.size(); level++) {
-            int mipmappedX = point.getX() >> level;
-            int mipmappedY = point.getY() >> level;
+            int mipmappedX = point.x() >> level;
+            int mipmappedY = point.y() >> level;
 
             CloseableImage mipmap = mipmaps.get(level);
-            int mipmappedWidth = mipmap.getWidth();
-            int mipmappedHeight = mipmap.getHeight();
+            int mipmappedWidth = mipmap.width();
+            int mipmappedHeight = mipmap.height();
 
             if (mipmappedWidth > 0 && mipmappedHeight > 0) {
                 mipmap.upload(mipmappedX, mipmappedY);
@@ -112,7 +112,7 @@ public class CloseableImageFrame {
      * @return  the width of this frame in pixels
      * @throws IllegalStateException if this frame has been closed
      */
-    public int getWidth() {
+    public int width() {
         checkOpen();
         return WIDTH;
     }
@@ -122,7 +122,7 @@ public class CloseableImageFrame {
      * @return  the height of this frame in pixels
      * @throws IllegalStateException if this frame has been closed
      */
-    public int getHeight() {
+    public int height() {
         checkOpen();
         return HEIGHT;
     }
@@ -132,7 +132,7 @@ public class CloseableImageFrame {
      * @return the mipmap level of this frame
      * @throws IllegalStateException if this frame has been closed
      */
-    public int getMipmapLevel() {
+    public int mipmapLevel() {
         checkOpen();
         return mipmaps.size() - 1;
     }
@@ -145,7 +145,7 @@ public class CloseableImageFrame {
     public void lowerMipmapLevel(int newMipmapLevel) {
         checkOpen();
 
-        if (newMipmapLevel == getMipmapLevel()) {
+        if (newMipmapLevel == mipmapLevel()) {
             return;
         }
 
@@ -153,9 +153,9 @@ public class CloseableImageFrame {
             throw new IllegalArgumentException("New mipmap level must be at least zero");
         }
 
-        if (newMipmapLevel > getMipmapLevel()) {
+        if (newMipmapLevel > mipmapLevel()) {
             throw new IllegalArgumentException("New mipmap level " + newMipmapLevel + " is greater than current " +
-                    "mipmap level " + getMipmapLevel());
+                    "mipmap level " + mipmapLevel());
         }
 
         for (int level = newMipmapLevel + 1; level < mipmaps.size(); level++) {
@@ -178,11 +178,11 @@ public class CloseableImageFrame {
 
         requireNonNull(source, "Source cannot be null");
 
-        if (source.getMipmapLevel() < getMipmapLevel()) {
+        if (source.mipmapLevel() < mipmapLevel()) {
             throw new IllegalArgumentException("Other frame cannot have lower mipmap level");
         }
 
-        for (int level = 0; level <= getMipmapLevel(); level++) {
+        for (int level = 0; level <= mipmapLevel(); level++) {
             mipmaps.get(level).copyFrom(source.mipmaps.get(level));
         }
     }
@@ -205,11 +205,11 @@ public class CloseableImageFrame {
 
         // Apply transformation to the original image
         applyArea.forEach((point) -> {
-            int x = point.getX();
-            int y = point.getY();
+            int x = point.x();
+            int y = point.y();
 
             int newColor = transform.transform(x, y).combine();
-            mipmaps.get(0).setPixel(x, y, newColor);
+            mipmaps.get(0).setColor(x, y, newColor);
         });
 
         /* Update corresponding mipmap pixels.
@@ -218,17 +218,17 @@ public class CloseableImageFrame {
            complexity. Instead, we can efficiently calculate the mipmaps
            ourselves. */
         applyArea.forEach((point) -> {
-            int x = point.getX();
-            int y = point.getY();
-            for (int level = 1; level <= getMipmapLevel(); level++) {
+            int x = point.x();
+            int y = point.y();
+            for (int level = 1; level <= mipmapLevel(); level++) {
                 int cornerX = makeEven(x);
                 int cornerY = makeEven(y);
 
                 CloseableImage prevImage = mipmaps.get(level - 1);
-                int topLeft = prevImage.getPixel(cornerX, cornerY);
-                int topRight = prevImage.getPixel(cornerX + 1, cornerY);
-                int bottomLeft = prevImage.getPixel(cornerX, cornerY + 1);
-                int bottomRight = prevImage.getPixel(cornerX + 1, cornerY + 1);
+                int topLeft = prevImage.color(cornerX, cornerY);
+                int topRight = prevImage.color(cornerX + 1, cornerY);
+                int bottomLeft = prevImage.color(cornerX, cornerY + 1);
+                int bottomRight = prevImage.color(cornerX + 1, cornerY + 1);
 
                 int blended = ColorBlender.blend(
                         topLeft,
@@ -237,7 +237,7 @@ public class CloseableImageFrame {
                         bottomRight
                 );
 
-                mipmaps.get(level).setPixel(x >> level, y >> level, blended);
+                mipmaps.get(level).setColor(x >> level, y >> level, blended);
             }
         });
 

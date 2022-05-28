@@ -90,7 +90,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * Gets the function that converts atlas sprites to their mipmap level.
      * @return the mipmap level getter
      */
-    protected ToIntFunction<TextureAtlasSprite> getMipmapLevelGetter(Logger logger) {
+    protected ToIntFunction<TextureAtlasSprite> mipmapLevelGetter(Logger logger) {
         return (sprite) -> ((SpriteAccessor) sprite).getMainImage().length - 1;
     }
 
@@ -98,7 +98,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * Gets the OpenGL preparer for new textures on this loader.
      * @return the OpenGL preparer for this loader
      */
-    protected TexturePreparer getPreparer() {
+    protected TexturePreparer preparer() {
         return (glId, mipmap, width, height) -> {
             if (!RenderSystem.isOnRenderThreadOrInit()) {
                 RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(glId, mipmap, width, height));
@@ -113,7 +113,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return the action that will unregister textures
      */
     @Override
-    protected BiConsumer<TextureManager, ResourceLocation> getUnregisterAction() {
+    protected BiConsumer<TextureManager, ResourceLocation> unregisterAction() {
         return (manager, location) -> {
             TextureManagerAccessor accessor = (TextureManagerAccessor) manager;
             accessor.getByPath().remove(location);
@@ -169,7 +169,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return the current reload instance
      */
     @Override
-    protected Optional<ReloadInstance> getReloadInstance(LoadingOverlay overlay, Logger logger) {
+    protected Optional<ReloadInstance> reloadInstance(LoadingOverlay overlay, Logger logger) {
         return Optional.of(((LoadingOverlayAccessor) overlay).getReloadInstance());
     }
 

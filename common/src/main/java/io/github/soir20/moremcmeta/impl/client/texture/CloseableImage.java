@@ -31,7 +31,7 @@ public interface CloseableImage {
      * @return  the color of the given pixel
      * @throws IllegalStateException if this image has been closed
      */
-    int getPixel(int x, int y);
+    int color(int x, int y);
 
     /**
      * Sets the color of a pixel in this image.
@@ -40,21 +40,21 @@ public interface CloseableImage {
      * @param color     new color of the pixel
      * @throws IllegalStateException if this image has been closed
      */
-    void setPixel(int x, int y, int color);
+    void setColor(int x, int y, int color);
 
     /**
      * Gets the width (pixels) of this image.
      * @return  the width of this image
      * @throws IllegalStateException if this image has been closed
      */
-    int getWidth();
+    int width();
 
     /**
      * Gets the height (pixels) of this image.
      * @return  the height of this image
      * @throws IllegalStateException if this image has been closed
      */
-    int getHeight();
+    int height();
 
     /**
      * Copies another image's pixels into this image, starting at the top leftmost point (0, 0).
@@ -64,9 +64,9 @@ public interface CloseableImage {
      * @param other     the other image to copy data form
      */
     default void copyFrom(CloseableImage other) {
-        for (int y = 0; y < Math.min(getWidth(), other.getHeight()); y++) {
-            for (int x = 0; x < Math.min(getHeight(), other.getWidth()); x++) {
-                setPixel(x, y, other.getPixel(x, y));
+        for (int y = 0; y < Math.min(width(), other.height()); y++) {
+            for (int x = 0; x < Math.min(height(), other.width()); x++) {
+                setColor(x, y, other.color(x, y));
             }
         }
     }

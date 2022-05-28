@@ -17,7 +17,6 @@
 
 package io.github.soir20.moremcmeta.api.math;
 
-import io.github.soir20.moremcmeta.api.math.Point;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -29,15 +28,15 @@ import static org.junit.Assert.*;
 public class PointTest {
 
     @Test
-    public void getX_SomePoint_CorrectCoordinate() {
+    public void x_SomePoint_CorrectCoordinate() {
         Point point = new Point(1, 2);
-        assertEquals(1, point.getX());
+        assertEquals(1, point.x());
     }
 
     @Test
-    public void getY_SomePoint_CorrectCoordinate() {
+    public void y_SomePoint_CorrectCoordinate() {
         Point point = new Point(1, 2);
-        assertEquals(2, point.getY());
+        assertEquals(2, point.y());
     }
 
     @Test

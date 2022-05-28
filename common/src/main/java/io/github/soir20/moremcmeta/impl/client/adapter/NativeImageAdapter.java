@@ -116,7 +116,7 @@ public class NativeImageAdapter implements CloseableImage {
      * @throws IllegalStateException if this image has been closed
      */
     @Override
-    public int getPixel(int x, int y) {
+    public int color(int x, int y) {
         checkOpen();
         checkInBounds(x, y);
         return IMAGE.getPixelRGBA(x + X_OFFSET, y + Y_OFFSET);
@@ -130,7 +130,7 @@ public class NativeImageAdapter implements CloseableImage {
      * @throws IllegalStateException if this image has been closed
      */
     @Override
-    public void setPixel(int x, int y, int color) {
+    public void setColor(int x, int y, int color) {
         checkOpen();
         checkInBounds(x, y);
         IMAGE.setPixelRGBA(x + X_OFFSET, y + Y_OFFSET, color);
@@ -142,7 +142,7 @@ public class NativeImageAdapter implements CloseableImage {
      * @throws IllegalStateException if this image has been closed
      */
     @Override
-    public int getWidth() {
+    public int width() {
         checkOpen();
         return WIDTH;
     }
@@ -153,7 +153,7 @@ public class NativeImageAdapter implements CloseableImage {
      * @throws IllegalStateException if this image has been closed
      */
     @Override
-    public int getHeight() {
+    public int height() {
         checkOpen();
         return HEIGHT;
     }
@@ -192,7 +192,7 @@ public class NativeImageAdapter implements CloseableImage {
      * @return the original {@link NativeImage}
      * @throws IllegalStateException if this image has been closed
      */
-    public NativeImage getImage() {
+    public NativeImage image() {
         checkOpen();
         return IMAGE;
     }
