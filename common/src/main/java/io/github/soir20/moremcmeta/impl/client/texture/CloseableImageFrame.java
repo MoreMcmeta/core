@@ -203,7 +203,7 @@ public class CloseableImageFrame {
             int x = point.getX();
             int y = point.getY();
 
-            int newColor = transform.transform(x, y);
+            int newColor = transform.transform(x, y).combine();
             mipmaps.get(0).setPixel(x, y, newColor);
         });
 

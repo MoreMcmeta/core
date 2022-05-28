@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
@@ -283,13 +284,13 @@ public class TextureDataAssembler {
          * @return the color of the pixel at the given coordinate
          */
         @Override
-        public int color(int x, int y) {
+        public Color color(int x, int y) {
             checkValid();
             if (x < 0 || y < 0 || x >= FRAME.getWidth() || y >= FRAME.getHeight()) {
                 throw new PixelOutOfBoundsException(x, y);
             }
 
-            return FRAME.color(x, y);
+            return new Color(FRAME.color(x, y));
         }
 
         /**

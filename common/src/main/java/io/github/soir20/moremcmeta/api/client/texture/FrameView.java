@@ -37,11 +37,11 @@ public interface FrameView {
      * Gets the color at a specific pixel in this frame.
      * @param x     x-coordinate of the pixel
      * @param y     y-coordinate of the pixel
-     * @return the color of the pixel in AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB format (32 bits)
+     * @return the color of the pixel
      * @throws PixelOutOfBoundsException if the requested pixel is outside the frame's bounds
      * @throws IllegalFrameReference if this view is no longer valid
      */
-    int color(int x, int y);
+    Color color(int x, int y);
 
     /**
      * Gets the width of the frame.

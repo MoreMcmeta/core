@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
+import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
@@ -327,7 +328,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @return the color of the pixel at the given coordinate
          */
         @Override
-        public int color(int x, int y) {
+        public Color color(int x, int y) {
             checkValid();
 
             if (x < 0 || y < 0 || x >= STATE.width() || y >= STATE.height()) {
@@ -499,8 +500,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param y     y-coordinate of the pixel (from the top left)
          * @return the color of the pixel at the given coordinate
          */
-        public int color(int x, int y) {
-            return getCurrentFrame().color(x, y);
+        public Color color(int x, int y) {
+            return new Color(getCurrentFrame().color(x, y));
         }
 
         /**

@@ -33,8 +33,7 @@ public interface ColorTransform {
      * @param x     x-coordinate of the pixel whose color will be replaced
      * @param y     y-coordinate of the pixel whose color will be replaced
      * @return the new color of the pixel at (x, y) in the format
-     *         AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB (32 bits)
      */
-    int transform(int x, int y);
+    Color transform(int x, int y);
 
 }
