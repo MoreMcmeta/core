@@ -98,11 +98,12 @@ public class SpriteFrameSizeFixPack implements PackResources {
         }
 
         ResourceLocation textureLocation = textureLocation(location);
-        boolean isKnownTexture = TEXTURES.containsKey(textureLocation);
+        TextureData<?> textureData = TEXTURES.get(textureLocation);
+
+        boolean isKnownTexture = textureData != null;
         boolean isVanillaMetadata = location.getPath().endsWith(VANILLA_METADATA_EXTENSION);
 
         if (isKnownTexture && isVanillaMetadata) {
-            TextureData<?> textureData = TEXTURES.get(textureLocation);
             int frameWidth = textureData.frameSize().width();
             int frameHeight = textureData.frameSize().height();
             return new ByteArrayInputStream(
