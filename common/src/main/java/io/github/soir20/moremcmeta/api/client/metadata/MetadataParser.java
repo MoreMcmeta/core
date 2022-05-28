@@ -37,7 +37,7 @@ public interface MetadataParser {
      *                      metadata attributes themselves are stored within their section names. That is,
      *                      to access an attribute, a {@link MetadataView} for the section must be accessed
      *                      first.
-     * @return an object with parsed data. Must not be null.
+     * @return an object with parsed data
      */
     ParsedMetadata parse(MetadataView metadata);
 

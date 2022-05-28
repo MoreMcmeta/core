@@ -36,8 +36,7 @@ public interface ComponentProvider {
      *                      {@link io.github.soir20.moremcmeta.api.client.metadata.MetadataParser}.
      * @param frames        all the predefined frames, which are mutable to allow for initial
      *                      {@link ColorTransform}s to be applied
-     * @return texture components for this texture. Neither the {@link Iterable} nor the individual
-     *         components may be null.
+     * @return texture components for this texture
      */
     Iterable<TextureComponent<CurrentFrameView>> assemble(ParsedMetadata metadata, FrameGroup<MutableFrameView> frames);
 

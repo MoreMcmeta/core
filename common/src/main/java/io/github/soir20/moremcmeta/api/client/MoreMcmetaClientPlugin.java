@@ -22,6 +22,10 @@ import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 
 /**
  * A user-provided plugin that interacts with the MoreMcmeta loader.
+ *
+ * MoreMcmeta avoids using `null`. Unless otherwise specified, neither parameters nor return values provided
+ * by MoreMcmeta or by plugins should ever be `null`. In cases where the absence of a value is permissible,
+ * {@link java.util.Optional} is used instead of `null`.
  * @author soir20
  * @since 4.0.0
  */
