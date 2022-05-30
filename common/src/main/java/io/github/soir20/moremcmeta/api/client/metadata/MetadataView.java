@@ -21,8 +21,9 @@ import java.util.Optional;
 
 /**
  * Provides immutable access to texture metadata. A view acts like an object and an array. As an object,
- * the view provides direct access to keys by name. As an array, the view's keys are ordered lexicographically
- * and can be accessed by index.
+ * the view provides direct access to keys by name. As an array, the view's keys are ordered based on
+ * highest section priority (at the topmost level) or lexicographically (at all lower levels) and can be
+ * accessed by index.
  *
  * No underlying file format or file location for this metadata is guaranteed. Arrays in the underlying
  * format are treated as views with the keys "0", "1", etc. for each item in the array.
