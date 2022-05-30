@@ -169,6 +169,10 @@ public class TextureManagerAdapterTest {
         assertEquals(1, texture.ticks());
     }
 
+    /**
+     * Mock class combining {@link AbstractTexture} and {@link Tickable}.
+     * @author soir20
+     */
     private static final class MockTickableAnimatedTexture extends MockAnimatedTexture implements Tickable {}
 
 }

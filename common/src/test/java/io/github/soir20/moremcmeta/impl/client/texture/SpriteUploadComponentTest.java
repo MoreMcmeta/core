@@ -26,6 +26,10 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests the {@link SpriteUploadComponent}.
+ * @author soir20
+ */
 public class SpriteUploadComponentTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
