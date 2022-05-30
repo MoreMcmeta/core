@@ -89,7 +89,7 @@ public class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListe
      * @param manager           Minecraft's resource manager
      * @param applyProfiler     profiler for apply stage
      * @param applyExecutor     asynchronously executes apply stage tasks
-     * @return the task for the apply stage that does not return anything
+     * @return the task for the "apply" stage that does not return anything
      */
     @Override
     public CompletableFuture<Void> apply(T data, ResourceManager manager, ProfilerFiller applyProfiler,

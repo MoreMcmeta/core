@@ -231,9 +231,17 @@ public class TextureDataAssembler {
         return components;
     }
 
+    /**
+     * Basic implementation of a {@link FrameGroup} that holds mutable frames.
+     * @author soir20
+     */
     private static class MutableFrameGroupImpl implements FrameGroup<MutableFrameView> {
         private final List<? extends MutableFrameView> FRAMES;
 
+        /**
+         * Creates a new group of mutable frames.
+         * @param frames        the mutable frames to put in the group
+         */
         public MutableFrameGroupImpl(List<? extends MutableFrameView> frames) {
             FRAMES = frames;
         }
@@ -345,11 +353,20 @@ public class TextureDataAssembler {
             FRAME.applyTransform(transform, applyArea);
         }
 
+        /**
+         * Makes this frame view invalid for further use. After this method is called, all future
+         * calls to other methods will throw an {@link IllegalFrameReference} exception. However,
+         * this method is idempotent.
+         */
         public void invalidate() {
             valid = false;
         }
 
-        public void checkValid() {
+        /**
+         * Checks that this frame view is currently valid and throws an exception if not.
+         * @throws IllegalFrameReference if this view is no longer valid
+         */
+        public void checkValid() throws IllegalFrameReference {
             if (!valid) {
                 throw new IllegalFrameReference();
             }

@@ -26,6 +26,10 @@ import net.minecraft.client.Minecraft;
  * @author soir20
  */
 public interface ResourceManagerInitializedCallback {
+
+    /**
+     * Event to subscribe to that will fire right after the resource manager is initialized.
+     */
     Event<ManagerInitialized> EVENT = EventFactory.createArrayBacked(ManagerInitialized.class,
             (callbacks) -> (client) -> {
         for (ManagerInitialized callback : callbacks) {

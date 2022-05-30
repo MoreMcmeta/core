@@ -25,6 +25,7 @@ import java.util.Map;
  * Finishes items that need to be completed lazily.
  * @param <I> input type
  * @param <O> output type
+ * @author soir20
  */
 public interface Finisher<I, O> {
 

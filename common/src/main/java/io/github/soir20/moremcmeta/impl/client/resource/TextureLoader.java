@@ -56,9 +56,10 @@ public class TextureLoader<R> {
     }
 
     /**
-     * Searches for and loads animated textures from a folder throughout all resource packs.
+     * Searches for and loads textures from a folder throughout all resource packs.
      * @param resourceRepository    resources to search through
      * @param path                  the path to search for textures in
+     * @return a mapping of texture location to the texture itself
      */
     public ImmutableMap<ResourceLocation, R> load(OrderedResourceRepository resourceRepository, String path) {
         requireNonNull(resourceRepository, "Resource manager cannot be null");
@@ -92,6 +93,7 @@ public class TextureLoader<R> {
      * Creates all valid textures from candidates.
      * @param candidates           possible locations of textures
      * @param resourceRepository   resources to search through
+     * @return a mapping of texture location to the texture itself
      */
     private ImmutableMap<ResourceLocation, R> getTextures(Collection<? extends ResourceLocation> candidates,
                                                           OrderedResourceRepository resourceRepository) {

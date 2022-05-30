@@ -51,7 +51,7 @@ public class TextureManagerAdapter implements Manager<AbstractTexture> {
 
     /**
      * Registers a texture to the texture manager
-     * @param location      file location of resource identical to how it is used in a entity/gui/map
+     * @param location      file location of resource identical to how it is used in an entity/GUI/map
      * @param texture       the texture to register
      */
     @Override

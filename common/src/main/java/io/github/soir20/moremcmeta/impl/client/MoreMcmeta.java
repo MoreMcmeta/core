@@ -75,6 +75,10 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public abstract class MoreMcmeta {
+
+    /**
+     * Mod ID for Forge and Fabric.
+     */
     public static final String MODID = "moremcmeta";
 
     private final Collection<MoreMcmetaClientPlugin> DEFAULT_PLUGINS = Set.of();
@@ -84,6 +88,10 @@ public abstract class MoreMcmeta {
     /**
      * Begins the startup process, creating necessary objects and registering the
      * resource reload listener.
+     * @throws MoreMcmetaClientPlugin.IncompletePluginException if one of the plugins did not provide
+     *         all required objects
+     * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins are not compatible for
+     *         any reason
      */
     public void start() throws MoreMcmetaClientPlugin.IncompletePluginException,
             MoreMcmetaClientPlugin.ConflictingPluginsException {
@@ -150,6 +158,7 @@ public abstract class MoreMcmeta {
 
     /**
      * Gets the function that converts atlas sprites to their mipmap level.
+     * @param logger        logger to report warnings and errors
      * @return the mipmap level getter
      */
     protected abstract ToIntFunction<TextureAtlasSprite> mipmapLevelGetter(Logger logger);
@@ -205,6 +214,7 @@ public abstract class MoreMcmeta {
     /**
      * Adds the default plugins to the main collection of plugins.
      * @param plugins       main collection of plugins (with user-provided plugins)
+     * @param logger        logger to report warnings and errors
      */
     private void addDefaultPlugins(Collection<MoreMcmetaClientPlugin> plugins, Logger logger) {
         Set<String> sections = plugins.stream()
@@ -356,6 +366,7 @@ public abstract class MoreMcmeta {
     /**
      * Adds a callback for any necessary post-reload work.
      * @param manager           texture manager with unfinished work
+     * @param logger            logger to report warnings and errors
      */
     private void addCompletedReloadCallback(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager,
                                             Logger logger) {

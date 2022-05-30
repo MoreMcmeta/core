@@ -51,7 +51,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
     /**
      * Registers a texture that needs to be finished. What happens when duplicate locations are added
      * depends on the provided {@link Finisher}.
-     * @param textureLocation   file location of texture identical to how it is used in a entity/gui/map
+     * @param textureLocation   file location of texture identical to how it is used in an entity/GUI/map
      * @param builder           unfinished texture
      */
     @Override

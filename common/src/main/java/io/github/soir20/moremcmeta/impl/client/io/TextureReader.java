@@ -32,7 +32,8 @@ public interface TextureReader<T> {
      * @param textureStream     input stream of image data
      * @param metadataStream    input stream of texture metadata (JSON)
      * @return getter for retrieving an animated texture after all resources are loaded
-     * @throws IOException  failure reading from either input stream
+     * @throws IOException failure reading from either input stream
+     * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
     T read(InputStream textureStream, InputStream metadataStream) throws IOException, InvalidMetadataException;
 

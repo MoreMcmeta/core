@@ -23,6 +23,7 @@ package io.github.soir20.moremcmeta.impl.client.texture;
  * manager does not remove a texture from the tickable list when that texture is removed,
  * causing OpenGL errors. (Forge patches this bug, but we need to work around it to be
  * multi-platform.)
+ * @author soir20
  */
 public interface CustomTickable {
 

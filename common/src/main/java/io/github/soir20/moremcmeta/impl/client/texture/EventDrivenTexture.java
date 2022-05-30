@@ -429,16 +429,19 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         /**
-         * Checks that this wrapper is still valid and throws an exception if not.
+         * Checks that this frame view is currently valid and throws an exception if not.
+         * @throws IllegalFrameReference if this view is no longer valid
          */
-        private void checkValid() {
+        private void checkValid() throws IllegalFrameReference {
             if (!valid) {
                 throw new IllegalFrameReference();
             }
         }
 
         /**
-         * Makes this wrapper no longer usable.
+         * Makes this frame view invalid for further use. After this method is called, all future
+         * calls to other methods will throw an {@link IllegalFrameReference} exception. However,
+         * this method is idempotent.
          */
         private void invalidate() {
             valid = false;

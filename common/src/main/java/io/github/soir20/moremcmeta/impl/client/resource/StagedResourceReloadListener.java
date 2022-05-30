@@ -26,7 +26,7 @@ import java.util.concurrent.Executor;
 
 /**
  * Resource reload listener with two stages: load and apply. The load stage is for gathering 
- * resources and data. The apply stage accepts the data from the load stage and does any 
+ * resources and data. The "apply" stage accepts the data from the load stage and does any
  * necessary work with it. This is based off of Fabric's listener, but it can be used on Forge 
  * as well.
  * @param <T>   type of data that is loaded
@@ -67,7 +67,7 @@ public interface StagedResourceReloadListener<T> extends PreparableReloadListene
      * @param manager           Minecraft's resource manager
      * @param applyProfiler     profiler for apply stage
      * @param applyExecutor     asynchronously executes apply stage tasks
-     * @return the task for the apply stage that does not return anything
+     * @return the task for the "apply" stage that does not return anything
      */
     CompletableFuture<Void> apply(T data, ResourceManager manager,
                                   ProfilerFiller applyProfiler, Executor applyExecutor);
