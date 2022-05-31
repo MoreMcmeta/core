@@ -872,7 +872,7 @@ public class CloseableImageFrameTest {
 
     @Test
     public void copyFrom_NullSource_NullPointerException() {
-        CloseableImageFrame source = new CloseableImageFrame(
+        CloseableImageFrame destination = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
                 ImmutableList.of(
                         new MockCloseableImage(100, 200),
@@ -882,7 +882,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        source.copyFrom(null);
+        destination.copyFrom(null);
     }
 
     @Test
