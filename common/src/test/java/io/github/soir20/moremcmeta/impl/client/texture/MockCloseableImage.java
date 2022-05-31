@@ -56,6 +56,10 @@ public class MockCloseableImage implements CloseableImage {
             throw new IllegalStateException("Mock image closed");
         }
 
+        if (x >= width() || x < 0 || y >= height() || y < 0) {
+            throw new MockPixelOutOfBoundsException(x, y);
+        }
+
         return PIXELS[x][y];
     }
 
@@ -63,6 +67,10 @@ public class MockCloseableImage implements CloseableImage {
     public void setColor(int x, int y, int color) {
         if (closed) {
             throw new IllegalStateException("Mock image closed");
+        }
+
+        if (x >= width() || x < 0 || y >= height() || y < 0) {
+            throw new MockPixelOutOfBoundsException(x, y);
         }
 
         PIXELS[x][y] = color;
@@ -106,6 +114,18 @@ public class MockCloseableImage implements CloseableImage {
 
     public Point lastUploadPoint() {
         return uploadPoint;
+    }
+
+    /**
+     * Mock exception thrown when a pixel out of bounds is accessed.
+     * @author soir20
+     */
+    public static class MockPixelOutOfBoundsException extends RuntimeException {
+
+        public MockPixelOutOfBoundsException(int x, int y) {
+            super("Point out of bounds: (" + x + ", " + y + ")");
+        }
+
     }
 
 }

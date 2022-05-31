@@ -64,8 +64,8 @@ public interface CloseableImage {
      * @param other     the other image to copy data form
      */
     default void copyFrom(CloseableImage other) {
-        for (int y = 0; y < Math.min(width(), other.height()); y++) {
-            for (int x = 0; x < Math.min(height(), other.width()); x++) {
+        for (int y = 0; y < Math.min(height(), other.height()); y++) {
+            for (int x = 0; x < Math.min(width(), other.width()); x++) {
                 setColor(x, y, other.color(x, y));
             }
         }
