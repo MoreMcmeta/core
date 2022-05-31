@@ -18,11 +18,17 @@
 package io.github.soir20.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
+import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1250,6 +1256,390 @@ public class CloseableImageFrameTest {
 
         expectedException.expect(IllegalStateException.class);
         destination.copyFrom(source);
+    }
+
+    @Test
+    public void applyTransform_NullTransform_NullPointerException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        expectedException.expect(NullPointerException.class);
+        frame.applyTransform(null, List.of());
+    }
+
+    @Test
+    public void applyTransform_TransformReturnsNull_NullPointerException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        expectedException.expect(NullPointerException.class);
+        frame.applyTransform((x, y) -> null, List.of(new Point(4, 5)));
+    }
+
+    @Test
+    public void applyTransform_NullArea_NullPointerException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        expectedException.expect(NullPointerException.class);
+        frame.applyTransform((x, y) -> new Color(100, 100, 100, 100), null);
+    }
+
+    @Test
+    public void applyTransform_NullPointInArea_NullPointerException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        List<Point> area = new ArrayList<>();
+        area.add(null);
+
+        expectedException.expect(NullPointerException.class);
+        frame.applyTransform((x, y) -> new Color(100, 100, 100, 100), area);
+    }
+
+    @Test
+    public void applyTransform_PointXTooLarge_ExceptionFromImage() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        frame.applyTransform((x, y) -> new Color(100, 100, 100, 100), List.of(new Point(100, 50)));
+    }
+
+    @Test
+    public void applyTransform_PointYTooLarge_ExceptionFromImage() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        frame.applyTransform((x, y) -> new Color(100, 100, 100, 100), List.of(new Point(50, 200)));
+    }
+
+    @Test
+    public void applyTransform_PointXNegative_ExceptionFromImage() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        frame.applyTransform((x, y) -> new Color(100, 100, 100, 100), List.of(new Point(-1, 50)));
+    }
+
+    @Test
+    public void applyTransform_PointYNegative_ExceptionFromImage() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        frame.applyTransform((x, y) -> new Color(100, 100, 100, 100), List.of(new Point(50, -1)));
+    }
+
+    @Test
+    public void applyTransform_AllColorsInSquareChanged_OriginalUpdated() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images
+        );
+
+        Map<Point, Color> pointToColor = new HashMap<>();
+        pointToColor.put(new Point(48, 100), new Color(1767640594));
+        pointToColor.put(new Point(48, 101), new Color(1177013896));
+        pointToColor.put(new Point(48, 102), new Color(721898013));
+        pointToColor.put(new Point(48, 103), new Color(450605672));
+        pointToColor.put(new Point(49, 100), new Color(-557109892));
+        pointToColor.put(new Point(49, 101), new Color(-172022466));
+        pointToColor.put(new Point(49, 102), new Color(-2092001461));
+        pointToColor.put(new Point(49, 103), new Color(208915787));
+        pointToColor.put(new Point(50, 100), new Color(673006803));
+        pointToColor.put(new Point(50, 101), new Color(-1839062270));
+        pointToColor.put(new Point(50, 102), new Color(-997731251));
+        pointToColor.put(new Point(50, 103), new Color(796332458));
+        pointToColor.put(new Point(51, 100), new Color(-1242096477));
+        pointToColor.put(new Point(51, 101), new Color(-327745376));
+        pointToColor.put(new Point(51, 102), new Color(-1450384761));
+        pointToColor.put(new Point(51, 103), new Color(1864744117));
+
+        frame.applyTransform(
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(-557109892)),
+                pointToColor.keySet()
+        );
+
+        for (Point point : pointToColor.keySet()) {
+            assertEquals(pointToColor.get(point).combine(), images.get(0).color(point.x(), point.y()));
+        }
+    }
+
+    @Test
+    public void applyTransform_AllColorsInSquareChanged_MipmapsBlended() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images
+        );
+
+        Map<Point, Color> pointToColor = new HashMap<>();
+        pointToColor.put(new Point(48, 100), new Color(1767640594));
+        pointToColor.put(new Point(48, 101), new Color(1177013896));
+        pointToColor.put(new Point(48, 102), new Color(721898013));
+        pointToColor.put(new Point(48, 103), new Color(450605672));
+        pointToColor.put(new Point(49, 100), new Color(-557109892));
+        pointToColor.put(new Point(49, 101), new Color(-172022466));
+        pointToColor.put(new Point(49, 102), new Color(-2092001461));
+        pointToColor.put(new Point(49, 103), new Color(208915787));
+        pointToColor.put(new Point(50, 100), new Color(673006803));
+        pointToColor.put(new Point(50, 101), new Color(-1839062270));
+        pointToColor.put(new Point(50, 102), new Color(-997731251));
+        pointToColor.put(new Point(50, 103), new Color(796332458));
+        pointToColor.put(new Point(51, 100), new Color(-1242096477));
+        pointToColor.put(new Point(51, 101), new Color(-327745376));
+        pointToColor.put(new Point(51, 102), new Color(-1450384761));
+        pointToColor.put(new Point(51, 103), new Color(1864744117));
+
+        frame.applyTransform(
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(-557109892)),
+                pointToColor.keySet()
+        );
+
+        int topLeftColorMip1 = ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466);
+        int topRightColorMip1 = ColorBlender.blend(673006803, -1839062270, -1242096477, -327745376);
+        int bottomLeftColorMip1 = ColorBlender.blend(721898013, 450605672, -2092001461, 208915787);
+        int bottomRightColorMip1 = ColorBlender.blend(-997731251, 796332458, -1450384761, 1864744117);
+
+        assertEquals(topLeftColorMip1, images.get(1).color(24, 50));
+        assertEquals(topRightColorMip1, images.get(1).color(25, 50));
+        assertEquals(bottomLeftColorMip1, images.get(1).color(24, 51));
+        assertEquals(bottomRightColorMip1, images.get(1).color(25, 51));
+
+        int colorMip2 = ColorBlender.blend(
+                topLeftColorMip1,
+                topRightColorMip1,
+                bottomLeftColorMip1,
+                bottomRightColorMip1
+        );
+        assertEquals(colorMip2, images.get(2).color(12, 25));
+    }
+
+    @Test
+    public void applyTransform_SomeColorsInSquareChanged_OriginalUpdated() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images
+        );
+
+        Map<Point, Color> pointToColor = new HashMap<>();
+        pointToColor.put(new Point(48, 100), new Color(1767640594));
+        images.get(0).setColor(48, 101, 1177013896);
+        pointToColor.put(new Point(48, 102), new Color(721898013));
+        images.get(0).setColor(48, 103, 450605672);
+        images.get(0).setColor(49, 100, -557109892);
+        pointToColor.put(new Point(49, 101), new Color(-172022466));
+        images.get(0).setColor(49, 102, -2092001461);
+        pointToColor.put(new Point(49, 103), new Color(208915787));
+        images.get(0).setColor(50, 100, 673006803);
+        pointToColor.put(new Point(50, 101), new Color(-1839062270));
+        images.get(0).setColor(50, 102, -997731251);
+        images.get(0).setColor(50, 103, 796332458);
+        images.get(0).setColor(51, 100, -1242096477);
+        pointToColor.put(new Point(51, 101), new Color(-327745376));
+        images.get(0).setColor(51, 102, -1450384761);
+        pointToColor.put(new Point(51, 103), new Color(1864744117));
+
+        frame.applyTransform(
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(-557109892)),
+                pointToColor.keySet()
+        );
+
+        assertEquals(1767640594, images.get(0).color(48, 100));
+        assertEquals(1177013896, images.get(0).color(48, 101));
+        assertEquals(721898013, images.get(0).color(48, 102));
+        assertEquals(450605672, images.get(0).color(48, 103));
+        assertEquals(-557109892, images.get(0).color(49, 100));
+        assertEquals(-172022466, images.get(0).color(49, 101));
+        assertEquals(-2092001461, images.get(0).color(49, 102));
+        assertEquals(208915787, images.get(0).color(49, 103));
+        assertEquals(673006803, images.get(0).color(50, 100));
+        assertEquals(-1839062270, images.get(0).color(50, 101));
+        assertEquals(-997731251, images.get(0).color(50, 102));
+        assertEquals(796332458, images.get(0).color(50, 103));
+        assertEquals(-1242096477, images.get(0).color(51, 100));
+        assertEquals(-327745376, images.get(0).color(51, 101));
+        assertEquals(-1450384761, images.get(0).color(51, 102));
+        assertEquals(1864744117, images.get(0).color(51, 103));
+    }
+
+    @Test
+    public void applyTransform_AllSomeInSquareChanged_MipmapsBlended() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images
+        );
+
+        Map<Point, Color> pointToColor = new HashMap<>();
+        pointToColor.put(new Point(48, 100), new Color(1767640594));
+        images.get(0).setColor(48, 101, 1177013896);
+        pointToColor.put(new Point(48, 102), new Color(721898013));
+        images.get(0).setColor(48, 103, 450605672);
+        images.get(0).setColor(49, 100, -557109892);
+        pointToColor.put(new Point(49, 101), new Color(-172022466));
+        images.get(0).setColor(49, 102, -2092001461);
+        pointToColor.put(new Point(49, 103), new Color(208915787));
+        images.get(0).setColor(50, 100, 673006803);
+        pointToColor.put(new Point(50, 101), new Color(-1839062270));
+        images.get(0).setColor(50, 102, -997731251);
+        images.get(0).setColor(50, 103, 796332458);
+        images.get(0).setColor(51, 100, -1242096477);
+        pointToColor.put(new Point(51, 101), new Color(-327745376));
+        images.get(0).setColor(51, 102, -1450384761);
+        pointToColor.put(new Point(51, 103), new Color(1864744117));
+
+        frame.applyTransform(
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(-557109892)),
+                pointToColor.keySet()
+        );
+
+        int topLeftColorMip1 = ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466);
+        int topRightColorMip1 = ColorBlender.blend(673006803, -1839062270, -1242096477, -327745376);
+        int bottomLeftColorMip1 = ColorBlender.blend(721898013, 450605672, -2092001461, 208915787);
+        int bottomRightColorMip1 = ColorBlender.blend(-997731251, 796332458, -1450384761, 1864744117);
+
+        assertEquals(topLeftColorMip1, images.get(1).color(24, 50));
+        assertEquals(topRightColorMip1, images.get(1).color(25, 50));
+        assertEquals(bottomLeftColorMip1, images.get(1).color(24, 51));
+        assertEquals(bottomRightColorMip1, images.get(1).color(25, 51));
+
+        int colorMip2 = ColorBlender.blend(
+                topLeftColorMip1,
+                topRightColorMip1,
+                bottomLeftColorMip1,
+                bottomRightColorMip1
+        );
+        assertEquals(colorMip2, images.get(2).color(12, 25));
+    }
+
+    @Test
+    public void applyTransform_AfterClose_IllegalStateException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        frame.close();
+
+        expectedException.expect(IllegalStateException.class);
+        frame.applyTransform((x, y) -> new Color(100, 100, 100, 100), List.of(new Point(50, 100)));
+    }
+
+    @Test
+    public void close_CloseTwice_NoException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                )
+        );
+
+        frame.close();
+        frame.close();
+    }
+
+    @Test
+    public void close_ImagesOpen_ImagesClosed() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images
+        );
+
+        assertFalse(images.get(0).isClosed());
+        assertFalse(images.get(1).isClosed());
+        assertFalse(images.get(2).isClosed());
+
+        frame.close();
+
+        assertTrue(images.get(0).isClosed());
+        assertTrue(images.get(1).isClosed());
+        assertTrue(images.get(2).isClosed());
     }
 
 }

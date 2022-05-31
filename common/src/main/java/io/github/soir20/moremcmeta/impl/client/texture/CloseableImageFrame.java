@@ -221,8 +221,8 @@ public class CloseableImageFrame {
             int x = point.x();
             int y = point.y();
             for (int level = 1; level <= mipmapLevel(); level++) {
-                int cornerX = makeEven(x);
-                int cornerY = makeEven(y);
+                int cornerX = makeEven(x >> (level - 1));
+                int cornerY = makeEven(y >> (level - 1));
 
                 CloseableImage prevImage = mipmaps.get(level - 1);
                 int topLeft = prevImage.color(cornerX, cornerY);
