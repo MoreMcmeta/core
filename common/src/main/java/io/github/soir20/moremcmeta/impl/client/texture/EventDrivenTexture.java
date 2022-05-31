@@ -163,7 +163,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * @param generatedFrame            initial image for this texture
      */
     private EventDrivenTexture(Map<ListenerType, List<Consumer<? super TextureAndFrameView>>> listeners,
-                               List<CloseableImageFrame> predefinedFrames, CloseableImageFrame generatedFrame) {
+                               List<? extends CloseableImageFrame> predefinedFrames,
+                               CloseableImageFrame generatedFrame) {
         super();
         LISTENERS = listeners;
         CURRENT_STATE = new TextureState(this, predefinedFrames, generatedFrame);
@@ -175,7 +176,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     public static class Builder {
         private final Map<ListenerType, List<Consumer<? super TextureAndFrameView>>> LISTENERS;
-        private List<CloseableImageFrame> predefinedFrames;
+        private List<? extends CloseableImageFrame> predefinedFrames;
         private CloseableImageFrame generatedFrame;
 
         /**
@@ -197,7 +198,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          *                      will not be modified, the frame's mipmap level may be altered.
          * @return this builder for chaining
          */
-        public Builder setPredefinedFrames(List<CloseableImageFrame> frames) {
+        public Builder setPredefinedFrames(List<? extends CloseableImageFrame> frames) {
             requireNonNull(frames, "Predefined frames cannot be null");
             if (frames.size() == 0) {
                 throw new IllegalArgumentException("Predefined frames cannot be empty");
@@ -455,7 +456,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     private static class TextureState {
         private final EventDrivenTexture TEXTURE;
-        private final List<CloseableImageFrame> PREDEFINED_FRAMES;
+        private final List<? extends CloseableImageFrame> PREDEFINED_FRAMES;
         private final CloseableImageFrame GENERATED_FRAME;
         private final Queue<Pair<ColorTransform, Iterable<Point>>> TRANSFORMS;
         private Integer currentFrameIndex;
@@ -585,7 +586,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param predefinedFrames      frames already existing in the image
          * @param generatedFrame        generated frame that holds images generated from the predefined frames
          */
-        private TextureState(EventDrivenTexture texture, List<CloseableImageFrame> predefinedFrames,
+        private TextureState(EventDrivenTexture texture, List<? extends CloseableImageFrame> predefinedFrames,
                              CloseableImageFrame generatedFrame) {
             TEXTURE = texture;
             PREDEFINED_FRAMES = predefinedFrames;
