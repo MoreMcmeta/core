@@ -579,13 +579,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         /**
-         * Flags the texture as needing an upload.
-         */
-        public void markNeedsUpload() {
-            hasUpdatedSinceUpload = true;
-        }
-
-        /**
          * Creates a new texture state. Automatically flags the texture
          * for upload on the first binding.
          * @param texture               the event-driven texture
@@ -599,6 +592,13 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             GENERATED_FRAME = generatedFrame;
             TRANSFORMS = new ArrayDeque<>();
             replaceWith(0);
+        }
+
+        /**
+         * Flags the texture as needing an upload.
+         */
+        private void markNeedsUpload() {
+            hasUpdatedSinceUpload = true;
         }
 
         /**
