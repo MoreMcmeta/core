@@ -221,6 +221,12 @@ public class CloseableImageFrame {
             int x = point.x();
             int y = point.y();
             for (int level = 1; level <= mipmapLevel(); level++) {
+
+                // Don't try to set a color when the mipmap is empty
+                if (mipmaps.get(level).width() == 0 && mipmaps.get(level).height() == 0) {
+                    break;
+                }
+
                 int cornerX = makeEven(x >> (level - 1));
                 int cornerY = makeEven(y >> (level - 1));
 

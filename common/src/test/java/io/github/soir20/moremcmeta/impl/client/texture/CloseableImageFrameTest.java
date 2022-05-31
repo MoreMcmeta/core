@@ -1382,6 +1382,36 @@ public class CloseableImageFrameTest {
     }
 
     @Test
+    public void applyTransform_EmptyMipmap_NonEmptyUpdated() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(2, 2),
+                new MockCloseableImage(1, 1),
+                new MockCloseableImage(0, 0)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(2, 2, 0, 0),
+                images
+        );
+
+        Map<Point, Color> pointToColor = new HashMap<>();
+        pointToColor.put(new Point(0, 0), new Color(1767640594));
+        pointToColor.put(new Point(0, 1), new Color(1177013896));
+        pointToColor.put(new Point(1, 0), new Color(-557109892));
+        pointToColor.put(new Point(1, 1), new Color(-172022466));
+
+        frame.applyTransform(
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(1013857456)),
+                pointToColor.keySet()
+        );
+
+        for (Point point : pointToColor.keySet()) {
+            assertEquals(pointToColor.get(point).combine(), images.get(0).color(point.x(), point.y()));
+        }
+        assertEquals(ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466), images.get(1).color(0, 0));
+    }
+
+    @Test
     public void applyTransform_AllColorsInSquareChanged_OriginalUpdated() {
         ImmutableList<MockCloseableImage> images = ImmutableList.of(
                 new MockCloseableImage(100, 200),
@@ -1413,7 +1443,7 @@ public class CloseableImageFrameTest {
         pointToColor.put(new Point(51, 103), new Color(1864744117));
 
         frame.applyTransform(
-                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(-557109892)),
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(1013857456)),
                 pointToColor.keySet()
         );
 
@@ -1454,7 +1484,7 @@ public class CloseableImageFrameTest {
         pointToColor.put(new Point(51, 103), new Color(1864744117));
 
         frame.applyTransform(
-                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(-557109892)),
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(1013857456)),
                 pointToColor.keySet()
         );
 
@@ -1509,7 +1539,7 @@ public class CloseableImageFrameTest {
         pointToColor.put(new Point(51, 103), new Color(1864744117));
 
         frame.applyTransform(
-                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(-557109892)),
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(1013857456)),
                 pointToColor.keySet()
         );
 
@@ -1563,7 +1593,7 @@ public class CloseableImageFrameTest {
         pointToColor.put(new Point(51, 103), new Color(1864744117));
 
         frame.applyTransform(
-                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(-557109892)),
+                (x, y) -> pointToColor.getOrDefault(new Point(x, y), new Color(1013857456)),
                 pointToColor.keySet()
         );
 
