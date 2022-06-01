@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.impl.client.texture;
 
 import io.github.soir20.moremcmeta.api.client.texture.Color;
+import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
 import org.junit.Rule;
@@ -359,6 +360,694 @@ public class EventDrivenTextureTest {
 
         action.accept(texture.build());
         assertArrayEquals(expected, execOrder.toArray(new Integer[expected.length]));
+    }
+
+    @Test
+    public void replace_Index0_Replaced() {
+        AtomicInteger currentFrameIndex = new AtomicInteger(-1);
+
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+
+            @Override
+            public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(1);
+            }
+
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(0);
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrameIndex.set(currentFrame.index().orElseThrow());
+            }
+        });
+
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        EventDrivenTexture texture = builder.build();
+
+        texture.load(null);
+
+        // We have to bind once first because the texture is always uploaded on the first bind
+        texture.bind();
+        assertEquals(1, currentFrameIndex.get());
+
+        texture.tick();
+
+        texture.bind();
+        assertEquals(0, currentFrameIndex.get());
+    }
+
+    @Test
+    public void replace_IndexNegative_FrameIndexOutOfBoundsException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(-1);
+            }
+        });
+
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        EventDrivenTexture texture = builder.build();
+
+        expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
+        texture.tick();
+    }
+
+    @Test
+    public void replace_IndexTooLarge_FrameIndexOutOfBoundsException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(2);
+            }
+        });
+
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        EventDrivenTexture texture = builder.build();
+
+        expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
+        texture.tick();
+    }
+
+    @Test
+    public void generate_NullTransform_NullPointerException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(null, List.of(new Point(0, 0)));
+            }
+        });
+
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        EventDrivenTexture texture = builder.build();
+
+        expectedException.expect(NullPointerException.class);
+        texture.tick();
+    }
+
+    @Test
+    public void generate_NullArea_NullPointerException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith((x, y) -> new Color(100, 100, 100, 100), null);
+            }
+        });
+
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        EventDrivenTexture texture = builder.build();
+
+        expectedException.expect(NullPointerException.class);
+        texture.tick();
+    }
+
+    @Test
+    public void generate_TransformReturnsNull_NullPointerException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith((x, y) -> null, List.of(new Point(0, 0)));
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        expectedException.expect(NullPointerException.class);
+        texture.bind();
+    }
+
+    @Test
+    public void generate_NullPointInArea_NullPointerException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+
+        List<Point> area = new ArrayList<>();
+        area.add(new Point(0, 0));
+        area.add(null);
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith((x, y) -> new Color(100, 100, 100, 100), area);
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        expectedException.expect(NullPointerException.class);
+        texture.bind();
+    }
+
+    @Test
+    public void generate_EmptyArea_FrameNotUpdated() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith((x, y) -> new Color(100, 100, 100, 100), List.of());
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4), new MockCloseableImageFrame(4, 4));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+        texture.bind();
+
+        assertEquals(0, frames.get(0).uploadCount());
+        assertEquals(0, frames.get(1).uploadCount());
+        assertEquals(1, generatedFrame.uploadCount());
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(0, generatedFrame.color(1, 0));
+        assertEquals(0, generatedFrame.color(1, 1));
+    }
+
+    @Test
+    public void generate_EmptyMipmap_NoException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(
+                        (x, y) -> new Color(100, 100, 100, 100),
+                        List.of(new Point(1, 0), new Point(1, 1))
+                );
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(2, 2), new MockCloseableImageFrame(2, 2));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(2, 2);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+        texture.bind();
+
+        assertEquals(0, frames.get(0).uploadCount());
+        assertEquals(0, frames.get(1).uploadCount());
+        assertEquals(1, generatedFrame.uploadCount());
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(new Color(100, 100, 100, 100).combine(), generatedFrame.color(1, 0));
+        assertEquals(new Color(100, 100, 100, 100).combine(), generatedFrame.color(1, 1));
+    }
+
+    @Test
+    public void generate_SingleTransformation_GeneratedFrameUpdatedOnUpload() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(
+                        (x, y) -> new Color(100, 100, 100, 100),
+                        List.of(new Point(1, 0), new Point(1, 1))
+                );
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4), new MockCloseableImageFrame(4, 4));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(0, generatedFrame.color(1, 0));
+        assertEquals(0, generatedFrame.color(1, 1));
+
+        texture.bind();
+
+        assertEquals(0, frames.get(0).uploadCount());
+        assertEquals(0, frames.get(1).uploadCount());
+        assertEquals(1, generatedFrame.uploadCount());
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(new Color(100, 100, 100, 100).combine(), generatedFrame.color(1, 0));
+        assertEquals(new Color(100, 100, 100, 100).combine(), generatedFrame.color(1, 1));
+    }
+
+    @Test
+    public void generate_MultipleTransformations_GeneratedFrameUpdatedOnUpload() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(
+                        (x, y) -> new Color(100, 100, 100, 100),
+                        List.of(new Point(1, 0), new Point(1, 1))
+                );
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(
+                        (x, y) -> new Color(200, 200, 200, 200),
+                        List.of(new Point(0, 0), new Point(1, 1))
+                );
+            }
+        });
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4), new MockCloseableImageFrame(4, 4));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(0, generatedFrame.color(1, 0));
+        assertEquals(0, generatedFrame.color(1, 1));
+
+        texture.bind();
+
+        assertEquals(0, frames.get(0).uploadCount());
+        assertEquals(0, frames.get(1).uploadCount());
+        assertEquals(1, generatedFrame.uploadCount());
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(new Color(200, 200, 200, 200).combine(), generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(new Color(100, 100, 100, 100).combine(), generatedFrame.color(1, 0));
+        assertEquals(new Color(200, 200, 200, 200).combine(), generatedFrame.color(1, 1));
+    }
+
+    @Test
+    public void changedFrames_GenerateReplace_ReplacedFrameUploaded() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(
+                        (x, y) -> new Color(100, 100, 100, 100),
+                        List.of(new Point(1, 0), new Point(1, 1))
+                );
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(1);
+            }
+        });
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4), new MockCloseableImageFrame(4, 4));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        texture.bind();
+
+        assertEquals(0, frames.get(0).uploadCount());
+        assertEquals(1, frames.get(1).uploadCount());
+        assertEquals(0, generatedFrame.uploadCount());
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+    }
+
+    @Test
+    public void changedFrames_GenerateReplaceGenerated_FrameGeneratedFromCorrectFrame() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(
+                        (x, y) -> new Color(100, 100, 100, 100),
+                        List.of(new Point(1, 0), new Point(1, 1), new Point(0, 0))
+                );
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(1);
+            }
+        });
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(
+                        (x, y) -> new Color(200, 200, 200, 200),
+                        List.of(new Point(1, 0), new Point(1, 1))
+                );
+            }
+        });
+
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4), new MockCloseableImageFrame(4, 4));
+        frames.get(0).applyTransform((x, y) -> new Color(10, 10, 10, 10), List.of(new Point(2, 3)));
+        frames.get(1).applyTransform((x, y) -> new Color(50, 50, 50, 50), List.of(new Point(2, 3)));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(0, generatedFrame.color(1, 0));
+        assertEquals(0, generatedFrame.color(1, 1));
+        assertEquals(0, generatedFrame.color(2, 3));
+
+        texture.bind();
+
+        assertEquals(0, frames.get(0).uploadCount());
+        assertEquals(0, frames.get(1).uploadCount());
+        assertEquals(1, generatedFrame.uploadCount());
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(new Color(200, 200, 200, 200).combine(), generatedFrame.color(1, 0));
+        assertEquals(new Color(200, 200, 200, 200).combine(), generatedFrame.color(1, 1));
+        assertEquals(new Color(50, 50, 50, 50).combine(), generatedFrame.color(2, 3));
+    }
+
+    @Test
+    public void changedFrames_ReplaceGenerate_FrameGeneratedFromCorrectFrame() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.replaceWith(1);
+            }
+        });
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.generateWith(
+                        (x, y) -> new Color(200, 200, 200, 200),
+                        List.of(new Point(1, 0), new Point(1, 1))
+                );
+            }
+        });
+
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4), new MockCloseableImageFrame(4, 4));
+        frames.get(0).applyTransform((x, y) -> new Color(10, 10, 10, 10), List.of(new Point(2, 3)));
+        frames.get(1).applyTransform((x, y) -> new Color(50, 50, 50, 50), List.of(new Point(2, 3)));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(0, generatedFrame.color(1, 0));
+        assertEquals(0, generatedFrame.color(1, 1));
+        assertEquals(0, generatedFrame.color(2, 3));
+
+        texture.bind();
+
+        assertEquals(0, frames.get(0).uploadCount());
+        assertEquals(0, frames.get(1).uploadCount());
+        assertEquals(1, generatedFrame.uploadCount());
+
+        assertEquals(0, frames.get(0).color(0, 0));
+        assertEquals(0, frames.get(0).color(0, 1));
+        assertEquals(0, frames.get(0).color(1, 0));
+        assertEquals(0, frames.get(0).color(1, 1));
+
+        assertEquals(0, frames.get(1).color(0, 0));
+        assertEquals(0, frames.get(1).color(0, 1));
+        assertEquals(0, frames.get(1).color(1, 0));
+        assertEquals(0, frames.get(1).color(1, 1));
+
+        assertEquals(0, generatedFrame.color(0, 0));
+        assertEquals(0, generatedFrame.color(0, 1));
+        assertEquals(new Color(200, 200, 200, 200).combine(), generatedFrame.color(1, 0));
+        assertEquals(new Color(200, 200, 200, 200).combine(), generatedFrame.color(1, 1));
+        assertEquals(new Color(50, 50, 50, 50).combine(), generatedFrame.color(2, 3));
+    }
+
+    @Test
+    public void changedFrames_ReplaceAfterInvalidated_IllegalFrameReferenceException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            private EventDrivenTexture.TextureAndFrameView view;
+
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                view = currentFrame;
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                view.replaceWith(1);
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4), new MockCloseableImageFrame(4, 4));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        expectedException.expect(FrameView.IllegalFrameReference.class);
+        texture.bind();
+    }
+
+    @Test
+    public void changedFrames_GenerateAfterInvalidated_IllegalFrameReferenceException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            private EventDrivenTexture.TextureAndFrameView view;
+
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                view = currentFrame;
+            }
+
+            @Override
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                view.generateWith((x, y) -> new Color(100, 100, 100, 100), List.of(new Point(0, 0)));
+                currentFrame.uploadAt(new Point(0, 0));
+            }
+        });
+
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4), new MockCloseableImageFrame(4, 4));
+        builder.setPredefinedFrames(frames);
+
+        MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4);
+        builder.setGeneratedFrame(generatedFrame);
+
+        EventDrivenTexture texture = builder.build();
+
+        texture.tick();
+
+        expectedException.expect(FrameView.IllegalFrameReference.class);
+        texture.bind();
     }
 
 }
