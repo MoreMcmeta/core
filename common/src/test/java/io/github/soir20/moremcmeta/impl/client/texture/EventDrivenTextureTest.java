@@ -317,52 +317,6 @@ public class EventDrivenTextureTest {
         testExpectedOrder((texture) -> { texture.close(); texture.close(); }, false, expected);
     }
 
-    private void testExpectedOrder(Consumer<EventDrivenTexture> action, boolean flagForUpload,
-                                   Integer[] expected) {
-        EventDrivenTexture.Builder texture = new EventDrivenTexture.Builder();
-        texture.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
-        texture.setGeneratedFrame(new MockCloseableImageFrame());
-
-        final int REG_ID_BASE = 1;
-        final int UPLOAD_ID_BASE = 4;
-        final int TICK_ID_BASE = 7;
-        final int CLOSE_ID_BASE = 10;
-
-        List<Integer> execOrder = new ArrayList<>();
-
-        for (int index = 0; index < 3; index++) {
-            int finalIndex = index;
-            texture.add(new CoreTextureComponent() {
-                @Override
-                public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
-                    if (flagForUpload) currentFrame.markNeedsUpload();
-                    execOrder.add(TICK_ID_BASE + finalIndex);
-                }
-
-                @Override
-                public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame) {
-                    if (flagForUpload) currentFrame.markNeedsUpload();
-                    execOrder.add(CLOSE_ID_BASE + finalIndex);
-                }
-
-                @Override
-                public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
-                    if (flagForUpload) currentFrame.markNeedsUpload();
-                    execOrder.add(REG_ID_BASE + finalIndex);
-                }
-
-                @Override
-                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
-                    if (flagForUpload) currentFrame.markNeedsUpload();
-                    execOrder.add(UPLOAD_ID_BASE + finalIndex);
-                }
-            });
-        }
-
-        action.accept(texture.build());
-        assertArrayEquals(expected, execOrder.toArray(new Integer[expected.length]));
-    }
-
     @Test
     public void replace_Index0_Replaced() {
         AtomicInteger currentFrameIndex = new AtomicInteger(-1);
@@ -1547,6 +1501,52 @@ public class EventDrivenTextureTest {
 
         expectedException.expect(FrameView.IllegalFrameReference.class);
         texture.bind();
+    }
+
+    private void testExpectedOrder(Consumer<EventDrivenTexture> action, boolean flagForUpload,
+                                   Integer[] expected) {
+        EventDrivenTexture.Builder texture = new EventDrivenTexture.Builder();
+        texture.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        texture.setGeneratedFrame(new MockCloseableImageFrame());
+
+        final int REG_ID_BASE = 1;
+        final int UPLOAD_ID_BASE = 4;
+        final int TICK_ID_BASE = 7;
+        final int CLOSE_ID_BASE = 10;
+
+        List<Integer> execOrder = new ArrayList<>();
+
+        for (int index = 0; index < 3; index++) {
+            int finalIndex = index;
+            texture.add(new CoreTextureComponent() {
+                @Override
+                public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(TICK_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(CLOSE_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(REG_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(UPLOAD_ID_BASE + finalIndex);
+                }
+            });
+        }
+
+        action.accept(texture.build());
+        assertArrayEquals(expected, execOrder.toArray(new Integer[expected.length]));
     }
 
 }
