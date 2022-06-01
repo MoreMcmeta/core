@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
+import java.util.Optional;
+
 /**
  * A fake {@link CloseableImageFrame}.
  * @author soir20
@@ -28,6 +30,7 @@ import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 public class MockCloseableImageFrame extends CloseableImageFrame {
     private final ImmutableList<MockCloseableImage> MIPMAPS;
     private int uploads;
+    private Point lastUploadPoint;
 
     public MockCloseableImageFrame(int width, int height) {
         this(ImmutableList.of(
@@ -54,10 +57,15 @@ public class MockCloseableImageFrame extends CloseableImageFrame {
     public void uploadAt(Point point) {
         super.uploadAt(point);
         uploads++;
+        lastUploadPoint = point;
     }
 
     public int uploadCount() {
         return uploads;
+    }
+
+    public Point lastUploadPoint() {
+        return lastUploadPoint;
     }
 
     public MockCloseableImage mipmap(int mipmap) {
