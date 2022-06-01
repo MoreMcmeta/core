@@ -48,7 +48,7 @@ public class MockCloseableImageFrame extends CloseableImageFrame {
         ));
     }
 
-    private MockCloseableImageFrame(ImmutableList<MockCloseableImage> mipmaps) {
+    public MockCloseableImageFrame(ImmutableList<MockCloseableImage> mipmaps) {
         super(new FrameReader.FrameData(mipmaps.get(0).width(), mipmaps.get(0).height(), 0, 0), mipmaps);
         MIPMAPS = mipmaps;
     }

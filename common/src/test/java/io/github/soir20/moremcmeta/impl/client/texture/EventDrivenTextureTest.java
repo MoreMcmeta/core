@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
+import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
@@ -139,6 +140,108 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.setGeneratedFrame(new MockCloseableImageFrame());
+        builder.build();
+    }
+
+    @Test
+    public void build_PredefinedFramesWithDifferentMipLevels_IllegalArgException() {
+        MockCloseableImageFrame lowerMipmapFrame = new MockCloseableImageFrame(
+                ImmutableList.of(new MockCloseableImage())
+        );
+
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+
+        expectedException.expect(IllegalArgumentException.class);
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), lowerMipmapFrame));
+    }
+
+    @Test
+    public void build_PredefinedFramesWithDifferentWidths_IllegalArgException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+
+        expectedException.expect(IllegalArgumentException.class);
+        builder.setPredefinedFrames(List.of(
+                new MockCloseableImageFrame(100, 200),
+                new MockCloseableImageFrame(50, 200)
+        ));
+    }
+
+    @Test
+    public void build_PredefinedFramesWithDifferentHeights_IllegalArgException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+
+        expectedException.expect(IllegalArgumentException.class);
+        builder.setPredefinedFrames(List.of(
+                new MockCloseableImageFrame(50, 200),
+                new MockCloseableImageFrame(50, 100)
+        ));
+    }
+
+    @Test
+    public void build_PredefinedFrameHasLowerMipLevelThanGenerated_IllegalStateException() {
+        MockCloseableImageFrame lowerMipmapFrame = new MockCloseableImageFrame(
+                ImmutableList.of(new MockCloseableImage())
+        );
+
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setPredefinedFrames(List.of(lowerMipmapFrame));
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+
+        expectedException.expect(IllegalStateException.class);
+        builder.build();
+    }
+
+    @Test
+    public void build_PredefinedFrameHasHigherMipLevelThanGenerated_IllegalStateException() {
+        MockCloseableImageFrame lowerMipmapFrame = new MockCloseableImageFrame(
+                ImmutableList.of(new MockCloseableImage())
+        );
+
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(lowerMipmapFrame);
+
+        expectedException.expect(IllegalStateException.class);
+        builder.build();
+    }
+
+    @Test
+    public void build_PredefinedFrameHasLargerWidthThanGenerated_IllegalStateException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(100, 200)));
+        builder.setGeneratedFrame(new MockCloseableImageFrame(50, 200));
+
+        expectedException.expect(IllegalStateException.class);
+        builder.build();
+    }
+
+    @Test
+    public void build_PredefinedFrameHasSmallerWidthThanGenerated_IllegalStateException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 200)));
+        builder.setGeneratedFrame(new MockCloseableImageFrame(100, 200));
+
+        expectedException.expect(IllegalStateException.class);
+        builder.build();
+    }
+
+    @Test
+    public void build_PredefinedFrameHasLargerHeightThanGenerated_IllegalStateException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 100)));
+        builder.setGeneratedFrame(new MockCloseableImageFrame(50, 200));
+
+        expectedException.expect(IllegalStateException.class);
+        builder.build();
+    }
+
+    @Test
+    public void build_PredefinedFrameHasSmallerHeightThanGenerated_IllegalStateException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 200)));
+        builder.setGeneratedFrame(new MockCloseableImageFrame(50, 100));
+
+        expectedException.expect(IllegalStateException.class);
         builder.build();
     }
 
