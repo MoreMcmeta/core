@@ -17,6 +17,8 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
+import java.util.Objects;
+
 /**
  * Represents an RGBA color.
  * @author soir20
@@ -100,6 +102,32 @@ public final class Color {
      */
     public int combine() {
         return COMBINED;
+    }
+
+    /**
+     * Check whether this color is the same as another object.
+     * @param other     the object to compare this color to
+     * @return true if the other object is a color with the same components or false otherwise
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Color otherAsColor)) {
+            return false;
+        }
+
+        return alpha() == otherAsColor.alpha()
+                && red() == otherAsColor.red()
+                && green() == otherAsColor.green()
+                && blue() == otherAsColor.blue();
+    }
+
+    /**
+     * Gets the hash code for this color.
+     * @return the hash code for this color
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(ALPHA, RED, GREEN, BLUE);
     }
 
     /**
