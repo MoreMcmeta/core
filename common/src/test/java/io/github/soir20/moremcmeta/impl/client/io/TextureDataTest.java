@@ -17,15 +17,21 @@
 
 package io.github.soir20.moremcmeta.impl.client.io;
 
+import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.MockCloseableImage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the link {@link TextureData} container.
@@ -140,6 +146,58 @@ public class TextureDataTest {
     }
 
     @Test
+    public void blur_False_RetrievesFalse() {
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new ParsedMetadata.FrameSize(10, 20),
+                false,
+                false,
+                new MockCloseableImage(100, 100),
+                List.of()
+        );
+
+        assertFalse(data.blur());
+    }
+
+    @Test
+    public void blur_True_RetrievesTrue() {
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new ParsedMetadata.FrameSize(10, 20),
+                true,
+                false,
+                new MockCloseableImage(100, 100),
+                List.of()
+        );
+
+        assertTrue(data.blur());
+    }
+
+    @Test
+    public void clamp_False_RetrievesFalse() {
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new ParsedMetadata.FrameSize(10, 20),
+                false,
+                false,
+                new MockCloseableImage(100, 100),
+                List.of()
+        );
+
+        assertFalse(data.clamp());
+    }
+
+    @Test
+    public void clamp_True_RetrievesTrue() {
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new ParsedMetadata.FrameSize(10, 20),
+                false,
+                true,
+                new MockCloseableImage(100, 100),
+                List.of()
+        );
+
+        assertTrue(data.clamp());
+    }
+
+    @Test
     public void frameSize_WidthProvided_RetrievesWidth() {
         TextureData<MockCloseableImage> data = new TextureData<>(
                 new ParsedMetadata.FrameSize(10, 20),
@@ -176,5 +234,98 @@ public class TextureDataTest {
         assertEquals(image, data.image());
     }
 
+    @Test
+    public void parsedMetadata_None_NoneReturned() {
+        List<Pair<ParsedMetadata, ComponentProvider>> expectedMetadata = List.of();
+
+        MockCloseableImage image = new MockCloseableImage(100, 100);
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new ParsedMetadata.FrameSize(10, 20),
+                false,
+                false,
+                image,
+                expectedMetadata
+        );
+
+        List<Pair<ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>();
+        for (Pair<ParsedMetadata, ComponentProvider> item : data.parsedMetadata()) {
+            actualMetadata.add(item);
+        }
+
+        assertEquals(0, actualMetadata.size());
+    }
+
+    @Test
+    public void parsedMetadata_Some_SameMetadataReturned() {
+        List<Pair<ParsedMetadata, ComponentProvider>> expectedMetadata = List.of(
+                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(new TextureComponent<>() {})),
+                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(new TextureComponent<>() {})),
+                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(new TextureComponent<>() {})),
+                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(new TextureComponent<>() {}))
+        );
+
+        MockCloseableImage image = new MockCloseableImage(100, 100);
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new ParsedMetadata.FrameSize(10, 20),
+                false,
+                false,
+                image,
+                expectedMetadata
+        );
+
+        List<Pair<ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>();
+        for (Pair<ParsedMetadata, ComponentProvider> item : data.parsedMetadata()) {
+            actualMetadata.add(item);
+        }
+
+        assertEquals(expectedMetadata, actualMetadata);
+    }
+
+    @Test
+    public void parsedMetadata_ListModifiedExternally_InternalListNotModified() {
+        List<Pair<ParsedMetadata, ComponentProvider>> expectedMetadata = new ArrayList<>();
+        expectedMetadata.add(Pair.of(
+                new ParsedMetadata() {},
+                (metadata, frames) -> List.of(new TextureComponent<>() {})
+        ));
+        expectedMetadata.add(Pair.of(
+                new ParsedMetadata() {},
+                (metadata, frames) -> List.of(new TextureComponent<>() {})
+        ));
+        expectedMetadata.add(Pair.of(
+                new ParsedMetadata() {},
+                (metadata, frames) -> List.of(new TextureComponent<>() {})
+        ));
+        expectedMetadata.add(Pair.of(
+                new ParsedMetadata() {},
+                (metadata, frames) -> List.of(new TextureComponent<>() {})
+        ));
+
+        Pair<ParsedMetadata, ComponentProvider> extraSection = Pair.of(
+                new ParsedMetadata() {},
+                (metadata, frames) -> List.of(new TextureComponent<>() {})
+        );
+
+        MockCloseableImage image = new MockCloseableImage(100, 100);
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new ParsedMetadata.FrameSize(10, 20),
+                false,
+                false,
+                image,
+                expectedMetadata
+        );
+
+        expectedMetadata.add(extraSection);
+
+        List<Pair<ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>();
+        for (Pair<ParsedMetadata, ComponentProvider> item : data.parsedMetadata()) {
+            actualMetadata.add(item);
+        }
+
+        // If the actual metadata already contains the extra section, the lists won't be equal
+        actualMetadata.add(extraSection);
+        assertEquals(expectedMetadata, actualMetadata);
+
+    }
 
 }
