@@ -50,8 +50,8 @@ public class JsonMetadataView implements MetadataView {
      */
     public JsonMetadataView(JsonObject root, Comparator<? super String> keyComparator) {
         ROOT = new Root(requireNonNull(root, "Root cannot be null"));
-        KEYS = root.keySet().stream().sorted(keyComparator).toList();
-        SIZE = root.size();
+        KEYS = root.keySet().stream().filter((key) -> !root.get(key).isJsonNull()).sorted(keyComparator).toList();
+        SIZE = KEYS.size();
     }
 
     /**
