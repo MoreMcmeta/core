@@ -131,7 +131,7 @@ public class JsonMetadataView implements MetadataView {
     public Optional<String> stringValue(String key) {
 
         // The Gson implementation can convert any primitive to a string, even if isString() is false
-        return primitiveFromKey(key, JsonPrimitive::isJsonPrimitive, JsonPrimitive::getAsString);
+        return primitiveFromKey(key, (element) -> true, JsonPrimitive::getAsString);
 
     }
 
@@ -153,7 +153,7 @@ public class JsonMetadataView implements MetadataView {
     public Optional<String> stringValue(int index) {
 
         // The Gson implementation can convert any primitive to a string, even if isString() is false
-        return primitiveFromIndex(index, JsonPrimitive::isJsonPrimitive, JsonPrimitive::getAsString);
+        return primitiveFromIndex(index, (element) -> true, JsonPrimitive::getAsString);
 
     }
 
@@ -396,7 +396,7 @@ public class JsonMetadataView implements MetadataView {
     public Optional<Boolean> booleanValue(String key) {
 
         // The Gson implementation can convert any primitive to a boolean, even if isString() is false
-        return primitiveFromKey(key, JsonPrimitive::isJsonPrimitive, JsonPrimitive::getAsBoolean);
+        return primitiveFromKey(key, (element) -> true, JsonPrimitive::getAsBoolean);
 
     }
 
@@ -418,7 +418,7 @@ public class JsonMetadataView implements MetadataView {
     public Optional<Boolean> booleanValue(int index) {
 
         // The Gson implementation can convert any primitive to a boolean, even if isString() is false
-        return primitiveFromIndex(index, JsonPrimitive::isJsonPrimitive, JsonPrimitive::getAsBoolean);
+        return primitiveFromIndex(index, (element) -> true, JsonPrimitive::getAsBoolean);
 
     }
 
@@ -507,8 +507,8 @@ public class JsonMetadataView implements MetadataView {
 
         int keyAsIndex = strAsIndex(key);
         return ROOT.get(
-                (obj) -> primitiveOfType(obj.get(key).getAsJsonPrimitive(), checkFunction, convertFunction),
-                (array) ->  primitiveOfType(array.get(keyAsIndex).getAsJsonPrimitive(), checkFunction, convertFunction)
+                (obj) -> primitiveOfType(obj.get(key), checkFunction, convertFunction),
+                (array) ->  primitiveOfType(array.get(keyAsIndex), checkFunction, convertFunction)
         );
     }
 
@@ -528,25 +528,27 @@ public class JsonMetadataView implements MetadataView {
         }
 
         return ROOT.get(
-                (obj) -> {
-                    JsonPrimitive primitive = objectElementByIndex(obj, index).getAsJsonPrimitive();
-                    return primitiveOfType(primitive, checkFunction, convertFunction);
-                },
-                (array) ->  primitiveOfType(array.get(index).getAsJsonPrimitive(), checkFunction, convertFunction)
+                (obj) -> primitiveOfType(objectElementByIndex(obj, index), checkFunction, convertFunction),
+                (array) ->  primitiveOfType(array.get(index), checkFunction, convertFunction)
         );
     }
 
     /**
-     * Converts a JSON primitive to a value of the desired type if it passes the `checkFunction`.
-     * @param primitive             primitive to convert
+     * Converts a JSON element to a value of the desired type if it is a primitive and  passes the `checkFunction`.
+     * @param element               element to convert
      * @param checkFunction         checks whether the primitive is a value of the required type
      * @param convertFunction       converts the primitive to the value of the required type if it
      *                              passes the `checkFunction`
      * @return the value if it satisfies the `checkFunction` or {@link Optional#empty()}
      * @param <T> the type to convert the primitive to
      */
-    private <T> Optional<T> primitiveOfType(JsonPrimitive primitive, Function<JsonPrimitive, Boolean> checkFunction,
+    private <T> Optional<T> primitiveOfType(JsonElement element, Function<JsonPrimitive, Boolean> checkFunction,
                                             Function<JsonPrimitive, T> convertFunction) {
+        if (!element.isJsonPrimitive()) {
+            return Optional.empty();
+        }
+
+        JsonPrimitive primitive = element.getAsJsonPrimitive();
         if (!checkFunction.apply(primitive)) {
             return Optional.empty();
         }
