@@ -30,9 +30,11 @@ public interface ImageReader<I> {
     /**
      * Reads an image from an {@link InputStream}.
      * @param imageStream     the stream of image data
+     * @param blur            whether to blur the image
+     * @param clamp           whether to clamp the image
      * @return the image read from the provided data
      * @throws IOException if the image stream cannot be read as an image
      */
-    I read(InputStream imageStream) throws IOException;
+    I read(InputStream imageStream, boolean blur, boolean clamp) throws IOException;
 
 }

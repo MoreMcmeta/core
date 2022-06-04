@@ -21,6 +21,8 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -37,75 +39,18 @@ public class NativeImageAdapter implements CloseableImage {
     private final boolean BLUR;
     private final boolean CLAMP;
     private final boolean AUTO_CLOSE;
-    private boolean closed;
-
-    /**
-     * Creates a new {@link NativeImage} wrapper for part of an image.
-     * @param image         the image to wrap
-     * @param xOffset       horizontal offset of the image in a texture
-     * @param yOffset       vertical offset of the image in a texture
-     * @param width         width of the image
-     * @param height        height of the image
-     * @param mipmapLevel   mipmap level of the image
-     * @param blur          whether to blur this image
-     * @param clamp         whether to clamp this image
-     * @param autoClose     whether to automatically close this image
-     */
-    public NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
-                              int mipmapLevel, boolean blur, boolean clamp, boolean autoClose) {
-        IMAGE = requireNonNull(image, "Image cannot be null");
-
-        if (xOffset < 0) {
-            throw new IllegalArgumentException("X offset cannot be negative");
-        }
-
-        if (yOffset < 0) {
-            throw new IllegalArgumentException("Y offset cannot be negative");
-        }
-
-        if (width < 0) {
-            throw new IllegalArgumentException("Width cannot be negative");
-        }
-
-        if (height < 0) {
-            throw new IllegalArgumentException("Height cannot be negative");
-        }
-
-        if (mipmapLevel < 0) {
-            throw new IllegalArgumentException("Mipmap level cannot be negative");
-        }
-
-        X_OFFSET = xOffset;
-        Y_OFFSET = yOffset;
-        WIDTH = width;
-        HEIGHT = height;
-        MIPMAP_LEVEL = mipmapLevel;
-        BLUR = blur;
-        CLAMP = clamp;
-        AUTO_CLOSE = autoClose;
-    }
+    private final AtomicBoolean CLOSED;
 
     /**
      * Creates a new {@link NativeImage} wrapper for an entire image. The image
      * is not blurred, clamped, or auto-closed, and it has no visible area.
      * @param image             the image to wrap
      * @param mipmapLevel       mipmap level of the image
+     * @param blur              whether to blur the image
+     * @param clamp             whether to clamp the image
      */
-    public NativeImageAdapter(NativeImage image, int mipmapLevel) {
-        IMAGE = requireNonNull(image, "Image cannot be null");
-
-        if (mipmapLevel < 0) {
-            throw new IllegalArgumentException("Mipmap level cannot be negative");
-        }
-
-        X_OFFSET = 0;
-        Y_OFFSET = 0;
-        WIDTH = image.getWidth();
-        HEIGHT = image.getHeight();
-        MIPMAP_LEVEL = mipmapLevel;
-        BLUR = false;
-        CLAMP = false;
-        AUTO_CLOSE = false;
+    public NativeImageAdapter(NativeImage image, int mipmapLevel, boolean blur, boolean clamp) {
+        this(image, 0, 0, image.getWidth(), image.getHeight(), mipmapLevel, blur, clamp, false, new AtomicBoolean());
     }
 
     /**
@@ -176,15 +121,54 @@ public class NativeImageAdapter implements CloseableImage {
     }
 
     /**
+     * Takes a portion of this image as a separate {@link CloseableImage}. This image will be
+     * closed when the sub-image is closed and vice versa. Changes in the original image or any of
+     * its sub-images will be reflected in all the sub-images.
+     * @param topLeftX      x-coordinate of the top-left corner of the sub-image
+     * @param topLeftY      y-coordinate of the top-left corner of the sub-image
+     * @param width         width of the sub-image
+     * @param height        height of the sub-image
+     * @return the corresponding sub-image
+     */
+    @Override
+    public CloseableImage subImage(int topLeftX, int topLeftY, int width, int height) {
+        return new NativeImageAdapter(
+                IMAGE,
+                topLeftX, topLeftY,
+                width, height,
+                MIPMAP_LEVEL,
+                BLUR, CLAMP,
+                AUTO_CLOSE,
+                CLOSED
+        );
+    }
+
+    /**
      * Closes the underlying {@link NativeImage} and any other related resources. Idempotent.
      */
     @Override
     public void close() {
 
         // NativeImage's close implementation is idempotent.
-        closed = true;
+        CLOSED.set(true);
         IMAGE.close();
 
+    }
+
+    /**
+     * Gets whether this image is blurred.
+     * @return whether this image is blurred
+     */
+    public boolean blur() {
+        return BLUR;
+    }
+
+    /**
+     * Gets whether this image is clamped.
+     * @return whether this image is clamped
+     */
+    public boolean clamp() {
+        return CLAMP;
     }
 
     /**
@@ -195,6 +179,61 @@ public class NativeImageAdapter implements CloseableImage {
     public NativeImage image() {
         checkOpen();
         return IMAGE;
+    }
+
+    /**
+     * Creates a new {@link NativeImage} wrapper for part of an image.
+     * @param image                 the image to wrap
+     * @param xOffset               horizontal offset of the image in a texture
+     * @param yOffset               vertical offset of the image in a texture
+     * @param width                 width of the image
+     * @param height                height of the image
+     * @param mipmapLevel           mipmap level of the image
+     * @param blur                  whether to blur this image
+     * @param clamp                 whether to clamp this image
+     * @param autoClose             whether to automatically close this image
+     * @param sharedCloseStatus     shared status between all images connected to the same
+     *                              {@link NativeImage}
+     */
+    private NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
+                               int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
+                               AtomicBoolean sharedCloseStatus) {
+        IMAGE = requireNonNull(image, "Image cannot be null");
+
+        if (xOffset < 0) {
+            throw new IllegalArgumentException("X offset cannot be negative");
+        }
+
+        if (yOffset < 0) {
+            throw new IllegalArgumentException("Y offset cannot be negative");
+        }
+
+        if (width < 0) {
+            throw new IllegalArgumentException("Width cannot be negative");
+        }
+
+        if (height < 0) {
+            throw new IllegalArgumentException("Height cannot be negative");
+        }
+
+        if (mipmapLevel < 0) {
+            throw new IllegalArgumentException("Mipmap level cannot be negative");
+        }
+
+        if (xOffset + width < 0 || xOffset + width > image.getWidth()
+                || yOffset + height < 0 || yOffset + height > image.getHeight()) {
+            throw new IllegalArgumentException("Sub image extends beyond original image");
+        }
+
+        X_OFFSET = xOffset;
+        Y_OFFSET = yOffset;
+        WIDTH = width;
+        HEIGHT = height;
+        MIPMAP_LEVEL = mipmapLevel;
+        BLUR = blur;
+        CLAMP = clamp;
+        AUTO_CLOSE = autoClose;
+        CLOSED = requireNonNull(sharedCloseStatus, "Close status cannot be null");
     }
 
     /**
@@ -214,7 +253,7 @@ public class NativeImageAdapter implements CloseableImage {
      * @throws IllegalStateException if the image is not open
      */
     private void checkOpen() {
-        if (closed) {
+        if (CLOSED.get()) {
             throw new IllegalStateException("Image is closed");
         }
     }

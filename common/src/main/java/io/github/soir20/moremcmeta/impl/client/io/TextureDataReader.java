@@ -79,9 +79,6 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
 
-        I image = IMAGE_READER.read(textureStream);
-        requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
-
         MetadataView metadata = readMetadata(metadataStream);
         List<Pair<ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
         Optional<ParsedMetadata.FrameSize> frameSizeOptional = Optional.empty();
@@ -109,6 +106,12 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
             }
         }
 
+        boolean blur = blurOptional.orElse(false);
+        boolean clamp = clampOptional.orElse(false);
+
+        I image = IMAGE_READER.read(textureStream, blur, clamp);
+        requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
+
         ParsedMetadata.FrameSize frameSize = frameSizeOptional.orElse(
                 new ParsedMetadata.FrameSize(image.width(), image.height())
         );
@@ -121,9 +124,6 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                     image.width(), image.height()
             ));
         }
-
-        boolean blur = blurOptional.orElse(false);
-        boolean clamp = clampOptional.orElse(false);
 
         return new TextureData<>(
                 frameSize,

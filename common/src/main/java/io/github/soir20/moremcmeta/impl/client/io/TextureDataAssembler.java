@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
@@ -30,27 +29,38 @@ import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
-import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.MipmapGenerator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * Assembles texture data into a texture builder.
+ * @param <I> image type
  * @author soir20
  */
-public class TextureDataAssembler {
+public class TextureDataAssembler<I extends CloseableImage> {
+    private final ImageAllocator ALLOCATOR;
+    private final Function<? super I, ? extends List<? extends I>> MIPMAP_GENERATOR;
+
+    /**
+     * Creates a new texture assembler.
+     * @param allocator         allocator for new images
+     * @param mipmapGenerator   generates mipmaps from an original image, the number of which
+     */
+    public TextureDataAssembler(ImageAllocator allocator,
+                                Function<? super I, ? extends List<? extends I>> mipmapGenerator) {
+        ALLOCATOR = requireNonNull(allocator, "Allocator cannot be null");
+        MIPMAP_GENERATOR = requireNonNull(mipmapGenerator, "Mipmap generator cannot be null");
+    }
 
     /**
      * Combines the texture image and metadata into a {@link EventDrivenTexture.Builder} that
@@ -58,29 +68,24 @@ public class TextureDataAssembler {
      * @param data          texture data to assemble
      * @return texture data assembled as a texture builder
      */
-    public EventDrivenTexture.Builder assemble(TextureData<NativeImageAdapter> data) {
+    public EventDrivenTexture.Builder assemble(TextureData<? extends I> data) {
         requireNonNull(data, "Data cannot be null");
 
-        Minecraft minecraft = Minecraft.getInstance();
-        final int MAX_MIPMAP = minecraft.options.mipmapLevels;
-
-        NativeImage original = data.image().image();
+        I original = data.image();
         int frameWidth = data.frameSize().width();
         int frameHeight = data.frameSize().height();
         boolean blur = data.blur();
         boolean clamp = data.clamp();
 
         // Create frames
-        List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(original, MAX_MIPMAP));
+        List<? extends I> mipmaps = MIPMAP_GENERATOR.apply(original);
         ImmutableList<CloseableImageFrame> frames = getFrames(
                 mipmaps,
                 frameWidth,
-                frameHeight,
-                blur,
-                clamp
+                frameHeight
         );
         CloseableImageFrame generatedFrame = createGeneratedFrame(
-                mipmaps,
+                mipmaps.size() - 1,
                 frameWidth,
                 frameHeight,
                 blur,
@@ -117,87 +122,56 @@ public class TextureDataAssembler {
      * @param mipmaps               mipmaps of the full texture image (with all frames)
      * @param frameWidth            width of each frame in the image
      * @param frameHeight           height of each frame in the image
-     * @param blur                  whether to blur the texture
-     * @param clamp                 whether to clamp the texture
      * @return the frames based on the texture image in chronological order
      */
-    private ImmutableList<CloseableImageFrame> getFrames(List<NativeImage> mipmaps, int frameWidth, int frameHeight,
-                                                         boolean blur, boolean clamp) {
+    private ImmutableList<CloseableImageFrame> getFrames(List<? extends I> mipmaps, int frameWidth,
+                                                         int frameHeight) {
         int mipmap = mipmaps.size() - 1;
 
         FrameReader<CloseableImageFrame> frameReader = new FrameReader<>((frameData) -> {
 
             /* The immutable list collector was marked as beta for a while,
                and the marking was removed in a later version. */
-            ImmutableList<CloseableImage> wrappedMipmaps = IntStream.rangeClosed(0, mipmap).mapToObj((level) -> {
-                int width = frameData.width() >> level;
-                int height = frameData.height() >> level;
+            ImmutableList<CloseableImage> subImageMipmaps = IntStream.rangeClosed(0, mipmap).mapToObj(
+                    (level) -> mipmaps.get(level).subImage(
+                            frameData.xOffset() >> level,
+                            frameData.yOffset() >> level,
+                            frameData.width() >> level,
+                            frameData.height() >> level
+                    )
+            ).collect(ImmutableList.toImmutableList());
 
-                return new NativeImageAdapter(
-                        mipmaps.get(level),
-                        frameData.xOffset() >> level, frameData.yOffset() >> level,
-                        width, height,
-                        level, blur, clamp, false
-                );
-            }).collect(ImmutableList.toImmutableList());
-
-            return new CloseableImageFrame(frameData, wrappedMipmaps);
+            return new CloseableImageFrame(frameData, subImageMipmaps);
         });
 
-        return frameReader.read(mipmaps.get(0).getWidth(), mipmaps.get(0).getHeight(), frameWidth, frameHeight);
+        return frameReader.read(mipmaps.get(0).width(), mipmaps.get(0).height(), frameWidth, frameHeight);
     }
 
     /**
      * Creates a frame that will hold generated frames.
-     * @param originals             the original mipmaps to copy from
+     * @param maxMipmap             maximum mipmap level of the original image
      * @param frameWidth            the width of a single frame
      * @param frameHeight           the height of a single frame
      * @param blur                  whether the images are blurred
      * @param clamp                 whether the images are clamped
      * @return the adapters for the interpolation images
      */
-    private CloseableImageFrame createGeneratedFrame(List<NativeImage> originals, int frameWidth,
+    private CloseableImageFrame createGeneratedFrame(int maxMipmap, int frameWidth,
                                                      int frameHeight, boolean blur, boolean clamp) {
-        ImmutableList.Builder<NativeImageAdapter> images = new ImmutableList.Builder<>();
+        ImmutableList.Builder<CloseableImage> images = new ImmutableList.Builder<>();
 
-        for (int level = 0; level < originals.size(); level++) {
+        for (int level = 0; level <= maxMipmap; level++) {
             int mipmappedWidth = frameWidth >> level;
             int mipmappedHeight = frameHeight >> level;
 
-            NativeImage original = originals.get(level);
-
-            NativeImage mipmappedImage = new NativeImage(mipmappedWidth, mipmappedHeight, true);
-            copyTopLeftRect(mipmappedWidth, mipmappedHeight, original, mipmappedImage);
-
-            NativeImageAdapter adapter = new NativeImageAdapter(
-                    mipmappedImage,
-                    0, 0,
-                    mipmappedWidth, mipmappedHeight,
-                    level,
-                    blur, clamp, false
-            );
-            images.add(adapter);
+            CloseableImage image = ALLOCATOR.allocate(mipmappedWidth, mipmappedHeight, level, blur, clamp);
+            images.add(image);
         }
 
         return new CloseableImageFrame(
                 new FrameReader.FrameData(frameWidth, frameHeight, 0, 0),
                 images.build()
         );
-    }
-
-    /**
-     * Copies a rectangle in the top left from one image to another.
-     * @param width     width of the rectangle to copy
-     * @param height    height of the rectangle to copy
-     * @param from      image to copy from (unchanged)
-     * @param to        image to copy to (changed)
-     */
-    private void copyTopLeftRect(int width, int height, NativeImage from, NativeImage to) {
-        for (int xPos = 0; xPos < width; xPos++) {
-            for (int yPos = 0; yPos < height; yPos++) {
-                to.setPixelRGBA(xPos, yPos, from.getPixelRGBA(xPos, yPos));
-            }
-        }
     }
 
     /**

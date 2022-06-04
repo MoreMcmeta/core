@@ -61,7 +61,7 @@ public class TextureDataReaderTest {
         expectedException.expect(NullPointerException.class);
         new TextureDataReader<>(
                 null,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
     }
 
@@ -78,7 +78,7 @@ public class TextureDataReaderTest {
     public void read_NullTextureStream_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
         expectedException.expect(NullPointerException.class);
         reader.read(null, makeStream("{\"texture\":{\"blur\": false}}"));
@@ -88,7 +88,7 @@ public class TextureDataReaderTest {
     public void read_NullMetadataStream_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
         expectedException.expect(NullPointerException.class);
         reader.read(DEMO_TEXTURE_STREAM, null);
@@ -98,7 +98,7 @@ public class TextureDataReaderTest {
     public void read_NullImageRead_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
-                (stream) -> null
+                (stream, blur, clamp) -> null
         );
         expectedException.expect(NullPointerException.class);
         reader.read(DEMO_TEXTURE_STREAM, null);
@@ -108,7 +108,7 @@ public class TextureDataReaderTest {
     public void read_ReaderIOException_IOException() throws IOException, TextureReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
-                (stream) -> { throw new IOException("dummy"); }
+                (stream, blur, clamp) -> { throw new IOException("dummy"); }
         );
         expectedException.expect(IOException.class);
         reader.read(DEMO_TEXTURE_STREAM, makeStream("{\"texture\":{\"blur\": false}}"));
@@ -118,7 +118,7 @@ public class TextureDataReaderTest {
     public void read_EmptyStream_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
         expectedException.expect(TextureReader.InvalidMetadataException.class);
         reader.read(DEMO_TEXTURE_STREAM, makeStream(""));
@@ -128,7 +128,7 @@ public class TextureDataReaderTest {
     public void read_InvalidJSON_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
         expectedException.expect(TextureReader.InvalidMetadataException.class);
         reader.read(DEMO_TEXTURE_STREAM, makeStream("{\"texture\":{\"blur: false}}"));
@@ -144,7 +144,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -171,7 +171,7 @@ public class TextureDataReaderTest {
     public void read_EmptyJSON_NoMetadata() throws IOException, TextureReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -199,7 +199,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -231,7 +231,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -263,7 +263,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         expectedException.expect(TextureReader.InvalidMetadataException.class);
@@ -282,7 +282,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         expectedException.expect(TextureReader.InvalidMetadataException.class);
@@ -301,7 +301,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         expectedException.expect(TextureReader.InvalidMetadataException.class);
@@ -320,7 +320,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -352,7 +352,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -384,7 +384,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -416,7 +416,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -448,7 +448,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -481,7 +481,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -514,7 +514,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -547,7 +547,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -580,7 +580,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -613,7 +613,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -650,7 +650,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -683,7 +683,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -715,7 +715,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         expectedException.expect(NullPointerException.class);
@@ -734,7 +734,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         expectedException.expect(TextureReader.InvalidMetadataException.class);
@@ -767,7 +767,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -814,7 +814,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -861,7 +861,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -894,7 +894,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         expectedException.expect(TextureReader.InvalidMetadataException.class);
@@ -913,7 +913,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new MockCloseableImage()
+                (stream, blur, clamp) -> new MockCloseableImage()
         );
 
         expectedException.expect(TextureReader.InvalidMetadataException.class);

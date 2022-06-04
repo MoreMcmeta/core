@@ -80,6 +80,18 @@ public interface CloseableImage {
     void upload(int uploadX, int uploadY);
 
     /**
+     * Takes a portion of this image as a separate {@link CloseableImage}. This image will be
+     * closed when the sub-image is closed and vice versa. Changes in the original image or any of
+     * its sub-images will be reflected in all the sub-images.
+     * @param topLeftX      x-coordinate of the top-left corner of the sub-image
+     * @param topLeftY      y-coordinate of the top-left corner of the sub-image
+     * @param width         width of the sub-image
+     * @param height        height of the sub-image
+     * @return the corresponding sub-image
+     */
+    CloseableImage subImage(int topLeftX, int topLeftY, int width, int height);
+
+    /**
      * Closes any resources associated with this image. Implementations should be idempotent.
      *
      * Currently, no image implementations need to throw exceptions, and {@link AutoCloseable} is not

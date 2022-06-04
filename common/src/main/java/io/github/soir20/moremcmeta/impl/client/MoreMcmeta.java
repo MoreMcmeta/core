@@ -39,6 +39,7 @@ import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
@@ -116,7 +117,7 @@ public abstract class MoreMcmeta {
         // Resource loaders
         TextureDataReader<NativeImageAdapter> reader = new TextureDataReader<>(
                 plugins,
-                (stream) -> new NativeImageAdapter(NativeImage.read(stream), 0)
+                (stream, blur, clamp) -> new NativeImageAdapter(NativeImage.read(stream), 0, blur, clamp)
         );
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(reader, logger);
 
@@ -422,7 +423,27 @@ public abstract class MoreMcmeta {
             requireNonNull(loadProfiler, "Profiler cannot be null");
             requireNonNull(loadExecutor, "Executor cannot be null");
 
-            TextureDataAssembler assembler = new TextureDataAssembler();
+            TextureDataAssembler<NativeImageAdapter> assembler = new TextureDataAssembler<>(
+                    (int width, int height, int mipmapLevel, boolean blur, boolean clamp) -> {
+                        NativeImage image = new NativeImage(width, height, true);
+                        return new NativeImageAdapter(image, mipmapLevel, blur, clamp);
+                    },
+                    (image) -> {
+                        int maxMipmap = Minecraft.getInstance().options.mipmapLevels;
+                        NativeImage[] mipmaps = MipmapGenerator.generateMipLevels(image.image(), maxMipmap);
+
+                        List<NativeImageAdapter> wrappedMipmaps = new ArrayList<>();
+                        for (int level = 0; level < mipmaps.length; level++) {
+                            wrappedMipmaps.add(new NativeImageAdapter(
+                                    mipmaps[level],
+                                    level,
+                                    image.blur(), image.clamp()
+                            ));
+                        }
+
+                        return wrappedMipmaps;
+                    }
+            );
 
             return CompletableFuture.supplyAsync(() -> lastTextures.entrySet().stream().parallel().collect(
                     Collectors.toMap(Map.Entry::getKey, (entry) -> assembler.assemble(entry.getValue()))

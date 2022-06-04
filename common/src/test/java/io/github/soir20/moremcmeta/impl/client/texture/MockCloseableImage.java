@@ -19,6 +19,8 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 
 import io.github.soir20.moremcmeta.api.math.Point;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Mocks an {@link CloseableImage}. Keeps track of set pixel colors.
  * @author soir20
@@ -30,29 +32,33 @@ public class MockCloseableImage implements CloseableImage {
     private final int WIDTH;
     private final int HEIGHT;
     private Point uploadPoint;
-    private boolean closed;
+    private final AtomicBoolean CLOSED;
 
     public MockCloseableImage() {
-        PIXELS = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
-        WIDTH = DEFAULT_DIMENSION;
-        HEIGHT = DEFAULT_DIMENSION;
+        this(DEFAULT_DIMENSION, DEFAULT_DIMENSION);
     }
 
     public MockCloseableImage(int width, int height) {
         PIXELS = new int[width][height];
         WIDTH = width;
         HEIGHT = height;
+        CLOSED = new AtomicBoolean();
     }
 
     public MockCloseableImage(int[][] pixels) {
+        this(pixels, new AtomicBoolean());
+    }
+
+    private MockCloseableImage(int[][] pixels, AtomicBoolean closedStatus) {
         PIXELS = pixels;
         WIDTH = pixels.length;
         HEIGHT = pixels[0].length;
+        CLOSED = closedStatus;
     }
 
     @Override
     public int color(int x, int y) {
-        if (closed) {
+        if (CLOSED.get()) {
             throw new IllegalStateException("Mock image closed");
         }
 
@@ -65,7 +71,7 @@ public class MockCloseableImage implements CloseableImage {
 
     @Override
     public void setColor(int x, int y, int color) {
-        if (closed) {
+        if (CLOSED.get()) {
             throw new IllegalStateException("Mock image closed");
         }
 
@@ -78,7 +84,7 @@ public class MockCloseableImage implements CloseableImage {
 
     @Override
     public int width() {
-        if (closed) {
+        if (CLOSED.get()) {
             throw new IllegalStateException("Mock image closed");
         }
 
@@ -87,7 +93,7 @@ public class MockCloseableImage implements CloseableImage {
 
     @Override
     public int height() {
-        if (closed) {
+        if (CLOSED.get()) {
             throw new IllegalStateException("Mock image closed");
         }
 
@@ -96,7 +102,7 @@ public class MockCloseableImage implements CloseableImage {
 
     @Override
     public void upload(int uploadX, int uploadY) {
-        if (closed) {
+        if (CLOSED.get()) {
             throw new IllegalStateException("Mock image closed");
         }
 
@@ -104,12 +110,22 @@ public class MockCloseableImage implements CloseableImage {
     }
 
     @Override
+    public CloseableImage subImage(int topLeftX, int topLeftY, int width, int height) {
+        int[][] subImagePixels = new int[width][height];
+        for (int x = 0; x < width; x++) {
+            System.arraycopy(PIXELS[x + topLeftX], topLeftY, subImagePixels[x], 0, height);
+        }
+
+        return new MockCloseableImage(subImagePixels);
+    }
+
+    @Override
     public void close() {
-        closed = true;
+        CLOSED.set(true);
     }
 
     public boolean isClosed() {
-        return closed;
+        return CLOSED.get();
     }
 
     public Point lastUploadPoint() {

@@ -17,26 +17,24 @@
 
 package io.github.soir20.moremcmeta.impl.client.io;
 
-import io.github.soir20.moremcmeta.impl.client.io.TextureDataAssembler;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 
 /**
- * Tests the {@link TextureDataAssembler}. This class uses some Minecraft IO functions, and it
- * is planned to completely revamp how this class works in the future. Its code is mostly creating
- * other things that are tested. Therefore, the tests for it are less thorough.
+ * Allocates an image. The resulting image should be entirely transparent with
+ * all pixels having value 0.
  * @author soir20
  */
-public class TextureDataAssemblerTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
+public interface ImageAllocator {
 
-    /*@Test
-    public void assemble_NullData_NullPointerException() {
-        TextureDataAssembler assembler = new TextureDataAssembler();
-        expectedException.expect(NullPointerException.class);
-        assembler.assemble(null);
-    }*/
+    /**
+     * Allocates a new, transparent image.
+     * @param width         the width of the image to allocate
+     * @param height        the height of the image to allocate
+     * @param mipmapLevel   the number mipmap that this image represents
+     * @param blur          whether to blur the image
+     * @param clamp         whether to clamp the image
+     * @return the allocated image
+     */
+    CloseableImage allocate(int width, int height, int mipmapLevel, boolean blur, boolean clamp);
 
 }
