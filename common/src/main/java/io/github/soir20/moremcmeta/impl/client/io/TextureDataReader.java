@@ -112,6 +112,24 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         ParsedMetadata.FrameSize frameSize = frameSizeOptional.orElse(
                 new ParsedMetadata.FrameSize(image.width(), image.height())
         );
+
+        // Check for frame size too large
+        if (frameSize.width() > image.width() || frameSize.height() > image.height()) {
+            throw new InvalidMetadataException(String.format(
+                    "%sx%s larger than %sx%s image",
+                    frameSize.width(), frameSize.height(),
+                    image.width(), image.height()
+            ));
+        }
+
+        // Check for negative frame size
+        if (frameSize.width() < 0 || frameSize.height() < 0) {
+            throw new InvalidMetadataException(String.format(
+                    "%sx%s has negative dimension",
+                    frameSize.width(), frameSize.height()
+            ));
+        }
+
         boolean blur = blurOptional.orElse(false);
         boolean clamp = clampOptional.orElse(false);
 

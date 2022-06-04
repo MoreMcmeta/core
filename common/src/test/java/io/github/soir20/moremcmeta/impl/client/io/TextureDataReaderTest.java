@@ -885,6 +885,44 @@ public class TextureDataReaderTest {
 
     }
 
+    @Test
+    public void read_FrameWidthLargerThanImage_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+        List<MockPlugin> plugins = List.of(
+                new MockPlugin("animation", new ParsedMetadata.FrameSize(1000, 100), null, null, null),
+                new MockPlugin("texture", new ParsedMetadata.FrameSize(1000, 100), null, null, null)
+        );
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage()
+        );
+
+        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        reader.read(
+                DEMO_TEXTURE_STREAM,
+                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+        );
+    }
+
+    @Test
+    public void read_FrameHeightLargerThanImage_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+        List<MockPlugin> plugins = List.of(
+                new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 1000), null, null, null),
+                new MockPlugin("texture", new ParsedMetadata.FrameSize(100, 1000), null, null, null)
+        );
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage()
+        );
+
+        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        reader.read(
+                DEMO_TEXTURE_STREAM,
+                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+        );
+    }
+
     /**
      * Mock implementation of {@link MockPlugin} for easy creation in tests.
      * @author soir20
