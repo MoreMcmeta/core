@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.impl.client;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
@@ -113,7 +114,10 @@ public abstract class MoreMcmeta {
         );
 
         // Resource loaders
-        TextureDataReader reader = new TextureDataReader(plugins);
+        TextureDataReader<NativeImageAdapter> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new NativeImageAdapter(NativeImage.read(stream), 0)
+        );
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(reader, logger);
 
         // Listener registration and add resource pack

@@ -19,14 +19,13 @@ package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
-import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.resource.JsonMetadataView;
+import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 import net.minecraft.util.GsonHelper;
 import org.apache.commons.io.IOUtils;
 
@@ -46,18 +45,24 @@ import static java.util.Objects.requireNonNull;
 /**
  * Reads minimum texture data from byte streams. The {@link TextureDataAssembler} takes
  * this data and puts it together.
+ * @param <I> image type
  * @author soir20
  */
-public class TextureDataReader implements TextureReader<TextureData<NativeImageAdapter>> {
+public class TextureDataReader<I extends CloseableImage> implements TextureReader<TextureData<I>> {
     private final Map<String, MoreMcmetaClientPlugin> SECTION_TO_PLUGIN;
+    private final ImageReader<? extends I> IMAGE_READER;
 
     /**
      * Creates a new reader that is aware of the given plugins, if any.
      * @param plugins       plugins that the reader should use to parse texture data
+     * @param imageReader   reads the image from the {@link InputStream} of texture data
      */
-    public TextureDataReader(Iterable<MoreMcmetaClientPlugin> plugins) {
+    public TextureDataReader(Iterable<? extends MoreMcmetaClientPlugin> plugins, ImageReader<? extends I> imageReader) {
+        requireNonNull(plugins, "Plugins cannot be null");
         SECTION_TO_PLUGIN = new HashMap<>();
         plugins.forEach((plugin) -> SECTION_TO_PLUGIN.put(plugin.sectionName(), plugin));
+
+        IMAGE_READER = requireNonNull(imageReader, "Image reader cannot be null");
     }
 
     /**
@@ -69,12 +74,13 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
      * @throws InvalidMetadataException if the metadata is invalid
      */
     @Override
-    public TextureData<NativeImageAdapter> read(InputStream textureStream, InputStream metadataStream)
+    public TextureData<I> read(InputStream textureStream, InputStream metadataStream)
             throws IOException, InvalidMetadataException {
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
 
-        NativeImage image = NativeImage.read(textureStream);
+        I image = IMAGE_READER.read(textureStream);
+        requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
 
         MetadataView metadata = readMetadata(metadataStream);
         List<Pair<ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
@@ -104,7 +110,7 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
         }
 
         ParsedMetadata.FrameSize frameSize = frameSizeOptional.orElse(
-                new ParsedMetadata.FrameSize(image.getWidth(), image.getHeight())
+                new ParsedMetadata.FrameSize(image.width(), image.height())
         );
         boolean blur = blurOptional.orElse(false);
         boolean clamp = clampOptional.orElse(false);
@@ -113,7 +119,7 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
                 frameSize,
                 blur,
                 clamp,
-                new NativeImageAdapter(image, 0),
+                image,
                 parsedSections
         );
     }
@@ -169,7 +175,7 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
         MetadataView view2 = root.subView(section2).orElseThrow();
 
         final String PRIORITY_KEY = "priority";
-        int priorityDiff = view1.integerValue(PRIORITY_KEY).orElse(0) - view2.integerValue(PRIORITY_KEY).orElse(0);
+        int priorityDiff = view2.integerValue(PRIORITY_KEY).orElse(0) - view1.integerValue(PRIORITY_KEY).orElse(0);
 
         if (priorityDiff != 0) {
             return priorityDiff;
