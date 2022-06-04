@@ -122,14 +122,6 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
             ));
         }
 
-        // Check for negative frame size
-        if (frameSize.width() < 0 || frameSize.height() < 0) {
-            throw new InvalidMetadataException(String.format(
-                    "%sx%s has negative dimension",
-                    frameSize.width(), frameSize.height()
-            ));
-        }
-
         boolean blur = blurOptional.orElse(false);
         boolean clamp = clampOptional.orElse(false);
 
