@@ -352,7 +352,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream, blur, clamp) -> new MockCloseableImage()
+                (stream, blur, clamp) -> { assertTrue(blur); return new MockCloseableImage(); }
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -384,7 +384,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream, blur, clamp) -> new MockCloseableImage()
+                (stream, blur, clamp) -> { assertFalse(blur); return new MockCloseableImage(); }
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -416,7 +416,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream, blur, clamp) -> new MockCloseableImage()
+                (stream, blur, clamp) -> { assertTrue(clamp); return new MockCloseableImage(); }
         );
 
         TextureData<MockCloseableImage> data = reader.read(
@@ -448,7 +448,7 @@ public class TextureDataReaderTest {
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 plugins,
-                (stream, blur, clamp) -> new MockCloseableImage()
+                (stream, blur, clamp) -> { assertFalse(clamp); return new MockCloseableImage(); }
         );
 
         TextureData<MockCloseableImage> data = reader.read(
