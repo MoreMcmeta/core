@@ -31,6 +31,8 @@ public class MockCloseableImage implements CloseableImage {
     private final int[][] PIXELS;
     private final int WIDTH;
     private final int HEIGHT;
+    private final int X_OFFSET;
+    private final int Y_OFFSET;
     private Point uploadPoint;
     private final AtomicBoolean CLOSED;
 
@@ -42,17 +44,28 @@ public class MockCloseableImage implements CloseableImage {
         PIXELS = new int[width][height];
         WIDTH = width;
         HEIGHT = height;
+        X_OFFSET = 0;
+        Y_OFFSET = 0;
         CLOSED = new AtomicBoolean();
     }
 
     public MockCloseableImage(int[][] pixels) {
-        this(pixels, new AtomicBoolean());
+        this(pixels, 0, 0, pixels.length, pixels[0].length, new AtomicBoolean());
     }
 
-    private MockCloseableImage(int[][] pixels, AtomicBoolean closedStatus) {
+    private MockCloseableImage(int[][] pixels, int xOffset, int yOffset, int width, int height,
+                               AtomicBoolean closedStatus) {
+        int maxX = xOffset + width;
+        int maxY = yOffset + height;
+        if (maxX < 0 || maxX > pixels.length || maxY < 0 || maxY > pixels[0].length) {
+            throw new MockSubImageOutsideOriginalException();
+        }
+
         PIXELS = pixels;
-        WIDTH = pixels.length;
-        HEIGHT = pixels[0].length;
+        WIDTH = width;
+        HEIGHT = height;
+        X_OFFSET = xOffset;
+        Y_OFFSET = yOffset;
         CLOSED = closedStatus;
     }
 
@@ -61,6 +74,9 @@ public class MockCloseableImage implements CloseableImage {
         if (CLOSED.get()) {
             throw new IllegalStateException("Mock image closed");
         }
+
+        x += X_OFFSET;
+        y += Y_OFFSET;
 
         if (x >= width() || x < 0 || y >= height() || y < 0) {
             throw new MockPixelOutOfBoundsException(x, y);
@@ -74,6 +90,9 @@ public class MockCloseableImage implements CloseableImage {
         if (CLOSED.get()) {
             throw new IllegalStateException("Mock image closed");
         }
+
+        x += X_OFFSET;
+        y += Y_OFFSET;
 
         if (x >= width() || x < 0 || y >= height() || y < 0) {
             throw new MockPixelOutOfBoundsException(x, y);
@@ -111,12 +130,7 @@ public class MockCloseableImage implements CloseableImage {
 
     @Override
     public CloseableImage subImage(int topLeftX, int topLeftY, int width, int height) {
-        int[][] subImagePixels = new int[width][height];
-        for (int x = 0; x < width; x++) {
-            System.arraycopy(PIXELS[x + topLeftX], topLeftY, subImagePixels[x], 0, height);
-        }
-
-        return new MockCloseableImage(subImagePixels);
+        return new MockCloseableImage(PIXELS, topLeftX, topLeftY, width, height, CLOSED);
     }
 
     @Override
@@ -132,6 +146,22 @@ public class MockCloseableImage implements CloseableImage {
         return uploadPoint;
     }
 
+    public boolean hasSamePixels(MockCloseableImage other) {
+        if (width() != other.width() || height() != other.height()) {
+            return false;
+        }
+
+        for (int x = 0; x < width(); x++) {
+            for (int y = 0; y < height(); y++) {
+                if (color(x, y) != other.color(x, y)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Mock exception thrown when a pixel out of bounds is accessed.
      * @author soir20
@@ -140,6 +170,18 @@ public class MockCloseableImage implements CloseableImage {
 
         public MockPixelOutOfBoundsException(int x, int y) {
             super("Point out of bounds: (" + x + ", " + y + ")");
+        }
+
+    }
+
+    /**
+     * Mock exception thrown when a sub-image that extends beyond the original is created.
+     * @author soir20
+     */
+    public static class MockSubImageOutsideOriginalException extends RuntimeException {
+
+        public MockSubImageOutsideOriginalException() {
+            super("Sub-image extends beyond original");
         }
 
     }
