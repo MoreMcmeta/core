@@ -27,6 +27,13 @@ import java.util.Optional;
  *
  * No underlying file format or file location for this metadata is guaranteed. Arrays in the underlying
  * format are treated as views with the keys "0", "1", etc. for each item in the array.
+ *
+ * All index-based methods throw {@link NegativeKeyIndexException} if the provided index is negative. It
+ * is always an error to access a key with a negative index. In contrast, these methods return
+ * {@link Optional#empty()} if a positive index out of bounds is provided, as a positive index would be
+ * valid under some circumstances, even though a key at that index does not exist for this particular view.
+ * Similarly, the string-based methods return {@link Optional#empty()} for keys that could exist but
+ * don't in this particular view.
  * @author soir20
  * @since 4.0.0
  */
