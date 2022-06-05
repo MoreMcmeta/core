@@ -443,7 +443,7 @@ public class JsonMetadataView implements MetadataView {
                     return convertToSubView(obj.get(key));
                 }, (array) -> {
                     int keyAsIndex = strAsIndex(key);
-                    if (keyAsIndex < 0 || keyAsIndex >= SIZE) {
+                    if (!hasKey(keyAsIndex)) {
                         return Optional.empty();
                     }
 
