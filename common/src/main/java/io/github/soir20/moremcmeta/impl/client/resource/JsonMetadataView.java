@@ -107,10 +107,15 @@ public class JsonMetadataView implements MetadataView {
      * bounds.
      * @param index       the index of the key to check for
      * @return true if the view has a data value or sub-view for this key or false otherwise
+     * @throws NegativeKeyIndexException if the provided index is negative
      */
     @Override
     public boolean hasKey(int index) {
-        return index >= 0 && index < SIZE;
+        if (index < 0) {
+            throw new NegativeKeyIndexException(index);
+        }
+
+        return index < SIZE;
     }
 
     /**
@@ -146,7 +151,7 @@ public class JsonMetadataView implements MetadataView {
      * @return An {@link Optional} containing the string value or {@link Optional#empty()} if there is
      *         string value associated with the key. The string inside the {@link Optional} will never
      *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
+     * @throws NegativeKeyIndexException if the provided index is negative
      */
     @Override
     public Optional<String> stringValue(int index) {
@@ -183,7 +188,7 @@ public class JsonMetadataView implements MetadataView {
      * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
      *         integer value associated with the key. The integer inside the {@link Optional} will never
      *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
+     * @throws NegativeKeyIndexException if the provided index is negative
      */
     @Override
     public Optional<Integer> integerValue(int index) {
@@ -220,7 +225,7 @@ public class JsonMetadataView implements MetadataView {
      * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
      *         long value associated with the key. The long inside the {@link Optional} will never
      *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
+     * @throws NegativeKeyIndexException if the provided index is negative
      */
     @Override
     public Optional<Long> longValue(int index) {
@@ -257,7 +262,7 @@ public class JsonMetadataView implements MetadataView {
      * @return An {@link Optional} containing the float value or {@link Optional#empty()} if there is
      *         float value associated with the key. The float inside the {@link Optional} will never
      *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
+     * @throws NegativeKeyIndexException if the provided index is negative
      */
     @Override
     public Optional<Float> floatValue(int index) {
@@ -294,7 +299,7 @@ public class JsonMetadataView implements MetadataView {
      * @return An {@link Optional} containing the double value or {@link Optional#empty()} if there is
      *         double value associated with the key. The double inside the {@link Optional} will never
      *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
+     * @throws NegativeKeyIndexException if the provided index is negative
      */
     @Override
     public Optional<Double> doubleValue(int index) {
@@ -337,7 +342,7 @@ public class JsonMetadataView implements MetadataView {
      * @return An {@link Optional} containing the boolean value or {@link Optional#empty()} if there is
      *         boolean value associated with the key. The boolean inside the {@link Optional} will never
      *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
+     * @throws NegativeKeyIndexException if the provided index is negative
      */
     @Override
     public Optional<Boolean> booleanValue(int index) {
@@ -368,7 +373,9 @@ public class JsonMetadataView implements MetadataView {
                     return convertToSubView(obj.get(key));
                 }, (array) -> {
                     int keyAsIndex = strAsIndex(key);
-                    if (!hasKey(keyAsIndex)) {
+
+                    // Do not use hasKey(index) here as a negative index should not raise an exception
+                    if (keyAsIndex < 0 || keyAsIndex >= SIZE) {
                         return Optional.empty();
                     }
 
@@ -386,12 +393,12 @@ public class JsonMetadataView implements MetadataView {
      * @return An {@link Optional} containing the sub-view or {@link Optional#empty()} if there is
      *         sub-view associated with the key. The sub-view inside the {@link Optional} will never
      *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
+     * @throws NegativeKeyIndexException if the provided index is negative
      */
     @Override
     public Optional<MetadataView> subView(int index) {
         if (!hasKey(index)) {
-            throw new KeyIndexOutOfBoundsException(index);
+            return Optional.empty();
         }
 
         return ROOT.get(
@@ -449,7 +456,7 @@ public class JsonMetadataView implements MetadataView {
     private <T> Optional<T> primitiveFromIndex(int index, Function<JsonPrimitive, Boolean> checkFunction,
                                                Function<JsonPrimitive, T> convertFunction) {
         if (!hasKey(index)) {
-            throw new KeyIndexOutOfBoundsException(index);
+            return Optional.empty();
         }
 
         return ROOT.get(
