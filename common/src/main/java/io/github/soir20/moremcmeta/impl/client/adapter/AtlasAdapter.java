@@ -67,6 +67,8 @@ public class AtlasAdapter implements Atlas {
      */
     @Override
     public Optional<Sprite> sprite(ResourceLocation location) {
+        requireNonNull(location, "Sprite location cannot be null");
+
         if (ATLAS == null) {
             return Optional.empty();
         }
