@@ -25,7 +25,6 @@ import com.google.gson.JsonPrimitive;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -195,43 +194,6 @@ public class JsonMetadataView implements MetadataView {
     }
 
     /**
-     * Retrieves the value of an unsigned 32-bit integer for the given key if any exists. If there is no such key or
-     * the key's associated value is not a valid unsigned 32-bit integer, this method returns {@link Optional#empty()}.
-     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
-     * not an integer.
-     * @param key       the key whose unsigned 32-bit integer value to retrieve
-     * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
-     *         integer value associated with the key. The integer inside the {@link Optional} will never
-     *         be null.
-     */
-    @Override
-    public Optional<Integer> unsignedIntegerValue(String key) {
-        return primitiveFromKey(key,
-                (primitive) -> primitive.isNumber() && isUnsignedInteger(primitive.getAsBigDecimal()),
-                JsonPrimitive::getAsInt
-        );
-    }
-
-    /**
-     * Retrieves the value of an unsigned 32-bit integer for the key at the given index if any exists. If there is
-     * no such key or the key's associated value is not a valid unsigned 32-bit integer, this method returns
-     * {@link Optional#empty()}. {@link #hasKey(int)} can be used to determine whether the key is present
-     * or the value is not an integer.
-     * @param index       the index of the key whose boolean value to retrieve
-     * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
-     *         integer value associated with the key. The integer inside the {@link Optional} will never
-     *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
-     */
-    @Override
-    public Optional<Integer> unsignedIntegerValue(int index) {
-        return primitiveFromIndex(index,
-                (primitive) -> primitive.isNumber() && isUnsignedInteger(primitive.getAsBigDecimal()),
-                JsonPrimitive::getAsInt
-        );
-    }
-
-    /**
      * Retrieves the value of a signed 64-bit long for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid signed 64-bit long, this method returns {@link Optional#empty()}.
      * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
@@ -264,43 +226,6 @@ public class JsonMetadataView implements MetadataView {
     public Optional<Long> longValue(int index) {
         return primitiveFromIndex(index,
                 (primitive) -> primitive.isNumber() && isSignedLong(primitive.getAsBigDecimal()),
-                JsonPrimitive::getAsLong
-        );
-    }
-
-    /**
-     * Retrieves the value of an unsigned 64-bit long for the given key if any exists. If there is no such key or
-     * the key's associated value is not a valid unsigned 64-bit long, this method returns {@link Optional#empty()}.
-     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
-     * not a long.
-     * @param key       the key whose unsigned 64-bit long value to retrieve
-     * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
-     *         long value associated with the key. The long inside the {@link Optional} will never
-     *         be null.
-     */
-    @Override
-    public Optional<Long> unsignedLongValue(String key) {
-        return primitiveFromKey(key,
-                (primitive) -> primitive.isNumber() && isUnsignedLong(primitive.getAsBigDecimal()),
-                JsonPrimitive::getAsLong
-        );
-    }
-
-    /**
-     * Retrieves the value of an unsigned 64-bit long for the key at the given index if any exists. If there is
-     * no such key or the key's associated value is not a valid unsigned 64-bit long, this method returns
-     * {@link Optional#empty()}. {@link #hasKey(int)} can be used to determine whether the key is present
-     * or the value is not a long.
-     * @param index       the index of the key whose boolean value to retrieve
-     * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
-     *         long value associated with the key. The long inside the {@link Optional} will never
-     *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
-     */
-    @Override
-    public Optional<Long> unsignedLongValue(int index) {
-        return primitiveFromIndex(index,
-                (primitive) -> primitive.isNumber() && isUnsignedLong(primitive.getAsBigDecimal()),
                 JsonPrimitive::getAsLong
         );
     }
@@ -577,16 +502,6 @@ public class JsonMetadataView implements MetadataView {
     }
 
     /**
-     * Checks if a number is an unsigned 32-bit integer.
-     * @param num       number to check
-     * @return true if the number is an unsigned 32-bit integer, false otherwise
-     */
-    private boolean isUnsignedInteger(BigDecimal num) {
-        return num.stripTrailingZeros().scale() <= 0
-                && isBetweenInclusive(num, BigDecimal.ZERO, BigDecimal.valueOf((1L << 32) - 1));
-    }
-
-    /**
      * Checks if a number is a signed 64-bit long.
      * @param num       number to check
      * @return true if the number is a signed 64-bit long, false otherwise
@@ -594,17 +509,6 @@ public class JsonMetadataView implements MetadataView {
     private boolean isSignedLong(BigDecimal num) {
         return num.stripTrailingZeros().scale() <= 0
                 && isBetweenInclusive(num, BigDecimal.valueOf(Long.MIN_VALUE), BigDecimal.valueOf(Long.MAX_VALUE));
-    }
-
-    /**
-     * Checks if a number is an unsigned 64-bit long.
-     * @param num       number to check
-     * @return true if the number is an unsigned 64-bit long, false otherwise
-     */
-    private boolean isUnsignedLong(BigDecimal num) {
-        return num.stripTrailingZeros().scale() <= 0
-                && isBetweenInclusive(num.toBigInteger(), BigInteger.ZERO,
-                BigInteger.ONE.shiftRight(64).subtract(BigInteger.ONE));
     }
 
     /**

@@ -117,32 +117,6 @@ public interface MetadataView {
      */
     Optional<Integer> integerValue(int index);
 
-
-    /**
-     * Retrieves the value of an unsigned 32-bit integer for the given key if any exists. If there is no such key or
-     * the key's associated value is not a valid unsigned 32-bit integer, this method returns {@link Optional#empty()}.
-     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
-     * not an integer.
-     * @param key       the key whose unsigned 32-bit integer value to retrieve
-     * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
-     *         integer value associated with the key. The integer inside the {@link Optional} will never
-     *         be null.
-     */
-    Optional<Integer> unsignedIntegerValue(String key);
-
-    /**
-     * Retrieves the value of an unsigned 32-bit integer for the key at the given index if any exists. If there is
-     * no such key or the key's associated value is not a valid unsigned 32-bit integer, this method returns
-     * {@link Optional#empty()}. {@link #hasKey(int)} can be used to determine whether the key is present
-     * or the value is not an integer.
-     * @param index       the index of the key whose boolean value to retrieve
-     * @return An {@link Optional} containing the integer value or {@link Optional#empty()} if there is
-     *         integer value associated with the key. The integer inside the {@link Optional} will never
-     *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
-     */
-    Optional<Integer> unsignedIntegerValue(int index);
-
     /**
      * Retrieves the value of a signed 64-bit long for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid signed 64-bit long, this method returns {@link Optional#empty()}.
@@ -167,31 +141,6 @@ public interface MetadataView {
      * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
      */
     Optional<Long> longValue(int index);
-
-    /**
-     * Retrieves the value of an unsigned 64-bit long for the given key if any exists. If there is no such key or
-     * the key's associated value is not a valid unsigned 64-bit long, this method returns {@link Optional#empty()}.
-     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
-     * not a long.
-     * @param key       the key whose unsigned 64-bit long value to retrieve
-     * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
-     *         long value associated with the key. The long inside the {@link Optional} will never
-     *         be null.
-     */
-    Optional<Long> unsignedLongValue(String key);
-
-    /**
-     * Retrieves the value of an unsigned 64-bit long for the key at the given index if any exists. If there is
-     * no such key or the key's associated value is not a valid unsigned 64-bit long, this method returns
-     * {@link Optional#empty()}. {@link #hasKey(int)} can be used to determine whether the key is present
-     * or the value is not a long.
-     * @param index       the index of the key whose boolean value to retrieve
-     * @return An {@link Optional} containing the long value or {@link Optional#empty()} if there is
-     *         long value associated with the key. The long inside the {@link Optional} will never
-     *         be null.
-     * @throws KeyIndexOutOfBoundsException if the provided index is out of bounds
-     */
-    Optional<Long> unsignedLongValue(int index);
 
     /**
      * Retrieves the value of a float for the given key if any exists. If there is no such key or
