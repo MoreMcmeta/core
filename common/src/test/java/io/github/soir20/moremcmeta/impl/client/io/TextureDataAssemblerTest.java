@@ -1002,7 +1002,7 @@ public class TextureDataAssemblerTest {
     }
 
     @Test
-    public void assemble_TransfomrAfterInvalid_IllegalFrameReferenceException() {
+    public void assemble_TransformAfterInvalid_IllegalFrameReferenceException() {
         MockCloseableImage originalImage = new MockCloseableImage(100, 100);
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
