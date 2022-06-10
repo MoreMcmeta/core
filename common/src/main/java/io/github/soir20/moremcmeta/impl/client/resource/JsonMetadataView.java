@@ -60,8 +60,16 @@ public class JsonMetadataView implements MetadataView {
      */
     public JsonMetadataView(JsonArray root) {
         ROOT = new Root(requireNonNull(root, "Array cannot be null"));
-        KEYS = IntStream.range(0, root.size()).mapToObj(String::valueOf).toList();
+
+        // Remove all null elements
+        for (int index = root.size() - 1; index >= 0; index--) {
+            if (root.get(index).isJsonNull()) {
+                root.remove(index);
+            }
+        }
+
         SIZE = root.size();
+        KEYS = IntStream.range(0, SIZE).mapToObj(String::valueOf).toList();
     }
 
     /**
@@ -97,7 +105,7 @@ public class JsonMetadataView implements MetadataView {
 
         int keyAsIndex = strAsIndex(key);
         return ROOT.get(
-                (obj) -> obj.has(key),
+                (obj) -> obj.has(key) && !obj.get(key).isJsonNull(),
                 (array) -> keyAsIndex >= 0 && keyAsIndex < SIZE
         );
     }
