@@ -217,7 +217,7 @@ public class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.getResources(PackType.CLIENT_RESOURCES, "minecraft",
-                "textures", (file) -> file.endsWith(".png"));
+                "textures", (file) -> file.getPath().endsWith(".png"));
 
         assertEquals(2, resources.size());
         assertTrue(resources.contains(new ResourceLocation("textures/hello.png")));
@@ -229,7 +229,7 @@ public class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.getResources(PackType.SERVER_DATA, "sea",
-                "textures", (file) -> file.endsWith(".png"));
+                "textures", (file) -> file.getPath().endsWith(".png"));
 
         assertEquals(1, resources.size());
         assertTrue(resources.contains(new ResourceLocation("sea", "textures/block/coral.png")));
@@ -240,7 +240,7 @@ public class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.getResources(PackType.CLIENT_RESOURCES, "other",
-                "textures", (file) -> file.endsWith(".png"));
+                "textures", (file) -> file.getPath().endsWith(".png"));
 
         assertEquals(0, resources.size());
     }
@@ -250,7 +250,7 @@ public class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.getResources(PackType.CLIENT_RESOURCES, "minecraft",
-                "other", (file) -> file.endsWith(".png"));
+                "other", (file) -> file.getPath().endsWith(".png"));
 
         assertEquals(0, resources.size());
     }
@@ -260,7 +260,7 @@ public class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.getResources(PackType.CLIENT_RESOURCES, "",
-                "textures", (file) -> file.endsWith(".png"));
+                "textures", (file) -> file.getPath().endsWith(".png"));
 
         assertEquals(0, resources.size());
     }
@@ -270,7 +270,7 @@ public class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.getResources(PackType.CLIENT_RESOURCES, "minecraft",
-                "", (file) -> file.endsWith(".png"));
+                "", (file) -> file.getPath().endsWith(".png"));
 
         assertEquals(2, resources.size());
         assertTrue(resources.contains(new ResourceLocation("textures/hello.png")));
@@ -282,7 +282,7 @@ public class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.getResources(PackType.CLIENT_RESOURCES, "minecraft",
-                "textures", (file) -> file.endsWith(".jpg"));
+                "textures", (file) -> file.getPath().endsWith(".jpg"));
 
         assertEquals(0, resources.size());
     }
@@ -294,7 +294,7 @@ public class PackResourcesAdapterTest {
 
         expectedException.expect(RuntimeException.class);
         adapter.getResources(PackType.CLIENT_RESOURCES, "minecraft",
-                "textures", (file) -> file.endsWith(".png"));
+                "textures", (file) -> file.getPath().endsWith(".png"));
     }
 
     @Test
@@ -353,7 +353,7 @@ public class PackResourcesAdapterTest {
 
         @Override
         public Collection<ResourceLocation> getResources(PackType packType, String namespace, String pathStart,
-                                                         int maxDepth, Predicate<String> fileFilter) {
+                                                         Predicate<ResourceLocation> fileFilter) {
             throw new RuntimeException("dummy getResources exception");
         }
 

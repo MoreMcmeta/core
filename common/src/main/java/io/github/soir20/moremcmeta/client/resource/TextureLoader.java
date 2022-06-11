@@ -77,7 +77,7 @@ public class TextureLoader<R> {
         try {
              textureCandidates = resourceRepository.listResources(
                     path,
-                    fileName -> fileName.endsWith(METADATA_EXTENSION)
+                    fileName -> fileName.getPath().endsWith(METADATA_EXTENSION)
              );
 
         } catch (ResourceLocationException error) {

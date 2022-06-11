@@ -103,7 +103,7 @@ public class OrderedResourceRepository {
      * @param fileFilter    filter for the file name
      * @return all matching resource locations
      */
-    public Set<ResourceLocation> listResources(String pathStart, Predicate<String> fileFilter) {
+    public Set<ResourceLocation> listResources(String pathStart, Predicate<ResourceLocation> fileFilter) {
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(fileFilter, "Path filter cannot be null");
 

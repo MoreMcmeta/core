@@ -282,7 +282,7 @@ public class TextureLoaderTest {
                 )))
         ) {
             @Override
-            public Set<ResourceLocation> listResources(String pathIn, Predicate<String> fileFilter) {
+            public Set<ResourceLocation> listResources(String pathIn, Predicate<ResourceLocation> fileFilter) {
                 throw new RuntimeException();
             }
         };
@@ -480,7 +480,7 @@ public class TextureLoaderTest {
                 )))
         ) {
             @Override
-            public Set<ResourceLocation> listResources(String pathIn, Predicate<String> fileFilter) {
+            public Set<ResourceLocation> listResources(String pathIn, Predicate<ResourceLocation> fileFilter) {
                 throw new ResourceLocationException("Dummy exception");
             }
         };

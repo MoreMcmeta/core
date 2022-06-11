@@ -71,7 +71,7 @@ public class TextureDataAssembler {
         requireNonNull(data, "Data cannot be null");
 
         Minecraft minecraft = Minecraft.getInstance();
-        final int MAX_MIPMAP = minecraft.options.mipmapLevels;
+        final int MAX_MIPMAP = minecraft.options.mipmapLevels().get();
 
         NativeImage original = data.getImage().getImage();
 

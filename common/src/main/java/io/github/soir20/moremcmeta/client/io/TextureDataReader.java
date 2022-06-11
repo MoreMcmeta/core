@@ -24,8 +24,7 @@ import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.resource.ModAnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.SimpleResource;
+import net.minecraft.server.packs.resources.ResourceMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,25 +57,16 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
 
         NativeImage image = NativeImage.read(textureStream);
 
-        /* The SimpleResource class would normally handle metadata parsing when we originally
-           got the resource. However, the ResourceManager only looks for .mcmeta metadata, and its
-           nested structure and an unordered (stream) accessor for resource packs cannot be
-           easily overridden. However, we can create a dummy resource to parse the metadata. */
-        SimpleResource metadataParser = new SimpleResource("dummy", new ResourceLocation(""),
-                textureStream, metadataStream);
+        ResourceMetadata metadata = ResourceMetadata.fromJsonStream(metadataStream);
 
         // TODO: add registration for metadata instead of hardcoding them
 
         AnimationMetadataSection animationMetadata =
-                metadataParser.getMetadata(AnimationMetadataSection.SERIALIZER);
+                metadata.getSection(AnimationMetadataSection.SERIALIZER).orElse(AnimationMetadataSection.EMPTY);
         ModAnimationMetadataSection modAnimationMetadata =
-                metadataParser.getMetadata(ModAnimationMetadataSection.SERIALIZER);
+                metadata.getSection(ModAnimationMetadataSection.SERIALIZER).orElse(null);
         TextureMetadataSection textureMetadata =
-                metadataParser.getMetadata(TextureMetadataSection.SERIALIZER);
-
-        if (animationMetadata == null) {
-            animationMetadata = AnimationMetadataSection.EMPTY;
-        }
+                metadata.getSection(TextureMetadataSection.SERIALIZER).orElse(null);
 
         Pair<Integer, Integer> frameSize = animationMetadata.getFrameSize(image.getWidth(), image.getHeight());
 

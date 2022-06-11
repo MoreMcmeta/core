@@ -78,7 +78,7 @@ public class MockPackResources implements PackResources {
 
     @Override
     public Collection<ResourceLocation> getResources(PackType packType, String namespace, String pathStart,
-                                                     int maxDepth, Predicate<String> pathFilter) {
+                                                     Predicate<ResourceLocation> pathFilter) {
 
         String directoryStart = pathStart.length() > 0 ? pathStart + "/" : "";
 
@@ -86,11 +86,8 @@ public class MockPackResources implements PackResources {
         return REGULAR_RESOURCES.getOrDefault(packType, new HashSet<>()).stream().filter((location) -> {
             String path = location.getPath();
             boolean isRightNamespace = location.getNamespace().equals(namespace);
-            boolean isRightPath = path.startsWith(directoryStart) && pathFilter.test(path);
-            boolean isRightDepth = isRightPath &&
-                    StringUtils.countMatches(path.substring(directoryStart.length()), '/') <= maxDepth - 1;
-
-            return isRightNamespace && isRightDepth;
+            boolean isRightPath = path.startsWith(directoryStart) && pathFilter.test(location);
+            return isRightNamespace && isRightPath;
         }).collect(Collectors.toList());
 
     }

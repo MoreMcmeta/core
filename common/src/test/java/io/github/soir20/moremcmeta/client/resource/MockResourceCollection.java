@@ -70,13 +70,13 @@ public class MockResourceCollection implements ResourceCollection {
 
     @Override
     public Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
-                                                     Predicate<String> fileFilter) {
+                                                     Predicate<ResourceLocation> fileFilter) {
         Collection<ResourceLocation> locationsOfType = resourceType == PackType.CLIENT_RESOURCES ?
                 CLIENT_RESOURCES : SERVER_RESOURCES;
         return locationsOfType.stream()
                 .filter((location) -> location.getNamespace().equals(namespace))
                 .filter((location) -> location.getPath().startsWith(pathStart))
-                .filter((location) -> fileFilter.test(location.getPath()))
+                .filter(fileFilter)
                 .collect(Collectors.toSet());
     }
 

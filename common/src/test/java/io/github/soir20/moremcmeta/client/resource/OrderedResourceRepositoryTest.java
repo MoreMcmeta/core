@@ -365,7 +365,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.endsWith(".png"));
+        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.getPath().endsWith(".png"));
         assertEquals(2, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/one.png")));
         assertTrue(results.contains(new ResourceLocation("textures/three.png")));
@@ -380,7 +380,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.endsWith(".jpg"));
+        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.getPath().endsWith(".jpg"));
         assertEquals(0, results.size());
     }
 
@@ -393,7 +393,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.endsWith(".png"));
+        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.getPath().endsWith(".png"));
         assertEquals(1, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/one.png")));
     }
@@ -407,7 +407,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.endsWith(".png"));
+        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.getPath().endsWith(".png"));
         assertEquals(1, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/three.png")));
     }

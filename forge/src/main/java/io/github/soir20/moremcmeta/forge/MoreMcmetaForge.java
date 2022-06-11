@@ -113,9 +113,9 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     protected TexturePreparer getPreparer() {
         return (glId, mipmap, width, height) -> {
             if (!RenderSystem.isOnRenderThreadOrInit()) {
-                RenderSystem.recordRenderCall(() -> TextureUtil.m_85287_(glId, mipmap, width, height));
+                RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(glId, mipmap, width, height));
             } else {
-                TextureUtil.m_85287_(glId, mipmap, width, height);
+                TextureUtil.prepareImage(glId, mipmap, width, height);
             }
         };
     }

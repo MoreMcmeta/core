@@ -17,8 +17,6 @@
 
 package io.github.soir20.moremcmeta.client.adapter;
 
-import com.google.common.collect.ImmutableList;
-import io.github.soir20.moremcmeta.client.resource.MockResourceManager;
 import io.github.soir20.moremcmeta.client.texture.MockAnimatedTexture;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -36,8 +34,7 @@ import static org.junit.Assert.*;
  * @author soir20
  */
 public class TextureManagerAdapterTest {
-    private static final ResourceManager MOCK_RESOURCE_MANAGER =
-            new MockResourceManager(ImmutableList.of(), ImmutableList.of(), false);
+    private static final ResourceManager MOCK_RESOURCE_MANAGER = ResourceManager.Empty.INSTANCE;
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

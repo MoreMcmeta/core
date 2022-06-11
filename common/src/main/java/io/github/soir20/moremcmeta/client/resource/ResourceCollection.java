@@ -58,7 +58,7 @@ public interface ResourceCollection {
      * @return all the matching resource locations
      */
     Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
-                                              Predicate<String> fileFilter);
+                                              Predicate<ResourceLocation> fileFilter);
 
     /**
      * Gets the namespaces of all resources in this collection.

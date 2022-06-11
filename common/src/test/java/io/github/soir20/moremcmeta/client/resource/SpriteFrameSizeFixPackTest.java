@@ -325,7 +325,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         assertEquals(0, pack.getResources(PackType.SERVER_DATA, "minecraft", "textures",
-                20, (fileName) -> true).size());
+                (fileName) -> true).size());
     }
 
     @Test
@@ -337,7 +337,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         expectedException.expect(NullPointerException.class);
-        pack.getResources(null, "minecraft", "textures", 20, (fileName) -> true);
+        pack.getResources(null, "minecraft", "textures", (fileName) -> true);
     }
 
     @Test
@@ -349,7 +349,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         expectedException.expect(NullPointerException.class);
-        pack.getResources(PackType.CLIENT_RESOURCES, null, "textures", 20, (fileName) -> true);
+        pack.getResources(PackType.CLIENT_RESOURCES, null, "textures", (fileName) -> true);
     }
 
     @Test
@@ -361,7 +361,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         expectedException.expect(NullPointerException.class);
-        pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", null, 20, (fileName) -> true);
+        pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", null, (fileName) -> true);
     }
 
     @Test
@@ -373,129 +373,11 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         expectedException.expect(NullPointerException.class);
-        pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures", 20, null);
+        pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures", null);
     }
 
     @Test
-    public void getResources_DepthNegative_IllegalArgException() {
-        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
-
-        expectedException.expect(IllegalArgumentException.class);
-        pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures", -1, (path) -> true);
-    }
-
-    @Test
-    public void getResources_DepthZeroNoneMatch_NoneFound() {
-        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/folder/one.png"), new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-        textures1.put(new ResourceLocation("textures/folder/five.png"), new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
-
-        assertEquals(0, pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                0, (path) -> true).size());
-    }
-
-    @Test
-    public void getResources_DepthZeroDirectlyWithinFolder_NoneFound() {
-        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
-
-        Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                0, (path) -> true);
-        assertEquals(0, results.size());
-    }
-
-    @Test
-    public void getResources_DepthPositiveNoneMatch_NoneFound() {
-        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/folder2/folder3/folder4/one.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-        textures1.put(new ResourceLocation("textures/folder/folder2/five.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
-
-        Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                2, (path) -> true);
-        assertEquals(0, results.size());
-    }
-
-    @Test
-    public void getResources_DepthPositiveTreeSameDepth_MatchingFound() {
-        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/folder2/folder3/folder4/folder5/one.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-        textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
-
-        Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                4, (path) -> true);
-        assertEquals(1, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/folder/folder2/folder3/five.png")));
-    }
-
-    @Test
-    public void getResources_DepthPositiveTreeSmallerDepth_MatchingFound() {
-        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/folder2/folder3/folder4/folder5/one.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-        textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
-
-        Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                6, (path) -> true);
-        assertEquals(2, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/folder2/folder3/folder4/folder5/one.png")));
-        assertTrue(results.contains(new ResourceLocation("textures/folder/folder2/folder3/five.png")));
-    }
-
-    @Test
-    public void getResources_DepthMaxInt_MatchingFound() {
-        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/folder2/folder3/folder4/folder5/one.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-        textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
-
-        Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                Integer.MAX_VALUE, (path) -> true);
-        assertEquals(2, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/folder2/folder3/folder4/folder5/one.png")));
-        assertTrue(results.contains(new ResourceLocation("textures/folder/folder2/folder3/five.png")));
-    }
-
-    @Test
-    public void getResources_DepthMultiFolderPathStart_DepthFromPathStart() {
-        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/folder/folder3/folder4/folder5/one.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-        textures1.put(new ResourceLocation("textures/folder/folder2/five.png"),
-                new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
-
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
-
-        Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures/folder",
-                2, (path) -> true);
-        assertEquals(1, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/folder/folder2/five.png")));
-    }
-
-    @Test
-    public void getResources_NamespaceMismatch_DepthFromPathStart() {
+    public void getResources_NamespaceMismatch_NoMismatchedResources() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
                 new TextureData<>(1, 2, new MockRGBAImage(10, 10)));
@@ -505,7 +387,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "other", "textures",
-                2, (path) -> true);
+                (path) -> true);
         assertEquals(0, results.size());
     }
 
@@ -520,7 +402,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                2, (path) -> true);
+                (path) -> true);
         assertEquals(0, results.size());
     }
 
@@ -535,7 +417,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "other",
-                2, (path) -> true);
+                (path) -> true);
         assertEquals(0, results.size());
     }
 
@@ -550,7 +432,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "",
-                2, (path) -> true);
+                (path) -> true);
         assertEquals(2, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/one.png")));
         assertTrue(results.contains(new ResourceLocation("textures/five.png")));
@@ -567,7 +449,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "text",
-                2, (path) -> true);
+                (path) -> true);
         assertEquals(0, results.size());
     }
 
@@ -582,7 +464,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures/",
-                2, (path) -> true);
+                (path) -> true);
         assertEquals(0, results.size());
     }
 
@@ -597,7 +479,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                2, (path) -> false);
+                (path) -> false);
         assertEquals(0, results.size());
     }
 
@@ -612,7 +494,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                2, (path) -> path.endsWith("five.png"));
+                (path) -> path.getPath().endsWith("five.png"));
         assertEquals(1, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/folder/five.png")));
     }
@@ -624,7 +506,7 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                2, (path) -> true);
+                (path) -> true);
         assertEquals(0, results.size());
     }
 
@@ -645,8 +527,8 @@ public class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
-                2, (path) -> path.endsWith(".png"));
-        assertEquals(1, results.size());
+                (path) -> path.getPath().endsWith(".png"));
+        assertEquals(2, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/folder/two.png")));
     }
 

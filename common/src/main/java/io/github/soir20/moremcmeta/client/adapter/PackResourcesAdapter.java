@@ -82,12 +82,12 @@ public class PackResourcesAdapter implements ResourceCollection {
      */
     @Override
     public Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
-                                                     Predicate<String> fileFilter) {
+                                                     Predicate<ResourceLocation> fileFilter) {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(namespace, "Namespace cannot be null");
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(fileFilter, "File filter cannot be null");
-        return ORIGINAL.getResources(resourceType, namespace, pathStart, Integer.MAX_VALUE, fileFilter);
+        return ORIGINAL.getResources(resourceType, namespace, pathStart, fileFilter);
     }
 
 
