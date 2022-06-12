@@ -2358,13 +2358,13 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void doubleValueStringObject_PosDoubleVal_Empty() {
+    public void doubleValueStringObject_PosDoubleVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertEquals(Double.MAX_VALUE, view.doubleValue("pos double val0").orElseThrow(), 0.000001);
     }
 
     @Test
-    public void doubleValueStringObject_NegDoubleVal_Empty() {
+    public void doubleValueStringObject_NegDoubleVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertEquals(-Double.MAX_VALUE, view.doubleValue("neg double val0").orElseThrow(), 0.000001);
     }
@@ -2472,13 +2472,13 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void doubleValueStringArray_PosDoubleVal_Empty() {
+    public void doubleValueStringArray_PosDoubleVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoArray());
         assertEquals(Double.MAX_VALUE, view.doubleValue("9").orElseThrow(), 0.000001);
     }
 
     @Test
-    public void doubleValueStringArray_NegDoubleVal_Empty() {
+    public void doubleValueStringArray_NegDoubleVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoArray());
         assertEquals(-Double.MAX_VALUE, view.doubleValue("10").orElseThrow(), 0.000001);
     }
@@ -2562,13 +2562,13 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void doubleValueIndexObject_PosDoubleVal_Empty() {
+    public void doubleValueIndexObject_PosDoubleVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertEquals(Double.MAX_VALUE, view.doubleValue(8).orElseThrow(), 0.000001);
     }
 
     @Test
-    public void doubleValueIndexObject_NegDoubleVal_Empty() {
+    public void doubleValueIndexObject_NegDoubleVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertEquals(-Double.MAX_VALUE, view.doubleValue(2).orElseThrow(), 0.000001);
     }
@@ -2665,13 +2665,13 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void doubleValueIndexArray_PosDoubleVal_Empty() {
+    public void doubleValueIndexArray_PosDoubleVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoArray());
         assertEquals(Double.MAX_VALUE, view.doubleValue(9).orElseThrow(), 0.000001);
     }
 
     @Test
-    public void doubleValueIndexArray_NegDoubleVal_Empty() {
+    public void doubleValueIndexArray_NegDoubleVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoArray());
         assertEquals(-Double.MAX_VALUE, view.doubleValue(10).orElseThrow(), 0.000001);
     }
