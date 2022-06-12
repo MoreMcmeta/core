@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.impl.client.resource;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -416,6 +417,212 @@ public class JsonMetadataViewTest {
     public void hasKeyStringArray_ArrayVal_True() {
         JsonMetadataView view = new JsonMetadataView(makeDemoArray());
         assertTrue(view.hasKey("14"));
+    }
+
+    @Test
+    public void hasKeyIndexObject_NegativeIndex_NegativeKeyIndexException() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        assertFalse(view.hasKey(-1));
+    }
+
+    @Test
+    public void hasKeyIndexObject_StringVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(0));
+    }
+
+    @Test
+    public void hasKeyIndexObject_PosIntVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(1));
+    }
+
+    @Test
+    public void hasKeyIndexObject_NegIntVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(2));
+    }
+
+    @Test
+    public void hasKeyIndexObject_PosLongVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(3));
+    }
+
+    @Test
+    public void hasKeyIndexObject_NegLongVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(4));
+    }
+
+    @Test
+    public void hasKeyIndexObject_PosBeyond64BitsVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(5));
+    }
+
+    @Test
+    public void hasKeyIndexObject_NegBeyond64BitsVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(6));
+    }
+
+    @Test
+    public void hasKeyIndexObject_PosFloatVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(7));
+    }
+
+    @Test
+    public void hasKeyIndexObject_NegFloatVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(8));
+    }
+
+    @Test
+    public void hasKeyIndexObject_PosDoubleVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(9));
+    }
+
+    @Test
+    public void hasKeyIndexObject_NegDoubleVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(10));
+    }
+
+    @Test
+    public void hasKeyIndexObject_TrueVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(11));
+    }
+
+    @Test
+    public void hasKeyIndexObject_FalseVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(12));
+    }
+
+    @Test
+    public void hasKeyIndexObject_ObjectVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(13));
+    }
+
+    @Test
+    public void hasKeyIndexObject_ArrayVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.hasKey(14));
+    }
+
+    @Test
+    public void hasKeyIndexArray_PositiveIndexNotPresent_False() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.hasKey(view.size()));
+    }
+
+    @Test
+    public void hasKeyIndexArray_NegativeIndex_NegativeKeyIndexException() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        view.hasKey(-1);
+    }
+
+    @Test
+    public void hasKeyIndexArray_ValidIfNullNotFiltered_False() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.hasKey(15));
+    }
+
+    @Test
+    public void hasKeyIndexArray_StringVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(0));
+    }
+
+    @Test
+    public void hasKeyIndexArray_PosIntVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(1));
+    }
+
+    @Test
+    public void hasKeyIndexArray_NegIntVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(2));
+    }
+
+    @Test
+    public void hasKeyIndexArray_PosLongVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(3));
+    }
+
+    @Test
+    public void hasKeyIndexArray_NegLongVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(4));
+    }
+
+    @Test
+    public void hasKeyIndexArray_PosBeyond64BitsVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(5));
+    }
+
+    @Test
+    public void hasKeyIndexArray_NegBeyond64BitsVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(6));
+    }
+
+    @Test
+    public void hasKeyIndexArray_PosFloatVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(7));
+    }
+
+    @Test
+    public void hasKeyIndexArray_NegFloatVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(8));
+    }
+
+    @Test
+    public void hasKeyIndexArray_PosDoubleVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(9));
+    }
+
+    @Test
+    public void hasKeyIndexArray_NegDoubleVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(10));
+    }
+
+    @Test
+    public void hasKeyIndexArray_TrueVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(11));
+    }
+
+    @Test
+    public void hasKeyIndexArray_FalseVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(12));
+    }
+
+    @Test
+    public void hasKeyIndexArray_ObjectVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(13));
+    }
+
+    @Test
+    public void hasKeyIndexArray_ArrayVal_True() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.hasKey(14));
     }
 
     @Test
