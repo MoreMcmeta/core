@@ -2700,6 +2700,469 @@ public class JsonMetadataViewTest {
         assertFalse(view.doubleValue(14).isPresent());
     }
 
+    @Test
+    public void booleanValueStringObject_KeyNotPresent_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("not present").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringObject_KeyAtNextLevel_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("object val1").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringObject_NullVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("null val0").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringObject_StringVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("string val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_PosIntVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("pos int val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_NegIntVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("neg int val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_PosLongVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("pos long val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_NegLongVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("neg long val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_PosBeyond64BitsVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("pos int >64-bits val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_NegBeyond64BitsVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("neg int >64-bits val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_PosFloatVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("pos float val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_NegFloatVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("neg float val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_PosDoubleVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("pos double val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_NegDoubleVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("neg double val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_TrueVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.booleanValue("true val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_FalseVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("false val0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringObject_ObjectVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("object val0").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringObject_ArrayVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue("array val0").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringArray_KeyNegative_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("-1").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringArray_KeyNotPresent_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("not present").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringArray_KeyAtNextLevel_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("object val1").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringArray_ValidIfNullNotFiltered_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("15").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringArray_StringVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("0").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_PosIntVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("1").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_NegIntVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("2").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_PosLongVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("3").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_NegLongVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("4").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_PosBeyond64BitsVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("5").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_NegBeyond64BitsVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("6").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_PosFloatVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("7").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_NegFloatVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("8").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_PosDoubleVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("9").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_NegDoubleVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("10").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_TrueVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.booleanValue("11").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_FalseVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("12").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_ObjectVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("13").isPresent());
+    }
+
+    @Test
+    public void booleanValueStringArray_ArrayVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue("14").isPresent());
+    }
+
+    @Test
+    public void booleanValueIndexObject_StringVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(13).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_PosIntVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(11).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_NegIntVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(5).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_PosLongVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(12).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_NegLongVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(6).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_PosBeyond64BitsVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(10).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_NegBeyond64BitsVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(4).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_PosFloatVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(9).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_NegFloatVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(3).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_PosDoubleVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(8).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_NegDoubleVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(2).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_TrueVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertTrue(view.booleanValue(14).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_FalseVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(1).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_ObjectVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(7).isPresent());
+    }
+
+    @Test
+    public void booleanValueIndexObject_ArrayVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
+        assertFalse(view.booleanValue(0).isPresent());
+    }
+
+    @Test
+    public void booleanValueIndexArray_KeyNegative_NegativeKeyIndexException() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        view.booleanValue(-1);
+    }
+
+    @Test
+    public void booleanValueIndexArray_ValidIfNullNotFiltered_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(15).isPresent());
+    }
+
+    @Test
+    public void booleanValueIndexArray_StringVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(0).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_PosIntVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(1).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_NegIntVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(2).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_PosLongVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(3).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_NegLongVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(4).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_PosBeyond64BitsVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(5).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_NegBeyond64BitsVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(6).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_PosFloatVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(7).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_NegFloatVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(8).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_PosDoubleVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(9).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_NegDoubleVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(10).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_TrueVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertTrue(view.booleanValue(11).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_FalseVal_ValueFound() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(12).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_ObjectVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(13).isPresent());
+    }
+
+    @Test
+    public void booleanValueIndexArray_ArrayVal_Empty() {
+        JsonMetadataView view = new JsonMetadataView(makeDemoArray());
+        assertFalse(view.booleanValue(14).isPresent());
+    }
+
+    @Test
+    public void booleanValueStringObject_TrueString_CaseInsensitive() {
+        JsonObject root = new JsonObject();
+        root.add("lowercase", new JsonPrimitive("true"));
+        root.add("uppercase", new JsonPrimitive("TRUE"));
+        root.add("mixed case", new JsonPrimitive("TrUe"));
+        JsonMetadataView view = new JsonMetadataView(root, String::compareTo);
+        assertTrue(view.booleanValue("lowercase").orElseThrow());
+        assertTrue(view.booleanValue("uppercase").orElseThrow());
+        assertTrue(view.booleanValue("mixed case").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueStringArray_TrueString_CaseInsensitive() {
+        JsonArray root = new JsonArray();
+        root.add(new JsonPrimitive("true"));
+        root.add(new JsonPrimitive("TRUE"));
+        root.add(new JsonPrimitive("TrUe"));
+        JsonMetadataView view = new JsonMetadataView(root);
+        assertTrue(view.booleanValue("0").orElseThrow());
+        assertTrue(view.booleanValue("1").orElseThrow());
+        assertTrue(view.booleanValue("2").orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexObject_TrueString_CaseInsensitive() {
+        JsonObject root = new JsonObject();
+        root.add("lowercase", new JsonPrimitive("true"));
+        root.add("uppercase", new JsonPrimitive("TRUE"));
+        root.add("mixed case", new JsonPrimitive("TrUe"));
+        JsonMetadataView view = new JsonMetadataView(root, String::compareTo);
+        assertTrue(view.booleanValue(0).orElseThrow());
+        assertTrue(view.booleanValue(2).orElseThrow());
+        assertTrue(view.booleanValue(1).orElseThrow());
+    }
+
+    @Test
+    public void booleanValueIndexArray_TrueString_CaseInsensitive() {
+        JsonArray root = new JsonArray();
+        root.add(new JsonPrimitive("true"));
+        root.add(new JsonPrimitive("TRUE"));
+        root.add(new JsonPrimitive("TrUe"));
+        JsonMetadataView view = new JsonMetadataView(root);
+        assertTrue(view.booleanValue(0).orElseThrow());
+        assertTrue(view.booleanValue(1).orElseThrow());
+        assertTrue(view.booleanValue(2).orElseThrow());
+    }
+
     private JsonObject makeDemoObject() {
         JsonObject root = new JsonObject();
         addAllTypeVals(root, 0);
