@@ -1059,7 +1059,7 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void integerValueStringObject_StringVal_ValueFound() {
+    public void integerValueStringObject_StringVal_Empty() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertFalse(view.integerValue("string val0").isPresent());
     }
@@ -1474,7 +1474,7 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void longValueStringObject_StringVal_ValueFound() {
+    public void longValueStringObject_StringVal_Empty() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertFalse(view.longValue("string val0").isPresent());
     }
@@ -1931,13 +1931,13 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void floatValueStringObject_PosFloatVal_Empty() {
+    public void floatValueStringObject_PosFloatVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertEquals(Float.MAX_VALUE, view.floatValue("pos float val0").orElseThrow(), 0.000001);
     }
 
     @Test
-    public void floatValueStringObject_NegFloatVal_Empty() {
+    public void floatValueStringObject_NegFloatVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertEquals(-Float.MAX_VALUE, view.floatValue("neg float val0").orElseThrow(), 0.000001);
     }
@@ -2051,7 +2051,7 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void floatValueStringArray_NegFloatVal_Empty() {
+    public void floatValueStringArray_NegFloatVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoArray());
         assertEquals(-Float.MAX_VALUE, view.floatValue("8").orElseThrow(), 0.000001);
     }
@@ -2244,7 +2244,7 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void floatValueIndexArray_NegFloatVal_Empty() {
+    public void floatValueIndexArray_NegFloatVal_ValueFound() {
         JsonMetadataView view = new JsonMetadataView(makeDemoArray());
         assertEquals(-Float.MAX_VALUE, view.floatValue(8).orElseThrow(), 0.000001);
     }
