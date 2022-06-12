@@ -3411,13 +3411,13 @@ public class JsonMetadataViewTest {
     }
 
     @Test
-    public void subViewIndexObject_PosIntVal_ValueFound() {
+    public void subViewIndexObject_PosIntVal_Empty() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertFalse(view.subView(11).isPresent());
     }
 
     @Test
-    public void subViewIndexObject_NegIntVal_ValueFound() {
+    public void subViewIndexObject_NegIntVal_Empty() {
         JsonMetadataView view = new JsonMetadataView(makeDemoObject(), String::compareTo);
         assertFalse(view.subView(5).isPresent());
     }
