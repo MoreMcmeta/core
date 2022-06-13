@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Represents a rectangular area, all of whose points can be iterated.
  * @author soir20
@@ -59,6 +61,66 @@ public final class Rectangle implements Iterable<Point> {
         Y_START = topLeftY;
         WIDTH = width;
         HEIGHT = height;
+    }
+
+    /**
+     * Gets the width of the rectangle.
+     * @return the width of the rectangle
+     */
+    public int width() {
+        return WIDTH;
+    }
+
+    /**
+     * Gets the height of the rectangle.
+     * @return the height of the rectangle
+     */
+    public int height() {
+        return HEIGHT;
+    }
+
+    /**
+     * Gets the x-coordinate of the top-left corner of the rectangle.
+     * @return the x-coordinate of the top-left corner of the rectangle
+     */
+    public int topLeftX() {
+        return X_START;
+    }
+
+    /**
+     * Gets the y-coordinate of the top-left corner of the rectangle.
+     * @return the y-coordinate of the top-left corner of the rectangle
+     */
+    public int topLeftY() {
+        return Y_START;
+    }
+
+    /**
+     * Checks if this rectangle contains a point.
+     * @param point     the point to check
+     * @return true if this rectangle contains the point or false otherwise
+     */
+    public boolean contains(Point point) {
+        requireNonNull(point, "Point cannot be null");
+        return contains(point.x(), point.y());
+    }
+
+    /**
+     * Checks if this rectangle contains a point.
+     * @param x     the x-coordinate of the point to check
+     * @param y     the y-coordinate of the point to check
+     * @return true if this rectangle contains the point or false otherwise
+     */
+    public boolean contains(int x, int y) {
+        return x >= X_START && x <= X_START + WIDTH && y >= Y_START && y <= Y_START + HEIGHT;
+    }
+
+    /**
+     * Checks if this rectangle contains no points.
+     * @return true if this rectangle contains no points or false otherwise
+     */
+    public boolean isEmpty() {
+        return WIDTH == 0 || HEIGHT == 0;
     }
 
     /**
@@ -125,8 +187,14 @@ public final class Rectangle implements Iterable<Point> {
          */
         @Override
         public Point next() {
-            int x = X_START + currentRow++;
-            int y = Y_START + currentCol++;
+            int x = X_START + currentRow;
+            int y = Y_START + currentCol;
+
+            currentCol++;
+            if (currentCol > WIDTH) {
+                currentCol = 0;
+                currentRow++;
+            }
 
             if (!hasNext()) {
                 throw new NoSuchElementException("Rectangle has no more points");
