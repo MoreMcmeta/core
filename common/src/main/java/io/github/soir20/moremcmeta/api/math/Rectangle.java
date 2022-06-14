@@ -112,7 +112,7 @@ public final class Rectangle implements Iterable<Point> {
      * @return true if this rectangle contains the point or false otherwise
      */
     public boolean contains(int x, int y) {
-        return x >= X_START && x <= X_START + WIDTH && y >= Y_START && y <= Y_START + HEIGHT;
+        return x >= X_START && x < X_START + WIDTH && y >= Y_START && y < Y_START + HEIGHT;
     }
 
     /**
@@ -187,17 +187,17 @@ public final class Rectangle implements Iterable<Point> {
          */
         @Override
         public Point next() {
-            int x = X_START + currentRow;
-            int y = Y_START + currentCol;
-
-            currentCol++;
-            if (currentCol > WIDTH) {
-                currentCol = 0;
-                currentRow++;
-            }
-
             if (!hasNext()) {
                 throw new NoSuchElementException("Rectangle has no more points");
+            }
+
+            int x = X_START + currentCol;
+            int y = Y_START + currentRow;
+
+            currentCol++;
+            if (currentCol == WIDTH) {
+                currentCol = 0;
+                currentRow++;
             }
 
             return new Point(x, y);
