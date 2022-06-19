@@ -20,7 +20,6 @@ package io.github.soir20.moremcmeta.impl.client.io;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
-import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
@@ -260,22 +259,6 @@ public class TextureDataAssembler<I extends CloseableImage> {
         }
 
         /**
-         * Gets the color of the given pixel in the current frame.
-         * @param x     x-coordinate of the pixel (from the top left)
-         * @param y     y-coordinate of the pixel (from the top left)
-         * @return the color of the pixel at the given coordinate
-         */
-        @Override
-        public Color color(int x, int y) {
-            checkValid();
-            if (x < 0 || y < 0 || x >= FRAME.width() || y >= FRAME.height()) {
-                throw new PixelOutOfBoundsException(x, y);
-            }
-
-            return new Color(FRAME.color(x, y));
-        }
-
-        /**
          * Gets the width of the frame.
          * @return width of the frame
          */
@@ -320,11 +303,12 @@ public class TextureDataAssembler<I extends CloseableImage> {
          * Modifies this frame with the given function over the given apply area.
          * @param transform     transformation to apply to this frame
          * @param applyArea     area to apply the transformation to
+         * @param dependencies  the points whose current colors this transformation depends on
          */
         @Override
-        public void transform(ColorTransform transform, Iterable<Point> applyArea) {
+        public void transform(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies) {
             checkValid();
-            FRAME.applyTransform(transform, applyArea);
+            FRAME.applyTransform(transform, applyArea, dependencies);
         }
 
         /**

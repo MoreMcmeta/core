@@ -28,13 +28,16 @@ public interface MutableFrameView extends FrameView {
 
     /**
      * Modifies the predefined frame by applying the given {@link ColorTransform} over
-     * the given area.
+     * the given area. There is no ordering guaranteed for how the transform will be applied.
+     * To calculate new point colors based on the current colors, specify those points as
+     * dependencies.
      * @param transform     the transformation to apply to the given points
      * @param applyArea     the points to apply the transformation to
+     * @param dependencies  the points whose current colors this transformation depends on
      * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.PixelOutOfBoundsException if a pixel
      *         in the `applyArea` is out of the frame's bounds
      * @throws IllegalFrameReference if this view is no longer valid
      */
-    void transform(ColorTransform transform, Iterable<Point> applyArea);
+    void transform(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies);
 
 }

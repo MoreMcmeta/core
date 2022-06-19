@@ -19,7 +19,6 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
@@ -28,6 +27,7 @@ import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -304,11 +304,12 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * a new frame, which will become the current frame.
          * @param transform     the transformation to apply to the current frame
          * @param applyArea     area to apply the transformation to
+         * @param dependencies  the points whose current colors this transformation depends on
          */
         @Override
-        public void generateWith(ColorTransform transform, Iterable<Point> applyArea) {
+        public void generateWith(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies) {
             checkValid();
-            STATE.generateWith(transform, applyArea);
+            STATE.generateWith(transform, applyArea, dependencies);
         }
 
         /**
@@ -320,23 +321,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         public void replaceWith(int index) {
             checkValid();
             STATE.replaceWith(index);
-        }
-
-        /**
-         * Gets the color of the given pixel in the current frame.
-         * @param x     x-coordinate of the pixel (from the top left)
-         * @param y     y-coordinate of the pixel (from the top left)
-         * @return the color of the pixel at the given coordinate
-         */
-        @Override
-        public Color color(int x, int y) {
-            checkValid();
-
-            if (x < 0 || y < 0 || x >= STATE.width() || y >= STATE.height()) {
-                throw new PixelOutOfBoundsException(x, y);
-            }
-
-            return STATE.color(x, y);
         }
 
         /**
@@ -458,7 +442,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final EventDrivenTexture TEXTURE;
         private final List<? extends CloseableImageFrame> PREDEFINED_FRAMES;
         private final CloseableImageFrame GENERATED_FRAME;
-        private final Queue<Pair<ColorTransform, Iterable<Point>>> TRANSFORMS;
+        private final Queue<Triple<ColorTransform, Iterable<Point>, Iterable<Point>>> TRANSFORMS;
         private Integer currentFrameIndex;
         private Integer indexToCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
@@ -468,14 +452,16 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * a new frame, which will become the current frame.
          * @param transform     the transformation to apply to the current frame
          * @param applyArea     area to apply the transformation to
+         * @param dependencies  the points whose current colors this transformation depends on
          */
-        public void generateWith(ColorTransform transform, Iterable<Point> applyArea) {
+        public void generateWith(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies) {
             requireNonNull(transform, "Frame transform cannot be null");
             requireNonNull(applyArea, "Apply area cannot be null");
+            requireNonNull(dependencies, "Dependencies cannot be null");
 
             markNeedsUpload();
             currentFrameIndex = null;
-            TRANSFORMS.add(Pair.of(transform, applyArea));
+            TRANSFORMS.add(Triple.of(transform, applyArea, dependencies));
         }
 
         /**
@@ -622,8 +608,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             }
 
             while (!TRANSFORMS.isEmpty()) {
-                Pair<ColorTransform, Iterable<Point>> transform = TRANSFORMS.remove();
-                GENERATED_FRAME.applyTransform(transform.getFirst(), transform.getSecond());
+                Triple<ColorTransform, Iterable<Point>, Iterable<Point>> transform = TRANSFORMS.remove();
+                GENERATED_FRAME.applyTransform(transform.getLeft(), transform.getMiddle(), transform.getRight());
             }
         }
 

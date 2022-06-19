@@ -17,6 +17,10 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
+import io.github.soir20.moremcmeta.api.math.Point;
+
+import java.util.function.Function;
+
 /**
  * Calculates a new RGBA color for an individual pixel in a frame.
  * @author soir20
@@ -30,10 +34,30 @@ public interface ColorTransform {
      * While this method only takes the x and y-coordinates of the pixel, a {@link FrameView} for
      * the frame being modified is available in contexts where a {@link ColorTransform} would be
      * provided.
-     * @param x     x-coordinate of the pixel whose color will be replaced
-     * @param y     y-coordinate of the pixel whose color will be replaced
+     * @param overwritePoint        location of the pixel whose color will be replaced
+     * @param dependencyFunction    function to retrieve the color of a dependency. If a point
+     *                              not given as a dependency when this transform was applied is
+     *                              requested, it will throw a {@link NonDependencyRequestException}.
+     *                              The colors returned will be those before the associated transformation
+     *                              was applied to any points.
      * @return the new color of the pixel at (x, y) in the format
      */
-    Color transform(int x, int y);
+    Color transform(Point overwritePoint, Function<Point, Color> dependencyFunction);
+
+    /**
+     * Indicates that a transform requested the current color of a point that is not its dependency.
+     * @author soir20
+     * @since 4.0.0
+     */
+    class NonDependencyRequestException extends RuntimeException {
+
+        /**
+         * Creates a new exception to indicate a transform requested a non-dependency.
+         */
+        public NonDependencyRequestException() {
+            super("A transform tried to retrieve the color of a point that is not its dependency");
+        }
+
+    }
 
 }

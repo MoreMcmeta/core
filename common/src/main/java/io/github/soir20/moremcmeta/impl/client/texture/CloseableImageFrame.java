@@ -18,9 +18,13 @@
 package io.github.soir20.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
+import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
@@ -195,20 +199,33 @@ public class CloseableImageFrame {
      * bounds.
      * @param transform     transform to apply
      * @param applyArea     area to apply the transformation to
+     * @param dependencies  points whose colors the given transform is dependent on
      * @throws IllegalStateException if this frame has been closed
+     * @throws ColorTransform.NonDependencyRequestException if the previous color of a point that
+     *                                                     is not a dependency is requested
      */
-    public void applyTransform(ColorTransform transform, Iterable<Point> applyArea) {
+    public void applyTransform(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies) {
         checkOpen();
 
         requireNonNull(transform, "Transform cannot be null");
         requireNonNull(applyArea, "Apply area cannot be null");
+        requireNonNull(dependencies, "Dependencies cannot be null");
+
+        Map<Point, Color> previousColors = new HashMap<>();
+        dependencies.forEach((point) -> {
+            requireNonNull(point, "Dependency point cannot be null");
+            previousColors.put(point, new Color(color(point.x(), point.y())));
+        });
 
         // Apply transformation to the original image
         applyArea.forEach((point) -> {
             int x = point.x();
             int y = point.y();
 
-            int newColor = transform.transform(x, y).combine();
+            int newColor = transform.transform(
+                    point,
+                    (requestedPoint) -> colorIfDependency(requestedPoint, previousColors)
+            ).combine();
             mipmaps.get(0).setColor(x, y, newColor);
         });
 
@@ -265,6 +282,25 @@ public class CloseableImageFrame {
         if (closed) {
             throw new IllegalStateException("Frame is closed");
         }
+    }
+
+    /**
+     * Retrieves the current color of a point that a transform depends on, or throws an
+     * exception if the transform did not request the point as a dependency.
+     * @param requestedPoint        point the transform requested
+     * @param dependencies          all the transform's dependencies and their current colors
+     * @return the color of the requested point
+     * @throws ColorTransform.NonDependencyRequestException if the point is not a dependency
+     *                                                     of the transform
+     */
+    private Color colorIfDependency(Point requestedPoint, Map<Point, Color> dependencies) {
+        Color color = dependencies.get(requestedPoint);
+
+        if (color == null) {
+            throw new ColorTransform.NonDependencyRequestException();
+        }
+
+        return color;
     }
 
     /**

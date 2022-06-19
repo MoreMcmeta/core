@@ -31,18 +31,21 @@ public interface CurrentFrameView extends FrameView {
     /**
      * Generates a frame from the current frame by applying the given {@link ColorTransform} over
      * the given area. The current frame may be a predefined frame or a generated frame. Predefined
-     * frames are never modified.
+     * frames are never modified. There is no ordering guaranteed for how the transform will be applied.
+     * To calculate new point colors based on the current colors, specify those points as
+     * dependencies.
      * @param transform     the transformation to apply to the given points
      * @param applyArea     the points to apply the transformation to
+     * @param dependencies  the points whose current colors this transformation depends on
      * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.PixelOutOfBoundsException if a pixel
      *         in the `applyArea` is out of the frame's bounds
      * @throws IllegalFrameReference if this view is no longer valid
      */
-    void generateWith(ColorTransform transform, Iterable<Point> applyArea);
+    void generateWith(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies);
 
     /**
      * Makes the predefined frame with the given index the current frame. The next call to
-     * {@link #generateWith(ColorTransform, Iterable)} by any plugin will generate a frame based
+     * {@link #generateWith(ColorTransform, Iterable, Iterable)} by any plugin will generate a frame based
      * on this predefined frame, unless another predefined frame is made the current frame.
      * @param index     the index of the predefined frame to make current
      * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.FrameIndexOutOfBoundsException if the

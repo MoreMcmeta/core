@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.impl.client.io;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
+import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
@@ -350,194 +351,6 @@ public class TextureDataAssemblerTest {
     }
 
     @Test
-    public void assemble_ColorNegativeX_PixelOutOfBoundsException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).color(-1, 0);
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_ColorOutOfBoundsX_PixelOutOfBoundsException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).color(30, 0);
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_ColorNegativeY_PixelOutOfBoundsException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).color(0, -1);
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_ColorOutOfBoundsY_PixelOutOfBoundsException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).color(0, 40);
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_ColorOrigin_PixelRetrieved() {
-        int expectedColor = new Color(100, 100, 100, 100).combine();
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-        originalImage.setColor(0, 0, expectedColor);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    assertEquals(expectedColor, frames.frame(0).color(0, 0).combine());
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_ColorInteriorPoint_PixelRetrieved() {
-        int expectedColor = new Color(100, 100, 100, 100).combine();
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-        originalImage.setColor(20, 25, expectedColor);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    assertEquals(expectedColor, frames.frame(0).color(20, 25).combine());
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_ColorAfterInvalid_IllegalFrameReferenceException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        MutableFrameView[] frameView = new MutableFrameView[1];
-
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frameView[0] = frames.frame(0);
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-
-        expectedException.expect(FrameView.IllegalFrameReference.class);
-        frameView[0].color(20, 25);
-    }
-
-    @Test
     public void assemble_WidthWhileValid_CorrectWidth() {
         MockCloseableImage originalImage = new MockCloseableImage(100, 100);
 
@@ -777,7 +590,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform(null, List.of(new Point(0, 0)));
+                    frames.frame(0).transform(null, List.of(new Point(0, 0)), List.of());
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -803,7 +616,33 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y) -> new Color(100), null);
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), null, List.of());
+                    return List.of(new TextureComponent<>() {});
+                }))
+        )).build();
+    }
+
+    @Test
+    public void assemble_NullDependencyList_NullPointerException() {
+        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
+
+        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
+                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
+                (original) -> List.of(
+                        original,
+                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
+                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
+                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
+                )
+        );
+
+        expectedException.expect(NullPointerException.class);
+        assembler.assemble(new TextureData<>(
+                new ParsedMetadata.FrameSize(30, 40),
+                false, true,
+                originalImage,
+                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(), null);
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -829,7 +668,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y) -> null, List.of(new Point(0, 0)));
+                    frames.frame(0).transform((point, depFunction) -> null, List.of(new Point(0, 0)), List.of());
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -859,7 +698,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y) -> new Color(100), applyArea);
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), applyArea, List.of());
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -885,7 +724,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y) -> new Color(100), List.of(new Point(-1, 0)));
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(-1, 0)), List.of());
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -911,7 +750,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y) -> new Color(100), List.of(new Point(0, -1)));
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(0, -1)), List.of());
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -937,7 +776,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y) -> new Color(100), List.of(new Point(30, 0)));
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(30, 0)), List.of());
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -963,7 +802,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y) -> new Color(100), List.of(new Point(0, 40)));
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(0, 40)), List.of());
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -988,7 +827,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y) -> new Color(100), List.of(new Point(0, 0), new Point(20, 25)));
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(0, 0), new Point(20, 25)), List.of());
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
@@ -998,6 +837,203 @@ public class TextureDataAssemblerTest {
            limited value. */
         assertEquals(100, originalImage.color(0, 0));
         assertEquals(100, originalImage.color(20, 25));
+
+    }
+
+    @Test
+    public void assemble_DependencyListContainsNull_NullPointerException() {
+        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
+
+        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
+                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
+                (original) -> List.of(
+                        original,
+                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
+                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
+                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
+                )
+        );
+
+        List<Point> dependencies = new ArrayList<>();
+        dependencies.add(new Point(0, 0));
+        dependencies.add(null);
+
+        expectedException.expect(NullPointerException.class);
+        assembler.assemble(new TextureData<>(
+                new ParsedMetadata.FrameSize(30, 40),
+                false, true,
+                originalImage,
+                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(0, 0)), dependencies);
+                    return List.of(new TextureComponent<>() {});
+                }))
+        )).build();
+    }
+
+    @Test
+    public void assemble_DependencyListContainsPointNegativeX_ExceptionFromImage() {
+        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
+
+        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
+                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
+                (original) -> List.of(
+                        original,
+                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
+                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
+                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
+                )
+        );
+
+        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        assembler.assemble(new TextureData<>(
+                new ParsedMetadata.FrameSize(30, 40),
+                false, true,
+                originalImage,
+                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(0, 0)), List.of(new Point(-1, 0)));
+                    return List.of(new TextureComponent<>() {});
+                }))
+        )).build();
+    }
+
+    @Test
+    public void assemble_DependencyListContainsPointNegativeY_ExceptionFromImage() {
+        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
+
+        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
+                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
+                (original) -> List.of(
+                        original,
+                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
+                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
+                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
+                )
+        );
+
+        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        assembler.assemble(new TextureData<>(
+                new ParsedMetadata.FrameSize(30, 40),
+                false, true,
+                originalImage,
+                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(0, 0)), List.of(new Point(0, -1)));
+                    return List.of(new TextureComponent<>() {});
+                }))
+        )).build();
+    }
+
+    @Test
+    public void assemble_DependencyListContainsPointOutOfBoundsX_ExceptionFromImage() {
+        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
+
+        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
+                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
+                (original) -> List.of(
+                        original,
+                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
+                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
+                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
+                )
+        );
+
+        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        assembler.assemble(new TextureData<>(
+                new ParsedMetadata.FrameSize(30, 40),
+                false, true,
+                originalImage,
+                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(0, 0)), List.of(new Point(30, 0)));
+                    return List.of(new TextureComponent<>() {});
+                }))
+        )).build();
+    }
+
+    @Test
+    public void assemble_DependencyListContainsPointOutOfBoundsY_ExceptionFromImage() {
+        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
+
+        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
+                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
+                (original) -> List.of(
+                        original,
+                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
+                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
+                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
+                )
+        );
+
+        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        assembler.assemble(new TextureData<>(
+                new ParsedMetadata.FrameSize(30, 40),
+                false, true,
+                originalImage,
+                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
+                    frames.frame(0).transform((point, depFunction) -> new Color(100), List.of(new Point(0, 0)), List.of(new Point(0, 40)));
+                    return List.of(new TextureComponent<>() {});
+                }))
+        )).build();
+    }
+
+    @Test
+    public void assemble_NonDependencyPointRequested_NonDependencyRequestException() {
+        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
+
+        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
+                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
+                (original) -> List.of(
+                        original,
+                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
+                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
+                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
+                )
+        );
+
+        expectedException.expect(ColorTransform.NonDependencyRequestException.class);
+        assembler.assemble(new TextureData<>(
+                new ParsedMetadata.FrameSize(30, 40),
+                false, true,
+                originalImage,
+                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
+                    frames.frame(0).transform((point, depFunction) -> depFunction.apply(new Point(25, 0)), List.of(new Point(0, 0)), List.of(new Point(0, 25)));
+                    return List.of(new TextureComponent<>() {});
+                }))
+        )).build();
+    }
+
+    @Test
+    public void assemble_ValidDependencyPoint_PointRetrieved() {
+        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
+        originalImage.setColor(25, 30, new Color(100, 100, 100, 100).combine());
+
+        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
+                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
+                (original) -> List.of(
+                        original,
+                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
+                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
+                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
+                )
+        );
+
+        assembler.assemble(new TextureData<>(
+                new ParsedMetadata.FrameSize(30, 40),
+                false, true,
+                originalImage,
+                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
+                    frames.frame(0).transform(
+                            (point, depFunction) -> depFunction.apply(new Point(25, 30)),
+                            List.of(new Point(0, 0), new Point(20, 25)), 
+                            List.of(new Point(25, 30))
+                    );
+                    return List.of(new TextureComponent<>() {});
+                }))
+        )).build();
+
+        /* The CloseableImageFrame logic is already tested, so focus on just testing that the transformation was
+           applied to the original image. Re-creating all the tests would be time-consuming while providing
+           limited value. */
+        assertEquals(new Color(100, 100, 100, 100).combine(), originalImage.color(0, 0));
+        assertEquals(new Color(100, 100, 100, 100).combine(), originalImage.color(20, 25));
 
     }
 
@@ -1028,7 +1064,7 @@ public class TextureDataAssemblerTest {
         )).build();
 
         expectedException.expect(FrameView.IllegalFrameReference.class);
-        frameView[0].transform((x, y) -> new Color(100), List.of(new Point(0, 0)));
+        frameView[0].transform((point, depFunction) -> new Color(100), List.of(new Point(0, 0)), List.of());
     }
 
     @Test
