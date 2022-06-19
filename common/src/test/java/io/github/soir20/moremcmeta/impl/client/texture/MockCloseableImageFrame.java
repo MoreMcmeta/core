@@ -21,8 +21,6 @@ import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
-import java.util.Optional;
-
 /**
  * A fake {@link CloseableImageFrame}.
  * @author soir20
