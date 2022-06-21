@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
+import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 import org.junit.Rule;
@@ -205,7 +206,7 @@ public class CloseableImageFrameTest {
                 ImmutableList.of(new MockCloseableImage(100, 200))
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.color(100, 45);
     }
 
@@ -216,7 +217,7 @@ public class CloseableImageFrameTest {
                 ImmutableList.of(new MockCloseableImage(100, 200))
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.color(-10, 45);
     }
 
@@ -227,7 +228,7 @@ public class CloseableImageFrameTest {
                 ImmutableList.of(new MockCloseableImage(100, 200))
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.color(45, 200);
     }
 
@@ -238,7 +239,7 @@ public class CloseableImageFrameTest {
                 ImmutableList.of(new MockCloseableImage(100, 200))
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.color(45, -10);
     }
 
@@ -1333,7 +1334,7 @@ public class CloseableImageFrameTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(100, 50)), List.of());
     }
 
@@ -1348,7 +1349,7 @@ public class CloseableImageFrameTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 200)), List.of());
     }
 
@@ -1363,7 +1364,7 @@ public class CloseableImageFrameTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(-1, 50)), List.of());
     }
 
@@ -1378,7 +1379,7 @@ public class CloseableImageFrameTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, -1)), List.of());
     }
 
@@ -1426,7 +1427,7 @@ public class CloseableImageFrameTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(100, 50)));
     }
 
@@ -1441,7 +1442,7 @@ public class CloseableImageFrameTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(50, 200)));
     }
 
@@ -1456,7 +1457,7 @@ public class CloseableImageFrameTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(-1, 50)));
     }
 
@@ -1471,7 +1472,7 @@ public class CloseableImageFrameTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(50, -1)));
     }
 

@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
+import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.math.Point;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -49,10 +50,6 @@ public class MockCloseableImage implements CloseableImage {
         CLOSED = new AtomicBoolean();
     }
 
-    public MockCloseableImage(int[][] pixels) {
-        this(pixels, 0, 0, pixels.length, pixels[0].length, new AtomicBoolean());
-    }
-
     private MockCloseableImage(int[][] pixels, int xOffset, int yOffset, int width, int height,
                                AtomicBoolean closedStatus) {
         int maxX = xOffset + width;
@@ -79,7 +76,7 @@ public class MockCloseableImage implements CloseableImage {
         y += Y_OFFSET;
 
         if (x >= width() || x < 0 || y >= height() || y < 0) {
-            throw new MockPixelOutOfBoundsException(x, y);
+            throw new FrameView.PixelOutOfBoundsException(x, y);
         }
 
         return PIXELS[x][y];
@@ -95,7 +92,7 @@ public class MockCloseableImage implements CloseableImage {
         y += Y_OFFSET;
 
         if (x >= width() || x < 0 || y >= height() || y < 0) {
-            throw new MockPixelOutOfBoundsException(x, y);
+            throw new FrameView.PixelOutOfBoundsException(x, y);
         }
 
         PIXELS[x][y] = color;
@@ -160,18 +157,6 @@ public class MockCloseableImage implements CloseableImage {
         }
 
         return true;
-    }
-
-    /**
-     * Mock exception thrown when a pixel out of bounds is accessed.
-     * @author soir20
-     */
-    public static class MockPixelOutOfBoundsException extends RuntimeException {
-
-        public MockPixelOutOfBoundsException(int x, int y) {
-            super("Point out of bounds: (" + x + ", " + y + ")");
-        }
-
     }
 
     /**

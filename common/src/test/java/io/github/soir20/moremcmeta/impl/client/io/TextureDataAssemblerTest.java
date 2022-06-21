@@ -634,7 +634,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new ParsedMetadata.FrameSize(30, 40),
                 false, true,
@@ -660,7 +660,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new ParsedMetadata.FrameSize(30, 40),
                 false, true,
@@ -686,7 +686,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new ParsedMetadata.FrameSize(30, 40),
                 false, true,
@@ -712,7 +712,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new ParsedMetadata.FrameSize(30, 40),
                 false, true,
@@ -800,7 +800,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new ParsedMetadata.FrameSize(30, 40),
                 false, true,
@@ -826,7 +826,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new ParsedMetadata.FrameSize(30, 40),
                 false, true,
@@ -852,7 +852,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new ParsedMetadata.FrameSize(30, 40),
                 false, true,
@@ -878,7 +878,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new ParsedMetadata.FrameSize(30, 40),
                 false, true,

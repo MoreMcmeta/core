@@ -690,7 +690,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         texture.tick();
     }
 
@@ -709,7 +709,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         texture.tick();
     }
 
@@ -728,7 +728,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         texture.tick();
     }
 
@@ -747,7 +747,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(MockCloseableImage.MockPixelOutOfBoundsException.class);
+        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         texture.tick();
     }
 
