@@ -24,8 +24,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.IntStream;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Basic implementation of a {@link FrameGroup} that holds a particular type of {@link FrameView}.
@@ -40,6 +43,12 @@ public class FrameGroupImpl<F extends FrameView> implements FrameGroup<F> {
      * @param frames the frames to put in the group
      */
     public FrameGroupImpl(List<? extends F> frames) {
+        requireNonNull(frames, "Frames cannot be null");
+
+        if (frames.stream().anyMatch(Objects::isNull)) {
+            throw new NullPointerException("No frame can be null");
+        }
+
         FRAMES = new ArrayList<>(frames);
     }
 
@@ -52,9 +61,11 @@ public class FrameGroupImpl<F extends FrameView> implements FrameGroup<F> {
     public <T> FrameGroupImpl(List<? extends T> frames,
                               BiFunction<? super T, ? super Integer, ? extends F> viewConstructor) {
         this(
-                IntStream.range(0, frames.size())
-                .mapToObj((index) -> viewConstructor.apply(frames.get(index), index))
-                .toList()
+                IntStream.range(0, requireNonNull(frames, "Frames cannot be null").size())
+                .mapToObj(
+                        (index) -> requireNonNull(viewConstructor, "View constructor cannot be null")
+                                .apply(requireNonNull(frames.get(index), "No frame can be null"), index)
+                ).toList()
         );
     }
 
