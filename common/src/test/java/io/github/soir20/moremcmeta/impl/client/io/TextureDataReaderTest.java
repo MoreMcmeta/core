@@ -1047,7 +1047,7 @@ public class TextureDataReaderTest {
 
         @Override
         public Iterable<TextureComponent<CurrentFrameView>> assemble(ParsedMetadata metadata,
-                                                                     FrameGroup<MutableFrameView> frames) {
+                                                                     FrameGroup<? extends MutableFrameView> frames) {
             return List.of(new TextureComponent<>() {});
         }
 

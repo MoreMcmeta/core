@@ -28,19 +28,21 @@ public interface TextureComponent<V> {
     /**
      * Responds to the tick event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
      * provided to this method is limited to the call of this method. Attempting to retain and use a
-     * {@link CurrentFrameView} at a later point will cause a
-     * {@link io.github.soir20.moremcmeta.api.client.texture.FrameView.IllegalFrameReference} exception to be thrown.
+     * {@link CurrentFrameView} at a later point will cause a {@link FrameView.IllegalFrameReference} exception
+     * to be thrown.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of all predefined frames
      */
-    default void onTick(V currentFrame) {}
+    default void onTick(V currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {}
 
     /**
      * Responds to the close event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
      * provided to this method is limited to the call of this method. Attempting to retain and use a
-     * {@link CurrentFrameView} at a later point will cause a
-     * {@link io.github.soir20.moremcmeta.api.client.texture.FrameView.IllegalFrameReference} exception to be thrown.
+     * {@link CurrentFrameView} at a later point will cause a {@link FrameView.IllegalFrameReference} exception
+     * to be thrown.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of all predefined frames
      */
-    default void onClose(V currentFrame) {}
+    default void onClose(V currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {}
 
 }

@@ -24,7 +24,6 @@ import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
-import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
@@ -32,8 +31,8 @@ import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
+import io.github.soir20.moremcmeta.impl.client.texture.FrameGroupImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -183,55 +182,13 @@ public class TextureDataAssembler<I extends CloseableImage> {
     private Iterable<TextureComponent<CurrentFrameView>> assembleComponents(ComponentProvider provider,
                                                                             List<CloseableImageFrame> frames,
                                                                             ParsedMetadata metadata) {
-        List<MutableFrameViewImpl> frameViews = new ArrayList<>();
+        FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(frames, MutableFrameViewImpl::new);
 
-        for (int index = 0; index < frames.size(); index++) {
-            CloseableImageFrame frame = frames.get(index);
-            frameViews.add(new MutableFrameViewImpl(
-                    frame,
-                    index,
-                    frames.size()
-            ));
-        }
+        Iterable<TextureComponent<CurrentFrameView>> components = provider.assemble(metadata, mutableFrames);
 
-        Iterable<TextureComponent<CurrentFrameView>> components = provider.assemble(
-                metadata,
-                new MutableFrameGroupImpl(frameViews)
-        );
-
-        frameViews.forEach(MutableFrameViewImpl::invalidate);
+        mutableFrames.forEach(MutableFrameViewImpl::invalidate);
 
         return components;
-    }
-
-    /**
-     * Basic implementation of a {@link FrameGroup} that holds mutable frames.
-     * @author soir20
-     */
-    private static class MutableFrameGroupImpl implements FrameGroup<MutableFrameView> {
-        private final List<? extends MutableFrameView> FRAMES;
-
-        /**
-         * Creates a new group of mutable frames.
-         * @param frames        the mutable frames to put in the group
-         */
-        public MutableFrameGroupImpl(List<? extends MutableFrameView> frames) {
-            FRAMES = frames;
-        }
-
-        @Override
-        public MutableFrameView frame(int index) {
-            if (index < 0 || index >= FRAMES.size()) {
-                throw new FrameView.FrameIndexOutOfBoundsException(index);
-            }
-
-            return FRAMES.get(index);
-        }
-
-        @Override
-        public int frames() {
-            return FRAMES.size();
-        }
     }
 
     /**
@@ -241,20 +198,17 @@ public class TextureDataAssembler<I extends CloseableImage> {
     private static class MutableFrameViewImpl implements MutableFrameView {
         private final CloseableImageFrame FRAME;
         private final int INDEX;
-        private final int NUM_FRAMES;
 
         private boolean valid;
 
         /**
-         * Creates a new view for a predefined frame.
+         * Creates a new view for a mutable predefined frame.
          * @param frame         the original frame
          * @param index         index of the frame among all frames
-         * @param numFrames     number of frames total
          */
-        public MutableFrameViewImpl(CloseableImageFrame frame, int index, int numFrames) {
+        public MutableFrameViewImpl(CloseableImageFrame frame, int index) {
             FRAME = frame;
             INDEX = index;
-            NUM_FRAMES = numFrames;
             valid = true;
         }
 
@@ -287,16 +241,6 @@ public class TextureDataAssembler<I extends CloseableImage> {
         public Optional<Integer> index() {
             checkValid();
             return Optional.of(INDEX);
-        }
-
-        /**
-         * Gets the total number of frames.
-         * @return total number of frames
-         */
-        @Override
-        public int predefinedFrames() {
-            checkValid();
-            return NUM_FRAMES;
         }
 
         /**

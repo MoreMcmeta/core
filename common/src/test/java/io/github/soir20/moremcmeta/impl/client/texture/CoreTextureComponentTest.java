@@ -30,25 +30,25 @@ public class CoreTextureComponentTest {
     @Test
     public void onRegistration_NullState_NoException() {
         CoreTextureComponent component = new CoreTextureComponent() {};
-        component.onRegistration(null);
+        component.onRegistration(null, new FrameGroupImpl<>(List.of()));
     }
 
     @Test
     public void onUpload_NullState_NoException() {
         CoreTextureComponent component = new CoreTextureComponent() {};
-        component.onUpload(null);
+        component.onUpload(null, new FrameGroupImpl<>(List.of()));
     }
 
     @Test
     public void onTick_NullState_NoException() {
         CoreTextureComponent component = new CoreTextureComponent() {};
-        component.onTick(null);
+        component.onTick(null, new FrameGroupImpl<>(List.of()));
     }
 
     @Test
     public void onClose_NullState_NoException() {
         CoreTextureComponent component = new CoreTextureComponent() {};
-        component.onClose(null);
+        component.onClose(null, new FrameGroupImpl<>(List.of()));
     }
 
     @Test

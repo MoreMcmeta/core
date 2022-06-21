@@ -38,6 +38,7 @@ public interface ComponentProvider {
      *                      {@link ColorTransform}s to be applied
      * @return texture components for this texture
      */
-    Iterable<TextureComponent<CurrentFrameView>> assemble(ParsedMetadata metadata, FrameGroup<MutableFrameView> frames);
+    Iterable<TextureComponent<CurrentFrameView>> assemble(ParsedMetadata metadata,
+                                                          FrameGroup<? extends MutableFrameView> frames);
 
 }

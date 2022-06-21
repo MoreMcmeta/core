@@ -17,6 +17,8 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
+import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
+import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.math.Point;
 
 import static java.util.Objects.requireNonNull;
@@ -43,27 +45,33 @@ public class SpriteUploadComponent implements CoreTextureComponent {
     /**
      * Releases unnecessary memory by lowering the frame's mipmap level to be the same as the sprite.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of the predefined frames
      */
     @Override
-    public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+    public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
+                               FrameGroup<PersistentFrameView> predefinedFrames) {
         currentFrame.lowerMipmapLevel(SPRITE.mipmapLevel());
     }
 
     /**
      * Uploads the texture when it needs to be uploaded.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of the predefined frames
      */
     @Override
-    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                         FrameGroup<PersistentFrameView> predefinedFrames) {
         currentFrame.uploadAt(UPLOAD_POINT);
     }
 
     /**
      * Uploads the texture to the atlas on tick since the sprite will never be bound.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of the predefined frames
      */
     @Override
-    public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+    public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame,
+                       FrameGroup<PersistentFrameView> predefinedFrames) {
 
         // We need this listener because atlas sprites will never be bound
         SPRITE.bind();

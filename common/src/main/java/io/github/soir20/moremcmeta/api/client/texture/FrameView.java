@@ -55,14 +55,6 @@ public interface FrameView {
     Optional<Integer> index();
 
     /**
-     * Gets the total number of predefined frames associated with the same texture as this frame.
-     * @return number of predefined frames associated with the same texture, including this frame if
-     *         it is a predefined frame
-     * @throws IllegalFrameReference if this view is no longer valid
-     */
-    int predefinedFrames();
-
-    /**
      * Indicates that an illegal predefined frame index was accessed.
      * @author soir20
      * @since 4.0.0

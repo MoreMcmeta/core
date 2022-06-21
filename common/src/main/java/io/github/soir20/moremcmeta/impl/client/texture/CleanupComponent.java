@@ -17,6 +17,9 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
+import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
+import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -37,9 +40,11 @@ public class CleanupComponent implements CoreTextureComponent {
     /**
      * Cleans up resources associated with the texture when it is closed.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of predefined frames
      */
     @Override
-    public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame) {
+    public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame,
+                        FrameGroup<PersistentFrameView> predefinedFrames) {
         CLOSE_ACTION.run();
     }
 

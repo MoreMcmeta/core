@@ -20,7 +20,9 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
+import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
+import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
 import org.junit.Rule;
@@ -78,8 +80,8 @@ public class EventDrivenTextureTest {
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
-                assertEquals(2, currentFrame.predefinedFrames());
+            public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+                assertEquals(2, predefinedFrames.frames());
             }
         });
         builder.build().load(null);
@@ -114,7 +116,7 @@ public class EventDrivenTextureTest {
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(0), List.of(), List.of());
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -256,7 +258,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new TextureComponent<>() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 assertEquals(textureGetter[0], currentFrame.texture());
             }
         });
@@ -275,12 +277,12 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.markNeedsUpload();
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 timesUploaded.incrementAndGet();
             }
         });
@@ -305,12 +307,12 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(1);
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 timesUploaded.incrementAndGet();
             }
         });
@@ -333,12 +335,12 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new TextureComponent<>() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(1);
             }
 
             @Override
-            public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 assertEquals(1, (int) currentFrame.index().orElseThrow());
             }
         });
@@ -429,17 +431,17 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
 
             @Override
-            public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(1);
             }
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(0);
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrameIndex.set(currentFrame.index().orElseThrow());
             }
         });
@@ -465,7 +467,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(-1);
             }
         });
@@ -483,7 +485,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(2);
             }
         });
@@ -501,7 +503,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(null, List.of(new Point(0, 0)), List.of());
             }
         });
@@ -519,7 +521,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), null, List.of());
             }
         });
@@ -537,12 +539,12 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> null, List.of(new Point(0, 0)), List.of());
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
@@ -566,12 +568,12 @@ public class EventDrivenTextureTest {
         area.add(null);
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), area, List.of());
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
@@ -591,12 +593,12 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), List.of(), List.of());
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
@@ -637,7 +639,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), null);
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -659,7 +661,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), dependencies);
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -678,7 +680,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(-1, 50)));
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -697,7 +699,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(50, -1)));
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -716,7 +718,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(100, 50)));
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -735,7 +737,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(50, 100)));
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -754,7 +756,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> depFunction.apply(new Point(25, 25)), List.of(new Point(50, 50)), List.of(new Point(25, 50)));
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -773,7 +775,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> depFunction.apply(new Point(25, 50)), List.of(new Point(50, 50)), List.of(new Point(25, 50)));
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -795,7 +797,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(100, 100, 100, 100),
                         List.of(new Point(1, 0), new Point(1, 1)),
@@ -804,7 +806,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
@@ -845,7 +847,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(100, 100, 100, 100),
                         List.of(new Point(1, 0), new Point(1, 1)),
@@ -854,7 +856,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
@@ -911,7 +913,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(100, 100, 100, 100),
                         List.of(new Point(1, 0), new Point(1, 1)),
@@ -920,13 +922,13 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(200, 200, 200, 200),
                         List.of(new Point(0, 0), new Point(1, 1)),
@@ -987,7 +989,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(100, 100, 100, 100),
                         List.of(new Point(1, 0), new Point(1, 1)),
@@ -996,13 +998,13 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(1);
             }
         });
@@ -1049,7 +1051,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(100, 100, 100, 100),
                         List.of(new Point(1, 0), new Point(1, 1), new Point(0, 0)),
@@ -1058,19 +1060,19 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(1);
             }
         });
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(200, 200, 200, 200),
                         List.of(new Point(1, 0), new Point(1, 1)),
@@ -1136,19 +1138,19 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(0, 0));
             }
         });
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.replaceWith(1);
             }
         });
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(200, 200, 200, 200),
                         List.of(new Point(1, 0), new Point(1, 1)),
@@ -1216,12 +1218,12 @@ public class EventDrivenTextureTest {
             private EventDrivenTexture.TextureAndFrameView view;
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view = currentFrame;
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view.replaceWith(1);
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -1249,12 +1251,12 @@ public class EventDrivenTextureTest {
             private EventDrivenTexture.TextureAndFrameView view;
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view = currentFrame;
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(0, 0)), List.of());
                 currentFrame.uploadAt(new Point(0, 0));
             }
@@ -1280,7 +1282,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 assertEquals(100, currentFrame.width());
             }
         });
@@ -1301,12 +1303,12 @@ public class EventDrivenTextureTest {
             private EventDrivenTexture.TextureAndFrameView view;
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view = currentFrame;
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view.width();
             }
         });
@@ -1326,7 +1328,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 assertEquals(100, currentFrame.height());
             }
         });
@@ -1347,12 +1349,12 @@ public class EventDrivenTextureTest {
             private EventDrivenTexture.TextureAndFrameView view;
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view = currentFrame;
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view.height();
             }
         });
@@ -1372,7 +1374,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y) -> new Color(100, 100, 100, 100),
                         List.of(new Point(1, 0), new Point(1, 1)),
@@ -1396,7 +1398,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 assertEquals(Optional.of(0), currentFrame.index());
                 currentFrame.replaceWith(1);
                 assertEquals(Optional.of(1), currentFrame.index());
@@ -1417,12 +1419,12 @@ public class EventDrivenTextureTest {
             private EventDrivenTexture.TextureAndFrameView view;
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view = currentFrame;
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view.index();
             }
         });
@@ -1443,7 +1445,7 @@ public class EventDrivenTextureTest {
         final EventDrivenTexture[] expectedTexture = new EventDrivenTexture[1];
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 assertEquals(expectedTexture[0], currentFrame.texture());
             }
         });
@@ -1465,12 +1467,12 @@ public class EventDrivenTextureTest {
             private EventDrivenTexture.TextureAndFrameView view;
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view = currentFrame;
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view.texture();
             }
         });
@@ -1490,7 +1492,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(null);
             }
         });
@@ -1510,7 +1512,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.uploadAt(new Point(2, 3));
             }
         });
@@ -1533,12 +1535,12 @@ public class EventDrivenTextureTest {
             private EventDrivenTexture.TextureAndFrameView view;
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view = currentFrame;
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view.uploadAt(new Point(0, 0));
             }
         });
@@ -1558,7 +1560,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.lowerMipmapLevel(-1);
             }
         });
@@ -1576,7 +1578,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.lowerMipmapLevel(3);
             }
         });
@@ -1594,7 +1596,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.lowerMipmapLevel(0);
             }
         });
@@ -1614,7 +1616,7 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.lowerMipmapLevel(2);
             }
         });
@@ -1636,12 +1638,12 @@ public class EventDrivenTextureTest {
             private EventDrivenTexture.TextureAndFrameView view;
 
             @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view = currentFrame;
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 view.lowerMipmapLevel(0);
             }
         });
@@ -1673,25 +1675,25 @@ public class EventDrivenTextureTest {
             int finalIndex = index;
             texture.add(new CoreTextureComponent() {
                 @Override
-                public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(TICK_ID_BASE + finalIndex);
                 }
 
                 @Override
-                public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(CLOSE_ID_BASE + finalIndex);
                 }
 
                 @Override
-                public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(REG_ID_BASE + finalIndex);
                 }
 
                 @Override
-                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(UPLOAD_ID_BASE + finalIndex);
                 }

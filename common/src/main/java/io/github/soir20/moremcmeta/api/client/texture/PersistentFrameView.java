@@ -18,26 +18,20 @@
 package io.github.soir20.moremcmeta.api.client.texture;
 
 /**
- * An ordered collection of {@link FrameView}s, which are accessible by index.
- * @param <F> type of {@link FrameView} available from this group
+ * A frame view that never becomes invalid and never throws an {@link FrameView.IllegalFrameReference}.
  * @author soir20
  * @since 4.0.0
  */
-public interface FrameGroup<F extends FrameView> extends Iterable<F> {
+public interface PersistentFrameView extends FrameView {
 
     /**
-     * Gets a frame in this group by its index.
-     * @param index     index of the frame to retrieve
-     * @return the frame at this index in the group
-     * @throws FrameView.FrameIndexOutOfBoundsException if the provided index is outside
-     *                                                  the range of legal frame indices
+     * Gets the color at a specific pixel in this frame.
+     * @param x     x-coordinate of the pixel
+     * @param y     y-coordinate of the pixel
+     * @return the color of the pixel
+     * @throws FrameView.PixelOutOfBoundsException if the requested pixel is outside
+     *                                             the frame's bounds
      */
-    F frame(int index);
-
-    /**
-     * Gets the number of frames in this group.
-     * @return number of frames in this group
-     */
-    int frames();
+    Color color(int x, int y);
 
 }

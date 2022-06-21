@@ -25,6 +25,7 @@ import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
+import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
@@ -89,7 +90,7 @@ public class TextureDataAssemblerTest {
         );
 
         AtomicBoolean checked = new AtomicBoolean();
-        Consumer<FrameGroup<MutableFrameView>> checkFunction = (group) -> {
+        Consumer<FrameGroup<? extends MutableFrameView>> checkFunction = (group) -> {
             checked.set(true);
 
             for (int index = 0; index < group.frames(); index++) {
@@ -338,10 +339,10 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(
-                        new TextureComponent<>() {public void onTick(CurrentFrameView view) { actualOrder.add(0);}},
-                        new TextureComponent<>() {public void onTick(CurrentFrameView view) { actualOrder.add(1);}},
-                        new TextureComponent<>() {public void onTick(CurrentFrameView view) { actualOrder.add(2);}},
-                        new TextureComponent<>() {public void onTick(CurrentFrameView view) { actualOrder.add(3);}}
+                        new TextureComponent<>() {public void onTick(CurrentFrameView view, FrameGroup<PersistentFrameView> predefinedFrames) { actualOrder.add(0);}},
+                        new TextureComponent<>() {public void onTick(CurrentFrameView view, FrameGroup<PersistentFrameView> predefinedFrames) { actualOrder.add(1);}},
+                        new TextureComponent<>() {public void onTick(CurrentFrameView view, FrameGroup<PersistentFrameView> predefinedFrames) { actualOrder.add(2);}},
+                        new TextureComponent<>() {public void onTick(CurrentFrameView view, FrameGroup<PersistentFrameView> predefinedFrames) { actualOrder.add(3);}}
                 )))
         )).build();
 
@@ -483,91 +484,6 @@ public class TextureDataAssemblerTest {
                     return List.of(new TextureComponent<>() {});
                 }))
         )).build();
-    }
-
-    @Test
-    public void assemble_IndexAfterInvalid_IllegalFrameReferenceException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        MutableFrameView[] frameView = new MutableFrameView[1];
-
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frameView[0] = frames.frame(0);
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-
-        expectedException.expect(FrameView.IllegalFrameReference.class);
-        frameView[0].index();
-    }
-
-    @Test
-    public void assemble_PredefinedFramesWhileValid_CorrectCount() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    assertEquals(6, frames.frame(1).predefinedFrames());
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_PredefinedFramesAfterInvalid_IllegalFrameReferenceException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        MutableFrameView[] frameView = new MutableFrameView[1];
-
-        assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
-                    frameView[0] = frames.frame(0);
-                    return List.of(new TextureComponent<>() {});
-                }))
-        )).build();
-
-        expectedException.expect(FrameView.IllegalFrameReference.class);
-        frameView[0].predefinedFrames();
     }
 
     @Test

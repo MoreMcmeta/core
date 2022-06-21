@@ -17,6 +17,8 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
+import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
+import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.math.Point;
 
 import static java.util.Objects.requireNonNull;
@@ -40,9 +42,11 @@ public class SingleUploadComponent implements CoreTextureComponent {
     /**
      * Prepares an OpenGL image for the texture when it is registered.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of predefined frames
      */
     @Override
-    public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {
+    public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
+                               FrameGroup<PersistentFrameView> predefinedFrames) {
         PREPARER.prepare(currentFrame.texture().getId(), 0, currentFrame.width(), currentFrame.height());
         currentFrame.lowerMipmapLevel(0);
     }
@@ -50,9 +54,11 @@ public class SingleUploadComponent implements CoreTextureComponent {
     /**
      * Uploads the texture when it needs to be uploaded.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of predefined frames
      */
     @Override
-    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                         FrameGroup<PersistentFrameView> predefinedFrames) {
         currentFrame.uploadAt(UPLOAD_POINT);
     }
 

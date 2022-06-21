@@ -18,6 +18,8 @@
 package io.github.soir20.moremcmeta.impl.client.texture;
 
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
+import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
+import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 
 /**
@@ -32,8 +34,10 @@ public interface CoreTextureComponent extends TextureComponent<EventDrivenTextur
      * to retain and use a {@link CurrentFrameView} at a later point will cause a
      * {@link io.github.soir20.moremcmeta.api.client.texture.FrameView.IllegalFrameReference} exception to be thrown.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of predefined frames
      */
-    default void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame) {}
+    default void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                FrameGroup<PersistentFrameView> predefinedFrames) {}
 
     /**
      * Responds to the upload event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
@@ -41,7 +45,9 @@ public interface CoreTextureComponent extends TextureComponent<EventDrivenTextur
      * {@link CurrentFrameView} at a later point will cause a
      * {@link io.github.soir20.moremcmeta.api.client.texture.FrameView.IllegalFrameReference} exception to be thrown.
      * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of predefined frames
      */
-    default void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {}
+    default void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                          FrameGroup<PersistentFrameView> predefinedFrames) {}
 
 }

@@ -38,7 +38,7 @@ public interface CurrentFrameView extends FrameView {
      * @param applyArea     the points to apply the transformation to
      * @param dependencies  the points whose current colors this transformation depends on
      * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.PixelOutOfBoundsException if a pixel
-     *         in the `applyArea` is out of the frame's bounds
+     *         in `applyArea` or `dependencies` is out of the frame's bounds
      * @throws IllegalFrameReference if this view is no longer valid
      */
     void generateWith(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies);

@@ -22,7 +22,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
+import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
+import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -37,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import static java.util.Objects.requireNonNull;
 
@@ -51,7 +53,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
-    private final Map<ListenerType, List<Consumer<? super TextureAndFrameView>>> LISTENERS;
+    private final Map<ListenerType, List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>> LISTENERS;
     private final TextureState CURRENT_STATE;
     private boolean registered;
 
@@ -151,7 +153,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
         LISTENERS.get(type).forEach((listener) -> {
             TextureAndFrameView view = new TextureAndFrameView(CURRENT_STATE);
-            listener.accept(view);
+            listener.accept(view, CURRENT_STATE.predefinedFrames());
             view.invalidate();
         });
     }
@@ -162,9 +164,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * @param predefinedFrames          frames already existing in the original image
      * @param generatedFrame            initial image for this texture
      */
-    private EventDrivenTexture(Map<ListenerType, List<Consumer<? super TextureAndFrameView>>> listeners,
-                               List<? extends CloseableImageFrame> predefinedFrames,
-                               CloseableImageFrame generatedFrame) {
+    private EventDrivenTexture(
+            Map<ListenerType, List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>> listeners,
+            List<? extends CloseableImageFrame> predefinedFrames,
+            CloseableImageFrame generatedFrame) {
         super();
         LISTENERS = listeners;
         CURRENT_STATE = new TextureState(this, predefinedFrames, generatedFrame);
@@ -175,7 +178,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * @author soir20
      */
     public static class Builder {
-        private final Map<ListenerType, List<Consumer<? super TextureAndFrameView>>> LISTENERS;
+        private final Map<
+                ListenerType,
+                List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>
+        > LISTENERS;
         private List<? extends CloseableImageFrame> predefinedFrames;
         private CloseableImageFrame generatedFrame;
 
@@ -355,17 +361,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         /**
-         * Gets the number of predefined frames this texture has. A texture
-         * always has at least one predefined frame.
-         * @return the number of predefined frames for this texture
-         */
-        @Override
-        public int predefinedFrames() {
-            checkValid();
-            return STATE.predefinedFrames();
-        }
-
-        /**
          * Gets the event-driven texture.
          * @return the event-driven texture
          */
@@ -441,6 +436,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     private static class TextureState {
         private final EventDrivenTexture TEXTURE;
         private final List<? extends CloseableImageFrame> PREDEFINED_FRAMES;
+        private final FrameGroup<PersistentFrameView> PREDEFINED_FRAME_GROUP;
         private final CloseableImageFrame GENERATED_FRAME;
         private final Queue<Triple<ColorTransform, Iterable<Point>, Iterable<Point>>> TRANSFORMS;
         private Integer currentFrameIndex;
@@ -521,15 +517,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         /**
-         * Gets the number of predefined frames this texture has. A texture
-         * always has at least one predefined frame.
-         * @return the number of predefined frames for this texture
-         */
-        public int predefinedFrames() {
-            return PREDEFINED_FRAMES.size();
-        }
-
-        /**
          * Gets the event-driven texture.
          * @return the event-driven texture
          */
@@ -566,6 +553,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         /**
+         * Gets the group of persistent views of the predefined frames.
+         * @return the group of predefined frames
+         */
+        public FrameGroup<PersistentFrameView> predefinedFrames() {
+            return PREDEFINED_FRAME_GROUP;
+        }
+
+        /**
          * Creates a new texture state. Automatically flags the texture
          * for upload on the first binding.
          * @param texture               the event-driven texture
@@ -576,6 +571,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                              CloseableImageFrame generatedFrame) {
             TEXTURE = texture;
             PREDEFINED_FRAMES = predefinedFrames;
+            PREDEFINED_FRAME_GROUP = new FrameGroupImpl<>(predefinedFrames, PredefinedFrameView::new);
             GENERATED_FRAME = generatedFrame;
             TRANSFORMS = new ArrayDeque<>();
             replaceWith(0);
