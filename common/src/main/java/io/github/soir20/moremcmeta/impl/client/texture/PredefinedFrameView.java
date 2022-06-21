@@ -41,6 +41,11 @@ public class PredefinedFrameView implements PersistentFrameView {
      */
     public PredefinedFrameView(CloseableImageFrame frame, int index) {
         FRAME = requireNonNull(frame, "Frame cannot be null");
+
+        if (index < 0) {
+            throw new IllegalArgumentException("Predefined frame index cannot be negative");
+        }
+
         INDEX = index;
     }
 
