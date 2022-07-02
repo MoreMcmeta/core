@@ -17,8 +17,10 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.math.Point;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -29,6 +31,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class SingleUploadComponent implements TextureComponent {
     private final TexturePreparer PREPARER;
+    private final AtomicBoolean IS_PREPARED;
 
     /**
      * Creates a new upload component for an independent texture.
@@ -36,6 +39,7 @@ public class SingleUploadComponent implements TextureComponent {
      */
     public SingleUploadComponent(TexturePreparer preparer) {
         PREPARER = requireNonNull(preparer, "Preparer cannot be null");
+        IS_PREPARED = new AtomicBoolean();
     }
 
     /**
@@ -47,15 +51,29 @@ public class SingleUploadComponent implements TextureComponent {
         TextureListener registrationListener = new TextureListener(TextureListener.Type.REGISTRATION,
                 (state) -> {
                     RGBAImageFrame image = state.getImage();
-                    PREPARER.prepare(state.getTexture().getId(), 0, image.getWidth(), image.getHeight());
+                    if (!RenderSystem.isOnRenderThreadOrInit()) {
+                        RenderSystem.recordRenderCall(() -> {
+                            PREPARER.prepare(
+                                    state.getTexture().getId(),
+                                    0,
+                                    image.getWidth(),
+                                    image.getHeight());
+                            IS_PREPARED.set(true);
+                        });
+                    } else {
+                        PREPARER.prepare(state.getTexture().getId(), 0, image.getWidth(), image.getHeight());
+                        IS_PREPARED.set(true);
+                    }
                 });
 
         Point uploadPoint = new Point(0, 0);
         TextureListener uploadListener = new TextureListener(
                 TextureListener.Type.UPLOAD,
                 (state) -> {
-                    state.getImage().lowerMipmapLevel(0);
-                    state.getImage().uploadAt(uploadPoint);
+                    if (IS_PREPARED.get()) {
+                        state.getImage().lowerMipmapLevel(0);
+                        state.getImage().uploadAt(uploadPoint);
+                    }
                 }
         );
 
