@@ -134,8 +134,12 @@ public class TextureFinisherTest {
 
         for (MockRGBAImageFrame frame : frames) {
             MockRGBAImage mockImage = (MockRGBAImage) frame.getImage(0);
-            assertEquals(new Point(0, 0), mockImage.getLastUploadPoint());
-            assertEquals(1, frame.getUploadCount());
+
+            /* The SpriteUploadComponent will always upload, while the SingleUploadComponent must
+               be on the render thread. */
+            assertNull(mockImage.getLastUploadPoint());
+            assertEquals(0, frame.getUploadCount());
+
         }
 
     }

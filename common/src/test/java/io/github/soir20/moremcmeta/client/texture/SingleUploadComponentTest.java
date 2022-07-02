@@ -17,14 +17,9 @@
 
 package io.github.soir20.moremcmeta.client.texture;
 
-import io.github.soir20.moremcmeta.math.Point;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.stream.Stream;
-
-import static org.junit.Assert.*;
 
 /**
  * Tests the {@link SingleUploadComponent}. Coverage here is somewhat low
@@ -41,70 +36,6 @@ public class SingleUploadComponentTest {
     public void construct_NullPreparer_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new SingleUploadComponent(null);
-    }
-
-    @Test
-    public void upload_FirstUpload_FrameUploadedAtOrigin() {
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
-
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
-        builder.setImage(frame);
-        EventDrivenTexture texture = builder.build();
-
-        texture.upload();
-
-        assertEquals(1, frame.getUploadCount());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
-    }
-
-    @Test
-    public void upload_SecondUpload_FrameUploadedAtOriginAgain() {
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
-
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
-        builder.setImage(frame);
-        EventDrivenTexture texture = builder.build();
-
-        texture.upload();
-        texture.upload();
-
-        assertEquals(2, frame.getUploadCount());
-        assertEquals(new Point(0, 0), ((MockRGBAImage) frame.getImage(0)).getLastUploadPoint());
-    }
-
-    @Test
-    public void upload_OriginalImage_MipmapLoweredTo0() {
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
-
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
-        builder.setImage(frame);
-        EventDrivenTexture texture = builder.build();
-
-        assertEquals(2, frame.getMipmapLevel());
-        texture.upload();
-        assertEquals(0, frame.getMipmapLevel());
-    }
-
-    @Test
-    public void upload_SecondImage_MipmapLoweredTo0() {
-        MockRGBAImageFrame frame2 = new MockRGBAImageFrame();
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(() -> Stream.of(new TextureListener(TextureListener.Type.TICK, (state) -> state.replaceImage(frame2))));
-        builder.add(() -> (new SingleUploadComponent((id, mipmap, width, height) -> {})).getListeners());
-
-        MockRGBAImageFrame frame = new MockRGBAImageFrame();
-        builder.setImage(frame);
-        EventDrivenTexture texture = builder.build();
-
-        texture.upload();
-        texture.tick();
-
-        assertEquals(2, frame2.getMipmapLevel());
-        texture.upload();
-        assertEquals(0, frame2.getMipmapLevel());
     }
 
 }
