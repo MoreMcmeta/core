@@ -137,8 +137,11 @@ public class TextureFinisherTest {
 
         for (MockCloseableImageFrame frame : frames) {
             MockCloseableImage mockImage = frame.mipmap(0);
-            assertEquals(new Point(0, 0), mockImage.lastUploadPoint());
-            assertEquals(1, frame.uploadCount());
+
+            /* The SpriteUploadComponent will always upload, while the SingleUploadComponent must
+               be on the render thread. */
+            assertNull(mockImage.lastUploadPoint());
+            assertEquals(0, frame.uploadCount());
         }
 
     }

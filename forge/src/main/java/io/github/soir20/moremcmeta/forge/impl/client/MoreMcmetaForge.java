@@ -125,13 +125,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @return the OpenGL preparer for this loader
      */
     protected TexturePreparer preparer() {
-        return (glId, mipmap, width, height) -> {
-            if (!RenderSystem.isOnRenderThreadOrInit()) {
-                RenderSystem.recordRenderCall(() -> TextureUtil.m_85287_(glId, mipmap, width, height));
-            } else {
-                TextureUtil.m_85287_(glId, mipmap, width, height);
-            }
-        };
+        return TextureUtil::m_85287_;
     }
 
     /**

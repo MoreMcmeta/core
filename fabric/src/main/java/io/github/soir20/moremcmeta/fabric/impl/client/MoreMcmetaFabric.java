@@ -19,7 +19,6 @@ package io.github.soir20.moremcmeta.fabric.impl.client;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
@@ -99,13 +98,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return the OpenGL preparer for this loader
      */
     protected TexturePreparer preparer() {
-        return (glId, mipmap, width, height) -> {
-            if (!RenderSystem.isOnRenderThreadOrInit()) {
-                RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(glId, mipmap, width, height));
-            } else {
-                TextureUtil.prepareImage(glId, mipmap, width, height);
-            }
-        };
+        return TextureUtil::prepareImage;
     }
 
     /**
