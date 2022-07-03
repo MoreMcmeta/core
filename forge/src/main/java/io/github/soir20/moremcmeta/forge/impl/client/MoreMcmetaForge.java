@@ -20,7 +20,6 @@ package io.github.soir20.moremcmeta.forge.impl.client;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
