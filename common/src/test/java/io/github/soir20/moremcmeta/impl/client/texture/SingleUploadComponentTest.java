@@ -17,14 +17,9 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
-import io.github.soir20.moremcmeta.api.math.Point;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link SingleUploadComponent}. Coverage here is somewhat low
@@ -41,39 +36,6 @@ public class SingleUploadComponentTest {
     public void construct_NullPreparer_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new SingleUploadComponent(null);
-    }
-
-    @Test
-    public void upload_FirstUpload_FrameUploadedAtOrigin() {
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new SingleUploadComponent((id, mipmap, width, height) -> {}));
-
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        EventDrivenTexture texture = builder.build();
-
-        texture.upload();
-
-        assertEquals(1, frame.uploadCount());
-        assertEquals(new Point(0, 0), frame.mipmap(0).lastUploadPoint());
-    }
-
-    @Test
-    public void upload_SecondUpload_FrameUploadedAtOriginAgain() {
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new SingleUploadComponent((id, mipmap, width, height) -> {}));
-
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
-        builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        EventDrivenTexture texture = builder.build();
-
-        texture.upload();
-        texture.upload();
-
-        assertEquals(2, frame.uploadCount());
-        assertEquals(new Point(0, 0), frame.mipmap(0).lastUploadPoint());
     }
 
 }

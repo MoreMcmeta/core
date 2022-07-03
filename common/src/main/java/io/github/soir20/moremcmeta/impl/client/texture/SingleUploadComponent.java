@@ -17,9 +17,12 @@
 
 package io.github.soir20.moremcmeta.impl.client.texture;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.math.Point;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,6 +33,7 @@ import static java.util.Objects.requireNonNull;
 public class SingleUploadComponent implements CoreTextureComponent {
     private static final Point UPLOAD_POINT = new Point(0, 0);
     private final TexturePreparer PREPARER;
+    private final AtomicBoolean IS_PREPARED;
 
     /**
      * Creates a new upload component for an independent texture.
@@ -37,6 +41,7 @@ public class SingleUploadComponent implements CoreTextureComponent {
      */
     public SingleUploadComponent(TexturePreparer preparer) {
         PREPARER = requireNonNull(preparer, "Preparer cannot be null");
+        IS_PREPARED = new AtomicBoolean();
     }
 
     /**
@@ -47,8 +52,15 @@ public class SingleUploadComponent implements CoreTextureComponent {
     @Override
     public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
                                FrameGroup<PersistentFrameView> predefinedFrames) {
-        PREPARER.prepare(currentFrame.texture().getId(), 0, currentFrame.width(), currentFrame.height());
-        currentFrame.lowerMipmapLevel(0);
+        if (!RenderSystem.isOnRenderThreadOrInit()) {
+            RenderSystem.recordRenderCall(() -> {
+                prepareTexture(currentFrame);
+                IS_PREPARED.set(true);
+            });
+        } else {
+            prepareTexture(currentFrame);
+            IS_PREPARED.set(true);
+        }
     }
 
     /**
@@ -59,7 +71,18 @@ public class SingleUploadComponent implements CoreTextureComponent {
     @Override
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
                          FrameGroup<PersistentFrameView> predefinedFrames) {
-        currentFrame.uploadAt(UPLOAD_POINT);
+        if (IS_PREPARED.get()) {
+            currentFrame.uploadAt(UPLOAD_POINT);
+        }
+    }
+
+    /**
+     * Prepares an individual texture on the current thread.
+     * @param currentFrame      the current frame of the texture
+     */
+    private void prepareTexture(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        PREPARER.prepare(currentFrame.texture().getId(), 0, currentFrame.width(), currentFrame.height());
+        currentFrame.lowerMipmapLevel(0);
     }
 
 }
