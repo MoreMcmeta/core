@@ -17,6 +17,8 @@
 
 package io.github.soir20.moremcmeta.api.math;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -100,6 +102,7 @@ public final class Area implements Iterable<Point> {
      * @return  the iterator for all points in this area
      */
     @Override
+    @NotNull
     public Iterator<Point> iterator() {
         return new PointIterator(ROWS);
     }
