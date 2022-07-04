@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,6 +67,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
@@ -83,7 +85,7 @@ public abstract class MoreMcmeta {
      */
     public static final String MODID = "moremcmeta";
 
-    private final Collection<MoreMcmetaClientPlugin> DEFAULT_PLUGINS = Set.of();
+    private final Set<String> DEFAULT_PLUGINS = Set.of();
 
     private Map<ResourceLocation, TextureData<NativeImageAdapter>> lastTextures;
 
@@ -103,8 +105,10 @@ public abstract class MoreMcmeta {
 
         // Fetch and validate plugins
         Collection<MoreMcmetaClientPlugin> plugins = fetchPlugins(logger);
-        addDefaultPlugins(plugins, logger);
-        validatePlugins(plugins);
+        validateIndividualPlugins(plugins);
+        checkItemConflict(plugins, MoreMcmetaClientPlugin::displayName, "display name");
+        plugins = removeOverriddenPlugins(plugins, DEFAULT_PLUGINS, logger);
+        checkItemConflict(plugins, MoreMcmetaClientPlugin::sectionName, "section name");
 
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
@@ -217,35 +221,49 @@ public abstract class MoreMcmeta {
     protected abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
 
     /**
-     * Adds the default plugins to the main collection of plugins.
-     * @param plugins       main collection of plugins (with user-provided plugins)
-     * @param logger        logger to report warnings and errors
+     * Removes default plugins that are overridden by other plugins.
+     * @param plugins           main collection of plugins (with user-provided plugins)
+     * @param defaultPlugins    unique names of default plugins
+     * @param logger            logger to report warnings and errors
+     * @return the new collection of plugins with overridden plugins removed
      */
-    private void addDefaultPlugins(Collection<MoreMcmetaClientPlugin> plugins, Logger logger) {
-        Set<String> sections = plugins.stream()
-                .map(MoreMcmetaClientPlugin::sectionName)
-                .collect(Collectors.toSet());
+    private Collection<MoreMcmetaClientPlugin> removeOverriddenPlugins(Collection<MoreMcmetaClientPlugin> plugins,
+                                                                       Set<String> defaultPlugins,
+                                                                       Logger logger) {
+        Map<String, Long> countBySection = plugins.stream()
+                .collect(Collectors.groupingBy(
+                        MoreMcmetaClientPlugin::sectionName,
+                        Collectors.counting()
+                ));
 
-        DEFAULT_PLUGINS.forEach((defaultPlugin) -> {
+        Set<MoreMcmetaClientPlugin> results = new HashSet<>();
 
-            // Disable default plugin if there is a user-provided plugin with the same section name
-            if (sections.contains(defaultPlugin.sectionName())) {
-                logger.info("Disabled default plugin " + defaultPlugin.displayName()
+        plugins.forEach((plugin) -> {
+            String section = plugin.sectionName();
+            String displayName = plugin.displayName();
+
+            /* Disable default plugin if there is a user-provided plugin with the same section name.
+               It has already been validated that no two plugins have the same display name, so only
+               default plugins will be disabled. */
+            if (countBySection.get(section) > 1 && defaultPlugins.contains(displayName)) {
+                logger.info("Disabled default plugin " + plugin.displayName()
                         + " as a replacement plugin was provided");
             } else {
-                plugins.add(defaultPlugin);
+                results.add(plugin);
             }
 
         });
+
+        return results;
     }
 
     /**
-     * Validates all the registered plugins, both individually and for conflicts.
+     * Checks all the registered plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
      * @throws MoreMcmetaClientPlugin.IncompletePluginException if a plugin is not valid
      * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins conflict
      */
-    private void validatePlugins(Collection<MoreMcmetaClientPlugin> plugins)
+    private void validateIndividualPlugins(Collection<MoreMcmetaClientPlugin> plugins)
             throws MoreMcmetaClientPlugin.IncompletePluginException,
             MoreMcmetaClientPlugin.ConflictingPluginsException {
 
@@ -256,30 +274,6 @@ public abstract class MoreMcmeta {
             validatePluginItem(plugin.parser(), "parser", plugin.displayName());
             validatePluginItem(plugin.componentProvider(), "component provider", plugin.displayName());
         }
-
-        // Check that no two plugins have the same section name
-        Map<String, List<MoreMcmetaClientPlugin>> pluginsBySectionName = plugins
-                .stream()
-                .collect(Collectors.groupingBy(MoreMcmetaClientPlugin::sectionName));
-        Optional<Map.Entry<String, List<MoreMcmetaClientPlugin>>> conflictingPlugins = pluginsBySectionName
-                .entrySet()
-                .stream()
-                .filter((entry) -> entry.getValue().size() > 1)
-                .findFirst();
-
-        if (conflictingPlugins.isEmpty()) {
-            return;
-        }
-
-        // Report section name and plugin display names to help diagnose the issue
-        String conflictingSectionName = conflictingPlugins.get().getKey();
-        List<String> conflictingPluginNames = conflictingPlugins.get().getValue()
-                .stream()
-                .map(MoreMcmetaClientPlugin::displayName)
-                .toList();
-
-        throw new MoreMcmetaClientPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
-                + " have conflicting section name: " + conflictingSectionName);
     }
 
     /**
@@ -295,6 +289,43 @@ public abstract class MoreMcmeta {
         if (item == null) {
             throw new MoreMcmetaClientPlugin.IncompletePluginException("Plugin " + pluginName + " is missing " + itemName);
         }
+    }
+
+    /**
+     * Checks the provided plugins and throws a {@link MoreMcmetaClientPlugin.ConflictingPluginsException}
+     * if any two have a duplicate value for the property being checked.
+     * @param plugins               the plugins to check
+     * @param propertyAccessor      the function to use to access the property
+     * @param propertyName          display name of the property
+     * @param <T> type of the property values
+     * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins have the same value returned
+     *                                                            by the propertyAccessor
+     */
+    private <T> void checkItemConflict(Collection<MoreMcmetaClientPlugin> plugins,
+                                       Function<MoreMcmetaClientPlugin, T> propertyAccessor,
+                                       String propertyName) throws MoreMcmetaClientPlugin.ConflictingPluginsException {
+        Map<T, List<MoreMcmetaClientPlugin>> pluginsByProperty = plugins
+                .stream()
+                .collect(Collectors.groupingBy(propertyAccessor));
+        Optional<Map.Entry<T, List<MoreMcmetaClientPlugin>>> conflictingPlugins = pluginsByProperty
+                .entrySet()
+                .stream()
+                .filter((entry) -> entry.getValue().size() > 1)
+                .findFirst();
+
+        if (conflictingPlugins.isEmpty()) {
+            return;
+        }
+
+        // Report section name and plugin display names to help diagnose the issue
+        T conflictingProperty = conflictingPlugins.get().getKey();
+        List<String> conflictingPluginNames = conflictingPlugins.get().getValue()
+                .stream()
+                .map(MoreMcmetaClientPlugin::displayName)
+                .toList();
+
+        throw new MoreMcmetaClientPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
+                + " have conflicting " + propertyName + ": " + conflictingProperty);
     }
 
     /**
