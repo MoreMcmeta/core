@@ -30,7 +30,7 @@ import java.util.Set;
  * @author soir20
  * @since 4.0.0
  */
-public class Area implements Iterable<Point> {
+public final class Area implements Iterable<Point> {
 
     /**
      * Creates an area from a predefined list of points.
@@ -109,7 +109,7 @@ public class Area implements Iterable<Point> {
      * @author soir20
      * @since 4.0.0
      */
-    public static class Builder {
+    public static final class Builder {
 
         // Keys are y (row) coordinates. Values are x (column) coordinates.
         private final Map<Integer, Set<Integer>> ROWS;
