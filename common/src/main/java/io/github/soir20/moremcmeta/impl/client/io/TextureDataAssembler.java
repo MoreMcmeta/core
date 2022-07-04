@@ -26,7 +26,7 @@ import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
-import io.github.soir20.moremcmeta.api.math.Point;
+import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
@@ -250,7 +250,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
          * @param dependencies  the points whose current colors this transformation depends on
          */
         @Override
-        public void transform(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies) {
+        public void transform(ColorTransform transform, Area applyArea, Area dependencies) {
             checkValid();
             FRAME.applyTransform(transform, applyArea, dependencies);
         }

@@ -21,15 +21,14 @@ import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
+import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -1272,7 +1271,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform(null, List.of(), List.of());
+        frame.applyTransform(null, Area.of(), Area.of());
     }
 
     @Test
@@ -1287,7 +1286,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> null, List.of(new Point(4, 5)), List.of());
+        frame.applyTransform((point, depFunction) -> null, Area.of(new Point(4, 5)), Area.of());
     }
 
     @Test
@@ -1302,25 +1301,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), null, List.of());
-    }
-
-    @Test
-    public void applyTransform_NullPointInArea_NullPointerException() {
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(
-                        new MockCloseableImage(100, 200),
-                        new MockCloseableImage(50, 100),
-                        new MockCloseableImage(25, 50)
-                )
-        );
-
-        List<Point> area = new ArrayList<>();
-        area.add(null);
-
-        expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), area, List.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), null, Area.of());
     }
 
     @Test
@@ -1335,7 +1316,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(100, 50)), List.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(100, 50)), Area.of());
     }
 
     @Test
@@ -1350,7 +1331,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 200)), List.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 200)), Area.of());
     }
 
     @Test
@@ -1365,7 +1346,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(-1, 50)), List.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(-1, 50)), Area.of());
     }
 
     @Test
@@ -1380,7 +1361,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, -1)), List.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, -1)), Area.of());
     }
 
     @Test
@@ -1395,25 +1376,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), null);
-    }
-
-    @Test
-    public void applyTransform_NullDependencyPoint_NullPointerException() {
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(
-                        new MockCloseableImage(100, 200),
-                        new MockCloseableImage(50, 100),
-                        new MockCloseableImage(25, 50)
-                )
-        );
-
-        List<Point> dependencies = new ArrayList<>();
-        dependencies.add(null);
-
-        expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), dependencies);
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), null);
     }
 
     @Test
@@ -1428,7 +1391,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(100, 50)));
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(100, 50)));
     }
 
     @Test
@@ -1443,7 +1406,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(50, 200)));
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, 200)));
     }
 
     @Test
@@ -1458,7 +1421,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(-1, 50)));
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(-1, 50)));
     }
 
     @Test
@@ -1473,7 +1436,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 50)), List.of(new Point(50, -1)));
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, -1)));
     }
 
     @Test
@@ -1491,7 +1454,7 @@ public class CloseableImageFrameTest {
         frame.applyTransform((point, depFunction) -> {
             depFunction.apply(new Point(50, 50));
             return new Color(100, 100, 100, 100);
-        }, List.of(new Point(50, 50)), List.of(new Point(50, 100)));
+        }, Area.of(new Point(50, 50)), Area.of(new Point(50, 100)));
     }
 
     @Test
@@ -1510,8 +1473,8 @@ public class CloseableImageFrameTest {
 
         frame.applyTransform(
                 (point, depFunction) -> new Color(depFunction.apply(new Point(50, 50)).combine() / 2),
-                List.of(new Point(50, 50)),
-                List.of(new Point(50, 50))
+                Area.of(new Point(50, 50)),
+                Area.of(new Point(50, 50))
         );
     }
 
@@ -1536,8 +1499,8 @@ public class CloseableImageFrameTest {
 
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
-                pointToColor.keySet(),
-                List.of()
+                Area.of(pointToColor.keySet()),
+                Area.of()
         );
 
         for (Point point : pointToColor.keySet()) {
@@ -1579,8 +1542,8 @@ public class CloseableImageFrameTest {
 
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
-                pointToColor.keySet(),
-                List.of()
+                Area.of(pointToColor.keySet()),
+                Area.of()
         );
 
         for (Point point : pointToColor.keySet()) {
@@ -1621,8 +1584,8 @@ public class CloseableImageFrameTest {
 
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
-                pointToColor.keySet(),
-                List.of()
+                Area.of(pointToColor.keySet()),
+                Area.of()
         );
 
         int topLeftColorMip1 = ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466);
@@ -1677,8 +1640,8 @@ public class CloseableImageFrameTest {
 
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
-                pointToColor.keySet(),
-                List.of()
+                Area.of(pointToColor.keySet()),
+                Area.of()
         );
 
         assertEquals(1767640594, images.get(0).color(48, 100));
@@ -1732,8 +1695,8 @@ public class CloseableImageFrameTest {
 
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
-                pointToColor.keySet(),
-                List.of()
+                Area.of(pointToColor.keySet()),
+                Area.of()
         );
 
         int topLeftColorMip1 = ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466);
@@ -1769,7 +1732,7 @@ public class CloseableImageFrameTest {
         frame.close();
 
         expectedException.expect(IllegalStateException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), List.of(new Point(50, 100)), List.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 100)), Area.of());
     }
 
     @Test

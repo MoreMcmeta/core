@@ -31,6 +31,37 @@ import java.util.Set;
  * @since 4.0.0
  */
 public class Area implements Iterable<Point> {
+
+    /**
+     * Creates an area from a predefined list of points.
+     * @param points        the points that make up the area
+     * @return an area containing only these points
+     */
+    public static Area of(Point... points) {
+        Area.Builder builder = new Builder();
+
+        for (Point point : points) {
+            builder.addPixel(point.x(), point.y());
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * Creates an area from a predefined list of points.
+     * @param points        the points that make up the area
+     * @return an area containing only these points
+     */
+    public static Area of(Iterable<Point> points) {
+        Area.Builder builder = new Builder();
+
+        for (Point point : points) {
+            builder.addPixel(point.x(), point.y());
+        }
+
+        return builder.build();
+    }
+
     private final Set<Row> ROWS;
 
     /**

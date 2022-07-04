@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
+import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
@@ -204,7 +205,7 @@ public class CloseableImageFrame {
      * @throws ColorTransform.NonDependencyRequestException if the previous color of a point that
      *                                                     is not a dependency is requested
      */
-    public void applyTransform(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies) {
+    public void applyTransform(ColorTransform transform, Area applyArea, Area dependencies) {
         checkOpen();
 
         requireNonNull(transform, "Transform cannot be null");

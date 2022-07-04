@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
-import io.github.soir20.moremcmeta.api.math.Point;
+import io.github.soir20.moremcmeta.api.math.Area;
 
 /**
  * A {@link FrameView} that represents a predefined frame whose pixels can be modified.
@@ -38,6 +38,6 @@ public interface MutableFrameView extends FrameView {
      *                                             is out of the frame's bounds
      * @throws IllegalFrameReference if this view is no longer valid
      */
-    void transform(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies);
+    void transform(ColorTransform transform, Area applyArea, Area dependencies);
 
 }

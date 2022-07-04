@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.api.client.texture;
 
-import io.github.soir20.moremcmeta.api.math.Point;
+import io.github.soir20.moremcmeta.api.math.Area;
 
 /**
  * {@link FrameView} with the ability to adjust the current frame. Predefined frames are
@@ -41,11 +41,11 @@ public interface CurrentFrameView extends FrameView {
      *         in `applyArea` or `dependencies` is out of the frame's bounds
      * @throws IllegalFrameReference if this view is no longer valid
      */
-    void generateWith(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies);
+    void generateWith(ColorTransform transform, Area applyArea, Area dependencies);
 
     /**
      * Makes the predefined frame with the given index the current frame. The next call to
-     * {@link #generateWith(ColorTransform, Iterable, Iterable)} by any plugin will generate a frame based
+     * {@link #generateWith(ColorTransform, Area, Area)} by any plugin will generate a frame based
      * on this predefined frame, unless another predefined frame is made the current frame.
      * @param index     the index of the predefined frame to make current
      * @throws io.github.soir20.moremcmeta.api.client.texture.FrameView.FrameIndexOutOfBoundsException if the

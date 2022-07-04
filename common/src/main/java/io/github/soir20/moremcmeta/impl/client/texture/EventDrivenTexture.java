@@ -26,6 +26,7 @@ import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
+import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -313,7 +314,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param dependencies  the points whose current colors this transformation depends on
          */
         @Override
-        public void generateWith(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies) {
+        public void generateWith(ColorTransform transform, Area applyArea, Area dependencies) {
             checkValid();
             STATE.generateWith(transform, applyArea, dependencies);
         }
@@ -438,7 +439,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final List<? extends CloseableImageFrame> PREDEFINED_FRAMES;
         private final FrameGroup<PersistentFrameView> PREDEFINED_FRAME_GROUP;
         private final CloseableImageFrame GENERATED_FRAME;
-        private final Queue<Triple<ColorTransform, Iterable<Point>, Iterable<Point>>> TRANSFORMS;
+        private final Queue<Triple<ColorTransform, Area, Area>> TRANSFORMS;
         private Integer currentFrameIndex;
         private Integer indexToCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
@@ -450,7 +451,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param applyArea     area to apply the transformation to
          * @param dependencies  the points whose current colors this transformation depends on
          */
-        public void generateWith(ColorTransform transform, Iterable<Point> applyArea, Iterable<Point> dependencies) {
+        public void generateWith(ColorTransform transform, Area applyArea, Area dependencies) {
             requireNonNull(transform, "Frame transform cannot be null");
             requireNonNull(applyArea, "Apply area cannot be null");
             requireNonNull(dependencies, "Dependencies cannot be null");
@@ -604,7 +605,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             }
 
             while (!TRANSFORMS.isEmpty()) {
-                Triple<ColorTransform, Iterable<Point>, Iterable<Point>> transform = TRANSFORMS.remove();
+                Triple<ColorTransform, Area, Area> transform = TRANSFORMS.remove();
                 GENERATED_FRAME.applyTransform(transform.getLeft(), transform.getMiddle(), transform.getRight());
             }
         }
