@@ -69,6 +69,11 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
         start();
     }
 
+    /**
+     * Gets all loaded MoreMcmeta plugins from other mods.
+     * @param logger    logger to report errors
+     * @return all loaded plugins
+     */
     @Override
     protected Collection<MoreMcmetaClientPlugin> fetchPlugins(Logger logger) {
         List<MoreMcmetaClientPlugin> plugins = new ArrayList<>();

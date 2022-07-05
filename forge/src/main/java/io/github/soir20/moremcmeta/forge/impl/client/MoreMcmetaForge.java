@@ -84,6 +84,11 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> this::start);
     }
 
+    /**
+     * Gets all loaded MoreMcmeta plugins from other mods.
+     * @param logger    logger to report errors
+     * @return all loaded plugins
+     */
     @Override
     protected Collection<MoreMcmetaClientPlugin> fetchPlugins(Logger logger) {
         List<MoreMcmetaClientPlugin> plugins = new ArrayList<>();
