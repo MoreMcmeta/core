@@ -84,7 +84,7 @@ public class ModRepositorySourceTest {
 
         repositorySource.loadPacks((pack) -> packId.set(pack.getId()), MOCK_CONSTRUCTOR);
 
-        assertEquals(ModRepositorySource.getPackId(), packId.get());
+        assertEquals(ModRepositorySource.PACK_ID, packId.get());
     }
 
 }
