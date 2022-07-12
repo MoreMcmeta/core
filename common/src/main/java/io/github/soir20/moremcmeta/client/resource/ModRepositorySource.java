@@ -34,6 +34,11 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class ModRepositorySource implements RepositorySource {
+
+    /**
+     * The unique identifier for the mod's resource pack.
+     */
+    public static final String PACK_ID = "__moremcmeta-internal__";
     private final Supplier<PackResources> PACK_GETTER;
 
     /**
@@ -55,7 +60,7 @@ public class ModRepositorySource implements RepositorySource {
         requireNonNull(packConstructor, "Pack constructor cannot be null");
 
         Pack pack = new Pack(
-                getPackId(),
+                PACK_ID,
                 true,
                 PACK_GETTER,
                 new TextComponent("MoreMcmeta Internal"),
@@ -67,14 +72,6 @@ public class ModRepositorySource implements RepositorySource {
         );
 
         consumer.accept(pack);
-    }
-
-    /**
-     * Gets the ID used as the unique identifier for the mod's resource pack/
-     * @return the mod's resource pack ID
-     */
-    public static String getPackId() {
-        return "__moremcmeta-internal__";
     }
 
 }
