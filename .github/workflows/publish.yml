@@ -39,7 +39,7 @@ jobs:
       - name: Publish to GitHub Packages
         uses: gradle/gradle-build-action@v2.2.1
         with:
-          arguments: :${{ matrix.loader }}:publish
+          arguments: :${{ matrix.loader }}:build :${{ matrix.loader }}:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MOD_VERSION: ${{ steps.mod_version.outputs.result }}
