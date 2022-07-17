@@ -17,6 +17,8 @@
 
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "com.modrinth.minotaur" version "2.3.1"
 }
 
 configurations {
@@ -74,4 +76,58 @@ sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
+}
+
+publishing {
+    publications {
+        mavenFabric(MavenPublication) {
+            artifactId = "${archivesBaseName}-${version}-${project.name}"
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/soir20/MoreMcmeta"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
+if (System.getenv("CURSEFORGE_TOKEN") != null) {
+    curseforge {
+        apiKey = System.getenv("CURSEFORGE_TOKEN")
+        project {
+            id = project.fabricCurseForgeId
+            releaseType = "release"
+            addGameVersion "Fabric"
+            addGameVersion "Java $project.javaVersion"
+            addGameVersion project.minecraftVersion
+            mainArtifact(remapJar.archiveFile) {
+                displayName = "v$version"
+            }
+            changelog = System.getenv("CHANGELOG")
+            changelogType = "markdown"
+        }
+    }
+}
+
+if (System.getenv("MODRINTH_TOKEN") != null) {
+    modrinth {
+        token = System.getenv("MODRINTH_TOKEN")
+        projectId = project.modrinthId
+        changelog = System.getenv("CHANGELOG")
+        versionNumber = "v$version-fabric"
+        versionType = "release"
+        uploadFile = remapJar
+        gameVersions = [project.minecraftVersion]
+        loaders = ["fabric"]
+        dependencies {
+            required.project "fabric-api"
+        }
+    }
 }

@@ -58,15 +58,16 @@ subprojects {
 allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
+    apply plugin: "maven-publish"
 
+    rootProject.ext.modVersion = System.getenv("MOD_VERSION") ?: "DEV"
     version = "${rootProject.minecraftVersion}-${rootProject.modVersion}"
     group = rootProject.mavenGroup
     archivesBaseName = rootProject.modArchivesBaseName
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-
-        def targetVersion = 8
+        def targetVersion = rootProject.javaVersion.toInteger()
         if (JavaVersion.current().isJava9Compatible()) {
             options.release.set(targetVersion)
         }
