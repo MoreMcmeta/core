@@ -54,7 +54,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MOD_VERSION: ${{ steps.mod_version.outputs.result }}
-          MC_VERSION: 1.19
+          MC_VERSION: 1.16.5
 
       - name: Publish to CurseForge
         uses: gradle/gradle-build-action@v2.2.1
