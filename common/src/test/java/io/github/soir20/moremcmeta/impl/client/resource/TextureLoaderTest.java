@@ -484,7 +484,7 @@ public class TextureLoaderTest {
     }
 
     @SafeVarargs
-    private OrderedResourceRepository makeMockRepository(Set<String>... presentFiles) {
+    public static OrderedResourceRepository makeMockRepository(Set<String>... presentFiles) {
         ImmutableSet.Builder<ResourceCollection> builder = new ImmutableSet.Builder<>();
 
         for (Set<String> files : presentFiles) {

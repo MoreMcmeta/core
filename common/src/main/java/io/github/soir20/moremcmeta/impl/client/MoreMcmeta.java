@@ -30,6 +30,7 @@ import io.github.soir20.moremcmeta.impl.client.resource.ModRepositorySource;
 import io.github.soir20.moremcmeta.impl.client.resource.OrderedResourceRepository;
 import io.github.soir20.moremcmeta.impl.client.resource.SpriteFrameSizeFixPack;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
+import io.github.soir20.moremcmeta.impl.client.resource.TextureCache;
 import io.github.soir20.moremcmeta.impl.client.resource.TextureLoader;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.LazyTextureManager;
@@ -68,6 +69,7 @@ import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
@@ -86,8 +88,6 @@ public abstract class MoreMcmeta {
     public static final String MODID = "moremcmeta";
 
     private final Set<String> DEFAULT_PLUGINS = Set.of();
-
-    private Map<ResourceLocation, TextureData<NativeImageAdapter>> lastTextures;
 
     /**
      * Begins the startup process, creating necessary objects and registering the
@@ -125,6 +125,9 @@ public abstract class MoreMcmeta {
         );
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(reader, logger);
 
+        // Cache
+        final TextureCache<TextureData<NativeImageAdapter>, List<String>> cache = new TextureCache<>(loader);
+
         // Listener registration and add resource pack
         onResourceManagerInitialized((client) -> {
             if (!(client.getResourceManager() instanceof ReloadableResourceManager rscManager)) {
@@ -133,13 +136,17 @@ public abstract class MoreMcmeta {
             }
 
             PackRepository packRepository = client.getResourcePackRepository();
+            Supplier<List<String>> packIdGetter = () -> packRepository.getSelectedPacks().stream()
+                    .map(Pack::getId)
+                    .toList();
+
             ModRepositorySource source = new ModRepositorySource(() -> {
-                OrderedResourceRepository repository = getResourceRepository(packRepository,
-                        ModRepositorySource.packId());
+                OrderedResourceRepository repository = getResourceRepository(packRepository);
 
-                lastTextures = loadData(repository, loader);
+                List<String> currentPackIds = packIdGetter.get();
 
-                return new SpriteFrameSizeFixPack(lastTextures, repository);
+                cache.load(repository, Set.of("textures", "optifine"), currentPackIds);
+                return new SpriteFrameSizeFixPack(cache.get(currentPackIds), repository);
             });
 
             addRepositorySource(packRepository, source);
@@ -148,7 +155,12 @@ public abstract class MoreMcmeta {
                registering our listener like a vanilla listener ensures it is executed
                before the TextureManager resets its textures. This is the least invasive way to
                animate preloaded title screen textures. */
-            rscManager.registerReloadListener(wrapListener(makeListener(manager, logger)));
+            rscManager.registerReloadListener(wrapListener(new TextureResourceReloadListener(
+                    manager,
+                    cache,
+                    packIdGetter,
+                    logger
+            )));
             logger.debug("Added texture reload listener");
 
         });
@@ -167,7 +179,7 @@ public abstract class MoreMcmeta {
 
     /**
      * Gets the function that converts atlas sprites to their mipmap level.
-     * @param logger        logger to report warnings and errors
+     * @param logger        logger to report warnings or errors
      * @return the mipmap level getter
      */
     protected abstract ToIntFunction<TextureAtlasSprite> mipmapLevelGetter(Logger logger);
@@ -330,14 +342,13 @@ public abstract class MoreMcmeta {
 
     /**
      * Gets the repository containing all the game's resources except the pack this mod adds.
-     * @param packRepository        the repository containing all packs
-     * @param modPackId             unique identifier of the pack this mod adds
+     * @param packRepository the repository containing all packs
      * @return the repository with all resources
      */
-    private OrderedResourceRepository getResourceRepository(PackRepository packRepository, String modPackId) {
+    private OrderedResourceRepository getResourceRepository(PackRepository packRepository) {
         List<PackResourcesAdapter> otherPacks = new ArrayList<>(packRepository.getSelectedPacks()
                 .stream()
-                .filter((pack) -> !pack.getId().equals(modPackId))
+                .filter((pack) -> !pack.getId().equals(ModRepositorySource.PACK_ID))
                 .map(Pack::open)
                 .map(PackResourcesAdapter::new)
                 .toList());
@@ -345,41 +356,6 @@ public abstract class MoreMcmeta {
         Collections.reverse(otherPacks);
 
         return new OrderedResourceRepository(PackType.CLIENT_RESOURCES, otherPacks);
-    }
-
-    /**
-     * Loads minimum texture data for textures controlled by this mod.
-     * @param resourceRepository    repository containing resources to load from
-     * @param loader                loader to load data
-     * @return texture data for textures controlled by this mod
-     */
-    private Map<ResourceLocation, TextureData<NativeImageAdapter>> loadData(
-            OrderedResourceRepository resourceRepository,
-            TextureLoader<TextureData<NativeImageAdapter>> loader
-    ) {
-        requireNonNull(loader, "Loader cannot be null");
-
-        /* We would normally want to load data asynchronously during reloading. However, this
-           portion of texture loading is efficient, even for large images. We have to do this
-           before reloading starts to avoid a race with texture atlases. */
-        Map<ResourceLocation, TextureData<NativeImageAdapter>> textures = new HashMap<>();
-        textures.putAll(loader.load(resourceRepository, "textures"));
-        textures.putAll(loader.load(resourceRepository, "optifine"));
-        return textures;
-
-    }
-
-    /**
-     * Creates a new reload listener that loads and queues animated textures for a mod loader.
-     * @param texManager        manages prebuilt textures
-     * @param logger            a logger to write output
-     * @return reload listener that loads and queues animated textures
-     */
-    private StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> makeListener(
-            LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
-            Logger logger
-    ) {
-        return new TextureResourceReloadListener(texManager, logger);
     }
 
     /**
@@ -402,7 +378,7 @@ public abstract class MoreMcmeta {
     /**
      * Adds a callback for any necessary post-reload work.
      * @param manager           texture manager with unfinished work
-     * @param logger            logger to report warnings and errors
+     * @param logger            logger to report warnings or errors
      */
     private void addCompletedReloadCallback(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager,
                                             Logger logger) {
@@ -423,19 +399,27 @@ public abstract class MoreMcmeta {
     private class TextureResourceReloadListener
             implements StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> {
         private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
+        private final TextureCache<TextureData<NativeImageAdapter>, List<String>> CACHE;
+        private final Supplier<List<String>> PACK_ID_GETTER;
         private final LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> TEX_MANAGER;
         private final Logger LOGGER;
 
         /**
          * Creates a new resource reload listener.
          * @param texManager            texture manager that accepts queued textures
+         * @param cache                 cache for texture data that should be loaded
+         * @param packIdGetter          gets the IDs of the currently-selected packs
          * @param logger                a logger to write output
          */
         public TextureResourceReloadListener(
                 LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
+                TextureCache<TextureData<NativeImageAdapter>, List<String>> cache,
+                Supplier<List<String>> packIdGetter,
                 Logger logger
         ) {
             TEX_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
+            CACHE = requireNonNull(cache, "Cache cannot be null");
+            PACK_ID_GETTER = requireNonNull(packIdGetter, "Pack ID getter cannot be null");
             LOGGER = requireNonNull(logger, "Logger cannot be null");
         }
 
@@ -476,9 +460,11 @@ public abstract class MoreMcmeta {
                     }
             );
 
-            return CompletableFuture.supplyAsync(() -> lastTextures.entrySet().stream().parallel().collect(
-                    Collectors.toMap(Map.Entry::getKey, (entry) -> assembler.assemble(entry.getValue()))
-            ), loadExecutor);
+            return CompletableFuture.supplyAsync(() -> CACHE.get(PACK_ID_GETTER.get()).entrySet()
+                    .stream().parallel()
+                    .collect(
+                            Collectors.toMap(Map.Entry::getKey, (entry) -> assembler.assemble(entry.getValue()))
+                    ), loadExecutor);
         }
 
         /**
