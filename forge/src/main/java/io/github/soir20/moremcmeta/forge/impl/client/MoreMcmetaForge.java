@@ -20,14 +20,14 @@ package io.github.soir20.moremcmeta.forge.impl.client;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
-import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
-import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
-import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.forge.api.client.MoreMcmetaClientPluginRegisterEvent;
 import io.github.soir20.moremcmeta.forge.impl.client.event.ClientTicker;
+import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
+import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.LazyTextureManager;
+import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -90,8 +90,8 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @return all loaded plugins
      */
     @Override
-    protected Collection<MoreMcmetaClientPlugin> fetchPlugins(Logger logger) {
-        List<MoreMcmetaClientPlugin> plugins = new ArrayList<>();
+    protected Collection<MoreMcmetaTexturePlugin> fetchTexturePlugins(Logger logger) {
+        List<MoreMcmetaTexturePlugin> plugins = new ArrayList<>();
         FMLJavaModLoadingContext.get().getModEventBus().post(new MoreMcmetaClientPluginRegisterEvent(plugins));
         return plugins;
     }

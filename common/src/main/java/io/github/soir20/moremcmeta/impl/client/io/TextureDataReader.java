@@ -20,7 +20,7 @@ package io.github.soir20.moremcmeta.impl.client.io;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
@@ -49,7 +49,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureDataReader<I extends CloseableImage> implements TextureReader<TextureData<I>> {
-    private final Map<String, MoreMcmetaClientPlugin> SECTION_TO_PLUGIN;
+    private final Map<String, MoreMcmetaTexturePlugin> SECTION_TO_PLUGIN;
     private final ImageReader<? extends I> IMAGE_READER;
 
     /**
@@ -57,7 +57,9 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
      * @param plugins       plugins that the reader should use to parse texture data
      * @param imageReader   reads the image from the {@link InputStream} of texture data
      */
-    public TextureDataReader(Iterable<? extends MoreMcmetaClientPlugin> plugins, ImageReader<? extends I> imageReader) {
+    public TextureDataReader(Iterable<? extends MoreMcmetaTexturePlugin> plugins,
+                             ImageReader<? extends I> imageReader) {
+
         requireNonNull(plugins, "Plugins cannot be null");
         SECTION_TO_PLUGIN = new HashMap<>();
         plugins.forEach((plugin) -> SECTION_TO_PLUGIN.put(plugin.sectionName(), plugin));
@@ -86,7 +88,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         Optional<Boolean> clampOptional = Optional.empty();
 
         for (String section : metadata.keys()) {
-            MoreMcmetaClientPlugin plugin = SECTION_TO_PLUGIN.get(section);
+            MoreMcmetaTexturePlugin plugin = SECTION_TO_PLUGIN.get(section);
             if (plugin == null) {
                 continue;
             }

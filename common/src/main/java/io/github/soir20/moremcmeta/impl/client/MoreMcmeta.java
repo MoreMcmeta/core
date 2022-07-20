@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta.impl.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.PackResourcesAdapter;
@@ -104,11 +105,11 @@ public abstract class MoreMcmeta {
         Logger logger = LogManager.getLogger();
 
         // Fetch and validate plugins
-        Collection<MoreMcmetaClientPlugin> plugins = fetchPlugins(logger);
-        validateIndividualPlugins(plugins);
+        Collection<MoreMcmetaTexturePlugin> plugins = fetchTexturePlugins(logger);
+        validateIndividualTexturePlugins(plugins);
         checkItemConflict(plugins, MoreMcmetaClientPlugin::displayName, "display name");
-        plugins = removeOverriddenPlugins(plugins, DEFAULT_PLUGINS, logger);
-        checkItemConflict(plugins, MoreMcmetaClientPlugin::sectionName, "section name");
+        plugins = removeOverriddenPlugins(plugins, MoreMcmetaTexturePlugin::sectionName, DEFAULT_PLUGINS, logger);
+        checkItemConflict(plugins, MoreMcmetaTexturePlugin::sectionName, "section name");
 
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
@@ -175,7 +176,7 @@ public abstract class MoreMcmeta {
      * @param logger    logger to report errors
      * @return all loaded plugins
      */
-    protected abstract Collection<MoreMcmetaClientPlugin> fetchPlugins(Logger logger);
+    protected abstract Collection<MoreMcmetaTexturePlugin> fetchTexturePlugins(Logger logger);
 
     /**
      * Gets the function that converts atlas sprites to their mipmap level.
@@ -233,31 +234,37 @@ public abstract class MoreMcmeta {
     protected abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
 
     /**
-     * Removes default plugins that are overridden by other plugins.
-     * @param plugins           main collection of plugins (with user-provided plugins)
-     * @param defaultPlugins    unique names of default plugins
-     * @param logger            logger to report warnings and errors
+     * Removes default plugins that are overridden by other plugins if they share an item.
+     * @param plugins               main collection of plugins (with user-provided plugins)
+     * @param itemRetriever         retrieves the item that will be used to override plugins
+     * @param defaultPluginNames    unique names of default plugins
+     * @param logger                logger to report warnings and errors
      * @return the new collection of plugins with overridden plugins removed
+     * @param <P>   plugin type
+     * @param <T>   item type
      */
-    private Collection<MoreMcmetaClientPlugin> removeOverriddenPlugins(Collection<MoreMcmetaClientPlugin> plugins,
-                                                                       Set<String> defaultPlugins,
-                                                                       Logger logger) {
-        Map<String, Long> countBySection = plugins.stream()
+    private <P extends MoreMcmetaClientPlugin, T> Collection<P> removeOverriddenPlugins(
+            Collection<P> plugins,
+            Function<P, T> itemRetriever,
+            Set<String> defaultPluginNames,
+            Logger logger) {
+
+        Map<T, Long> countBySection = plugins.stream()
                 .collect(Collectors.groupingBy(
-                        MoreMcmetaClientPlugin::sectionName,
+                        itemRetriever,
                         Collectors.counting()
                 ));
 
-        Set<MoreMcmetaClientPlugin> results = new HashSet<>();
+        Set<P> results = new HashSet<>();
 
         plugins.forEach((plugin) -> {
-            String section = plugin.sectionName();
+            T item = itemRetriever.apply(plugin);
             String displayName = plugin.displayName();
 
-            /* Disable default plugin if there is a user-provided plugin with the same section name.
+            /* Disable default plugin if there is a user-provided plugin with the same item.
                It has already been validated that no two plugins have the same display name, so only
                default plugins will be disabled. */
-            if (countBySection.get(section) > 1 && defaultPlugins.contains(displayName)) {
+            if (countBySection.get(item) > 1 && defaultPluginNames.contains(displayName)) {
                 logger.info("Disabled default plugin " + plugin.displayName()
                         + " as a replacement plugin was provided");
             } else {
@@ -275,12 +282,12 @@ public abstract class MoreMcmeta {
      * @throws MoreMcmetaClientPlugin.IncompletePluginException if a plugin is not valid
      * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins conflict
      */
-    private void validateIndividualPlugins(Collection<MoreMcmetaClientPlugin> plugins)
+    private void validateIndividualTexturePlugins(Collection<MoreMcmetaTexturePlugin> plugins)
             throws MoreMcmetaClientPlugin.IncompletePluginException,
             MoreMcmetaClientPlugin.ConflictingPluginsException {
 
         // Validate individual plugins
-        for (MoreMcmetaClientPlugin plugin : plugins) {
+        for (MoreMcmetaTexturePlugin plugin : plugins) {
             validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
             validatePluginItem(plugin.sectionName(), "section name", plugin.displayName());
             validatePluginItem(plugin.parser(), "parser", plugin.displayName());
@@ -309,17 +316,21 @@ public abstract class MoreMcmeta {
      * @param plugins               the plugins to check
      * @param propertyAccessor      the function to use to access the property
      * @param propertyName          display name of the property
+     * @param <P> type of plugin
      * @param <T> type of the property values
      * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins have the same value returned
      *                                                            by the propertyAccessor
      */
-    private <T> void checkItemConflict(Collection<MoreMcmetaClientPlugin> plugins,
-                                       Function<MoreMcmetaClientPlugin, T> propertyAccessor,
-                                       String propertyName) throws MoreMcmetaClientPlugin.ConflictingPluginsException {
-        Map<T, List<MoreMcmetaClientPlugin>> pluginsByProperty = plugins
+    private <P extends MoreMcmetaClientPlugin, T> void checkItemConflict(
+            Collection<P> plugins,
+            Function<P, T> propertyAccessor,
+            String propertyName)
+            throws MoreMcmetaClientPlugin.ConflictingPluginsException {
+
+        Map<T, List<P>> pluginsByProperty = plugins
                 .stream()
                 .collect(Collectors.groupingBy(propertyAccessor));
-        Optional<Map.Entry<T, List<MoreMcmetaClientPlugin>>> conflictingPlugins = pluginsByProperty
+        Optional<Map.Entry<T, List<P>>> conflictingPlugins = pluginsByProperty
                 .entrySet()
                 .stream()
                 .filter((entry) -> entry.getValue().size() > 1)

@@ -19,8 +19,8 @@ package io.github.soir20.moremcmeta.fabric.impl.client;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
 import io.github.soir20.moremcmeta.fabric.impl.client.adapter.SimpleReloadListenerAdapter;
@@ -75,10 +75,10 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return all loaded plugins
      */
     @Override
-    protected Collection<MoreMcmetaClientPlugin> fetchPlugins(Logger logger) {
-        List<MoreMcmetaClientPlugin> plugins = new ArrayList<>();
+    protected Collection<MoreMcmetaTexturePlugin> fetchTexturePlugins(Logger logger) {
+        List<MoreMcmetaTexturePlugin> plugins = new ArrayList<>();
         FabricLoader.getInstance()
-                .getEntrypointContainers(PLUGIN_ENTRYPOINT, MoreMcmetaClientPlugin.class)
+                .getEntrypointContainers(PLUGIN_ENTRYPOINT, MoreMcmetaTexturePlugin.class)
                 .forEach((entrypoint) -> {
                     try {
                         plugins.add(entrypoint.getEntrypoint());

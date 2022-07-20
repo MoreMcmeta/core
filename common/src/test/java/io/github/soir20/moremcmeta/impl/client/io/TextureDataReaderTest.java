@@ -19,6 +19,7 @@ package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
@@ -927,7 +928,7 @@ public class TextureDataReaderTest {
      * Mock implementation of {@link MockPlugin} for easy creation in tests.
      * @author soir20
      */
-    private static final class MockPlugin implements MoreMcmetaClientPlugin {
+    private static final class MockPlugin implements MoreMcmetaTexturePlugin {
         private static int nextId;
         private final int ID;
         private final String SECTION;

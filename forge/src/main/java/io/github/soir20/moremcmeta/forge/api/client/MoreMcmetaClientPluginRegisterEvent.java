@@ -17,7 +17,7 @@
 
 package io.github.soir20.moremcmeta.forge.api.client;
 
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
 
@@ -31,13 +31,13 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 public class MoreMcmetaClientPluginRegisterEvent extends Event implements IModBusEvent {
-    private final Collection<MoreMcmetaClientPlugin> PLUGINS;
+    private final Collection<MoreMcmetaTexturePlugin> PLUGINS;
 
     /**
      * Creates a new plugin registration event.
      * @param resultContainer       collection that will be updated with registered plugins
      */
-    public MoreMcmetaClientPluginRegisterEvent(Collection<MoreMcmetaClientPlugin> resultContainer) {
+    public MoreMcmetaClientPluginRegisterEvent(Collection<MoreMcmetaTexturePlugin> resultContainer) {
         PLUGINS = requireNonNull(resultContainer, "Queue cannot be null");
     }
 
@@ -45,7 +45,7 @@ public class MoreMcmetaClientPluginRegisterEvent extends Event implements IModBu
      * Registers a client plugin.
      * @param plugin        the plugin to register
      */
-    public void registerPlugin(MoreMcmetaClientPlugin plugin) {
+    public void registerPlugin(MoreMcmetaTexturePlugin plugin) {
         requireNonNull(plugin, "Plugin cannot be null");
         PLUGINS.add(plugin);
     }
