@@ -18,7 +18,7 @@
 package io.github.soir20.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableSet;
-import io.github.soir20.moremcmeta.impl.client.io.TextureReader;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -205,7 +205,7 @@ public class TextureLoaderTest {
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadataStream) -> {
                     if (texturesLoaded.getAndIncrement() < 1) {
-                        throw new TextureReader.InvalidMetadataException("Dummy exception");
+                        throw new MetadataReader.InvalidMetadataException("Dummy exception");
                     }
                     return 1;
                 },

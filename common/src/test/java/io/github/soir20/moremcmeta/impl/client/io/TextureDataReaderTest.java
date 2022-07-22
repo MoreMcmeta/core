@@ -18,9 +18,9 @@
 package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataParser;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
@@ -76,7 +76,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_NullTextureStream_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_NullTextureStream_NullPointerException() throws IOException, MetadataReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
                 (stream, blur, clamp) -> new MockCloseableImage()
@@ -86,7 +86,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_NullMetadataStream_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_NullMetadataStream_NullPointerException() throws IOException, MetadataReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
                 (stream, blur, clamp) -> new MockCloseableImage()
@@ -96,7 +96,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_NullImageRead_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_NullImageRead_NullPointerException() throws IOException, MetadataReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
                 (stream, blur, clamp) -> null
@@ -106,7 +106,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_ReaderIOException_IOException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_ReaderIOException_IOException() throws IOException, MetadataReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
                 (stream, blur, clamp) -> { throw new IOException("dummy"); }
@@ -116,27 +116,27 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_EmptyStream_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_EmptyStream_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
-        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(DEMO_TEXTURE_STREAM, makeStream(""));
     }
 
     @Test
-    public void read_InvalidJSON_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_InvalidJSON_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
-        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(DEMO_TEXTURE_STREAM, makeStream("{\"texture\":{\"blur: false}}"));
     }
 
     @Test
-    public void read_NullInJSON_PluginSkipped() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_NullInJSON_PluginSkipped() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 100), true, null, null),
                 new MockPlugin("other", null, true, null, null),
@@ -169,7 +169,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_EmptyJSON_NoMetadata() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_EmptyJSON_NoMetadata() throws IOException, MetadataReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
                 (stream, blur, clamp) -> new MockCloseableImage()
@@ -193,7 +193,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_NoPluginForSection_MetadataForPresentPlugins() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_NoPluginForSection_MetadataForPresentPlugins() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("texture", null, null, null, null)
         );
@@ -224,7 +224,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_NoSectionForPlugin_MetadataForPresentSections() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_NoSectionForPlugin_MetadataForPresentSections() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, null, null),
                 new MockPlugin("texture", null, null, null, null)
@@ -256,7 +256,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_ConflictingFrameSize_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_ConflictingFrameSize_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 100), null, null, null),
                 new MockPlugin("texture", new ParsedMetadata.FrameSize(50, 50), null, null, null)
@@ -267,7 +267,7 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
 
-        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
                 makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
@@ -275,7 +275,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_ConflictingBlur_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_ConflictingBlur_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, true, null, null),
                 new MockPlugin("texture", null, false, null, null)
@@ -286,7 +286,7 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
 
-        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
                 makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
@@ -294,7 +294,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_ConflictingClamp_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_ConflictingClamp_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, false, null),
                 new MockPlugin("texture", null, null, true, null)
@@ -305,7 +305,7 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
 
-        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
                 makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
@@ -313,7 +313,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_AllPluginsProvideSameFrameSize_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_AllPluginsProvideSameFrameSize_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 100), null, null, null),
                 new MockPlugin("texture", new ParsedMetadata.FrameSize(100, 100), null, null, null)
@@ -345,7 +345,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_AllPluginsProvideTrueBlur_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_AllPluginsProvideTrueBlur_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, true, null, null),
                 new MockPlugin("texture", null, true, null, null)
@@ -377,7 +377,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_AllPluginsProvideFalseBlur_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_AllPluginsProvideFalseBlur_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, false, null, null),
                 new MockPlugin("texture", null, false, null, null)
@@ -409,7 +409,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_AllPluginsProvideTrueClamp_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_AllPluginsProvideTrueClamp_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, true, null),
                 new MockPlugin("texture", null, null, true, null)
@@ -441,7 +441,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_AllPluginsProvideFalseClamp_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_AllPluginsProvideFalseClamp_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, false, null),
                 new MockPlugin("texture", null, null, false, null)
@@ -473,7 +473,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_SomePluginsProvideSameFrameSize_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_SomePluginsProvideSameFrameSize_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 100), null, null, null),
                 new MockPlugin("other", new ParsedMetadata.FrameSize(100, 100), null, null, null),
@@ -506,7 +506,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_SomePluginsProvideTrueBlur_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_SomePluginsProvideTrueBlur_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, true, null, null),
                 new MockPlugin("other", null, true, null, null),
@@ -539,7 +539,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_SomePluginsProvideFalseBlur_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_SomePluginsProvideFalseBlur_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, false, null, null),
                 new MockPlugin("other", null, false, null, null),
@@ -572,7 +572,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_SomePluginsProvideTrueClamp_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_SomePluginsProvideTrueClamp_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, true, null),
                 new MockPlugin("other", null, null, true, null),
@@ -605,7 +605,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_SomePluginsProvideFalseClamp_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_SomePluginsProvideFalseClamp_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, false, null),
                 new MockPlugin("other", null, null, false, null),
@@ -642,7 +642,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_NoPluginsProvideMinParams_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_NoPluginsProvideMinParams_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, null, null),
                 new MockPlugin("other", null, null, null, null),
@@ -675,7 +675,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_NoPluginsProvideClamp_NoConflict() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_NoPluginsProvideClamp_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 100), true, null, null),
                 new MockPlugin("other", null, true, null, null),
@@ -708,7 +708,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_ParsedMetadataNull_NullPointerException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_ParsedMetadataNull_NullPointerException() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, null, null),
                 new MockPlugin("other", null, null, null, null, true, (view) -> {})
@@ -727,7 +727,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_InvalidReasonProvided_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_InvalidReasonProvided_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, null, null),
                 new MockPlugin("other", null, null, null, "dummy")
@@ -738,7 +738,7 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
 
-        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
                 makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
@@ -746,7 +746,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_AllSectionsHavePriority_MetadataOrderedByPriority() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_AllSectionsHavePriority_MetadataOrderedByPriority() throws IOException, MetadataReader.InvalidMetadataException {
         AtomicBoolean checked = new AtomicBoolean(false);
 
         Consumer<MetadataView> viewCheckFunction = (view) -> {
@@ -793,7 +793,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_SomeSectionsHavePriority_MetadataOrderedByPriorityThenLexicographically() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_SomeSectionsHavePriority_MetadataOrderedByPriorityThenLexicographically() throws IOException, MetadataReader.InvalidMetadataException {
         AtomicBoolean checked = new AtomicBoolean(false);
 
         Consumer<MetadataView> viewCheckFunction = (view) -> {
@@ -840,7 +840,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_SectionsHaveNegativePriority_MetadataOrderedByPriority() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_SectionsHaveNegativePriority_MetadataOrderedByPriority() throws IOException, MetadataReader.InvalidMetadataException {
         AtomicBoolean checked = new AtomicBoolean(false);
 
         Consumer<MetadataView> viewCheckFunction = (view) -> {
@@ -887,7 +887,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_FrameWidthLargerThanImage_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_FrameWidthLargerThanImage_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", new ParsedMetadata.FrameSize(1000, 100), null, null, null),
                 new MockPlugin("texture", new ParsedMetadata.FrameSize(1000, 100), null, null, null)
@@ -898,7 +898,7 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
 
-        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
                 makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
@@ -906,7 +906,7 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_FrameHeightLargerThanImage_InvalidMetadataException() throws IOException, TextureReader.InvalidMetadataException {
+    public void read_FrameHeightLargerThanImage_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 1000), null, null, null),
                 new MockPlugin("texture", new ParsedMetadata.FrameSize(100, 1000), null, null, null)
@@ -917,7 +917,7 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
 
-        expectedException.expect(TextureReader.InvalidMetadataException.class);
+        expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
                 makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")

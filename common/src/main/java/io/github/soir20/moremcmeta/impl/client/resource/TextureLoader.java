@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.soir20.moremcmeta.impl.client.io.TextureReader;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
@@ -143,7 +144,7 @@ public class TextureLoader<R> {
         } catch (IOException ioException) {
             LOGGER.error("Using missing texture, unable to load {}: {}",
                     textureLocation, ioException);
-        } catch (TextureReader.InvalidMetadataException metadataError) {
+        } catch (MetadataReader.InvalidMetadataException metadataError) {
             LOGGER.error("Invalid metadata for texture {}: {}", textureLocation, metadataError);
         }
 

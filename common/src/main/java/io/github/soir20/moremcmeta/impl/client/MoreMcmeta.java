@@ -18,7 +18,9 @@
 package io.github.soir20.moremcmeta.impl.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
@@ -105,11 +107,30 @@ public abstract class MoreMcmeta {
         Logger logger = LogManager.getLogger();
 
         // Fetch and validate plugins
-        Collection<MoreMcmetaTexturePlugin> plugins = fetchTexturePlugins(logger);
-        validateIndividualTexturePlugins(plugins);
-        checkItemConflict(plugins, MoreMcmetaClientPlugin::displayName, "display name");
-        plugins = removeOverriddenPlugins(plugins, MoreMcmetaTexturePlugin::sectionName, DEFAULT_PLUGINS, logger);
-        checkItemConflict(plugins, MoreMcmetaTexturePlugin::sectionName, "section name");
+        Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>> plugins
+                = fetchTexturePlugins(logger);
+
+        Collection<MoreMcmetaTexturePlugin> texturePlugins = plugins.getFirst();
+        validateIndividualTexturePlugins(texturePlugins);
+        checkItemConflict(texturePlugins, MoreMcmetaClientPlugin::displayName, "display name");
+        texturePlugins = removeOverriddenPlugins(
+                texturePlugins,
+                MoreMcmetaTexturePlugin::sectionName,
+                DEFAULT_PLUGINS,
+                logger
+        );
+        checkItemConflict(texturePlugins, MoreMcmetaTexturePlugin::sectionName, "section name");
+
+        Collection<MoreMcmetaMetadataReaderPlugin> readerPlugins = plugins.getSecond();
+        validateIndividualReaderPlugins(readerPlugins);
+        checkItemConflict(readerPlugins, MoreMcmetaClientPlugin::displayName, "display name");
+        readerPlugins = removeOverriddenPlugins(
+                readerPlugins,
+                MoreMcmetaMetadataReaderPlugin::extension,
+                DEFAULT_PLUGINS,
+                logger
+        );
+        checkItemConflict(readerPlugins, MoreMcmetaMetadataReaderPlugin::extension, "extension");
 
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
@@ -121,7 +142,7 @@ public abstract class MoreMcmeta {
 
         // Resource loaders
         TextureDataReader<NativeImageAdapter> reader = new TextureDataReader<>(
-                plugins,
+                texturePlugins,
                 (stream, blur, clamp) -> new NativeImageAdapter(NativeImage.read(stream), 0, blur, clamp)
         );
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(reader, logger);
@@ -176,7 +197,8 @@ public abstract class MoreMcmeta {
      * @param logger    logger to report errors
      * @return all loaded plugins
      */
-    protected abstract Collection<MoreMcmetaTexturePlugin> fetchTexturePlugins(Logger logger);
+    protected abstract Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>>
+    fetchTexturePlugins(Logger logger);
 
     /**
      * Gets the function that converts atlas sprites to their mipmap level.
@@ -277,14 +299,12 @@ public abstract class MoreMcmeta {
     }
 
     /**
-     * Checks all the registered plugins to make sure they are individually valid.
+     * Checks all the registered texture plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
      * @throws MoreMcmetaClientPlugin.IncompletePluginException if a plugin is not valid
-     * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins conflict
      */
     private void validateIndividualTexturePlugins(Collection<MoreMcmetaTexturePlugin> plugins)
-            throws MoreMcmetaClientPlugin.IncompletePluginException,
-            MoreMcmetaClientPlugin.ConflictingPluginsException {
+            throws MoreMcmetaClientPlugin.IncompletePluginException {
 
         // Validate individual plugins
         for (MoreMcmetaTexturePlugin plugin : plugins) {
@@ -293,6 +313,24 @@ public abstract class MoreMcmeta {
             validatePluginItem(plugin.parser(), "parser", plugin.displayName());
             validatePluginItem(plugin.componentProvider(), "component provider", plugin.displayName());
         }
+
+    }
+
+    /**
+     * Checks all the reader registered plugins to make sure they are individually valid.
+     * @param plugins   plugins to validate
+     * @throws MoreMcmetaClientPlugin.IncompletePluginException if a plugin is not valid
+     */
+    private void validateIndividualReaderPlugins(Collection<MoreMcmetaMetadataReaderPlugin> plugins)
+            throws MoreMcmetaClientPlugin.IncompletePluginException {
+
+        // Validate individual plugins
+        for (MoreMcmetaMetadataReaderPlugin plugin : plugins) {
+            validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
+            validatePluginItem(plugin.extension(), "extension", plugin.displayName());
+            validatePluginItem(plugin.metadataReader(), "metadata reader", plugin.displayName());
+        }
+
     }
 
     /**

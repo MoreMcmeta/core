@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
@@ -73,11 +74,11 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
      * @param metadataStream    input stream of texture metadata (JSON)
      * @return minimum texture data
      * @throws IOException if the image could not be read
-     * @throws InvalidMetadataException if the metadata is invalid
+     * @throws MetadataReader.InvalidMetadataException if the metadata is invalid
      */
     @Override
     public TextureData<I> read(InputStream textureStream, InputStream metadataStream)
-            throws IOException, InvalidMetadataException {
+            throws IOException, MetadataReader.InvalidMetadataException {
         requireNonNull(textureStream, "Texture input stream cannot be null");
         requireNonNull(metadataStream, "Metadata input stream cannot be null");
 
@@ -103,7 +104,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
             clampOptional = getIfCompatible(clampOptional, sectionData.clamp(), "clamp");
 
             if (sectionData.invalidReason().isPresent()) {
-                throw new InvalidMetadataException(String.format("%s marked metadata as invalid: %s",
+                throw new MetadataReader.InvalidMetadataException(String.format("%s marked metadata as invalid: %s",
                         plugin.displayName(), sectionData.invalidReason().get()));
             }
         }
@@ -120,7 +121,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
         // Check for frame size too large
         if (frameSize.width() > image.width() || frameSize.height() > image.height()) {
-            throw new InvalidMetadataException(String.format(
+            throw new MetadataReader.InvalidMetadataException(String.format(
                     "%sx%s larger than %sx%s image",
                     frameSize.width(), frameSize.height(),
                     image.width(), image.height()
@@ -141,9 +142,9 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
      * @param metadataStream        metadata stream with JSON data
      * @return a view of the parsed metadata. The keys are in order of how plugins
      *         should be applied.
-     * @throws InvalidMetadataException if the input stream does not contain valid JSON
+     * @throws MetadataReader.InvalidMetadataException if the input stream does not contain valid JSON
      */
-    private MetadataView readMetadata(InputStream metadataStream) throws InvalidMetadataException {
+    private MetadataView readMetadata(InputStream metadataStream) throws MetadataReader.InvalidMetadataException {
         BufferedReader bufferedReader = null;
         MetadataView metadata;
 
@@ -158,7 +159,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                     (section1, section2) -> compareSections(unsortedRoot, section1, section2)
             );
         } catch (JsonParseException parseError) {
-            throw new InvalidMetadataException("Metadata is not valid JSON");
+            throw new MetadataReader.InvalidMetadataException("Metadata is not valid JSON");
         } finally {
             IOUtils.closeQuietly(bufferedReader);
         }
@@ -209,13 +210,13 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
      * @param propName      property name describing what is contained in the values
      * @param <T> type contained by the {@link Optional}s
      * @return the new value if both values are compatible
-     * @throws InvalidMetadataException if the values are not compatible
+     * @throws MetadataReader.InvalidMetadataException if the values are not compatible
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private <T> Optional<T> getIfCompatible(Optional<T> currentVal, Optional<T> newVal, String propName)
-            throws InvalidMetadataException {
+            throws MetadataReader.InvalidMetadataException {
         if (currentVal.isPresent() && newVal.isPresent() && !currentVal.get().equals(newVal.get())) {
-            throw new InvalidMetadataException(String.format("%s was given conflicting values by two plugins: %s %s",
+            throw new MetadataReader.InvalidMetadataException(String.format("%s was given conflicting values by two plugins: %s %s",
                     propName, currentVal.get(), newVal.get()));
         }
 

@@ -17,6 +17,7 @@
 
 package io.github.soir20.moremcmeta.forge.api.client;
 
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -31,23 +32,36 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 public class MoreMcmetaClientPluginRegisterEvent extends Event implements IModBusEvent {
-    private final Collection<MoreMcmetaTexturePlugin> PLUGINS;
+    private final Collection<MoreMcmetaTexturePlugin> TEXTURE_PLUGINS;
+    private final Collection<MoreMcmetaMetadataReaderPlugin> READER_PLUGINS;
 
     /**
      * Creates a new plugin registration event.
-     * @param resultContainer       collection that will be updated with registered plugins
+     * @param textureResults       collection that will be updated with registered texture plugins
+     * @param readerResults        collection that will be updated with registered reader plugins
      */
-    public MoreMcmetaClientPluginRegisterEvent(Collection<MoreMcmetaTexturePlugin> resultContainer) {
-        PLUGINS = requireNonNull(resultContainer, "Queue cannot be null");
+    public MoreMcmetaClientPluginRegisterEvent(Collection<MoreMcmetaTexturePlugin> textureResults,
+                                               Collection<MoreMcmetaMetadataReaderPlugin> readerResults) {
+        TEXTURE_PLUGINS = requireNonNull(textureResults, "Texture results cannot be null");
+        READER_PLUGINS = requireNonNull(readerResults, "Reader results cannot be null");
     }
 
     /**
-     * Registers a client plugin.
+     * Registers a client texture plugin.
      * @param plugin        the plugin to register
      */
-    public void registerPlugin(MoreMcmetaTexturePlugin plugin) {
+    public void register(MoreMcmetaTexturePlugin plugin) {
         requireNonNull(plugin, "Plugin cannot be null");
-        PLUGINS.add(plugin);
+        TEXTURE_PLUGINS.add(plugin);
+    }
+
+    /**
+     * Registers a client metadata reader plugin.
+     * @param plugin        the plugin to register
+     */
+    public void register(MoreMcmetaMetadataReaderPlugin plugin) {
+        requireNonNull(plugin, "Plugin cannot be null");
+        READER_PLUGINS.add(plugin);
     }
 
 }

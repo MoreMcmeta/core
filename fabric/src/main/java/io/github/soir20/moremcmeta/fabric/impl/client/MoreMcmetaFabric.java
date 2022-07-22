@@ -19,6 +19,8 @@ package io.github.soir20.moremcmeta.fabric.impl.client;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.datafixers.util.Pair;
+import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
@@ -75,19 +77,12 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return all loaded plugins
      */
     @Override
-    protected Collection<MoreMcmetaTexturePlugin> fetchTexturePlugins(Logger logger) {
-        List<MoreMcmetaTexturePlugin> plugins = new ArrayList<>();
-        FabricLoader.getInstance()
-                .getEntrypointContainers(PLUGIN_ENTRYPOINT, MoreMcmetaTexturePlugin.class)
-                .forEach((entrypoint) -> {
-                    try {
-                        plugins.add(entrypoint.getEntrypoint());
-                    } catch (Throwable err) {
-                        logger.error("Mod {} provided broken plugin to {}: {}",
-                                entrypoint.getProvider().getMetadata().getId(), MODID, err);
-                    }
-                });
-        return plugins;
+    protected Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>>
+            fetchTexturePlugins(Logger logger) {
+        return Pair.of(
+                listPlugins(MoreMcmetaTexturePlugin.class, logger),
+                listPlugins(MoreMcmetaMetadataReaderPlugin.class, logger)
+        );
     }
 
     /**
@@ -178,6 +173,28 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     @Override
     protected void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
         ClientTickEvents.START_CLIENT_TICK.register((client) -> texManager.tick());
+    }
+
+    /**
+     * Retrieves all plugins with the given class.
+     * @param pluginClass       the class of the plugin
+     * @param logger            logger to record warnings or errors
+     * @return the list of all plugins added as an entrypoint
+     * @param <T> type of plugin
+     */
+    private <T> List<T> listPlugins(Class<T> pluginClass, Logger logger) {
+        List<T> plugins = new ArrayList<>();
+        FabricLoader.getInstance()
+                .getEntrypointContainers(PLUGIN_ENTRYPOINT, pluginClass)
+                .forEach((entrypoint) -> {
+                    try {
+                        plugins.add(entrypoint.getEntrypoint());
+                    } catch (Throwable err) {
+                        logger.error("Mod {} provided broken plugin to {}: {}",
+                                entrypoint.getProvider().getMetadata().getId(), MODID, err);
+                    }
+                });
+        return plugins;
     }
 
 }
