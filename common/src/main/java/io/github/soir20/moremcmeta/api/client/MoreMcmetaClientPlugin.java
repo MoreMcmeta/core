@@ -43,13 +43,13 @@ public interface MoreMcmetaClientPlugin {
      * @author soir20
      * @since 4.0.0
      */
-    final class IncompletePluginException extends PluginException {
+    final class InvalidPluginException extends PluginException {
 
         /**
          * Creates a new exception with a detail message.
          * @param reason    the reason the plugin is invalid
          */
-        public IncompletePluginException(String reason) {
+        public InvalidPluginException(String reason) {
             super(reason);
         }
 

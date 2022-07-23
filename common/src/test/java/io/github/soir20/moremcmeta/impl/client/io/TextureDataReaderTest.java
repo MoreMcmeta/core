@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +47,9 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link TextureDataReader}.
@@ -55,7 +59,7 @@ public class TextureDataReaderTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
     
-    private final InputStream DEMO_TEXTURE_STREAM = makeStream("test");
+    private final InputStream DEMO_TEXTURE_STREAM = makeStream();
 
     @Test
     public void test_NullPluginsList_NullPointerException() {
@@ -82,7 +86,7 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> new MockCloseableImage()
         );
         expectedException.expect(NullPointerException.class);
-        reader.read(null, makeStream("{\"texture\":{\"blur\": false}}"));
+        reader.read(null, new MockMetadataView(Collections.singletonList("texture")));
     }
 
     @Test
@@ -102,7 +106,7 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> null
         );
         expectedException.expect(NullPointerException.class);
-        reader.read(DEMO_TEXTURE_STREAM, null);
+        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")));
     }
 
     @Test
@@ -112,64 +116,11 @@ public class TextureDataReaderTest {
                 (stream, blur, clamp) -> { throw new IOException("dummy"); }
         );
         expectedException.expect(IOException.class);
-        reader.read(DEMO_TEXTURE_STREAM, makeStream("{\"texture\":{\"blur\": false}}"));
+        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")));
     }
 
     @Test
-    public void read_EmptyStream_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
-                (stream, blur, clamp) -> new MockCloseableImage()
-        );
-        expectedException.expect(MetadataReader.InvalidMetadataException.class);
-        reader.read(DEMO_TEXTURE_STREAM, makeStream(""));
-    }
-
-    @Test
-    public void read_InvalidJSON_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
-                (stream, blur, clamp) -> new MockCloseableImage()
-        );
-        expectedException.expect(MetadataReader.InvalidMetadataException.class);
-        reader.read(DEMO_TEXTURE_STREAM, makeStream("{\"texture\":{\"blur: false}}"));
-    }
-
-    @Test
-    public void read_NullInJSON_PluginSkipped() throws IOException, MetadataReader.InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
-                new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 100), true, null, null),
-                new MockPlugin("other", null, true, null, null),
-                new MockPlugin("texture", null, true, null, null)
-        );
-
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                plugins,
-                (stream, blur, clamp) -> new MockCloseableImage()
-        );
-
-        TextureData<MockCloseableImage> data = reader.read(
-                DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\": null, \"other\": {}}")
-        );
-
-        Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Pair<ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getFirst()).id());
-            assertEquals(
-                    ((MockParsedMetadata) metadata.getFirst()).id(),
-                    ((MockComponentProvider) metadata.getSecond()).id()
-            );
-            numParsed++;
-        }
-
-        assertEquals(Set.of(plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(2, numParsed);
-    }
-
-    @Test
-    public void read_EmptyJSON_NoMetadata() throws IOException, MetadataReader.InvalidMetadataException {
+    public void read_NoSections_NoMetadata() throws IOException, MetadataReader.InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
                 List.of(new MockPlugin()),
                 (stream, blur, clamp) -> new MockCloseableImage()
@@ -177,7 +128,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{}")
+                new MockMetadataView(new ArrayList<>())
         );
 
         int numParsed = 0;
@@ -205,7 +156,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"animation\":{\"blur\": false}, \"texture\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -237,7 +188,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}}")
+                new MockMetadataView(Collections.singletonList("texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -270,7 +221,7 @@ public class TextureDataReaderTest {
         expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -289,7 +240,7 @@ public class TextureDataReaderTest {
         expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -308,7 +259,7 @@ public class TextureDataReaderTest {
         expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -326,7 +277,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -358,7 +309,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -390,7 +341,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -422,7 +373,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -454,7 +405,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -487,7 +438,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -520,7 +471,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -553,7 +504,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -586,7 +537,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -619,7 +570,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -637,10 +588,6 @@ public class TextureDataReaderTest {
         assertEquals(3, numParsed);
     }
 
-    private InputStream makeStream(String text) {
-        return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
-    }
-
     @Test
     public void read_NoPluginsProvideMinParams_NoConflict() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
@@ -656,7 +603,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -689,7 +636,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -722,7 +669,7 @@ public class TextureDataReaderTest {
         expectedException.expect(NullPointerException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
     }
 
@@ -741,59 +688,12 @@ public class TextureDataReaderTest {
         expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}, \"other\": {}}")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
     }
 
     @Test
-    public void read_AllSectionsHavePriority_MetadataOrderedByPriority() throws IOException, MetadataReader.InvalidMetadataException {
-        AtomicBoolean checked = new AtomicBoolean(false);
-
-        Consumer<MetadataView> viewCheckFunction = (view) -> {
-            checked.set(true);
-
-            List<String> sectionNames = new ArrayList<>();
-            for (String key : view.keys()) {
-                sectionNames.add(key);
-            }
-
-            assertEquals(List.of("animation", "texture", "other"), sectionNames);
-        };
-
-        List<MockPlugin> plugins = List.of(
-                new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 100), true, null, null),
-                new MockPlugin("other", null, true, null, null, false, viewCheckFunction),
-                new MockPlugin("texture", null, true, null, null)
-        );
-
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                plugins,
-                (stream, blur, clamp) -> new MockCloseableImage()
-        );
-
-        TextureData<MockCloseableImage> data = reader.read(
-                DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false, \"priority\": 1}, \"animation\":{\"priority\": 2, \"interpolate\": true}, \"other\": {\"priority\": 0}}")
-        );
-
-        // Make sure that the view was checked for correct priority ordering
-        assertTrue(checked.get());
-
-        // Check the parsed metadata for priority ordering
-        List<Integer> foundIds = new ArrayList<>();
-        for (Pair<ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            assertEquals(
-                    ((MockParsedMetadata) metadata.getFirst()).id(),
-                    ((MockComponentProvider) metadata.getSecond()).id()
-            );
-            foundIds.add(((MockParsedMetadata) metadata.getFirst()).id());
-        }
-        assertEquals(List.of(plugins.get(0).id(), plugins.get(2).id(), plugins.get(1).id()), foundIds);
-
-    }
-
-    @Test
-    public void read_SomeSectionsHavePriority_MetadataOrderedByPriorityThenLexicographically() throws IOException, MetadataReader.InvalidMetadataException {
+    public void read_OrderInView_MetadataOrderedByViewOrder() throws IOException, MetadataReader.InvalidMetadataException {
         AtomicBoolean checked = new AtomicBoolean(false);
 
         Consumer<MetadataView> viewCheckFunction = (view) -> {
@@ -820,7 +720,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false, \"priority\": 1}, \"animation\":{\"interpolate\": true}, \"other\": {\"priority\": 0}}")
+                new MockMetadataView(Arrays.asList("texture", "animation", "other"))
         );
 
         // Make sure that the view was checked for correct priority ordering
@@ -840,53 +740,6 @@ public class TextureDataReaderTest {
     }
 
     @Test
-    public void read_SectionsHaveNegativePriority_MetadataOrderedByPriority() throws IOException, MetadataReader.InvalidMetadataException {
-        AtomicBoolean checked = new AtomicBoolean(false);
-
-        Consumer<MetadataView> viewCheckFunction = (view) -> {
-            checked.set(true);
-
-            List<String> sectionNames = new ArrayList<>();
-            for (String key : view.keys()) {
-                sectionNames.add(key);
-            }
-
-            assertEquals(List.of("texture", "other", "animation"), sectionNames);
-        };
-
-        List<MockPlugin> plugins = List.of(
-                new MockPlugin("animation", new ParsedMetadata.FrameSize(100, 100), true, null, null),
-                new MockPlugin("other", null, true, null, null, false, viewCheckFunction),
-                new MockPlugin("texture", null, true, null, null)
-        );
-
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                plugins,
-                (stream, blur, clamp) -> new MockCloseableImage()
-        );
-
-        TextureData<MockCloseableImage> data = reader.read(
-                DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false, \"priority\": 1}, \"animation\":{\"priority\": -2, \"interpolate\": true}, \"other\": {\"priority\": -1}}")
-        );
-
-        // Make sure that the view was checked for correct priority ordering
-        assertTrue(checked.get());
-
-        // Check the parsed metadata for priority ordering
-        List<Integer> foundIds = new ArrayList<>();
-        for (Pair<ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getFirst()).id());
-            assertEquals(
-                    ((MockParsedMetadata) metadata.getFirst()).id(),
-                    ((MockComponentProvider) metadata.getSecond()).id()
-            );
-        }
-        assertEquals(List.of(plugins.get(2).id(), plugins.get(1).id(), plugins.get(0).id()), foundIds);
-
-    }
-
-    @Test
     public void read_FrameWidthLargerThanImage_InvalidMetadataException() throws IOException, MetadataReader.InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", new ParsedMetadata.FrameSize(1000, 100), null, null, null),
@@ -901,7 +754,7 @@ public class TextureDataReaderTest {
         expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -920,8 +773,12 @@ public class TextureDataReaderTest {
         expectedException.expect(MetadataReader.InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                makeStream("{\"texture\":{\"blur\": false}, \"animation\":{\"interpolate\": true}}")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
+    }
+
+    private InputStream makeStream() {
+        return new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
     }
 
     /**

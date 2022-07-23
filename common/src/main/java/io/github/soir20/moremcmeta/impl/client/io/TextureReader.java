@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.impl.client.io;
 
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,17 +28,18 @@ import java.io.InputStream;
  * @param <T>
  * @author soir20
  */
+@FunctionalInterface
 public interface TextureReader<T> {
 
     /**
      * Reads an animated texture from file data.
      * @param textureStream     input stream of image data
-     * @param metadataStream    input stream of texture metadata (JSON)
+     * @param metadata          metadata associated with this texture
      * @return getter for retrieving an animated texture after all resources are loaded
      * @throws IOException failure reading from either input stream
      * @throws MetadataReader.InvalidMetadataException if the metadata is not valid for some reason
      */
-    T read(InputStream textureStream, InputStream metadataStream)
+    T read(InputStream textureStream, MetadataView metadata)
             throws IOException, MetadataReader.InvalidMetadataException;
 
 }

@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.soir20.moremcmeta.impl.client.io.TextureReader;
 import net.minecraft.ResourceLocationException;
@@ -40,19 +41,28 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureLoader<R> {
-    private static final String IMAGE_EXTENSION = ".png";
-    private static final String METADATA_EXTENSION = IMAGE_EXTENSION +  ".moremcmeta";
-
     private final TextureReader<? extends R> TEXTURE_READER;
+    private final Map<String, ? extends MetadataReader> METADATA_READERS;
     private final Logger LOGGER;
 
     /**
      * Creates a TextureLoader.
-     * @param texReader             reads textures
+     * @param textureReader         reads textures from a stream of file data
+     * @param metadataReaders       {@link MetadataReader}s by extension. All extensions must start with a
+     *                              period (.) and contain at least one other character.
      * @param logger                logs listener-related messages to the game's output
      */
-    public TextureLoader(TextureReader<? extends R> texReader, Logger logger) {
-        TEXTURE_READER = requireNonNull(texReader, "Texture reader cannot be null");
+    public TextureLoader(TextureReader<? extends R> textureReader,
+                         ImmutableMap<String, ? extends MetadataReader> metadataReaders, Logger logger) {
+
+        TEXTURE_READER = requireNonNull(textureReader, "Texture reader cannot be null");
+        METADATA_READERS = requireNonNull(metadataReaders, "Metadata readers cannot be null");
+
+        if (METADATA_READERS.keySet().stream().anyMatch((ext) -> ext.lastIndexOf('.') != 0 || ext.length() < 2)) {
+            throw new IllegalArgumentException("File extensions must contain only one period (.) at the start and " +
+                    "contain least one other character");
+        }
+
         LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
 
@@ -78,7 +88,7 @@ public class TextureLoader<R> {
         try {
              textureCandidates = resourceRepository.listResources(
                     path,
-                    fileName -> fileName.endsWith(METADATA_EXTENSION)
+                    fileName ->  METADATA_READERS.keySet().stream().anyMatch(fileName::endsWith)
              );
 
         } catch (ResourceLocationException error) {
@@ -102,13 +112,10 @@ public class TextureLoader<R> {
 
         // Create textures from unique candidates
         candidates.stream().distinct().parallel().forEach((metadataLocation) -> {
-            ResourceLocation textureLocation = new ResourceLocation(metadataLocation.getNamespace(),
-                    metadataLocation.getPath().replace(METADATA_EXTENSION, IMAGE_EXTENSION));
-
-            Optional<R> texture = texture(resourceRepository, textureLocation, metadataLocation);
+            Optional<Pair<ResourceLocation, R>> texture = texture(resourceRepository, metadataLocation);
 
             // Keep track of which textures are created
-            texture.ifPresent(tex -> textures.put(textureLocation, tex));
+            texture.ifPresent(tex -> textures.put(tex.getFirst(), tex.getSecond()));
 
         });
 
@@ -118,34 +125,42 @@ public class TextureLoader<R> {
     /**
      * Gets a texture from a file.
      * @param resourceRepository   resource manager to get textures/metadata from
-     * @param textureLocation      location of the image/.png texture
      * @param metadataLocation     file location of texture's metadata for this mod (not .mcmeta)
      * @return the texture, or empty if the file is not found
      */
-    private Optional<R> texture(OrderedResourceRepository resourceRepository,
-                                ResourceLocation textureLocation,
-                                ResourceLocation metadataLocation) {
+    private Optional<Pair<ResourceLocation, R>> texture(OrderedResourceRepository resourceRepository,
+                                                        ResourceLocation metadataLocation) {
         PackType resourceType = resourceRepository.resourceType();
 
         try {
-            ResourceCollection resources = resourceRepository.getFirstCollectionWith(textureLocation);
+            ResourceCollection metadataResources = resourceRepository.getFirstCollectionWith(metadataLocation);
 
-            if (resources.hasResource(resourceType, metadataLocation)) {
-                InputStream textureStream = resources.getResource(resourceType, textureLocation);
-                InputStream metadataStream = resources.getResource(resourceType, metadataLocation);
+            InputStream metadataStream = metadataResources.getResource(resourceType, metadataLocation);
+            String metadataPath = metadataLocation.getPath();
+            String extension = metadataPath.substring(metadataPath.lastIndexOf('.'));
 
-                Optional<R> texture = Optional.of(TEXTURE_READER.read(textureStream, metadataStream));
+            MetadataReader.ReadMetadata metadata = METADATA_READERS
+                    .get(extension)
+                    .read(metadataLocation, metadataStream);
+
+            ResourceLocation textureLocation = metadata.textureLocation();
+
+            if (resourceRepository.getFirstCollectionWith(textureLocation).equals(metadataResources)) {
+                InputStream textureStream = metadataResources.getResource(resourceType, textureLocation);
+
+                // There must be a reader for this extension since we only retrieved files with readers' extensions
+                Optional<R> texture = Optional.of(TEXTURE_READER.read(textureStream, metadata.metadata()));
 
                 textureStream.close();
                 metadataStream.close();
 
-                return texture;
+                return texture.map((tex) -> Pair.of(textureLocation, tex));
             }
         } catch (IOException ioException) {
-            LOGGER.error("Using missing texture, unable to load {}: {}",
-                    textureLocation, ioException);
+            LOGGER.error("Texture associated with metadata in file {} is missing: {}",
+                    metadataLocation, ioException);
         } catch (MetadataReader.InvalidMetadataException metadataError) {
-            LOGGER.error("Invalid metadata for texture {}: {}", textureLocation, metadataError);
+            LOGGER.error("Invalid metadata in file {}: {}", metadataLocation, metadataError);
         }
 
         return Optional.empty();

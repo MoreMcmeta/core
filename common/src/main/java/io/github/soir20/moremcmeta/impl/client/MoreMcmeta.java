@@ -17,11 +17,13 @@
 
 package io.github.soir20.moremcmeta.impl.client;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.soir20.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.PackResourcesAdapter;
@@ -95,12 +97,12 @@ public abstract class MoreMcmeta {
     /**
      * Begins the startup process, creating necessary objects and registering the
      * resource reload listener.
-     * @throws MoreMcmetaClientPlugin.IncompletePluginException if one of the plugins did not provide
+     * @throws MoreMcmetaClientPlugin.InvalidPluginException if one of the plugins did not provide
      *         all required objects
      * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins are not compatible for
      *         any reason
      */
-    public void start() throws MoreMcmetaClientPlugin.IncompletePluginException,
+    public void start() throws MoreMcmetaClientPlugin.InvalidPluginException,
             MoreMcmetaClientPlugin.ConflictingPluginsException {
 
         Minecraft minecraft = Minecraft.getInstance();
@@ -145,7 +147,11 @@ public abstract class MoreMcmeta {
                 texturePlugins,
                 (stream, blur, clamp) -> new NativeImageAdapter(NativeImage.read(stream), 0, blur, clamp)
         );
-        TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(reader, logger);
+        TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(
+                reader,
+                readersByExtension(readerPlugins),
+                logger
+        );
 
         // Cache
         final TextureCache<TextureData<NativeImageAdapter>, List<String>> cache = new TextureCache<>(loader);
@@ -301,10 +307,10 @@ public abstract class MoreMcmeta {
     /**
      * Checks all the registered texture plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
-     * @throws MoreMcmetaClientPlugin.IncompletePluginException if a plugin is not valid
+     * @throws MoreMcmetaClientPlugin.InvalidPluginException if a plugin is not valid
      */
     private void validateIndividualTexturePlugins(Collection<MoreMcmetaTexturePlugin> plugins)
-            throws MoreMcmetaClientPlugin.IncompletePluginException {
+            throws MoreMcmetaClientPlugin.InvalidPluginException {
 
         // Validate individual plugins
         for (MoreMcmetaTexturePlugin plugin : plugins) {
@@ -319,15 +325,25 @@ public abstract class MoreMcmeta {
     /**
      * Checks all the reader registered plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
-     * @throws MoreMcmetaClientPlugin.IncompletePluginException if a plugin is not valid
+     * @throws MoreMcmetaClientPlugin.InvalidPluginException if a plugin is not valid
      */
     private void validateIndividualReaderPlugins(Collection<MoreMcmetaMetadataReaderPlugin> plugins)
-            throws MoreMcmetaClientPlugin.IncompletePluginException {
+            throws MoreMcmetaClientPlugin.InvalidPluginException {
 
         // Validate individual plugins
         for (MoreMcmetaMetadataReaderPlugin plugin : plugins) {
             validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
-            validatePluginItem(plugin.extension(), "extension", plugin.displayName());
+
+            String extension = plugin.extension();
+            validatePluginItem(extension, "extension", plugin.displayName());
+            if (extension.contains(".")) {
+                throw new MoreMcmetaClientPlugin.InvalidPluginException("Extension cannot contain a period (.)");
+            }
+
+            if (extension.length() == 0) {
+                throw new MoreMcmetaClientPlugin.InvalidPluginException("Extension cannot be empty");
+            }
+
             validatePluginItem(plugin.metadataReader(), "metadata reader", plugin.displayName());
         }
 
@@ -338,13 +354,13 @@ public abstract class MoreMcmeta {
      * @param item          item to validate
      * @param itemName      display name of the item
      * @param pluginName    display name of the plugin
-     * @throws MoreMcmetaClientPlugin.IncompletePluginException if the item is not present
+     * @throws MoreMcmetaClientPlugin.InvalidPluginException if the item is not present
      */
     private void validatePluginItem(Object item, String itemName, String pluginName)
-            throws MoreMcmetaClientPlugin.IncompletePluginException {
+            throws MoreMcmetaClientPlugin.InvalidPluginException {
 
         if (item == null) {
-            throw new MoreMcmetaClientPlugin.IncompletePluginException("Plugin " + pluginName + " is missing " + itemName);
+            throw new MoreMcmetaClientPlugin.InvalidPluginException("Plugin " + pluginName + " is missing " + itemName);
         }
     }
 
@@ -387,6 +403,25 @@ public abstract class MoreMcmeta {
 
         throw new MoreMcmetaClientPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
                 + " have conflicting " + propertyName + ": " + conflictingProperty);
+    }
+
+    /**
+     * Associates all registered {@link MetadataReader}s with their extensions.
+     * @param readerPlugins     all the metadata reader plugins
+     * @return a map that is a valid input to a {@link TextureLoader}
+     */
+    private ImmutableMap<String, MetadataReader> readersByExtension(
+            Iterable<MoreMcmetaMetadataReaderPlugin> readerPlugins) {
+
+        ImmutableMap.Builder<String, MetadataReader> readers = new ImmutableMap.Builder<>();
+        for (MoreMcmetaMetadataReaderPlugin plugin : readerPlugins) {
+            readers.put(
+                    "." + plugin.extension(),
+                    plugin.metadataReader()
+            );
+        }
+
+        return readers.build();
     }
 
     /**

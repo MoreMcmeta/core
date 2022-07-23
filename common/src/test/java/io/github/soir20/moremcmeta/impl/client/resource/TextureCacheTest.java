@@ -18,6 +18,8 @@
 package io.github.soir20.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.soir20.moremcmeta.impl.client.io.MockMetadataView;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,6 +40,15 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 public class TextureCacheTest {
+    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream) -> new MetadataReader.ReadMetadata(
+            new ResourceLocation(
+                    metadataLocation.getNamespace(),
+                    metadataLocation.getPath().replace(".moremcmeta", "")
+            ),
+            new MockMetadataView(Collections.emptyList())
+    );
+    private final ImmutableMap<String, MetadataReader> MOCK_READERS = ImmutableMap.of(".moremcmeta", MOCK_READER);
+
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
@@ -55,7 +67,7 @@ public class TextureCacheTest {
                 new TextureLoader<>((texStream, metadataStream) -> {
                     texturesRead.incrementAndGet();
                     return 1;
-                }, LOGGER)
+                }, MOCK_READERS, LOGGER)
         );
 
         expectedException.expect(NullPointerException.class);
@@ -69,7 +81,7 @@ public class TextureCacheTest {
                 new TextureLoader<>((texStream, metadataStream) -> {
                     texturesRead.incrementAndGet();
                     return 1;
-                }, LOGGER)
+                }, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
@@ -86,7 +98,7 @@ public class TextureCacheTest {
                 new TextureLoader<>((texStream, metadataStream) -> {
                     texturesRead.incrementAndGet();
                     return 1;
-                }, LOGGER)
+                }, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
@@ -103,7 +115,7 @@ public class TextureCacheTest {
                 new TextureLoader<>((texStream, metadataStream) -> {
                     texturesRead.incrementAndGet();
                     return 1;
-                }, LOGGER)
+                }, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
@@ -120,7 +132,7 @@ public class TextureCacheTest {
     @Test
     public void load_GetAfterLoad_CacheRetrieved() {
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER)
+                new TextureLoader<>((texStream, metadataStream) -> 1, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
@@ -140,7 +152,7 @@ public class TextureCacheTest {
     @Test
     public void load_LoadAfterGet_CacheRetrieved() throws InterruptedException {
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER)
+                new TextureLoader<>((texStream, metadataStream) -> 1, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
@@ -168,7 +180,7 @@ public class TextureCacheTest {
     @Test
     public void load_GetAndLoadAfterDifferentStateLoaded_SecondCacheRetrieved() throws InterruptedException {
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER)
+                new TextureLoader<>((texStream, metadataStream) -> 1, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",

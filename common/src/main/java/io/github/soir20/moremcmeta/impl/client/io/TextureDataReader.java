@@ -17,24 +17,16 @@
 
 package io.github.soir20.moremcmeta.impl.client.io;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
-import io.github.soir20.moremcmeta.impl.client.resource.JsonMetadataView;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
-import net.minecraft.util.GsonHelper;
-import org.apache.commons.io.IOUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,8 +47,8 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
     /**
      * Creates a new reader that is aware of the given plugins, if any.
-     * @param plugins       plugins that the reader should use to parse texture data
-     * @param imageReader   reads the image from the {@link InputStream} of texture data
+     * @param plugins           plugins that the reader should use to parse texture data
+     * @param imageReader       reads the image from the {@link InputStream} of texture data
      */
     public TextureDataReader(Iterable<? extends MoreMcmetaTexturePlugin> plugins,
                              ImageReader<? extends I> imageReader) {
@@ -71,18 +63,18 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
     /**
      * Reads texture data from texture and metadata byte streams.
      * @param textureStream     input stream of image data
-     * @param metadataStream    input stream of texture metadata (JSON)
+     * @param metadata          metadata associated with this texture
      * @return minimum texture data
      * @throws IOException if the image could not be read
-     * @throws MetadataReader.InvalidMetadataException if the metadata is invalid
+     * @throws MetadataReader.InvalidMetadataException if the metadata is not valid for some reason
      */
     @Override
-    public TextureData<I> read(InputStream textureStream, InputStream metadataStream)
+    public TextureData<I> read(InputStream textureStream, MetadataView metadata)
             throws IOException, MetadataReader.InvalidMetadataException {
-        requireNonNull(textureStream, "Texture input stream cannot be null");
-        requireNonNull(metadataStream, "Metadata input stream cannot be null");
 
-        MetadataView metadata = readMetadata(metadataStream);
+        requireNonNull(textureStream, "Texture stream cannot be null");
+        requireNonNull(metadata, "Metadata cannot be null");
+
         List<Pair<ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
         Optional<ParsedMetadata.FrameSize> frameSizeOptional = Optional.empty();
         Optional<Boolean> blurOptional = Optional.empty();
@@ -135,66 +127,6 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                 image,
                 parsedSections
         );
-    }
-
-    /**
-     * Reads JSON metadata from an input stream.
-     * @param metadataStream        metadata stream with JSON data
-     * @return a view of the parsed metadata. The keys are in order of how plugins
-     *         should be applied.
-     * @throws MetadataReader.InvalidMetadataException if the input stream does not contain valid JSON
-     */
-    private MetadataView readMetadata(InputStream metadataStream) throws MetadataReader.InvalidMetadataException {
-        BufferedReader bufferedReader = null;
-        MetadataView metadata;
-
-        try {
-            bufferedReader = new BufferedReader(new InputStreamReader(metadataStream, StandardCharsets.UTF_8));
-            JsonObject metadataObject = GsonHelper.parse(bufferedReader);
-
-            // Create another root object to reuse its integer parsing code
-            MetadataView unsortedRoot = new JsonMetadataView(metadataObject, String::compareTo);
-
-            metadata = new JsonMetadataView(metadataObject,
-                    (section1, section2) -> compareSections(unsortedRoot, section1, section2)
-            );
-        } catch (JsonParseException parseError) {
-            throw new MetadataReader.InvalidMetadataException("Metadata is not valid JSON");
-        } finally {
-            IOUtils.closeQuietly(bufferedReader);
-        }
-
-        return metadata;
-    }
-
-    /**
-     * Compares two section names at the topmost metadata level to
-     * determine plugin application order. Compares the sections
-     * based on priority and then based on lexicographical ordering
-     * of their names.
-     *
-     * If section1 should precede section2, a negative integer is returned.
-     * If section2 should precede section1, a positive integer is returned.
-     * If section1 and section2 are identical, then zero is returned.
-     * @param root          top-level view of the metadata
-     * @param section1      first section to compare
-     * @param section2      second section to compare
-     * @return a negative integer if section1 precedes section2, a positive
-     *         integer if section2 precedes section1, or zero if they are
-     *         the same
-     */
-    private int compareSections(MetadataView root, String section1, String section2) {
-        MetadataView view1 = root.subView(section1).orElseThrow();
-        MetadataView view2 = root.subView(section2).orElseThrow();
-
-        final String PRIORITY_KEY = "priority";
-        int priorityDiff = view2.integerValue(PRIORITY_KEY).orElse(0) - view1.integerValue(PRIORITY_KEY).orElse(0);
-
-        if (priorityDiff != 0) {
-            return priorityDiff;
-        }
-
-        return section1.compareTo(section2);
     }
 
     /**

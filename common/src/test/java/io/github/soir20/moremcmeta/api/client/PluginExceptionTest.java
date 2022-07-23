@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Tests the messages inside the {@link MoreMcmetaClientPlugin.IncompletePluginException} and
+ * Tests the messages inside the {@link MoreMcmetaClientPlugin.InvalidPluginException} and
  * {@link MoreMcmetaClientPlugin.ConflictingPluginsException}.
  * @author soir20
  */
@@ -32,9 +32,9 @@ public class PluginExceptionTest {
 
     @Test
     public void incompletePluginException_Thrown_MessageSameAsReason() {
-        expectedException.expect(MoreMcmetaClientPlugin.IncompletePluginException.class);
+        expectedException.expect(MoreMcmetaClientPlugin.InvalidPluginException.class);
         expectedException.expectMessage("Dummy message");
-        throw new MoreMcmetaClientPlugin.IncompletePluginException("Dummy message");
+        throw new MoreMcmetaClientPlugin.InvalidPluginException("Dummy message");
     }
 
     @Test

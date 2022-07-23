@@ -17,8 +17,10 @@
 
 package io.github.soir20.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.soir20.moremcmeta.impl.client.io.MockMetadataView;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -30,6 +32,7 @@ import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,6 +55,14 @@ import static org.junit.Assert.*;
  */
 public class TextureLoaderTest {
     private final Logger LOGGER = LogManager.getLogger();
+    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream) -> new MetadataReader.ReadMetadata(
+            new ResourceLocation(
+                    metadataLocation.getNamespace(),
+                    metadataLocation.getPath().replace(".moremcmeta", "")
+            ),
+            new MockMetadataView(Collections.emptyList())
+    );
+    private final ImmutableMap<String, MetadataReader> MOCK_READERS = ImmutableMap.of(".moremcmeta", MOCK_READER);
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -59,18 +70,80 @@ public class TextureLoaderTest {
     @Test
     public void construct_TextureFactoryNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new TextureLoader<>(null, LOGGER);
+        new TextureLoader<>(
+                null,
+                MOCK_READERS,
+                LOGGER
+        );
+    }
+
+    @Test
+    public void construct_MetadataReadersNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                null,
+                LOGGER
+        );
     }
 
     @Test
     public void construct_LoggerNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new TextureLoader<>((texStream, metadataStream) -> 1, null);
+        new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                null
+        );
+    }
+
+    @Test
+    public void construct_ExtensionWithoutPeriod_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                ImmutableMap.of("moremcmeta", MOCK_READER),
+                LOGGER
+        );
+    }
+
+    @Test
+    public void construct_ExtensionWithPeriodNotAtStart_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                ImmutableMap.of("png.moremcmeta", MOCK_READER),
+                LOGGER
+        );
+    }
+
+    @Test
+    public void construct_ExtensionWithMultiplePeriods_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                ImmutableMap.of(".png.moremcmeta", MOCK_READER),
+                LOGGER
+        );
+    }
+
+    @Test
+    public void construct_ExtensionWithJustPeriod_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                ImmutableMap.of(".", MOCK_READER),
+                LOGGER
+        );
     }
 
     @Test
     public void load_ResourceManagerNull_NullPointerException() {
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         expectedException.expect(NullPointerException.class);
         loader.load(null, "textures");
@@ -81,7 +154,11 @@ public class TextureLoaderTest {
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1, 
+                MOCK_READERS,
+                LOGGER
+        );
 
         expectedException.expect(IllegalArgumentException.class);
         loader.load(repository, "");
@@ -92,7 +169,11 @@ public class TextureLoaderTest {
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         expectedException.expect(IllegalArgumentException.class);
         loader.load(repository, "/");
@@ -103,7 +184,11 @@ public class TextureLoaderTest {
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         expectedException.expect(IllegalArgumentException.class);
         loader.load(repository, "/textures");
@@ -120,7 +205,11 @@ public class TextureLoaderTest {
                 "textures/zombie.png.moremcmeta"
         ));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
@@ -141,7 +230,11 @@ public class TextureLoaderTest {
                 "other/zombie.png.moremcmeta"
         ));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "other");
 
@@ -156,7 +249,11 @@ public class TextureLoaderTest {
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "creeper",
                 "creeper.moremcmeta", "zombie.jpg", "zombie.jpg.moremcmeta"));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
@@ -169,7 +266,11 @@ public class TextureLoaderTest {
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png", "textures/bat.png.moremcmeta",
                 "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
@@ -182,7 +283,11 @@ public class TextureLoaderTest {
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png", "textures/bat.png.moremcmeta",
                 "textures/creeper.png", "textures/zombie.png"));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
@@ -209,6 +314,7 @@ public class TextureLoaderTest {
                     }
                     return 1;
                 },
+                MOCK_READERS,
                 LOGGER
         );
 
@@ -227,7 +333,6 @@ public class TextureLoaderTest {
                 "textures/zombie.png.moremcmeta"
         ));
 
-
         AtomicInteger texturesLoaded = new AtomicInteger();
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadataStream) -> {
@@ -236,6 +341,7 @@ public class TextureLoaderTest {
                     }
                     return 1;
                 },
+                MOCK_READERS,
                 LOGGER
         );
 
@@ -261,7 +367,11 @@ public class TextureLoaderTest {
             }
         };
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
 
         expectedException.expect(RuntimeException.class);
@@ -291,7 +401,11 @@ public class TextureLoaderTest {
                 Set.of(collection)
         );
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         expectedException.expect(NullPointerException.class);
         loader.load(repository, "textures");
@@ -320,7 +434,11 @@ public class TextureLoaderTest {
                 Set.of(collection)
         );
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         expectedException.expect(NullPointerException.class);
         loader.load(repository, "textures");
@@ -359,7 +477,11 @@ public class TextureLoaderTest {
                 Set.of(collection)
         );
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
@@ -400,7 +522,11 @@ public class TextureLoaderTest {
                 Set.of(collection)
         );
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         expectedException.expect(RuntimeException.class);
         loader.load(repository, "textures");
@@ -414,7 +540,11 @@ public class TextureLoaderTest {
                 Set.of("textures/creeper.png.moremcmeta")
         );
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
@@ -432,7 +562,11 @@ public class TextureLoaderTest {
                 Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
@@ -459,7 +593,11 @@ public class TextureLoaderTest {
             }
         };
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
         assertTrue(loader.load(repository, "textures").isEmpty());
     }
 
@@ -473,7 +611,11 @@ public class TextureLoaderTest {
                 "textures/zombie.png",
                 "textures/zombie.png.moremcmeta"));
 
-        TextureLoader<Integer> loader = new TextureLoader<>((texStream, metadataStream) -> 1, LOGGER);
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
