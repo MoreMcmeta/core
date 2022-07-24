@@ -66,13 +66,11 @@ public class SingleUploadComponent implements CoreTextureComponent {
     /**
      * Uploads the texture when it needs to be uploaded.
      * @param currentFrame      view of the texture's current frame
-     * @param predefinedFrames  persistent views of predefined frames
      */
     @Override
-    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
-                         FrameGroup<PersistentFrameView> predefinedFrames) {
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
         if (IS_PREPARED.get()) {
-            currentFrame.uploadAt(UPLOAD_POINT);
+            currentFrame.upload(UPLOAD_POINT.x(), UPLOAD_POINT.y());
         }
     }
 

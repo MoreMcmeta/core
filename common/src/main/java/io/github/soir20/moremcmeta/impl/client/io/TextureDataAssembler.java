@@ -26,6 +26,7 @@ import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
+import io.github.soir20.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.impl.client.texture.CleanupComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
@@ -179,12 +180,15 @@ public class TextureDataAssembler<I extends CloseableImage> {
      * @param metadata      metadata associated with the transform
      * @return assembled components
      */
-    private Iterable<TextureComponent<CurrentFrameView>> assembleComponents(ComponentProvider provider,
-                                                                            List<CloseableImageFrame> frames,
-                                                                            ParsedMetadata metadata) {
+    private Iterable<TextureComponent<CurrentFrameView, UploadableFrameView>>
+    assembleComponents(ComponentProvider provider, List<CloseableImageFrame> frames, ParsedMetadata metadata) {
+
         FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(frames, MutableFrameViewImpl::new);
 
-        Iterable<TextureComponent<CurrentFrameView>> components = provider.assemble(metadata, mutableFrames);
+        Iterable<TextureComponent<CurrentFrameView, UploadableFrameView>> components = provider.assemble(
+                metadata,
+                mutableFrames
+        );
 
         mutableFrames.forEach(MutableFrameViewImpl::invalidate);
 

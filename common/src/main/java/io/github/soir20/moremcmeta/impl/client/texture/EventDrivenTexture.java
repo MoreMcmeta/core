@@ -26,6 +26,7 @@ import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
+import io.github.soir20.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
@@ -55,6 +57,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
     private final Map<ListenerType, List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>> LISTENERS;
+    private final List<Consumer<TextureAndFrameView>> UPLOAD_LISTENERS;
     private final TextureState CURRENT_STATE;
     private boolean registered;
 
@@ -93,7 +96,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Fires upload listeners and marks the texture as not needing an upload.
      */
     public void upload() {
-        runListeners(ListenerType.UPLOAD);
+        UPLOAD_LISTENERS.forEach((listener) -> {
+            TextureAndFrameView view = new TextureAndFrameView(CURRENT_STATE);
+            listener.accept(view);
+            view.invalidate();
+        });
         CURRENT_STATE.hasUpdatedSinceUpload = false;
     }
 
@@ -162,15 +169,18 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     /**
      * Creates an event-driven texture with listeners.
      * @param listeners                 list of all listeners, which will execute in the order given (by type)
+     * @param uploadListeners           list of all upload listeners, which will execute in the order given
      * @param predefinedFrames          frames already existing in the original image
      * @param generatedFrame            initial image for this texture
      */
     private EventDrivenTexture(
             Map<ListenerType, List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>> listeners,
+            List<Consumer<TextureAndFrameView>> uploadListeners,
             List<? extends CloseableImageFrame> predefinedFrames,
             CloseableImageFrame generatedFrame) {
         super();
         LISTENERS = listeners;
+        UPLOAD_LISTENERS = uploadListeners;
         CURRENT_STATE = new TextureState(this, predefinedFrames, generatedFrame);
     }
 
@@ -183,6 +193,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 ListenerType,
                 List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>
         > LISTENERS;
+        private final List<Consumer<TextureAndFrameView>> UPLOAD_LISTENERS;
         private List<? extends CloseableImageFrame> predefinedFrames;
         private CloseableImageFrame generatedFrame;
 
@@ -192,9 +203,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         public Builder() {
             LISTENERS = new EnumMap<>(ListenerType.class);
             LISTENERS.put(ListenerType.REGISTRATION, new ArrayList<>());
-            LISTENERS.put(ListenerType.UPLOAD, new ArrayList<>());
             LISTENERS.put(ListenerType.TICK, new ArrayList<>());
             LISTENERS.put(ListenerType.CLOSE, new ArrayList<>());
+
+            UPLOAD_LISTENERS = new ArrayList<>();
         }
 
         /**
@@ -244,7 +256,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param component     component to add to the texture
          * @return this builder for chaining
          */
-        public Builder add(TextureComponent<? super TextureAndFrameView> component) {
+        public Builder add(TextureComponent<? super TextureAndFrameView, ? super TextureAndFrameView> component) {
             requireNonNull(component, "Component cannot be null");
             LISTENERS.get(ListenerType.TICK).add(component::onTick);
             LISTENERS.get(ListenerType.CLOSE).add(component::onClose);
@@ -259,7 +271,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         public Builder add(CoreTextureComponent component) {
             requireNonNull(component, "Component cannot be null");
             LISTENERS.get(ListenerType.REGISTRATION).add(component::onRegistration);
-            LISTENERS.get(ListenerType.UPLOAD).add(component::onUpload);
+            UPLOAD_LISTENERS.add(component::onUpload);
             LISTENERS.get(ListenerType.TICK).add(component::onTick);
             LISTENERS.get(ListenerType.CLOSE).add(component::onClose);
             return this;
@@ -293,7 +305,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new IllegalStateException("Predefined frames and generated frame must have same height");
             }
 
-            return new EventDrivenTexture(LISTENERS, predefinedFrames, generatedFrame);
+            return new EventDrivenTexture(LISTENERS, UPLOAD_LISTENERS, predefinedFrames, generatedFrame);
         }
 
     }
@@ -302,7 +314,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Provides a view of the current state of the texture and the current frame.
      * @author soir20
      */
-    public static class TextureAndFrameView implements CurrentFrameView {
+    public static class TextureAndFrameView implements CurrentFrameView, UploadableFrameView {
         private final TextureState STATE;
         private boolean valid;
 
@@ -374,11 +386,17 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Uploads the current frame at the given point. This should only
          * be called when the correct texture (usually this texture) is
          * bound in OpenGL.
-         * @param uploadPoint   point to upload the frame at
+         * @param x   x-coordinate of the point to upload the frame at
+         * @param y   y-coordinate of the point to upload the frame at
          */
-        public void uploadAt(Point uploadPoint) {
+        public void upload(int x, int y) {
             checkValid();
-            STATE.uploadAt(uploadPoint);
+
+            if (x < 0 || y < 0) {
+                throw new NegativeUploadPointException(x, y);
+            }
+
+            STATE.uploadAt(new Point(x, y));
         }
 
         /**

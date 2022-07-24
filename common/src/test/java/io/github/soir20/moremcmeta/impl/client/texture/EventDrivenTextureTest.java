@@ -24,6 +24,7 @@ import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
+import io.github.soir20.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
 import org.junit.Rule;
@@ -117,9 +118,9 @@ public class EventDrivenTextureTest {
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 currentFrame.generateWith((point, depFunction) -> new Color(0), Area.of(), Area.of());
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -283,7 +284,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 timesUploaded.incrementAndGet();
             }
         });
@@ -313,7 +314,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 timesUploaded.incrementAndGet();
             }
         });
@@ -442,7 +443,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 currentFrameIndex.set(currentFrame.index().orElseThrow());
             }
         });
@@ -545,8 +546,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -570,8 +571,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -613,7 +614,7 @@ public class EventDrivenTextureTest {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), null);
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -632,7 +633,7 @@ public class EventDrivenTextureTest {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(-1, 50)));
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -651,7 +652,7 @@ public class EventDrivenTextureTest {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, -1)));
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -670,7 +671,7 @@ public class EventDrivenTextureTest {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(100, 50)));
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -689,7 +690,7 @@ public class EventDrivenTextureTest {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, 100)));
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -708,7 +709,7 @@ public class EventDrivenTextureTest {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> depFunction.apply(new Point(25, 25)), Area.of(new Point(50, 50)), Area.of(new Point(25, 50)));
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -727,7 +728,7 @@ public class EventDrivenTextureTest {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith((point, depFunction) -> depFunction.apply(new Point(25, 50)), Area.of(new Point(50, 50)), Area.of(new Point(25, 50)));
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -756,8 +757,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -806,8 +807,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -872,8 +873,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.upload(0, 0);
             }
         });
         builder.add(new CoreTextureComponent() {
@@ -948,8 +949,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.upload(0, 0);
             }
         });
         builder.add(new CoreTextureComponent() {
@@ -1010,8 +1011,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.upload(0, 0);
             }
         });
         builder.add(new CoreTextureComponent() {
@@ -1088,8 +1089,8 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                currentFrame.upload(0, 0);
             }
         });
         builder.add(new CoreTextureComponent() {
@@ -1173,9 +1174,9 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 view.replaceWith(1);
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -1206,9 +1207,9 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 view.generateWith((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(0, 0)), Area.of());
-                currentFrame.uploadAt(new Point(0, 0));
+                currentFrame.upload(0, 0);
             }
         });
 
@@ -1258,7 +1259,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 view.width();
             }
         });
@@ -1304,7 +1305,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 view.height();
             }
         });
@@ -1374,7 +1375,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 view.index();
             }
         });
@@ -1422,7 +1423,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 view.texture();
             }
         });
@@ -1438,12 +1439,12 @@ public class EventDrivenTextureTest {
     }
 
     @Test
-    public void upload_NullPoint_NullPointerException() {
+    public void upload_NegativeXUploadPoint_NegativeUploadPointException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(null);
+                currentFrame.upload(-1, 0);
             }
         });
 
@@ -1453,7 +1454,27 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame());
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(UploadableFrameView.NegativeUploadPointException.class);
+        texture.tick();
+    }
+
+    @Test
+    public void upload_NegativeYUploadPoint_NegativeUploadPointException() {
+        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
+        builder.add(new CoreTextureComponent() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+                currentFrame.upload(0, -1);
+            }
+        });
+
+        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame());
+        frames.get(0).applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(20, 20)), Area.of());
+        builder.setPredefinedFrames(frames);
+        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        EventDrivenTexture texture = builder.build();
+
+        expectedException.expect(UploadableFrameView.NegativeUploadPointException.class);
         texture.tick();
     }
 
@@ -1463,7 +1484,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.uploadAt(new Point(2, 3));
+                currentFrame.upload(2, 3);
             }
         });
 
@@ -1479,7 +1500,7 @@ public class EventDrivenTextureTest {
     }
 
     @Test
-    public void uploadAt_AfterInvalidated_IllegalFrameReferenceException() {
+    public void upload_AfterInvalidated_IllegalFrameReferenceException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             private EventDrivenTexture.TextureAndFrameView view;
@@ -1490,8 +1511,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                view.uploadAt(new Point(0, 0));
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                view.upload(0, 0);
             }
         });
 
@@ -1593,7 +1614,7 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                 view.lowerMipmapLevel(0);
             }
         });
@@ -1643,7 +1664,7 @@ public class EventDrivenTextureTest {
                 }
 
                 @Override
-                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(UPLOAD_ID_BASE + finalIndex);
                 }

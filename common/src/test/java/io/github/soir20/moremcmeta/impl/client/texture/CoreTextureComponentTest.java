@@ -34,12 +34,6 @@ public class CoreTextureComponentTest {
     }
 
     @Test
-    public void onUpload_NullState_NoException() {
-        CoreTextureComponent component = new CoreTextureComponent() {};
-        component.onUpload(null, new FrameGroupImpl<>(List.of()));
-    }
-
-    @Test
     public void onTick_NullState_NoException() {
         CoreTextureComponent component = new CoreTextureComponent() {};
         component.onTick(null, new FrameGroupImpl<>(List.of()));

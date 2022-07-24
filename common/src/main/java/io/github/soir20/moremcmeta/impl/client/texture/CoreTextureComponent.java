@@ -26,7 +26,8 @@ import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
  * Responds to events relevant to MoreMcmeta's internal implementation for a particular texture.
  * @author soir20
  */
-public interface CoreTextureComponent extends TextureComponent<EventDrivenTexture.TextureAndFrameView> {
+public interface CoreTextureComponent
+        extends TextureComponent<EventDrivenTexture.TextureAndFrameView, EventDrivenTexture.TextureAndFrameView> {
 
     /**
      * Responds to the registration event of the associated texture. Note that the lifetime of the
@@ -38,16 +39,5 @@ public interface CoreTextureComponent extends TextureComponent<EventDrivenTextur
      */
     default void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
                                 FrameGroup<PersistentFrameView> predefinedFrames) {}
-
-    /**
-     * Responds to the upload event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
-     * provided to this method is limited to the call of this method. Attempting to retain and use a
-     * {@link CurrentFrameView} at a later point will cause a
-     * {@link io.github.soir20.moremcmeta.api.client.texture.FrameView.IllegalFrameReference} exception to be thrown.
-     * @param currentFrame      view of the texture's current frame
-     * @param predefinedFrames  persistent views of predefined frames
-     */
-    default void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
-                          FrameGroup<PersistentFrameView> predefinedFrames) {}
 
 }

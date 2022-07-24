@@ -56,12 +56,10 @@ public class SpriteUploadComponent implements CoreTextureComponent {
     /**
      * Uploads the texture when it needs to be uploaded.
      * @param currentFrame      view of the texture's current frame
-     * @param predefinedFrames  persistent views of the predefined frames
      */
     @Override
-    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
-                         FrameGroup<PersistentFrameView> predefinedFrames) {
-        currentFrame.uploadAt(UPLOAD_POINT);
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        currentFrame.upload(UPLOAD_POINT.x(), UPLOAD_POINT.y());
     }
 
     /**

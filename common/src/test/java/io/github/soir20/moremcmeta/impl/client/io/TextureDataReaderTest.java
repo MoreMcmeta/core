@@ -28,6 +28,7 @@ import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
+import io.github.soir20.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.soir20.moremcmeta.impl.client.texture.MockCloseableImage;
 import org.junit.Rule;
 import org.junit.Test;
@@ -904,8 +905,8 @@ public class TextureDataReaderTest {
         }
 
         @Override
-        public Iterable<TextureComponent<CurrentFrameView>> assemble(ParsedMetadata metadata,
-                                                                     FrameGroup<? extends MutableFrameView> frames) {
+        public Iterable<TextureComponent<CurrentFrameView, UploadableFrameView>>
+        assemble(ParsedMetadata metadata, FrameGroup<? extends MutableFrameView> frames) {
             return List.of(new TextureComponent<>() {});
         }
 
