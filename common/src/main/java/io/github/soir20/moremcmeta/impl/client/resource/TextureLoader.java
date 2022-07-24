@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.soir20.moremcmeta.impl.client.io.TextureReader;
 import net.minecraft.ResourceLocationException;
@@ -30,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.requireNonNull;
@@ -70,11 +68,16 @@ public class TextureLoader<R> {
      * Searches for and loads textures from a folder throughout all resource packs.
      * @param resourceRepository    resources to search through
      * @param path                  the path to search for textures in
+     * @param previousResults       previous results taken into account when checking for multiple metadata files for
+     *                              the same texture
      * @return a mapping of texture location to the texture itself
      */
-    public ImmutableMap<ResourceLocation, R> load(OrderedResourceRepository resourceRepository, String path) {
+    public ImmutableMap<ResourceLocation, R> load(OrderedResourceRepository resourceRepository, String path,
+                                                  ImmutableMap<ResourceLocation, R> previousResults) {
         requireNonNull(resourceRepository, "Resource manager cannot be null");
         requireNonNull(path, "Path cannot be null");
+        requireNonNull(previousResults, "Previous results cannot be null");
+
         if (path.isEmpty() || path.startsWith("/")) {
             throw new IllegalArgumentException("Path cannot be empty or start with a slash");
         }
@@ -97,39 +100,38 @@ public class TextureLoader<R> {
             return ImmutableMap.of();
         }
 
-        return getTextures(textureCandidates, resourceRepository);
+        return getTextures(textureCandidates, resourceRepository, previousResults);
     }
 
     /**
      * Creates all valid textures from candidates.
      * @param candidates           possible locations of textures
      * @param resourceRepository   resources to search through
+     * @param previousResults      previous results taken into account when checking for multiple metadata files for
+     *                             the same texture
      * @return a mapping of texture location to the texture itself
      */
     private ImmutableMap<ResourceLocation, R> getTextures(Collection<? extends ResourceLocation> candidates,
-                                                          OrderedResourceRepository resourceRepository) {
-        Map<ResourceLocation, R> textures = new ConcurrentHashMap<>();
+                                                          OrderedResourceRepository resourceRepository,
+                                                          Map<ResourceLocation, R> previousResults) {
+        Map<ResourceLocation, R> textures = new ConcurrentHashMap<>(previousResults);
 
         // Create textures from unique candidates
-        candidates.stream().distinct().parallel().forEach((metadataLocation) -> {
-            Optional<Pair<ResourceLocation, R>> texture = texture(resourceRepository, metadataLocation);
-
-            // Keep track of which textures are created
-            texture.ifPresent(tex -> textures.put(tex.getFirst(), tex.getSecond()));
-
-        });
+        candidates.stream().distinct().parallel().forEach(
+                (metadataLocation) -> texture(resourceRepository, metadataLocation, textures)
+        );
 
         return ImmutableMap.copyOf(textures);
     }
 
     /**
-     * Gets a texture from a file.
+     * Gets a texture from a file and places it in the provided map.
      * @param resourceRepository   resource manager to get textures/metadata from
      * @param metadataLocation     file location of texture's metadata for this mod (not .mcmeta)
-     * @return the texture, or empty if the file is not found
+     * @param results              filled with the result
      */
-    private Optional<Pair<ResourceLocation, R>> texture(OrderedResourceRepository resourceRepository,
-                                                        ResourceLocation metadataLocation) {
+    private void texture(OrderedResourceRepository resourceRepository, ResourceLocation metadataLocation,
+                         Map<ResourceLocation, R> results) {
         PackType resourceType = resourceRepository.resourceType();
 
         try {
@@ -149,12 +151,23 @@ public class TextureLoader<R> {
                 InputStream textureStream = metadataResources.getResource(resourceType, textureLocation);
 
                 // There must be a reader for this extension since we only retrieved files with readers' extensions
-                Optional<R> texture = Optional.of(TEXTURE_READER.read(textureStream, metadata.metadata()));
+                R texture = TEXTURE_READER.read(textureStream, metadata.metadata());
 
                 textureStream.close();
                 metadataStream.close();
 
-                return texture.map((tex) -> Pair.of(textureLocation, tex));
+                if (results.containsKey(textureLocation)) {
+                    results.remove(textureLocation);
+
+                    throw new MetadataReader.InvalidMetadataException(
+                            String.format(
+                                    "Two metadata files found for same texture (%s). Neither will be applied",
+                                    textureLocation
+                            )
+                    );
+                }
+
+                results.put(textureLocation, texture);
             }
         } catch (IOException ioException) {
             LOGGER.error("Texture associated with metadata in file {} is missing: {}",
@@ -162,8 +175,6 @@ public class TextureLoader<R> {
         } catch (MetadataReader.InvalidMetadataException metadataError) {
             LOGGER.error("Invalid metadata in file {}: {}", metadataLocation, metadataError);
         }
-
-        return Optional.empty();
     }
 
 }

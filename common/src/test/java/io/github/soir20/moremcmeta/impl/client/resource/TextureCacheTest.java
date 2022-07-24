@@ -109,6 +109,39 @@ public class TextureCacheTest {
     }
 
     @Test
+    public void load_PreviousResultsContainSameTexture_CacheRetrieved() {
+        TextureCache<Integer, Integer> cache = new TextureCache<>(
+                new TextureLoader<>(
+                        (texStream, metadataStream) -> 1,
+                        ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream) -> {
+                            if (metadataLocation.getPath().equals("test/bat2.png.moremcmeta")) {
+                                return new MetadataReader.ReadMetadata(
+                                        new ResourceLocation("textures/bat.png"),
+                                        new MockMetadataView(Collections.emptyList())
+                                );
+                            }
+
+                            return MOCK_READER.read(metadataLocation, metadataStream);
+                        }),
+                        LOGGER
+                )
+        );
+
+        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+                "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta",
+                "test/bat2.png.moremcmeta"));
+
+        cache.load(repository, Set.of("textures", "test"), 1);
+
+        ImmutableMap<ResourceLocation, Integer> actual = cache.get(1);
+        ImmutableMap<ResourceLocation, Integer> expected = ImmutableMap.<ResourceLocation, Integer>builder()
+                .put(new ResourceLocation("test/creeper.png"), 1)
+                .build();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void load_LoadTwiceSameState_LoaderUsedOnce() {
         AtomicInteger texturesRead = new AtomicInteger();
         TextureCache<Integer, Integer> cache = new TextureCache<>(

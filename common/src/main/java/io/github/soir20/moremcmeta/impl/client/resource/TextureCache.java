@@ -77,9 +77,11 @@ public class TextureCache<R, S> {
             /* We would normally want to load data asynchronously during reloading. However, this
                portion of texture loading is efficient, even for large images. We have to do this
                before reloading starts to avoid a race with texture atlases. */
+            ImmutableMap<ResourceLocation, R> previousResults = ImmutableMap.of();
             for (String path : paths) {
-                CACHE.putAll(LOADER.load(repository, path));
+                previousResults = LOADER.load(repository, path, previousResults);
             }
+            CACHE.putAll(previousResults);
 
             state = newState;
             IS_CURRENT.signal();

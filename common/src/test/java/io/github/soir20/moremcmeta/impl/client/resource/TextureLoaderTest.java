@@ -146,7 +146,37 @@ public class TextureLoaderTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        loader.load(null, "textures");
+        loader.load(null, "textures", ImmutableMap.of());
+    }
+
+    @Test
+    public void load_PathNull_NullPointerException() {
+        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
+                "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
+
+        expectedException.expect(NullPointerException.class);
+        loader.load(repository, null, ImmutableMap.of());
+    }
+
+    @Test
+    public void load_PreviousResultsNull_NullPointerException() {
+        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
+                "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
+
+        expectedException.expect(NullPointerException.class);
+        loader.load(repository, "textures", null);
     }
 
     @Test
@@ -161,7 +191,7 @@ public class TextureLoaderTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        loader.load(repository, "");
+        loader.load(repository, "", ImmutableMap.of());
     }
 
     @Test
@@ -176,7 +206,7 @@ public class TextureLoaderTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        loader.load(repository, "/");
+        loader.load(repository, "/", ImmutableMap.of());
     }
 
     @Test
@@ -191,7 +221,7 @@ public class TextureLoaderTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        loader.load(repository, "/textures");
+        loader.load(repository, "/textures", ImmutableMap.of());
     }
 
     @Test
@@ -211,10 +241,72 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures", ImmutableMap.of());
 
         assertEquals(3, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
+    }
+
+    @Test
+    public void load_PreviousResultsHasTexture_SkipsDuplicatedTexture() {
+        OrderedResourceRepository repository = makeMockRepository(Set.of(
+                "textures/bat.png",
+                "textures/bat.png.moremcmeta",
+                "textures/creeper.png",
+                "textures/creeper.png.moremcmeta",
+                "textures/zombie.png",
+                "textures/zombie.png.moremcmeta"
+        ));
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                MOCK_READERS,
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(
+                repository,
+                "textures",
+                ImmutableMap.of(new ResourceLocation("textures/bat.png"), 2)
+        );
+
+        assertEquals(2, locations.size());
+        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
+    }
+
+    @Test
+    public void load_TwoMetadataFilesForSameTexture_SkipsDuplicatedTexture() {
+        OrderedResourceRepository repository = makeMockRepository(Set.of(
+                "textures/bat.png",
+                "textures/bat.png.moremcmeta",
+                "textures/creeper.png",
+                "textures/creeper.png.moremcmeta",
+                "textures/zombie.png",
+                "textures/zombie.png.moremcmeta",
+                "textures/bat2.png.moremcmeta"
+        ));
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadataStream) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream) -> {
+                    if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
+                        return new MetadataReader.ReadMetadata(
+                                new ResourceLocation("textures/bat.png"),
+                                new MockMetadataView(Collections.emptyList())
+                        );
+                    }
+
+                    return MOCK_READER.read(metadataLocation, metadataStream);
+                }),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures", ImmutableMap.of());
+
+        assertEquals(2, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("textures/creeper.png")));
         assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
     }
@@ -236,7 +328,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "other");
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "other", ImmutableMap.of());
 
         assertEquals(3, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("other/bat.png")));
@@ -255,7 +347,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures", ImmutableMap.of());
 
         assertEquals(1, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
@@ -272,7 +364,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures", ImmutableMap.of());
 
         assertEquals(1, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
@@ -289,7 +381,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures", ImmutableMap.of());
 
         assertEquals(1, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
@@ -318,7 +410,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures", ImmutableMap.of());
         assertEquals(2, locations.size());
     }
 
@@ -346,7 +438,7 @@ public class TextureLoaderTest {
         );
 
         expectedException.expect(RuntimeException.class);
-        loader.load(repository, "textures");
+        loader.load(repository, "textures", ImmutableMap.of());
     }
 
     @Test
@@ -375,7 +467,7 @@ public class TextureLoaderTest {
 
 
         expectedException.expect(RuntimeException.class);
-        loader.load(repository, "textures");
+        loader.load(repository, "textures", ImmutableMap.of());
     }
 
     @Test
@@ -408,7 +500,7 @@ public class TextureLoaderTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        loader.load(repository, "textures");
+        loader.load(repository, "textures", ImmutableMap.of());
     }
 
     @Test
@@ -441,7 +533,7 @@ public class TextureLoaderTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        loader.load(repository, "textures");
+        loader.load(repository, "textures", ImmutableMap.of());
     }
 
     @Test
@@ -483,7 +575,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures", ImmutableMap.of());
 
         assertEquals(1, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
@@ -529,7 +621,7 @@ public class TextureLoaderTest {
         );
 
         expectedException.expect(RuntimeException.class);
-        loader.load(repository, "textures");
+        loader.load(repository, "textures", ImmutableMap.of());
     }
 
     @Test
@@ -546,7 +638,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> results = loader.load(repository, "textures", ImmutableMap.of());
 
         assertEquals(2, results.size());
         assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
@@ -568,7 +660,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> results = loader.load(repository, "textures", ImmutableMap.of());
 
         assertEquals(2, results.size());
         assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
@@ -598,7 +690,7 @@ public class TextureLoaderTest {
                 MOCK_READERS,
                 LOGGER
         );
-        assertTrue(loader.load(repository, "textures").isEmpty());
+        assertTrue(loader.load(repository, "textures", ImmutableMap.of()).isEmpty());
     }
 
     @Test
@@ -617,7 +709,7 @@ public class TextureLoaderTest {
                 LOGGER
         );
 
-        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures", ImmutableMap.of());
 
         assertEquals(3, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("test", "textures/bat.png")));
