@@ -272,7 +272,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
          * Checks that this frame view is currently valid and throws an exception if not.
          * @throws IllegalFrameReference if this view is no longer valid
          */
-        public void checkValid() throws IllegalFrameReference {
+        private void checkValid() throws IllegalFrameReference {
             if (!valid) {
                 throw new IllegalFrameReference();
             }
