@@ -247,21 +247,16 @@ public class TextureDataTest {
                 expectedMetadata
         );
 
-        List<Pair<ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>();
-        for (Pair<ParsedMetadata, ComponentProvider> item : data.parsedMetadata()) {
-            actualMetadata.add(item);
-        }
-
-        assertEquals(0, actualMetadata.size());
+        assertEquals(0, data.parsedMetadata().size());
     }
 
     @Test
     public void parsedMetadata_Some_SameMetadataReturned() {
         List<Pair<ParsedMetadata, ComponentProvider>> expectedMetadata = List.of(
-                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(new TextureComponent<>() {})),
-                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(new TextureComponent<>() {})),
-                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(new TextureComponent<>() {})),
-                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(new TextureComponent<>() {}))
+                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {})
         );
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
@@ -273,12 +268,7 @@ public class TextureDataTest {
                 expectedMetadata
         );
 
-        List<Pair<ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>();
-        for (Pair<ParsedMetadata, ComponentProvider> item : data.parsedMetadata()) {
-            actualMetadata.add(item);
-        }
-
-        assertEquals(expectedMetadata, actualMetadata);
+        assertEquals(expectedMetadata, data.parsedMetadata());
     }
 
     @Test
@@ -286,24 +276,24 @@ public class TextureDataTest {
         List<Pair<ParsedMetadata, ComponentProvider>> expectedMetadata = new ArrayList<>();
         expectedMetadata.add(Pair.of(
                 new ParsedMetadata() {},
-                (metadata, frames) -> List.of(new TextureComponent<>() {})
+                (metadata, frames) -> new TextureComponent<>() {}
         ));
         expectedMetadata.add(Pair.of(
                 new ParsedMetadata() {},
-                (metadata, frames) -> List.of(new TextureComponent<>() {})
+                (metadata, frames) -> new TextureComponent<>() {}
         ));
         expectedMetadata.add(Pair.of(
                 new ParsedMetadata() {},
-                (metadata, frames) -> List.of(new TextureComponent<>() {})
+                (metadata, frames) -> new TextureComponent<>() {}
         ));
         expectedMetadata.add(Pair.of(
                 new ParsedMetadata() {},
-                (metadata, frames) -> List.of(new TextureComponent<>() {})
+                (metadata, frames) -> new TextureComponent<>() {}
         ));
 
         Pair<ParsedMetadata, ComponentProvider> extraSection = Pair.of(
                 new ParsedMetadata() {},
-                (metadata, frames) -> List.of(new TextureComponent<>() {})
+                (metadata, frames) -> new TextureComponent<>() {}
         );
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
@@ -317,10 +307,7 @@ public class TextureDataTest {
 
         expectedMetadata.add(extraSection);
 
-        List<Pair<ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>();
-        for (Pair<ParsedMetadata, ComponentProvider> item : data.parsedMetadata()) {
-            actualMetadata.add(item);
-        }
+        List<Pair<ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>(data.parsedMetadata());
 
         // If the actual metadata already contains the extra section, the lists won't be equal
         actualMetadata.add(extraSection);

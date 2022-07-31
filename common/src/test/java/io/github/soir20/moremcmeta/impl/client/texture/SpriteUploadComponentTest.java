@@ -45,9 +45,9 @@ public class SpriteUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3))));
 
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
         texture.upload();
@@ -63,9 +63,9 @@ public class SpriteUploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3))));
 
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
         texture.upload();
@@ -83,9 +83,9 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(new Point(2, 3));
         builder.add(new SpriteUploadComponent(sprite));
 
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
         texture.tick();
@@ -103,9 +103,9 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(new Point(2, 3));
         builder.add(new SpriteUploadComponent(sprite));
 
-        MockCloseableImageFrame frame = new MockCloseableImageFrame();
+        MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
+        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
         texture.tick();
@@ -124,9 +124,9 @@ public class SpriteUploadComponentTest {
         MockSprite sprite = new MockSprite(1);
         builder.add(new SpriteUploadComponent(sprite));
 
-        MockCloseableImageFrame frame1 = new MockCloseableImageFrame();
-        MockCloseableImageFrame frame2 = new MockCloseableImageFrame();
-        MockCloseableImageFrame frame3 = new MockCloseableImageFrame();
+        MockCloseableImageFrame frame1 = new MockCloseableImageFrame(1);
+        MockCloseableImageFrame frame2 = new MockCloseableImageFrame(1);
+        MockCloseableImageFrame frame3 = new MockCloseableImageFrame(1);
 
         builder.setPredefinedFrames(List.of(frame1, frame2));
         builder.setGeneratedFrame(frame3);

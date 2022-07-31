@@ -21,11 +21,9 @@ import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
-import io.github.soir20.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.FrameGroup;
 import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.client.texture.MutableFrameView;
-import io.github.soir20.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
@@ -108,7 +106,7 @@ public class TextureDataAssemblerTest {
                 new MockCloseableImage(100, 100),
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     checkFunction.accept(frames);
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         ));
 
@@ -135,7 +133,7 @@ public class TextureDataAssemblerTest {
                 false, false,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) ->
-                    List.of(new TextureComponent<>() {})
+                    new TextureComponent<>() {}
                 ))
         ));
 
@@ -172,7 +170,7 @@ public class TextureDataAssemblerTest {
                 false, false,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) ->
-                        List.of(new TextureComponent<>() {})
+                        new TextureComponent<>() {}
                 ))
         ));
 
@@ -208,7 +206,7 @@ public class TextureDataAssemblerTest {
                 true, false,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) ->
-                        List.of(new TextureComponent<>() {})
+                        new TextureComponent<>() {}
                 ))
         ));
 
@@ -244,7 +242,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) ->
-                        List.of(new TextureComponent<>() {})
+                        new TextureComponent<>() {}
                 ))
         ));
 
@@ -271,7 +269,7 @@ public class TextureDataAssemblerTest {
                 false, false,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) ->
-                        List.of(new TextureComponent<>() {})
+                        new TextureComponent<>() {}
                 ))
         ));
     }
@@ -310,46 +308,13 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) ->
-                        List.of(new TextureComponent<>() {})
+                        new TextureComponent<>() {}
                 ))
         )).build();
 
         allocatedImages.forEach((image) -> assertFalse(image.isClosed()));
         texture.close();
         allocatedImages.forEach((image) -> assertTrue(image.isClosed()));
-    }
-
-    @Test
-    public void assemble_DataGiven_ComponentsAssembledInOrder() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        List<Integer> actualOrder = new ArrayList<>();
-
-        EventDrivenTexture texture = assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> List.of(
-                        new TextureComponent<>() {public void onTick(CurrentFrameView view, FrameGroup<PersistentFrameView> predefinedFrames) { actualOrder.add(0);}},
-                        new TextureComponent<>() {public void onTick(CurrentFrameView view, FrameGroup<PersistentFrameView> predefinedFrames) { actualOrder.add(1);}},
-                        new TextureComponent<>() {public void onTick(CurrentFrameView view, FrameGroup<PersistentFrameView> predefinedFrames) { actualOrder.add(2);}},
-                        new TextureComponent<>() {public void onTick(CurrentFrameView view, FrameGroup<PersistentFrameView> predefinedFrames) { actualOrder.add(3);}}
-                )))
-        )).build();
-
-        texture.tick();
-
-        assertEquals(List.of(0, 1, 2, 3), actualOrder);
     }
 
     @Test
@@ -372,7 +337,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     assertEquals(30, frames.frame(0).width());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -399,7 +364,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
 
@@ -427,7 +392,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     assertEquals(40, frames.frame(0).height());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -454,7 +419,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
 
@@ -482,7 +447,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     assertEquals(1, (int) frames.frame(1).index().orElseThrow());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -508,7 +473,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform(null, Area.of(new Point(0, 0)), Area.of());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -534,7 +499,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), null, Area.of());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -560,7 +525,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(), null);
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -586,7 +551,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> null, Area.of(new Point(0, 0)), Area.of());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -612,7 +577,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(-1, 0)), Area.of());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -638,7 +603,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, -1)), Area.of());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -664,7 +629,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(30, 0)), Area.of());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -690,7 +655,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 40)), Area.of());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -715,7 +680,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0), new Point(20, 25)), Area.of());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
 
@@ -748,7 +713,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of(new Point(-1, 0)));
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -774,7 +739,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of(new Point(0, -1)));
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -800,7 +765,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of(new Point(30, 0)));
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -826,7 +791,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of(new Point(0, 40)));
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -852,7 +817,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((point, depFunction) -> depFunction.apply(new Point(25, 0)), Area.of(new Point(0, 0)), Area.of(new Point(0, 25)));
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -882,7 +847,7 @@ public class TextureDataAssemblerTest {
                             Area.of(new Point(0, 0), new Point(20, 25)), 
                             Area.of(new Point(25, 30))
                     );
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
 
@@ -916,7 +881,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
 
@@ -945,7 +910,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(-1);
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -971,7 +936,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(6);
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }
@@ -996,7 +961,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Pair.of(new ParsedMetadata() {}, (metadata, frames) -> {
                     assertEquals(6, frames.frames());
-                    return List.of(new TextureComponent<>() {});
+                    return new TextureComponent<>() {};
                 }))
         )).build();
     }

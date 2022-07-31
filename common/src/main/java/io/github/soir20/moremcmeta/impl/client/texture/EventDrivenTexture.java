@@ -31,18 +31,14 @@ import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
@@ -56,8 +52,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
-    private final Map<ListenerType, List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>> LISTENERS;
-    private final List<Consumer<TextureAndFrameView>> UPLOAD_LISTENERS;
+    private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
     private boolean registered;
 
@@ -88,7 +83,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     @Override
     public void load(@Nullable ResourceManager resourceManager) {
-        runListeners(ListenerType.REGISTRATION);
+        runListeners((component, view) -> component.onRegistration(view, CURRENT_STATE.predefinedFrames()));
         registered = true;
     }
 
@@ -96,11 +91,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Fires upload listeners and marks the texture as not needing an upload.
      */
     public void upload() {
-        UPLOAD_LISTENERS.forEach((listener) -> {
-            TextureAndFrameView view = new TextureAndFrameView(CURRENT_STATE);
-            listener.accept(view);
-            view.invalidate();
-        });
+        runListeners(TextureComponent::onUpload);
         CURRENT_STATE.hasUpdatedSinceUpload = false;
     }
 
@@ -109,7 +100,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     @Override
     public void tick() {
-        runListeners(ListenerType.TICK);
+        runListeners((component, view) -> component.onTick(view, CURRENT_STATE.predefinedFrames()));
     }
 
     /**
@@ -117,7 +108,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     @Override
     public void close() {
-        runListeners(ListenerType.CLOSE);
+        runListeners((component, view) -> component.onClose(view, CURRENT_STATE.predefinedFrames()));
     }
 
     /**
@@ -152,35 +143,30 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     }
 
     /**
-     * Runs all listeners of a given type. Fills listener type
-     * with an empty list if no listeners exist.
-     * @param type      type of listeners to fire
+     * Runs all listeners (a method for every component), each with its own temporary view.
+     * @param method      executes the necessary method from the component
      */
-    private void runListeners(ListenerType type) {
-        LISTENERS.putIfAbsent(type, new ArrayList<>());
-
-        LISTENERS.get(type).forEach((listener) -> {
-            TextureAndFrameView view = new TextureAndFrameView(CURRENT_STATE);
-            listener.accept(view, CURRENT_STATE.predefinedFrames());
+    private void runListeners(
+            BiConsumer<CoreTextureComponent, TextureAndFrameView> method) {
+        for (int layer = 0; layer < COMPONENTS.size(); layer++) {
+            TextureAndFrameView view = new TextureAndFrameView(CURRENT_STATE, layer);
+            method.accept(COMPONENTS.get(layer), view);
             view.invalidate();
-        });
+        }
     }
 
     /**
      * Creates an event-driven texture with listeners.
-     * @param listeners                 list of all listeners, which will execute in the order given (by type)
-     * @param uploadListeners           list of all upload listeners, which will execute in the order given
+     * @param components                components that listen to texture events
      * @param predefinedFrames          frames already existing in the original image
      * @param generatedFrame            initial image for this texture
      */
     private EventDrivenTexture(
-            Map<ListenerType, List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>> listeners,
-            List<Consumer<TextureAndFrameView>> uploadListeners,
+            List<CoreTextureComponent> components,
             List<? extends CloseableImageFrame> predefinedFrames,
             CloseableImageFrame generatedFrame) {
         super();
-        LISTENERS = listeners;
-        UPLOAD_LISTENERS = uploadListeners;
+        COMPONENTS = components;
         CURRENT_STATE = new TextureState(this, predefinedFrames, generatedFrame);
     }
 
@@ -189,11 +175,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * @author soir20
      */
     public static class Builder {
-        private final Map<
-                ListenerType,
-                List<BiConsumer<TextureAndFrameView, FrameGroup<PersistentFrameView>>>
-        > LISTENERS;
-        private final List<Consumer<TextureAndFrameView>> UPLOAD_LISTENERS;
+        private final List<CoreTextureComponent> COMPONENTS;
         private List<? extends CloseableImageFrame> predefinedFrames;
         private CloseableImageFrame generatedFrame;
 
@@ -201,12 +183,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Creates a new event-driven texture builder.
          */
         public Builder() {
-            LISTENERS = new EnumMap<>(ListenerType.class);
-            LISTENERS.put(ListenerType.REGISTRATION, new ArrayList<>());
-            LISTENERS.put(ListenerType.TICK, new ArrayList<>());
-            LISTENERS.put(ListenerType.CLOSE, new ArrayList<>());
-
-            UPLOAD_LISTENERS = new ArrayList<>();
+            COMPONENTS = new ArrayList<>();
         }
 
         /**
@@ -235,6 +212,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new IllegalArgumentException("All predefined frames must have the same height");
             }
 
+            if (frames.stream().mapToInt(CloseableImageFrame::layers).distinct().count() > 1) {
+                throw new IllegalArgumentException("All predefined frames must have the same number of layers");
+            }
+
             predefinedFrames = frames;
             return this;
         }
@@ -258,8 +239,22 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public Builder add(TextureComponent<? super TextureAndFrameView, ? super TextureAndFrameView> component) {
             requireNonNull(component, "Component cannot be null");
-            LISTENERS.get(ListenerType.TICK).add(component::onTick);
-            LISTENERS.get(ListenerType.CLOSE).add(component::onClose);
+            add(new CoreTextureComponent() {
+                @Override
+                public void onTick(TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+                    component.onTick(currentFrame, predefinedFrames);
+                }
+
+                @Override
+                public void onUpload(TextureAndFrameView currentFrame) {
+                    component.onUpload(currentFrame);
+                }
+
+                @Override
+                public void onClose(TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+                    component.onClose(currentFrame, predefinedFrames);
+                }
+            });
             return this;
         }
 
@@ -270,10 +265,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public Builder add(CoreTextureComponent component) {
             requireNonNull(component, "Component cannot be null");
-            LISTENERS.get(ListenerType.REGISTRATION).add(component::onRegistration);
-            UPLOAD_LISTENERS.add(component::onUpload);
-            LISTENERS.get(ListenerType.TICK).add(component::onTick);
-            LISTENERS.get(ListenerType.CLOSE).add(component::onClose);
+            COMPONENTS.add(component);
             return this;
         }
 
@@ -305,7 +297,27 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new IllegalStateException("Predefined frames and generated frame must have same height");
             }
 
-            return new EventDrivenTexture(LISTENERS, UPLOAD_LISTENERS, predefinedFrames, generatedFrame);
+            int components = COMPONENTS.size();
+
+            int predefinedLayers = predefinedFrames.get(0).layers();
+            if (components > 0 && predefinedLayers != components) {
+                throw new IllegalStateException(String.format(
+                        "Predefined frames have %s layers but there are %s components; must be the same",
+                        predefinedLayers,
+                        components
+                ));
+            }
+
+            int generatedLayers = generatedFrame.layers();
+            if (components > 0 && generatedLayers != components) {
+                throw new IllegalStateException(String.format(
+                        "Generated frame %s layers but there are %s components; must be the same",
+                        generatedLayers,
+                        components
+                ));
+            }
+
+            return new EventDrivenTexture(COMPONENTS, predefinedFrames, generatedFrame);
         }
 
     }
@@ -316,6 +328,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     public static class TextureAndFrameView implements CurrentFrameView, UploadableFrameView {
         private final TextureState STATE;
+        private final int LAYER;
         private boolean valid;
 
         /**
@@ -328,7 +341,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         @Override
         public void generateWith(ColorTransform transform, Area applyArea, Area dependencies) {
             checkValid();
-            STATE.generateWith(transform, applyArea, dependencies);
+            STATE.generateWith(transform, applyArea, dependencies, LAYER);
         }
 
         /**
@@ -421,9 +434,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         /**
          * Creates an ephemeral wrapper for a texture state.
          * @param state     texture state to wrap
+         * @param layer     layer that will be modified when transforms are applied
          */
-        private TextureAndFrameView(TextureState state) {
+        private TextureAndFrameView(TextureState state, int layer) {
             STATE = state;
+            LAYER = layer;
             valid = true;
         }
 
@@ -457,7 +472,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final List<? extends CloseableImageFrame> PREDEFINED_FRAMES;
         private final FrameGroup<PersistentFrameView> PREDEFINED_FRAME_GROUP;
         private final CloseableImageFrame GENERATED_FRAME;
-        private final Queue<Triple<ColorTransform, Area, Area>> TRANSFORMS;
+        private final Queue<QueuedTransform> TRANSFORMS;
         private Integer currentFrameIndex;
         private Integer indexToCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
@@ -468,15 +483,16 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param transform     the transformation to apply to the current frame
          * @param applyArea     area to apply the transformation to
          * @param dependencies  the points whose current colors this transformation depends on
+         * @param layer         layer to apply the transform to
          */
-        public void generateWith(ColorTransform transform, Area applyArea, Area dependencies) {
+        public void generateWith(ColorTransform transform, Area applyArea, Area dependencies, int layer) {
             requireNonNull(transform, "Frame transform cannot be null");
             requireNonNull(applyArea, "Apply area cannot be null");
             requireNonNull(dependencies, "Dependencies cannot be null");
 
             markNeedsUpload();
             currentFrameIndex = null;
-            TRANSFORMS.add(Triple.of(transform, applyArea, dependencies));
+            TRANSFORMS.add(new QueuedTransform(transform, applyArea, dependencies, layer));
         }
 
         /**
@@ -623,22 +639,42 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             }
 
             while (!TRANSFORMS.isEmpty()) {
-                Triple<ColorTransform, Area, Area> transform = TRANSFORMS.remove();
-                GENERATED_FRAME.applyTransform(transform.getLeft(), transform.getMiddle(), transform.getRight());
+                QueuedTransform transform = TRANSFORMS.remove();
+                GENERATED_FRAME.applyTransform(
+                        transform.TRANSFORM,
+                        transform.APPLY_AREA,
+                        transform.DEPENDENCIES,
+                        transform.LAYER
+                );
             }
         }
 
     }
 
     /**
-     * Represents types of {@link CoreTextureComponent} listeners.
+     * Wrapper class for queued transforms.
      * @author soir20
      */
-    private enum ListenerType {
-        REGISTRATION,
-        UPLOAD,
-        TICK,
-        CLOSE,
+    private static class QueuedTransform {
+        private final ColorTransform TRANSFORM;
+        private final Area APPLY_AREA;
+        private final Area DEPENDENCIES;
+        private final int LAYER;
+
+        /**
+         * Creates a new wrapper for a queued transform.
+         * @param transform         the transform
+         * @param applyArea         apply area of the transform
+         * @param dependencies      dependencies of the transform
+         * @param layer             layer to apply the transform to
+         */
+        public QueuedTransform(ColorTransform transform, Area applyArea, Area dependencies, int layer) {
+            TRANSFORM = transform;
+            APPLY_AREA = applyArea;
+            DEPENDENCIES = dependencies;
+            LAYER = layer;
+        }
+
     }
 
 }

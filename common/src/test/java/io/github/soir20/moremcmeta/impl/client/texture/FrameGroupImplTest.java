@@ -70,13 +70,13 @@ public class FrameGroupImplTest {
     @Test
     public void constructFrameList_NullViewConstructor_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new FrameGroupImpl<>(List.of(new MockCloseableImageFrame()), null);
+        new FrameGroupImpl<>(List.of(new MockCloseableImageFrame(1)), null);
     }
 
     @Test
     public void frame_NegativeFrameIndex_FrameIndexOutOfBoundsException() {
         FrameGroup<PredefinedFrameView> frames =
-                new FrameGroupImpl<>(List.of(new MockCloseableImageFrame()), PredefinedFrameView::new);
+                new FrameGroupImpl<>(List.of(new MockCloseableImageFrame(1)), PredefinedFrameView::new);
 
         expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
         frames.frame(-1);
@@ -85,7 +85,7 @@ public class FrameGroupImplTest {
     @Test
     public void frame_TooLargeFrameIndex_FrameIndexOutOfBoundsException() {
         FrameGroup<PredefinedFrameView> frames =
-                new FrameGroupImpl<>(List.of(new MockCloseableImageFrame()), PredefinedFrameView::new);
+                new FrameGroupImpl<>(List.of(new MockCloseableImageFrame(1)), PredefinedFrameView::new);
 
         expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
         frames.frame(1);
@@ -94,7 +94,7 @@ public class FrameGroupImplTest {
     @Test
     public void frame_NonZeroValidFrameIndex_FrameRetrieved() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()),
+                List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
                 PredefinedFrameView::new
         );
 
@@ -104,7 +104,7 @@ public class FrameGroupImplTest {
     @Test
     public void frame_ZeroValidFrameIndex_FrameRetrieved() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()),
+                List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
                 PredefinedFrameView::new
         );
 
@@ -124,7 +124,7 @@ public class FrameGroupImplTest {
     @Test
     public void frames_MultipleFrames_CountReturned() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()),
+                List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
                 PredefinedFrameView::new
         );
 
@@ -147,7 +147,7 @@ public class FrameGroupImplTest {
     @Test
     public void iterator_MultipleFrames_FramesIteratedInOrder() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()),
+                List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
                 PredefinedFrameView::new
         );
 

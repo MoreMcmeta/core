@@ -49,14 +49,14 @@ public class CloseableImageFrameTest {
         ImmutableList<CloseableImage> mipmaps = ImmutableList.of(new MockCloseableImage());
 
         expectedException.expect(NullPointerException.class);
-        new CloseableImageFrame(null, mipmaps);
+        new CloseableImageFrame(null, mipmaps, 1);
     }
 
     @Test
     public void construct_MipmapsNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new CloseableImageFrame(new FrameReader.FrameData(100, 100, 0, 0),
-                null);
+                null, 1);
     }
 
     @Test
@@ -64,7 +64,8 @@ public class CloseableImageFrameTest {
         expectedException.expect(IllegalArgumentException.class);
         new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40),
-                ImmutableList.of()
+                ImmutableList.of(),
+                1
         );
     }
 
@@ -77,7 +78,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(51, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
     }
 
@@ -90,7 +92,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(49, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
     }
 
@@ -103,7 +106,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(26, 50)
-                )
+                ),
+                1
         );
     }
 
@@ -116,7 +120,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(24, 50)
-                )
+                ),
+                1
         );
     }
 
@@ -129,7 +134,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 101),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
     }
 
@@ -142,7 +148,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 99),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
     }
 
@@ -155,7 +162,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 51)
-                )
+                ),
+                1
         );
     }
 
@@ -168,7 +176,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 49)
-                )
+                ),
+                1
         );
     }
 
@@ -181,7 +190,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50),
                         new MockCloseableImage(12, 25)
-                )
+                ),
+                1
         );
     }
 
@@ -194,7 +204,38 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 50),
                         new MockCloseableImage(50, 25),
                         new MockCloseableImage(25, 12)
-                )
+                ),
+                1
+        );
+    }
+
+    @Test
+    public void construct_ZeroLayers_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                0
+        );
+    }
+
+    @Test
+    public void construct_NegativeLayers_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                -1
+        );
+    }
+
+    @Test
+    public void construct_TooManyLayers_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                129
         );
     }
 
@@ -202,7 +243,8 @@ public class CloseableImageFrameTest {
     public void color_XBeyondWidth_ExceptionFromImage() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(new MockCloseableImage(100, 200))
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
@@ -213,7 +255,8 @@ public class CloseableImageFrameTest {
     public void color_XNegative_ExceptionFromImage() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(new MockCloseableImage(100, 200))
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
@@ -224,7 +267,8 @@ public class CloseableImageFrameTest {
     public void color_YBeyondHeight_ExceptionFromImage() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(new MockCloseableImage(100, 200))
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
@@ -235,7 +279,8 @@ public class CloseableImageFrameTest {
     public void color_YNegative_ExceptionFromImage() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(new MockCloseableImage(100, 200))
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
@@ -249,7 +294,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(image)
+                ImmutableList.of(image),
+                1
         );
 
         assertEquals(1767640594, frame.color(45, 100));
@@ -262,7 +308,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(image)
+                ImmutableList.of(image),
+                1
         );
 
         frame.close();
@@ -275,7 +322,8 @@ public class CloseableImageFrameTest {
     public void width_WidthProvided_SameWidthReturned() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(new MockCloseableImage(100, 200))
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                1
         );
 
         assertEquals(100, frame.width());
@@ -285,7 +333,8 @@ public class CloseableImageFrameTest {
     public void width_AlreadyClosed_IllegalStateException() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(new MockCloseableImage(100, 200))
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                1
         );
 
         frame.close();
@@ -298,7 +347,8 @@ public class CloseableImageFrameTest {
     public void height_HeightProvided_SameHeightReturned() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(new MockCloseableImage(100, 200))
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                1
         );
 
         assertEquals(200, frame.height());
@@ -308,7 +358,8 @@ public class CloseableImageFrameTest {
     public void height_AlreadyClosed_IllegalStateException() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(new MockCloseableImage(100, 200))
+                ImmutableList.of(new MockCloseableImage(100, 200)),
+                1
         );
 
         frame.close();
@@ -329,7 +380,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         assertEquals(4, frame.mipmapLevel());
@@ -347,7 +399,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.close();
@@ -368,7 +421,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         expectedException.expect(NullPointerException.class);
@@ -387,7 +441,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -406,7 +461,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -425,7 +481,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -444,7 +501,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(0, 0));
@@ -468,7 +526,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(6, 4));
@@ -492,7 +551,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(55, 40));
@@ -516,7 +576,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(55, 40));
@@ -540,7 +601,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 16, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(4, 16));
@@ -564,7 +626,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 16, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(8, 8));
@@ -588,7 +651,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 16, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(8, 16));
@@ -612,7 +676,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(10, 20, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(5, 5));
@@ -636,7 +701,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(20, 10, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(5, 5));
@@ -660,7 +726,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(10, 10, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(5, 5));
@@ -684,7 +751,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(10, 10, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(500, 500));
@@ -708,7 +776,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 8, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.uploadAt(new Point(5, 5));
@@ -732,7 +801,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.close();
@@ -753,7 +823,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 8, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -772,7 +843,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 8, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         int newLevel = 0;
@@ -795,7 +867,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 8, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         int newLevel = 2;
@@ -818,7 +891,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 8, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         int newLevel = mipmaps.size();
@@ -839,7 +913,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 8, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         int newLevel = mipmaps.size();
@@ -867,7 +942,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(8, 8, 30, 40),
-                mipmaps
+                mipmaps,
+                1
         );
 
         frame.close();
@@ -885,7 +961,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(NullPointerException.class);
@@ -900,7 +977,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         CloseableImageFrame source = new CloseableImageFrame(
@@ -908,7 +986,8 @@ public class CloseableImageFrameTest {
                 ImmutableList.of(
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100)
-                )
+                ),
+                1
         );
 
         expectedException.expect(IllegalArgumentException.class);
@@ -923,7 +1002,8 @@ public class CloseableImageFrameTest {
         );
         CloseableImageFrame destination = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                destinations
+                destinations,
+                1
         );
 
         ImmutableList<MockCloseableImage> sources = ImmutableList.of(
@@ -940,7 +1020,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame source = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                sources
+                sources,
+                1
         );
 
         destination.copyFrom(source);
@@ -970,7 +1051,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame destination = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                destinations
+                destinations,
+                1
         );
 
         ImmutableList<MockCloseableImage> sources = ImmutableList.of(
@@ -987,7 +1069,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame source = new CloseableImageFrame(
                 new FrameReader.FrameData(50, 100, 0, 0),
-                sources
+                sources,
+                1
         );
 
         destination.copyFrom(source);
@@ -1025,7 +1108,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame destination = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 100, 0, 0),
-                destinations
+                destinations,
+                1
         );
 
         ImmutableList<MockCloseableImage> sources = ImmutableList.of(
@@ -1047,7 +1131,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame source = new CloseableImageFrame(
                 new FrameReader.FrameData(50, 200, 0, 0),
-                sources
+                sources,
+                1
         );
 
         destination.copyFrom(source);
@@ -1078,7 +1163,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame destination = new CloseableImageFrame(
                 new FrameReader.FrameData(50, 200, 0, 0),
-                destinations
+                destinations,
+                1
         );
 
         ImmutableList<MockCloseableImage> sources = ImmutableList.of(
@@ -1100,7 +1186,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame source = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 100, 0, 0),
-                sources
+                sources,
+                1
         );
 
         destination.copyFrom(source);
@@ -1128,7 +1215,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame destination = new CloseableImageFrame(
                 new FrameReader.FrameData(50, 100, 0, 0),
-                destinations
+                destinations,
+                1
         );
 
         ImmutableList<MockCloseableImage> sources = ImmutableList.of(
@@ -1155,7 +1243,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame source = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                sources
+                sources,
+                1
         );
 
         destination.copyFrom(source);
@@ -1177,7 +1266,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame destination = new CloseableImageFrame(
                 new FrameReader.FrameData(50, 100, 0, 0),
-                destinations
+                destinations,
+                1
         );
 
         ImmutableList<MockCloseableImage> sources = ImmutableList.of(
@@ -1204,7 +1294,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame source = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                sources
+                sources,
+                1
         );
 
         destination.close();
@@ -1223,7 +1314,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame destination = new CloseableImageFrame(
                 new FrameReader.FrameData(50, 100, 0, 0),
-                destinations
+                destinations,
+                1
         );
 
         ImmutableList<MockCloseableImage> sources = ImmutableList.of(
@@ -1250,7 +1342,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame source = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                sources
+                sources,
+                1
         );
 
         source.close();
@@ -1267,11 +1360,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform(null, Area.of(), Area.of());
+        frame.applyTransform(null, Area.of(), Area.of(), 0);
     }
 
     @Test
@@ -1282,11 +1376,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> null, Area.of(new Point(4, 5)), Area.of());
+        frame.applyTransform((point, depFunction) -> null, Area.of(new Point(4, 5)), Area.of(), 0);
     }
 
     @Test
@@ -1297,11 +1392,60 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), null, Area.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), null, Area.of(), 0);
+    }
+
+    @Test
+    public void applyTransform_NegativeLayer_IllegalArgException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                ),
+                5
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(), -1);
+    }
+
+    @Test
+    public void applyTransform_NonExistentLayer_IllegalArgException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                ),
+                5
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(), 5);
+    }
+
+    @Test
+    public void applyTransform_LayerOverflowsByte_IllegalArgException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(100, 200),
+                        new MockCloseableImage(50, 100),
+                        new MockCloseableImage(25, 50)
+                ),
+                128
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(), 128);
     }
 
     @Test
@@ -1312,11 +1456,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(100, 50)), Area.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(100, 50)), Area.of(), 0);
     }
 
     @Test
@@ -1327,11 +1472,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 200)), Area.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 200)), Area.of(), 0);
     }
 
     @Test
@@ -1342,11 +1488,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(-1, 50)), Area.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(-1, 50)), Area.of(), 0);
     }
 
     @Test
@@ -1357,11 +1504,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, -1)), Area.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, -1)), Area.of(), 0);
     }
 
     @Test
@@ -1372,11 +1520,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), null);
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), null, 0);
     }
 
     @Test
@@ -1387,11 +1536,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(100, 50)));
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(100, 50)), 0);
     }
 
     @Test
@@ -1402,11 +1552,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, 200)));
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, 200)), 0);
     }
 
     @Test
@@ -1417,11 +1568,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(-1, 50)));
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(-1, 50)), 0);
     }
 
     @Test
@@ -1432,11 +1584,12 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, -1)));
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, -1)), 0);
     }
 
     @Test
@@ -1447,14 +1600,15 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         expectedException.expect(ColorTransform.NonDependencyRequestException.class);
         frame.applyTransform((point, depFunction) -> {
             depFunction.apply(new Point(50, 50));
             return new Color(100, 100, 100, 100);
-        }, Area.of(new Point(50, 50)), Area.of(new Point(50, 100)));
+        }, Area.of(new Point(50, 50)), Area.of(new Point(50, 100)), 0);
     }
 
     @Test
@@ -1468,13 +1622,15 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                images
+                images,
+                1
         );
 
         frame.applyTransform(
                 (point, depFunction) -> new Color(depFunction.apply(new Point(50, 50)).combine() / 2),
                 Area.of(new Point(50, 50)),
-                Area.of(new Point(50, 50))
+                Area.of(new Point(50, 50)),
+                0
         );
     }
 
@@ -1488,7 +1644,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(2, 2, 0, 0),
-                images
+                images,
+                1
         );
 
         Map<Point, Color> pointToColor = new HashMap<>();
@@ -1500,7 +1657,8 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
                 Area.of(pointToColor.keySet()),
-                Area.of()
+                Area.of(),
+                0
         );
 
         for (Point point : pointToColor.keySet()) {
@@ -1519,7 +1677,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                images
+                images,
+                1
         );
 
         Map<Point, Color> pointToColor = new HashMap<>();
@@ -1543,7 +1702,8 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
                 Area.of(pointToColor.keySet()),
-                Area.of()
+                Area.of(),
+                0
         );
 
         for (Point point : pointToColor.keySet()) {
@@ -1561,7 +1721,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                images
+                images,
+                1
         );
 
         Map<Point, Color> pointToColor = new HashMap<>();
@@ -1585,7 +1746,8 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
                 Area.of(pointToColor.keySet()),
-                Area.of()
+                Area.of(),
+                0
         );
 
         int topLeftColorMip1 = ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466);
@@ -1617,7 +1779,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                images
+                images,
+                1
         );
 
         Map<Point, Color> pointToColor = new HashMap<>();
@@ -1641,7 +1804,8 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
                 Area.of(pointToColor.keySet()),
-                Area.of()
+                Area.of(),
+                0
         );
 
         assertEquals(1767640594, images.get(0).color(48, 100));
@@ -1672,7 +1836,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                images
+                images,
+                1
         );
 
         Map<Point, Color> pointToColor = new HashMap<>();
@@ -1696,7 +1861,8 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (point, dependencyGetter) -> pointToColor.getOrDefault(point, new Color(1013857456)),
                 Area.of(pointToColor.keySet()),
-                Area.of()
+                Area.of(),
+                0
         );
 
         int topLeftColorMip1 = ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466);
@@ -1719,6 +1885,647 @@ public class CloseableImageFrameTest {
     }
 
     @Test
+    public void applyTransform_WriteToTopBeforeWritingToBottom_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                0
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToTopBeforeWritingToMiddle_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                2
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToTopBeforeWritingToTop_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                2
+        );
+
+        // The dependency is retrieved from the previous layer, which does not see 796332458 in the top layer
+        assertEquals(450605672, images.get(0).color(48, 101));
+
+    }
+
+    @Test
+    public void applyTransform_WriteToMiddleBeforeWritingToBottom_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                0
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToMiddleBeforeWritingToMiddle_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                1
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToMiddleBeforeWritingToTop_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                2
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToBottomBeforeWritingToBottom_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToBottomBeforeWritingToMiddle_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                1
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToBottomBeforeWritingToTop_DependencyRetrievedFromCorrectLayer() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+        images.get(0).setColor(48, 103, 450605672);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 103)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 103));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> dependencyGetter.apply(new Point(48, 103)),
+                Area.of(new Point(48, 101)),
+                Area.of(new Point(48, 103)),
+                2
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToTopBeforeWritingToBottom_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToTopBeforeWritingToMiddle_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToTopBeforeWritingToTop_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToMiddleBeforeWritingToBottom_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToMiddleBeforeWritingToMiddle_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToMiddleBeforeWritingToTop_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToBottomBeforeWritingToBottom_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToBottomBeforeWritingToMiddle_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                1
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
+    public void applyTransform_WriteToBottomBeforeWritingToTop_LowerDoesNotOverwriteUpper() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(100, 200),
+                new MockCloseableImage(50, 100),
+                new MockCloseableImage(25, 50)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(100, 200, 0, 0),
+                images,
+                3
+        );
+
+        images.get(0).setColor(48, 101, 1177013896);
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(796332458),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                0
+        );
+
+        assertEquals(796332458, images.get(0).color(48, 101));
+
+        frame.applyTransform(
+                (point, dependencyGetter) -> new Color(450605672),
+                Area.of(new Point(48, 101)),
+                Area.of(),
+                2
+        );
+
+        assertEquals(450605672, images.get(0).color(48, 101));
+    }
+
+    @Test
     public void applyTransform_AfterClose_IllegalStateException() {
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
@@ -1726,13 +2533,14 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         frame.close();
 
         expectedException.expect(IllegalStateException.class);
-        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 100)), Area.of());
+        frame.applyTransform((point, depFunction) -> new Color(100, 100, 100, 100), Area.of(new Point(50, 100)), Area.of(), 0);
     }
 
     @Test
@@ -1743,7 +2551,8 @@ public class CloseableImageFrameTest {
                         new MockCloseableImage(100, 200),
                         new MockCloseableImage(50, 100),
                         new MockCloseableImage(25, 50)
-                )
+                ),
+                1
         );
 
         frame.close();
@@ -1760,7 +2569,8 @@ public class CloseableImageFrameTest {
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
-                images
+                images,
+                1
         );
 
         assertFalse(images.get(0).isClosed());

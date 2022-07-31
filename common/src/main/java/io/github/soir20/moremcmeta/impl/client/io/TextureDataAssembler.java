@@ -77,18 +77,21 @@ public class TextureDataAssembler<I extends CloseableImage> {
         boolean clamp = data.clamp();
 
         // Create frames
+        int layers = data.parsedMetadata().size() + 1;
         List<? extends I> mipmaps = MIPMAP_GENERATOR.apply(original);
         ImmutableList<CloseableImageFrame> frames = getFrames(
                 mipmaps,
                 frameWidth,
-                frameHeight
+                frameHeight,
+                layers
         );
         CloseableImageFrame generatedFrame = createGeneratedFrame(
                 mipmaps.size() - 1,
                 frameWidth,
                 frameHeight,
                 blur,
-                clamp
+                clamp,
+                layers
         );
 
         // Resource cleanup
@@ -103,14 +106,16 @@ public class TextureDataAssembler<I extends CloseableImage> {
                 .setGeneratedFrame(generatedFrame)
                 .add(new CleanupComponent(closeMipmaps));
 
-        for (Pair<ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
+        for (int index = 0; index < data.parsedMetadata().size(); index++) {
+            Pair<ParsedMetadata, ComponentProvider> metadata = data.parsedMetadata().get(index);
             ParsedMetadata sectionData = metadata.getFirst();
 
-            assembleComponents(
+            builder.add(assembleComponent(
                     metadata.getSecond(),
                     frames,
-                    sectionData
-            ).forEach(builder::add);
+                    sectionData,
+                    index
+            ));
         }
 
         return builder;
@@ -121,10 +126,11 @@ public class TextureDataAssembler<I extends CloseableImage> {
      * @param mipmaps               mipmaps of the full texture image (with all frames)
      * @param frameWidth            width of each frame in the image
      * @param frameHeight           height of each frame in the image
+     * @param layers                number of layers in the image
      * @return the frames based on the texture image in chronological order
      */
     private ImmutableList<CloseableImageFrame> getFrames(List<? extends I> mipmaps, int frameWidth,
-                                                         int frameHeight) {
+                                                         int frameHeight, int layers) {
         int mipmap = mipmaps.size() - 1;
 
         FrameReader<CloseableImageFrame> frameReader = new FrameReader<>((frameData) -> {
@@ -140,7 +146,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
                     )
             ).collect(ImmutableList.toImmutableList());
 
-            return new CloseableImageFrame(frameData, subImageMipmaps);
+            return new CloseableImageFrame(frameData, subImageMipmaps, layers);
         });
 
         return frameReader.read(mipmaps.get(0).width(), mipmaps.get(0).height(), frameWidth, frameHeight);
@@ -153,10 +159,12 @@ public class TextureDataAssembler<I extends CloseableImage> {
      * @param frameHeight           the height of a single frame
      * @param blur                  whether the images are blurred
      * @param clamp                 whether the images are clamped
+     * @param layers                number of layers in the image
      * @return the adapters for the interpolation images
      */
     private CloseableImageFrame createGeneratedFrame(int maxMipmap, int frameWidth,
-                                                     int frameHeight, boolean blur, boolean clamp) {
+                                                     int frameHeight, boolean blur, boolean clamp,
+                                                     int layers) {
         ImmutableList.Builder<CloseableImage> images = new ImmutableList.Builder<>();
 
         for (int level = 0; level <= maxMipmap; level++) {
@@ -169,30 +177,35 @@ public class TextureDataAssembler<I extends CloseableImage> {
 
         return new CloseableImageFrame(
                 new FrameReader.FrameData(frameWidth, frameHeight, 0, 0),
-                images.build()
+                images.build(),
+                layers
         );
     }
 
     /**
-     * Creates texture components based on the given frames and provider.
+     * Creates a texture component based on the given frames and provider.
      * @param provider      component provider
      * @param frames        predefined frames
      * @param metadata      metadata associated with the transform
-     * @return assembled components
+     * @param layer         index of layer to apply transformations to
+     * @return assembled component
      */
-    private Iterable<TextureComponent<CurrentFrameView, UploadableFrameView>>
-    assembleComponents(ComponentProvider provider, List<CloseableImageFrame> frames, ParsedMetadata metadata) {
+    private TextureComponent<CurrentFrameView, UploadableFrameView> assembleComponent(
+            ComponentProvider provider, List<CloseableImageFrame> frames, ParsedMetadata metadata, int layer) {
 
-        FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(frames, MutableFrameViewImpl::new);
+        FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(
+                frames,
+                (frame, index) -> new MutableFrameViewImpl(frame, index, layer)
+        );
 
-        Iterable<TextureComponent<CurrentFrameView, UploadableFrameView>> components = provider.assemble(
+        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
                 metadata,
                 mutableFrames
         );
 
         mutableFrames.forEach(MutableFrameViewImpl::invalidate);
 
-        return components;
+        return component;
     }
 
     /**
@@ -202,6 +215,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
     private static class MutableFrameViewImpl implements MutableFrameView {
         private final CloseableImageFrame FRAME;
         private final int INDEX;
+        private final int LAYER;
 
         private boolean valid;
 
@@ -209,10 +223,12 @@ public class TextureDataAssembler<I extends CloseableImage> {
          * Creates a new view for a mutable predefined frame.
          * @param frame         the original frame
          * @param index         index of the frame among all frames
+         * @param layer         layer in the original frame to apply transformations to
          */
-        public MutableFrameViewImpl(CloseableImageFrame frame, int index) {
+        public MutableFrameViewImpl(CloseableImageFrame frame, int index, int layer) {
             FRAME = frame;
             INDEX = index;
+            LAYER = layer;
             valid = true;
         }
 
@@ -256,7 +272,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
         @Override
         public void transform(ColorTransform transform, Area applyArea, Area dependencies) {
             checkValid();
-            FRAME.applyTransform(transform, applyArea, dependencies);
+            FRAME.applyTransform(transform, applyArea, dependencies, LAYER);
         }
 
         /**

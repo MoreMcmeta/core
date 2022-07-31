@@ -89,10 +89,10 @@ public class TextureFinisherTest {
         Set<MockCloseableImageFrame> frames = new HashSet<>();
         for (ResourceLocation location : locations) {
             EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-            MockCloseableImageFrame mockImage = new MockCloseableImageFrame();
+            MockCloseableImageFrame mockImage = new MockCloseableImageFrame(1);
             frames.add(mockImage);
             builder.setPredefinedFrames(List.of(mockImage));
-            builder.setGeneratedFrame(new MockCloseableImageFrame());
+            builder.setGeneratedFrame(new MockCloseableImageFrame(1));
             finisher.queue(location, builder);
         }
 
@@ -124,10 +124,10 @@ public class TextureFinisherTest {
         Set<MockCloseableImageFrame> frames = new HashSet<>();
         for (ResourceLocation location : locations) {
             EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-            MockCloseableImageFrame mockImage = new MockCloseableImageFrame();
+            MockCloseableImageFrame mockImage = new MockCloseableImageFrame(1);
             frames.add(mockImage);
             builder.setPredefinedFrames(List.of(mockImage));
-            builder.setGeneratedFrame(new MockCloseableImageFrame());
+            builder.setGeneratedFrame(new MockCloseableImageFrame(1));
             finisher.queue(location, builder);
         }
 

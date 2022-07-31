@@ -905,9 +905,9 @@ public class TextureDataReaderTest {
         }
 
         @Override
-        public Iterable<TextureComponent<CurrentFrameView, UploadableFrameView>>
+        public TextureComponent<CurrentFrameView, UploadableFrameView>
         assemble(ParsedMetadata metadata, FrameGroup<? extends MutableFrameView> frames) {
-            return List.of(new TextureComponent<>() {});
+            return new TextureComponent<>() {};
         }
 
         public int id() {

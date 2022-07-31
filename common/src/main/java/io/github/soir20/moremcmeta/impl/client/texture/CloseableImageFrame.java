@@ -24,8 +24,10 @@ import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 
 import static java.util.Objects.requireNonNull;
 
@@ -36,6 +38,9 @@ import static java.util.Objects.requireNonNull;
 public class CloseableImageFrame {
     private final int WIDTH;
     private final int HEIGHT;
+    private final ImmutableList<Layer> LOWER_LAYERS;
+    private final TopLayer TOP_LAYER;
+    private final int TOP_LAYER_INDEX;
     private ImmutableList<? extends CloseableImage> mipmaps;
     private boolean closed;
 
@@ -43,14 +48,17 @@ public class CloseableImageFrame {
      * Creates a new frame based on frame data.
      * @param frameData             general data associated with the frame
      * @param mipmaps               mipmapped images for this frame (starting with the original image)
+     * @param layers                number of layers in the frame
      */
-    public CloseableImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends CloseableImage> mipmaps) {
+    public CloseableImageFrame(FrameReader.FrameData frameData, ImmutableList<? extends CloseableImage> mipmaps,
+                               int layers) {
         requireNonNull(frameData, "Frame data cannot be null");
         this.mipmaps = requireNonNull(mipmaps, "Mipmaps cannot be null");
         if (mipmaps.isEmpty()) {
             throw new IllegalArgumentException("At least one mipmap must be provided");
         }
 
+        // Check mipmap sizes
         int frameWidth = frameData.width();
         int frameHeight = frameData.height();
 
@@ -70,6 +78,35 @@ public class CloseableImageFrame {
         WIDTH = frameWidth;
         HEIGHT = frameHeight;
         closed = false;
+
+        // Create layers
+        if (layers < 1) {
+            throw new IllegalArgumentException(String.format("Layers must be positive: %s", layers));
+        }
+
+        // We can represent at most 128 non-negative indices with the byte type
+        if (layers > 128) {
+            throw new IllegalArgumentException(String.format("Maximum number of layers is 128, was %s", layers));
+        }
+
+        TOP_LAYER = new TopLayer(mipmaps.get(0), WIDTH, HEIGHT, (byte) (layers - 1));
+        ImmutableList.Builder<Layer> layerBuilder = new ImmutableList.Builder<>();
+
+        if (layers > 1) {
+            BottomLayer bottomLayer = new BottomLayer(TOP_LAYER);
+            TOP_LAYER.setBottomLayer(bottomLayer);
+
+            Layer lastLayer = bottomLayer;
+            layerBuilder.add(lastLayer);
+
+            for (byte layerIndex = 1; layerIndex < layers - 1; layerIndex++) {
+                lastLayer = new MiddleLayer(TOP_LAYER, lastLayer, layerIndex);
+                layerBuilder.add(lastLayer);
+            }
+        }
+
+        LOWER_LAYERS = layerBuilder.build();
+        TOP_LAYER_INDEX = LOWER_LAYERS.size();
     }
 
     /**
@@ -201,33 +238,45 @@ public class CloseableImageFrame {
      * @param transform     transform to apply
      * @param applyArea     area to apply the transformation to
      * @param dependencies  points whose colors the given transform is dependent on
+     * @param layer         the index of the layer to apply the transformation to
      * @throws IllegalStateException if this frame has been closed
      * @throws ColorTransform.NonDependencyRequestException if the previous color of a point that
      *                                                     is not a dependency is requested
      */
-    public void applyTransform(ColorTransform transform, Area applyArea, Area dependencies) {
+    public void applyTransform(ColorTransform transform, Area applyArea, Area dependencies, int layer) {
         checkOpen();
 
         requireNonNull(transform, "Transform cannot be null");
         requireNonNull(applyArea, "Apply area cannot be null");
         requireNonNull(dependencies, "Dependencies cannot be null");
 
+        if (layer < 0) {
+            throw new IllegalArgumentException(String.format("Layer index cannot be negative: %s", layer));
+        }
+
+        // We omit the top layer from the list of lower layers, so do not check for equality
+        if (layer > TOP_LAYER_INDEX) {
+            throw new IllegalArgumentException(
+                    String.format("Layer index is out of bounds: %s when the max is %s", layer, TOP_LAYER_INDEX)
+            );
+        }
+
+        Layer layerBelow = layerBelow(layer);
         Map<Point, Color> previousColors = new HashMap<>();
         dependencies.forEach((point) -> {
             requireNonNull(point, "Dependency point cannot be null");
-            previousColors.put(point, new Color(color(point.x(), point.y())));
+            previousColors.put(point, layerBelow.read(point));
         });
 
         // Apply transformation to the original image
+        Layer thisLayer = layer == TOP_LAYER_INDEX ? TOP_LAYER : LOWER_LAYERS.get(layer);
         applyArea.forEach((point) -> {
-            int x = point.x();
-            int y = point.y();
-
-            int newColor = transform.transform(
+            Color newColor = transform.transform(
                     point,
                     (requestedPoint) -> colorIfDependency(requestedPoint, previousColors)
-            ).combine();
-            mipmaps.get(0).setColor(x, y, newColor);
+            );
+
+            thisLayer.write(point, newColor);
         });
 
         /* Update corresponding mipmap pixels.
@@ -235,7 +284,9 @@ public class CloseableImageFrame {
            knowledge would require all of them to handle additional
            complexity. Instead, we can efficiently calculate the mipmaps
            ourselves. */
-        applyArea.forEach((point) -> {
+        while (!TOP_LAYER.lastModified().isEmpty()) {
+            Point point = TOP_LAYER.lastModified().remove();
+
             int x = point.x();
             int y = point.y();
             for (int level = 1; level <= mipmapLevel(); level++) {
@@ -263,8 +314,16 @@ public class CloseableImageFrame {
 
                 mipmaps.get(level).setColor(x >> level, y >> level, blended);
             }
-        });
+        }
 
+    }
+
+    /**
+     * Gets the number of layers in this frame.
+     * @return the number of layers in this frame
+     */
+    public int layers() {
+        return TOP_LAYER_INDEX + 1;
     }
 
     /**
@@ -283,6 +342,24 @@ public class CloseableImageFrame {
         if (closed) {
             throw new IllegalStateException("Frame is closed");
         }
+    }
+
+    /**
+     * Gets the layer below the layer with the given index. If there are no layers below,
+     * returns the bottommost layer.
+     * @param layer     index of the layer above the layer to retrieve
+     * @return the layer below the layer with the given index or the bottommost layer
+     */
+    private Layer layerBelow(int layer) {
+        if (TOP_LAYER_INDEX == 0) {
+            return TOP_LAYER;
+        }
+
+        if (layer == 0) {
+            return LOWER_LAYERS.get(0);
+        }
+
+        return LOWER_LAYERS.get(layer - 1);
     }
 
     /**
@@ -315,6 +392,216 @@ public class CloseableImageFrame {
             /* The last bit determines +1 or +0, so unset it. There is no
                overflow for neither the integer minimum nor maximum. */
         return num & ~1;
+
+    }
+
+    /**
+     * Represents an individual layer in the frame that can be written to and read from.
+     * @author soir20
+     */
+    private interface Layer {
+
+        /**
+         * Writes a color to the specified point in this layer.
+         * @param point     the point to write the color at
+         * @param color     the color to write
+         */
+        void write(Point point, Color color);
+
+        /**
+         * Reads a color from the specified point in this layer.
+         * @param point     the point to read from
+         * @return the color at the given point
+         */
+        Color read(Point point);
+
+    }
+
+    /**
+     * Represents the bottommost layer of a frame unless there is only one layer.
+     * @author soir20
+     */
+    private static class BottomLayer implements Layer {
+        private final TopLayer TOP_LAYER;
+        private final byte INDEX;
+        private final Map<Point, Color> POINTS;
+
+        /**
+         * Creates a new bottommost layer.
+         * @param topLayer      the topmost layer in this frame
+         */
+        public BottomLayer(TopLayer topLayer) {
+            TOP_LAYER = topLayer;
+            INDEX = 0;
+            POINTS = new HashMap<>();
+        }
+
+        /**
+         * Writes a color to the specified point in this layer. If the top layer has
+         * already written to itself at the given point, then this method does nothing.
+         * Does not attempt to write the color to the underlying image (the top layer).
+         * @param point     the point to try to write to
+         * @param color     the color to write at the given point
+         */
+        public void tryWrite(Point point, Color color) {
+            POINTS.putIfAbsent(point, color);
+        }
+
+        @Override
+        public void write(Point point, Color color) {
+            POINTS.put(point, color);
+            TOP_LAYER.tryWrite(point, color, INDEX);
+        }
+
+        @Override
+        public Color read(Point point) {
+            return POINTS.getOrDefault(point, TOP_LAYER.read(point));
+        }
+    }
+
+    /**
+     * Represents layers of the frame that are neither bottommost nor topmost.
+     * @author soir20
+     */
+    private static class MiddleLayer implements Layer {
+        private final TopLayer TOP_LAYER;
+        private final Layer LAYER_BELOW;
+        private final byte INDEX;
+        private final Map<Point, Color> POINTS;
+
+        /**
+         * Creates a new middle layer.
+         * @param topLayer      the topmost layer
+         * @param layerBelow    the layer below this layer
+         * @param index         the index of this layer
+         */
+        public MiddleLayer(TopLayer topLayer, Layer layerBelow, byte index) {
+            TOP_LAYER = topLayer;
+            LAYER_BELOW = layerBelow;
+            INDEX = index;
+            POINTS = new HashMap<>();
+        }
+
+        @Override
+        public void write(Point point, Color color) {
+            POINTS.put(point, color);
+            TOP_LAYER.tryWrite(point, color, INDEX);
+        }
+
+        @Override
+        public Color read(Point point) {
+            Color localColor = POINTS.get(point);
+            if (localColor != null) {
+                return localColor;
+            }
+            return LAYER_BELOW.read(point);
+        }
+    }
+
+    /**
+     * Represents the topmost (and possibly bottommost) layer of the frame.
+     * @author soir20
+     */
+    private static class TopLayer implements Layer {
+        private final CloseableImage IMAGE;
+        private final int WIDTH;
+        private final byte INDEX;
+        private final byte[] MODIFIED_BY;
+        private final Queue<Point> LAST_MODIFIED;
+        private BottomLayer bottomLayer;
+
+        /**
+         * Creates a new topmost layer.
+         * @param image     the main image for the frame
+         * @param width     the width of the frame
+         * @param height    the height of the frame
+         * @param index     the index of this layer
+         */
+        public TopLayer(CloseableImage image, int width, int height, byte index) {
+            IMAGE = image;
+            WIDTH = width;
+            INDEX = index;
+            MODIFIED_BY = new byte[width * height];
+            LAST_MODIFIED = new ArrayDeque<>();
+        }
+
+        /**
+         * Sets the bottommost layer of the same frame.
+         * @param bottomLayer       the bottommost layer of the same frame
+         */
+        public void setBottomLayer(BottomLayer bottomLayer) {
+            this.bottomLayer = bottomLayer;
+        }
+
+        /**
+         * Retrieves the queue of points that have been modified in this layer. The returned
+         * queue is mutable. Note that it is possible for the queue to contain duplicates.
+         * @return the modified points in the topmost layer
+         */
+        public Queue<Point> lastModified() {
+            return LAST_MODIFIED;
+        }
+
+        /**
+         * Writes to this layer from a lower layer. If the top layer has already
+         * written to itself at the given point, then this method does nothing.
+         * @param point     the point to try to write to
+         * @param color     the color to write at the given point
+         * @param layer     the layer that is writing to this layer
+         */
+        public void tryWrite(Point point, Color color, byte layer) {
+            int pointIndex = pointIndex(point);
+
+            /* Have the underlying image to throw an exception when a point outside it is accessed,
+               as this is what happens with the lower layers. */
+            if (pointIndex >= 0 && pointIndex < MODIFIED_BY.length && layer < MODIFIED_BY[pointIndex]) {
+                return;
+            }
+
+            /* Attempting to write to the bottom layer handles three different cases:
+               1. The bottom layer writes to the top layer. In this case, the bottom layer has already
+                  written to itself, so writing to it again with tryWrite() does nothing.
+
+               2. The top layer is written to before the bottom layer has been written to (at the
+                  particular point). In this case, simply writing to the top layer will cause the
+                  bottom layer to be modified as well. This is problematic because the bottom layer
+                  uses the underlying image to retrieve points it does not already store. That means
+                  writing to the top layer will effectively modify the bottom layer, while the goal of
+                  the laying system is to have each layer only be aware of changes in the layers below
+                  it. So we need to take the old color and move it to the bottom layer to maintain the
+                  illusion that nothing has changed in the lower layers.
+
+               3. The top layer is written to after the bottom layer has been written to (at the
+                  particular point). Either the bottom layer is storing the original color (case 2),
+                  or the original color has been overwritten at the bottom layer and is therefore
+                  irrelevant. Hence, we don't need to write the original color to the bottom layer. */
+            if (bottomLayer != null) {
+                bottomLayer.tryWrite(point, read(point));
+            }
+
+            IMAGE.setColor(point.x(), point.y(), color.combine());
+            MODIFIED_BY[pointIndex] = layer;
+            LAST_MODIFIED.add(point);
+        }
+
+        @Override
+        public void write(Point point, Color color) {
+            tryWrite(point, color, INDEX);
+        }
+
+        @Override
+        public Color read(Point point) {
+            return new Color(IMAGE.color(point.x(), point.y()));
+        }
+
+        /**
+         * Converts a point to the index of a point in the modified set.
+         * @param point     the point to convert to an index
+         * @return the index corresponding to this point
+         */
+        private int pointIndex(Point point) {
+            return WIDTH * point.y() + point.x();
+        }
 
     }
 

@@ -50,9 +50,9 @@ public class CoreTextureComponentTest {
         CoreTextureComponent component = new CoreTextureComponent() {};
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
         builder.build().load(null);
     }
@@ -62,9 +62,9 @@ public class CoreTextureComponentTest {
         CoreTextureComponent component = new CoreTextureComponent() {};
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
         builder.build().upload();
     }
@@ -74,9 +74,9 @@ public class CoreTextureComponentTest {
         CoreTextureComponent component = new CoreTextureComponent() {};
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
         builder.build().tick();
     }
@@ -86,9 +86,9 @@ public class CoreTextureComponentTest {
         CoreTextureComponent component = new CoreTextureComponent() {};
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setGeneratedFrame(new MockCloseableImageFrame());
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame()));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(), new MockCloseableImageFrame()));
+        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
         builder.build().close();
     }

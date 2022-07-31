@@ -30,24 +30,24 @@ public class MockCloseableImageFrame extends CloseableImageFrame {
     private int uploads;
     private Point lastUploadPoint;
 
-    public MockCloseableImageFrame(int width, int height) {
+    public MockCloseableImageFrame(int width, int height, int layers) {
         this(ImmutableList.of(
                 new MockCloseableImage(width, height),
                 new MockCloseableImage(width >> 1, height >> 1),
                 new MockCloseableImage(width >> 2, height >> 2)
-        ));
+        ), layers);
     }
 
-    public MockCloseableImageFrame() {
+    public MockCloseableImageFrame(int layers) {
         this(ImmutableList.of(
                 new MockCloseableImage(100, 100),
                 new MockCloseableImage(50, 50),
                 new MockCloseableImage(25, 25)
-        ));
+        ), layers);
     }
 
-    public MockCloseableImageFrame(ImmutableList<MockCloseableImage> mipmaps) {
-        super(new FrameReader.FrameData(mipmaps.get(0).width(), mipmaps.get(0).height(), 0, 0), mipmaps);
+    public MockCloseableImageFrame(ImmutableList<MockCloseableImage> mipmaps, int layers) {
+        super(new FrameReader.FrameData(mipmaps.get(0).width(), mipmaps.get(0).height(), 0, 0), mipmaps, layers);
         MIPMAPS = mipmaps;
     }
 

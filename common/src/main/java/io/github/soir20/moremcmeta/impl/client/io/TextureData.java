@@ -102,7 +102,7 @@ public class TextureData<I extends CloseableImage> {
      * will process the metadata.
      * @return parsed metadata sections and associated component providers
      */
-    public Iterable<Pair<ParsedMetadata, ComponentProvider>> parsedMetadata() {
+    public List<Pair<ParsedMetadata, ComponentProvider>> parsedMetadata() {
         return PARSED_SECTIONS;
     }
 
