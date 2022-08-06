@@ -269,7 +269,7 @@ public class CloseableImageFrame {
             requireNonNull(point, "Dependency point cannot be null");
             checkPointInBounds(point);
 
-            previousColors.put(point, layerBelow.read(point));
+            previousColors.put(point, new Color(layerBelow.read(point.x(), point.y())));
         });
 
         // Apply transformation to the original image
@@ -283,7 +283,7 @@ public class CloseableImageFrame {
                     (requestedPoint) -> colorIfDependency(requestedPoint, previousColors)
             );
 
-            thisLayer.write(point, newColor);
+            thisLayer.write(point.x(), point.y(), newColor.combine());
         });
 
         /* Update corresponding mipmap pixels.
@@ -421,17 +421,19 @@ public class CloseableImageFrame {
 
         /**
          * Writes a color to the specified point in this layer.
-         * @param point     the point to write the color at
+         * @param x         the x-coordinate to write the color at
+         * @param y         the y-coordinate to write the color at
          * @param color     the color to write
          */
-        void write(Point point, Color color);
+        void write(int x, int y, int color);
 
         /**
          * Reads a color from the specified point in this layer.
-         * @param point     the point to read from
+         * @param x         the x-coordinate to read the color from
+         * @param y         the y-coordinate to read the color from
          * @return the color at the given point
          */
-        Color read(Point point);
+        int read(int x, int y);
 
     }
 
@@ -460,28 +462,29 @@ public class CloseableImageFrame {
          * Writes a color to the specified point in this layer. If the bottom layer has
          * already written to itself at the given point, then this method does nothing.
          * Does not attempt to write the color to the underlying image (the top layer).
-         * @param point     the point to try to write to
+         * @param x         the x-coordinate to try to write to
+         * @param y         the y-coordinate to try to write to
          * @param color     the color to write at the given point
          */
-        public void tryWrite(Point point, Color color) {
-            if (!POINTS.isSet(point.x(), point.y())) {
-                POINTS.set(point.x(), point.y(), color.combine());
+        public void tryWrite(int x, int y, int color) {
+            if (!POINTS.isSet(x, y)) {
+                POINTS.set(x, y, color);
             }
         }
 
         @Override
-        public void write(Point point, Color color) {
-            POINTS.set(point.x(), point.y(), color.combine());
-            TOP_LAYER.tryWrite(point, color, INDEX);
+        public void write(int x, int y, int color) {
+            POINTS.set(x, y, color);
+            TOP_LAYER.tryWrite(x, y, color, INDEX);
         }
 
         @Override
-        public Color read(Point point) {
-            if (POINTS.isSet(point.x(), point.y())) {
-                return new Color(POINTS.get(point.x(), point.y()));
+        public int read(int x, int y) {
+            if (POINTS.isSet(x, y)) {
+                return POINTS.get(x, y);
             }
 
-            return TOP_LAYER.read(point);
+            return TOP_LAYER.read(x, y);
         }
     }
 
@@ -511,17 +514,17 @@ public class CloseableImageFrame {
         }
 
         @Override
-        public void write(Point point, Color color) {
-            POINTS.set(point.x(), point.y(), color.combine());
-            TOP_LAYER.tryWrite(point, color, INDEX);
+        public void write(int x, int y, int color) {
+            POINTS.set(x, y, color);
+            TOP_LAYER.tryWrite(x, y, color, INDEX);
         }
 
         @Override
-        public Color read(Point point) {
-            if (POINTS.isSet(point.x(), point.y())) {
-                return new Color(POINTS.get(point.x(), point.y()));
+        public int read(int x, int y) {
+            if (POINTS.isSet(x, y)) {
+                return POINTS.get(x, y);
             }
-            return LAYER_BELOW.read(point);
+            return LAYER_BELOW.read(x, y);
         }
     }
 
@@ -572,12 +575,13 @@ public class CloseableImageFrame {
         /**
          * Writes to this layer from a lower layer. If the top layer has already
          * written to itself at the given point, then this method does nothing.
-         * @param point     the point to try to write to
+         * @param x         the x-coordinate to try to write to
+         * @param y         the y-coordinate to try to write to
          * @param color     the color to write at the given point
          * @param layer     the layer that is writing to this layer
          */
-        public void tryWrite(Point point, Color color, byte layer) {
-            int pointIndex = pointIndex(point);
+        public void tryWrite(int x, int y, int color, byte layer) {
+            int pointIndex = pointIndex(x, y);
             if (layer < MODIFIED_BY[pointIndex]) {
                 return;
             }
@@ -600,31 +604,32 @@ public class CloseableImageFrame {
                   or the original color has been overwritten at the bottom layer and is therefore
                   irrelevant. Hence, we don't need to write the original color to the bottom layer. */
             if (bottomLayer != null) {
-                bottomLayer.tryWrite(point, read(point));
+                bottomLayer.tryWrite(x, y, read(x, y));
             }
 
-            IMAGE.setColor(point.x(), point.y(), color.combine());
+            IMAGE.setColor(x, y, color);
             MODIFIED_BY[pointIndex] = layer;
-            LAST_MODIFIED.add(point);
+            LAST_MODIFIED.add(new Point(x, y));
         }
 
         @Override
-        public void write(Point point, Color color) {
-            tryWrite(point, color, INDEX);
+        public void write(int x, int y, int color) {
+            tryWrite(x, y, color, INDEX);
         }
 
         @Override
-        public Color read(Point point) {
-            return new Color(IMAGE.color(point.x(), point.y()));
+        public int read(int x, int y) {
+            return IMAGE.color(x, y);
         }
 
         /**
          * Converts a point to the index of a point in the modified set.
-         * @param point     the point to convert to an index
+         * @param x     the x-coordinate to convert to an index
+         * @param y     the y-coordinate to convert to an index
          * @return the index corresponding to this point
          */
-        private int pointIndex(Point point) {
-            return WIDTH * point.y() + point.x();
+        private int pointIndex(int x, int y) {
+            return WIDTH * y + x;
         }
 
     }
