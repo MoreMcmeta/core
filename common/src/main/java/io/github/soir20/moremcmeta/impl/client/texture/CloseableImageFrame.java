@@ -20,8 +20,10 @@ package io.github.soir20.moremcmeta.impl.client.texture;
 import com.google.common.collect.ImmutableList;
 import io.github.soir20.moremcmeta.api.client.texture.Color;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
+import io.github.soir20.moremcmeta.api.client.texture.FrameView;
 import io.github.soir20.moremcmeta.api.math.Area;
 import io.github.soir20.moremcmeta.api.math.Point;
+import io.github.soir20.moremcmeta.impl.adt.SparseIntMatrix;
 import io.github.soir20.moremcmeta.impl.client.io.FrameReader;
 
 import java.util.ArrayDeque;
@@ -93,14 +95,14 @@ public class CloseableImageFrame {
         ImmutableList.Builder<Layer> layerBuilder = new ImmutableList.Builder<>();
 
         if (layers > 1) {
-            BottomLayer bottomLayer = new BottomLayer(TOP_LAYER);
+            BottomLayer bottomLayer = new BottomLayer(TOP_LAYER, WIDTH, HEIGHT);
             TOP_LAYER.setBottomLayer(bottomLayer);
 
             Layer lastLayer = bottomLayer;
             layerBuilder.add(lastLayer);
 
             for (byte layerIndex = 1; layerIndex < layers - 1; layerIndex++) {
-                lastLayer = new MiddleLayer(TOP_LAYER, lastLayer, layerIndex);
+                lastLayer = new MiddleLayer(TOP_LAYER, lastLayer, WIDTH, HEIGHT, layerIndex);
                 layerBuilder.add(lastLayer);
             }
         }
@@ -265,12 +267,17 @@ public class CloseableImageFrame {
         Map<Point, Color> previousColors = new HashMap<>();
         dependencies.forEach((point) -> {
             requireNonNull(point, "Dependency point cannot be null");
+            checkPointInBounds(point);
+
             previousColors.put(point, layerBelow.read(point));
         });
 
         // Apply transformation to the original image
         Layer thisLayer = layer == TOP_LAYER_INDEX ? TOP_LAYER : LOWER_LAYERS.get(layer);
         applyArea.forEach((point) -> {
+            requireNonNull(point, "Apply area point cannot be null");
+            checkPointInBounds(point);
+
             Color newColor = transform.transform(
                     point,
                     (requestedPoint) -> colorIfDependency(requestedPoint, previousColors)
@@ -363,6 +370,17 @@ public class CloseableImageFrame {
     }
 
     /**
+     * Checks if a point is inside this layer's boundaries.
+     * @param point     the point to check
+     * @throws FrameView.PixelOutOfBoundsException if the point is out of bounds
+     */
+    private void checkPointInBounds(Point point) throws FrameView.PixelOutOfBoundsException {
+        if (point.x() < 0 || point.y() < 0 || point.x() >= WIDTH || point.y() >= HEIGHT) {
+            throw new FrameView.PixelOutOfBoundsException(point.x(), point.y());
+        }
+    }
+
+    /**
      * Retrieves the current color of a point that a transform depends on, or throws an
      * exception if the transform did not request the point as a dependency.
      * @param requestedPoint        point the transform requested
@@ -424,38 +442,46 @@ public class CloseableImageFrame {
     private static class BottomLayer implements Layer {
         private final TopLayer TOP_LAYER;
         private final byte INDEX;
-        private final Map<Point, Color> POINTS;
+        private final SparseIntMatrix POINTS;
 
         /**
          * Creates a new bottommost layer.
-         * @param topLayer      the topmost layer in this frame
+         * @param topLayer      topmost layer in this frame
+         * @param width         width of this layer
+         * @param height        height of this layer
          */
-        public BottomLayer(TopLayer topLayer) {
+        public BottomLayer(TopLayer topLayer, int width, int height) {
             TOP_LAYER = topLayer;
             INDEX = 0;
-            POINTS = new HashMap<>();
+            POINTS = new SparseIntMatrix(width, height, 3);
         }
 
         /**
-         * Writes a color to the specified point in this layer. If the top layer has
+         * Writes a color to the specified point in this layer. If the bottom layer has
          * already written to itself at the given point, then this method does nothing.
          * Does not attempt to write the color to the underlying image (the top layer).
          * @param point     the point to try to write to
          * @param color     the color to write at the given point
          */
         public void tryWrite(Point point, Color color) {
-            POINTS.putIfAbsent(point, color);
+            if (!POINTS.isSet(point.x(), point.y())) {
+                POINTS.set(point.x(), point.y(), color.combine());
+            }
         }
 
         @Override
         public void write(Point point, Color color) {
-            POINTS.put(point, color);
+            POINTS.set(point.x(), point.y(), color.combine());
             TOP_LAYER.tryWrite(point, color, INDEX);
         }
 
         @Override
         public Color read(Point point) {
-            return POINTS.getOrDefault(point, TOP_LAYER.read(point));
+            if (POINTS.isSet(point.x(), point.y())) {
+                return new Color(POINTS.get(point.x(), point.y()));
+            }
+
+            return TOP_LAYER.read(point);
         }
     }
 
@@ -467,32 +493,33 @@ public class CloseableImageFrame {
         private final TopLayer TOP_LAYER;
         private final Layer LAYER_BELOW;
         private final byte INDEX;
-        private final Map<Point, Color> POINTS;
+        private final SparseIntMatrix POINTS;
 
         /**
          * Creates a new middle layer.
-         * @param topLayer      the topmost layer
-         * @param layerBelow    the layer below this layer
-         * @param index         the index of this layer
+         * @param topLayer      topmost layer
+         * @param layerBelow    layer below this layer
+         * @param width         width of this layer
+         * @param height        height of this layer
+         * @param index         index of this layer
          */
-        public MiddleLayer(TopLayer topLayer, Layer layerBelow, byte index) {
+        public MiddleLayer(TopLayer topLayer, Layer layerBelow, int width, int height, byte index) {
             TOP_LAYER = topLayer;
             LAYER_BELOW = layerBelow;
             INDEX = index;
-            POINTS = new HashMap<>();
+            POINTS = new SparseIntMatrix(width, height, 3);
         }
 
         @Override
         public void write(Point point, Color color) {
-            POINTS.put(point, color);
+            POINTS.set(point.x(), point.y(), color.combine());
             TOP_LAYER.tryWrite(point, color, INDEX);
         }
 
         @Override
         public Color read(Point point) {
-            Color localColor = POINTS.get(point);
-            if (localColor != null) {
-                return localColor;
+            if (POINTS.isSet(point.x(), point.y())) {
+                return new Color(POINTS.get(point.x(), point.y()));
             }
             return LAYER_BELOW.read(point);
         }
@@ -551,10 +578,7 @@ public class CloseableImageFrame {
          */
         public void tryWrite(Point point, Color color, byte layer) {
             int pointIndex = pointIndex(point);
-
-            /* Have the underlying image to throw an exception when a point outside it is accessed,
-               as this is what happens with the lower layers. */
-            if (pointIndex >= 0 && pointIndex < MODIFIED_BY.length && layer < MODIFIED_BY[pointIndex]) {
+            if (layer < MODIFIED_BY[pointIndex]) {
                 return;
             }
 
