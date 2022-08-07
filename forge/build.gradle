@@ -42,6 +42,10 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
         transitive = false
     }
+
+    if (project.includeDefaultPlugins) {
+        // TODO: include default plugins here
+    }
 }
 
 processResources {
@@ -62,7 +66,7 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "forge"
+    classifier project.includeDefaultPlugins ? "forge" : "forge-no-plugins"
 }
 
 jar {

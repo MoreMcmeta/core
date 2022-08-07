@@ -81,6 +81,11 @@ allprojects {
     group = rootProject.mavenGroup
     archivesBaseName = rootProject.modArchivesBaseName
 
+    // Include plugins by default
+    if (!project.hasProperty("includeDefaultPlugins")) {
+        rootProject.ext.includeDefaultPlugins = true
+    }
+
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
         options.release = rootProject.javaVersion.toInteger()

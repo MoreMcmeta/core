@@ -38,6 +38,10 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabricLoaderVersion}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabricApiVersion}"
 
+    if (project.includeDefaultPlugins) {
+        // TODO: include default plugins here
+    }
+
     common(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
@@ -62,7 +66,7 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "fabric"
+    classifier project.includeDefaultPlugins ? "fabric" : "fabric-no-plugins"
 }
 
 jar {
