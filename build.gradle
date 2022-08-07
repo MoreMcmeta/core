@@ -82,9 +82,7 @@ allprojects {
     archivesBaseName = rootProject.modArchivesBaseName
 
     // Include plugins by default
-    if (!project.hasProperty("includeDefaultPlugins")) {
-        rootProject.ext.includeDefaultPlugins = true
-    }
+    rootProject.ext.includeDefaultPlugins = (System.getenv("INCLUDE_DEFAULT_PLUGINS") ?: "true").toBoolean()
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
