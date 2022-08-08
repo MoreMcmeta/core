@@ -1,0 +1,20 @@
+name: Clean up prerelease packages from deleted branches and tags
+on: [delete]
+jobs:
+  cleanup_packages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        loader: [forge, fabric]
+    steps:
+      - uses: actions/delete-package-versions@v3
+        with:
+          package-name: io.github.moremcmeta.moremcmeta-${{ github.event.ref }}-prerelease-${{ matrix.loader }}
+          min-versions-to-keep: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Protection against accidentally deleting a release version
+          delete-only-pre-release-versions: true

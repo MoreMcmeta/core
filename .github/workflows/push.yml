@@ -1,0 +1,47 @@
+name: Run tests and publish snapshot to Maven on push
+on: [push]
+jobs:
+  test_and_publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        loader: [forge, fabric]
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 16
+          distribution: temurin
+
+      - name: Determine mod version from branch or tag name
+        id: mod_version
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const ref = context.payload.ref;
+            const branchOrTag = ref.substring(ref.lastIndexOf('/') + 1);
+            return branchOrTag + '-prerelease';
+          result-encoding: string
+
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x ./gradlew
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1.0.4
+
+      - name: Run tests
+        uses: gradle/gradle-build-action@v2.2.1
+        with:
+          arguments: test
+
+      - name: Publish snapshot to GitHub Packages
+        uses: gradle/gradle-build-action@v2.2.1
+        with:
+          arguments: :${{ matrix.loader }}:build :${{ matrix.loader }}:publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MOD_VERSION: ${{ steps.mod_version.outputs.result }}
