@@ -77,7 +77,13 @@ allprojects {
     apply plugin: "maven-publish"
 
     rootProject.ext.modVersion = System.getenv("MOD_VERSION") ?: "DEV"
-    version = "${rootProject.minecraftVersion}-${rootProject.modVersion}"
+    rootProject.ext.isSnapshot = rootProject.modVersion.endsWith("-prerelease")
+
+    // Snapshot mod versions are not shared between Minecraft versions
+    version = project.isSnapshot
+            ? "${rootProject.modVersion}"
+            : "${rootProject.minecraftVersion}-${rootProject.modVersion}"
+
     group = rootProject.mavenGroup
     archivesBaseName = rootProject.modArchivesBaseName
 
