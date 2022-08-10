@@ -87,6 +87,11 @@ publishing {
     publications {
         mavenFabric(MavenPublication) {
             artifactId = "${archivesBaseName}-${version}-${project.name}"
+
+            if (project.isSnapshot) {
+                version = project.version + "-SNAPSHOT"
+            }
+
             from components.java
         }
     }
