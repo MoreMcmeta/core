@@ -18,7 +18,6 @@
 package io.github.soir20.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ColorTransform;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
@@ -33,6 +32,7 @@ import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImageFrame;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.FrameGroupImpl;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
 import java.util.Optional;
@@ -107,11 +107,11 @@ public class TextureDataAssembler<I extends CloseableImage> {
                 .add(new CleanupComponent(closeMipmaps));
 
         for (int index = 0; index < data.parsedMetadata().size(); index++) {
-            Pair<ParsedMetadata, ComponentProvider> metadata = data.parsedMetadata().get(index);
-            ParsedMetadata sectionData = metadata.getFirst();
+            Triple<String, ParsedMetadata, ComponentProvider> metadata = data.parsedMetadata().get(index);
+            ParsedMetadata sectionData = metadata.getMiddle();
 
             builder.add(assembleComponent(
-                    metadata.getSecond(),
+                    metadata.getRight(),
                     frames,
                     sectionData,
                     index

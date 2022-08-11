@@ -17,11 +17,11 @@
 
 package io.github.soir20.moremcmeta.impl.client.io;
 
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.api.client.texture.TextureComponent;
 import io.github.soir20.moremcmeta.impl.client.texture.MockCloseableImage;
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -236,7 +236,7 @@ public class TextureDataTest {
 
     @Test
     public void parsedMetadata_None_NoneReturned() {
-        List<Pair<ParsedMetadata, ComponentProvider>> expectedMetadata = List.of();
+        List<Triple<String, ParsedMetadata, ComponentProvider>> expectedMetadata = List.of();
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
         TextureData<MockCloseableImage> data = new TextureData<>(
@@ -252,11 +252,11 @@ public class TextureDataTest {
 
     @Test
     public void parsedMetadata_Some_SameMetadataReturned() {
-        List<Pair<ParsedMetadata, ComponentProvider>> expectedMetadata = List.of(
-                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Pair.of(new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {})
+        List<Triple<String, ParsedMetadata, ComponentProvider>> expectedMetadata = List.of(
+                Triple.of("pluginOne", new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Triple.of("pluginTwo", new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Triple.of("pluginThree", new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Triple.of("pluginFour", new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {})
         );
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
@@ -273,25 +273,30 @@ public class TextureDataTest {
 
     @Test
     public void parsedMetadata_ListModifiedExternally_InternalListNotModified() {
-        List<Pair<ParsedMetadata, ComponentProvider>> expectedMetadata = new ArrayList<>();
-        expectedMetadata.add(Pair.of(
+        List<Triple<String, ParsedMetadata, ComponentProvider>> expectedMetadata = new ArrayList<>();
+        expectedMetadata.add(Triple.of(
+                "pluginOne",
                 new ParsedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
-        expectedMetadata.add(Pair.of(
+        expectedMetadata.add(Triple.of(
+                "pluginTwo",
                 new ParsedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
-        expectedMetadata.add(Pair.of(
+        expectedMetadata.add(Triple.of(
+                "pluginThree",
                 new ParsedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
-        expectedMetadata.add(Pair.of(
+        expectedMetadata.add(Triple.of(
+                "pluginFour",
                 new ParsedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
 
-        Pair<ParsedMetadata, ComponentProvider> extraSection = Pair.of(
+        Triple<String, ParsedMetadata, ComponentProvider> extraSection = Triple.of(
+                "pluginFive",
                 new ParsedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         );
@@ -307,7 +312,7 @@ public class TextureDataTest {
 
         expectedMetadata.add(extraSection);
 
-        List<Pair<ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>(data.parsedMetadata());
+        List<Triple<String, ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>(data.parsedMetadata());
 
         // If the actual metadata already contains the extra section, the lists won't be equal
         actualMetadata.add(extraSection);

@@ -24,6 +24,7 @@ import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.soir20.moremcmeta.api.client.metadata.MetadataRegistry;
 import io.github.soir20.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.impl.client.adapter.PackResourcesAdapter;
@@ -31,6 +32,7 @@ import io.github.soir20.moremcmeta.impl.client.adapter.TextureManagerAdapter;
 import io.github.soir20.moremcmeta.impl.client.io.TextureData;
 import io.github.soir20.moremcmeta.impl.client.io.TextureDataAssembler;
 import io.github.soir20.moremcmeta.impl.client.io.TextureDataReader;
+import io.github.soir20.moremcmeta.impl.client.resource.MetadataRegistryImpl;
 import io.github.soir20.moremcmeta.impl.client.resource.ModRepositorySource;
 import io.github.soir20.moremcmeta.impl.client.resource.OrderedResourceRepository;
 import io.github.soir20.moremcmeta.impl.client.resource.SpriteFrameSizeFixPack;
@@ -91,6 +93,12 @@ public abstract class MoreMcmeta {
      * Mod ID for Forge and Fabric.
      */
     public static final String MODID = "moremcmeta";
+
+    /**
+     * Registry for the latest metadata. MODDERS: This is an internal field.
+     * Use {@link MetadataRegistry#INSTANCE} to access the registry.
+     */
+    public static final MetadataRegistryImpl METADATA_REGISTRY = new MetadataRegistryImpl();
 
     private final Set<String> DEFAULT_PLUGINS = Set.of();
 
@@ -543,6 +551,8 @@ public abstract class MoreMcmeta {
                         return wrappedMipmaps;
                     }
             );
+
+            METADATA_REGISTRY.set(CACHE.get(PACK_ID_GETTER.get()));
 
             return CompletableFuture.supplyAsync(() -> CACHE.get(PACK_ID_GETTER.get()).entrySet()
                     .stream().parallel()

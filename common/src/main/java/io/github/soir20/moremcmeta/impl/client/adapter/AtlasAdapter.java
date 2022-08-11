@@ -30,6 +30,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
 
+import static io.github.soir20.moremcmeta.impl.client.texture.Sprite.makeSpriteName;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -86,20 +87,6 @@ public class AtlasAdapter implements Atlas {
         }
 
         return Optional.of(new SpriteAdapter(sprite, MIPMAP_LEVEL_GETTER.applyAsInt(sprite)));
-    }
-
-    /**
-     * Converts a standard texture location (with textures/ prefix and .png suffix) to a
-     * sprite name.
-     * @param location      the location to convert
-     * @return that location as the name of a sprite in a texture atlas
-     */
-    private static ResourceLocation makeSpriteName(ResourceLocation location) {
-        String originalPath = location.getPath();
-        String cutPath = originalPath
-                .replace("textures/", "")
-                .replace(".png", "");
-        return new ResourceLocation(location.getNamespace(), cutPath);
     }
 
     /**

@@ -17,13 +17,13 @@
 
 package io.github.soir20.moremcmeta.impl.client.io;
 
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataView;
 import io.github.soir20.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.soir20.moremcmeta.impl.client.texture.CloseableImage;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +75,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         requireNonNull(textureStream, "Texture stream cannot be null");
         requireNonNull(metadata, "Metadata cannot be null");
 
-        List<Pair<ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
+        List<Triple<String, ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
         Optional<ParsedMetadata.FrameSize> frameSizeOptional = Optional.empty();
         Optional<Boolean> blurOptional = Optional.empty();
         Optional<Boolean> clampOptional = Optional.empty();
@@ -89,7 +89,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
             ParsedMetadata sectionData = plugin.parser().parse(metadata);
             requireNonNull(sectionData, "Plugin " + plugin.displayName()
                     + " returned null for parsed metadata");
-            parsedSections.add(Pair.of(sectionData, plugin.componentProvider()));
+            parsedSections.add(Triple.of(plugin.displayName(), sectionData, plugin.componentProvider()));
 
             frameSizeOptional = getIfCompatible(frameSizeOptional, sectionData.frameSize(), "frame size");
             blurOptional = getIfCompatible(blurOptional, sectionData.blur(), "blur");
