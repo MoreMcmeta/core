@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.github.soir20.moremcmeta.impl.client.texture.Sprite.makeTextureLocation;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Implementation of {@link MetadataRegistry} that can be updated.
@@ -53,6 +54,8 @@ public class MetadataRegistryImpl implements MetadataRegistry {
      */
     @Override
     public Optional<ParsedMetadata> getFromPath(String pluginName, ResourceLocation textureLocation) {
+        requireNonNull(pluginName, "Plugin name cannot be null");
+        requireNonNull(textureLocation, "Texture location cannot be null");
         return Optional.ofNullable(metadata.get(Pair.of(pluginName, textureLocation)));
     }
 
@@ -64,6 +67,8 @@ public class MetadataRegistryImpl implements MetadataRegistry {
      */
     @Override
     public Optional<ParsedMetadata> getFromSpriteName(String pluginName, ResourceLocation spriteName) {
+        requireNonNull(pluginName, "Plugin name cannot be null");
+        requireNonNull(spriteName, "Sprite name cannot be null");
         return Optional.ofNullable(metadata.get(Pair.of(pluginName, makeTextureLocation(spriteName))));
     }
 
@@ -72,6 +77,8 @@ public class MetadataRegistryImpl implements MetadataRegistry {
      * @param textureData           all current texture data (by full texture location)
      */
     public void set(Map<? extends ResourceLocation, ? extends TextureData<?>> textureData) {
+        requireNonNull(textureData, "Texture data cannot be null");
+
         ImmutableMap.Builder<Pair<String, ResourceLocation>, ParsedMetadata> builder = ImmutableMap.builder();
 
         for (Map.Entry<? extends ResourceLocation, ? extends TextureData<?>> entry : textureData.entrySet()) {
