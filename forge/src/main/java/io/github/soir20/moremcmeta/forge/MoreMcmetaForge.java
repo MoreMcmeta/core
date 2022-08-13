@@ -110,7 +110,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @return the OpenGL preparer for this loader
      */
     protected TexturePreparer getPreparer() {
-        return TextureUtil::m_85287_;
+        return TextureUtil::prepareImage;
     }
 
     /**
