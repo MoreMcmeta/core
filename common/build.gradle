@@ -15,23 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+architectury {
+    common(rootProject.enabled_platforms.split(","))
+}
+
 dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabricLoaderVersion}"
-}
-
-architectury {
-    injectInjectables = false
-    common()
-}
-
-configurations {
-    dev
-}
-
-artifacts {
-    dev(jar)
 }
 
 java {

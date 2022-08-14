@@ -18,11 +18,11 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "0.10.0-SNAPSHOT" apply false
+    id "dev.architectury.loom" version "0.12.0-SNAPSHOT" apply false
 }
 
 architectury {
-    minecraft = rootProject.minecraftVersion
+    minecraft = project.minecraftVersion
 }
 
 subprojects {
@@ -62,10 +62,10 @@ subprojects {
     }
 
     dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraftVersion}"
+        minecraft "com.mojang:minecraft:${project.minecraftVersion}"
         mappings loom.officialMojangMappings()
 
-        testImplementation "junit:junit:${rootProject.junitVersion}"
+        testImplementation "junit:junit:${project.junitVersion}"
         testImplementation "org.lwjgl:lwjgl:${rootProject.lwjglVersion}"
         testRuntimeOnly "org.lwjgl:lwjgl:${rootProject.lwjglVersion}:${lwjglNatives}"
     }
@@ -76,23 +76,23 @@ allprojects {
     apply plugin: "architectury-plugin"
     apply plugin: "maven-publish"
 
-    rootProject.ext.modVersion = System.getenv("MOD_VERSION") ?: "DEV"
-    rootProject.ext.isSnapshot = rootProject.modVersion.endsWith("-prerelease")
+    project.ext.modVersion = System.getenv("MOD_VERSION") ?: "DEV"
+    project.ext.isSnapshot = project.modVersion.endsWith("-prerelease")
 
     // Snapshot mod versions are not shared between Minecraft versions
     version = project.isSnapshot
-            ? "${rootProject.modVersion}"
-            : "${rootProject.minecraftVersion}-${rootProject.modVersion}"
+            ? "${project.modVersion}"
+            : "${project.minecraftVersion}-${project.modVersion}"
 
-    group = rootProject.mavenGroup
-    archivesBaseName = rootProject.modArchivesBaseName
+    group = project.mavenGroup
+    archivesBaseName = project.modArchivesBaseName
 
     // Include plugins by default
     rootProject.ext.includeDefaultPlugins = (System.getenv("INCLUDE_DEFAULT_PLUGINS") ?: "true").toBoolean()
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-        options.release = rootProject.javaVersion.toInteger()
+        options.release = project.javaVersion.toInteger()
     }
 
     java {
