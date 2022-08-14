@@ -76,16 +76,20 @@ allprojects {
     apply plugin: "architectury-plugin"
     apply plugin: "maven-publish"
 
+    def final SNAPSHOT_SUFFIX = "-prerelease"
+
     project.ext.modVersion = System.getenv("MOD_VERSION") ?: "DEV"
-    project.ext.isSnapshot = project.modVersion.endsWith("-prerelease")
+    project.ext.isSnapshot = project.modVersion.endsWith(SNAPSHOT_SUFFIX)
 
-    // Snapshot mod versions are not shared between Minecraft versions
-    version = project.isSnapshot
-            ? "${project.modVersion}"
-            : "${project.minecraftVersion}-${project.modVersion}"
-
+    // Include Minecraft version for snapshots since Forge requires the version to start with a number
+    version = "${project.minecraftVersion}-${project.modVersion}"
     group = project.mavenGroup
     archivesBaseName = project.modArchivesBaseName
+
+    project.ext.mavenArtifactId = "${archivesBaseName}-${project.name}"
+    project.ext.mavenVersion = isSnapshot
+            ? "${version.substring(0, version.length() - SNAPSHOT_SUFFIX.length())}-SNAPSHOT"
+            : version
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
