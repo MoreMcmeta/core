@@ -16,7 +16,7 @@
  */
 
 architectury {
-    common(rootProject.enabled_platforms.split(","))
+    common(rootProject.enabledPlatforms.split(","))
 }
 
 dependencies {
