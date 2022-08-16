@@ -1,12 +1,12 @@
 # The overall format is standard TOML format, v0.5.0.
 # Find more information on toml format here:  https://github.com/toml-lang/toml
 modLoader="javafml" #mandatory
-loaderVersion="[40,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+loaderVersion="[${loaderVersion},)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
 license="LGPL-3.0"
 issueTrackerURL="https://github.com/soir20/MoreMcmeta/issues" #optional
 [[mods]] #mandatory
 modId="moremcmeta" #mandatory
-version="${version}" #mandatory
+version="${modVersion}" #mandatory
 displayName="MoreMcmeta" #mandatory
 updateJSONURL="https://raw.githubusercontent.com/soir20/MoreMcmeta/main/info/update/update.json" #optional
 displayURL="https://github.com/soir20/MoreMcmeta" #optional
@@ -22,7 +22,7 @@ description='''Animate almost any Minecraft texture with more options.'''
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[40,)" #mandatory
+    versionRange="[${loaderVersion},)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -32,6 +32,6 @@ description='''Animate almost any Minecraft texture with more options.'''
     modId="minecraft"
     mandatory=true
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
-    versionRange="[1.18.2,1.19)"
+    versionRange="[${minecraftVersion},)"
     ordering="NONE"
     side="BOTH"
