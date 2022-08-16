@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "moremcmeta",
-  "version": "${version}",
+  "version": "${modVersion}",
   "name": "MoreMcmeta",
   "description": "Animate almost any Minecraft texture with more options.",
   "authors": [
@@ -26,6 +26,7 @@
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric": "*",
-    "minecraft": ">=1.16.5"
+    "minecraft": ">=${minecraftVersion}",
+    "java": ">=${javaVersion}"
   }
 }
