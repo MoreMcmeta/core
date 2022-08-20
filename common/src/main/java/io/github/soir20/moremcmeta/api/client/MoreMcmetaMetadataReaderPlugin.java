@@ -28,7 +28,7 @@ import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
  * @author soir20
  * @since 4.0.0
  */
-public interface MoreMcmetaMetadataReaderPlugin extends MoreMcmetaClientPlugin {
+public interface MoreMcmetaMetadataReaderPlugin extends ClientPlugin {
 
     /**
      * Gets the file extension the plugin is tied to (without a period). If a metadata file has this extension,

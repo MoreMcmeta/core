@@ -21,10 +21,12 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.datafixers.util.Pair;
+import io.github.soir20.moremcmeta.api.client.ClientPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
-import io.github.soir20.moremcmeta.forge.api.client.MoreMcmetaClientPluginRegisterEvent;
+import io.github.soir20.moremcmeta.forge.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.forge.impl.client.event.ClientTicker;
+import io.github.soir20.moremcmeta.forge.impl.client.reflection.AnnotatedClassLoader;
 import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
 import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
@@ -43,18 +45,21 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.IExtensionPoint;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.forgespi.language.ModFileScanData;
 import net.minecraftforge.network.NetworkConstants;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
@@ -67,11 +72,22 @@ import static io.github.soir20.moremcmeta.impl.client.MoreMcmeta.MODID;
  */
 @Mod(MODID)
 public final class MoreMcmetaForge extends MoreMcmeta {
+    private final AnnotatedClassLoader CLASS_LOADER;
 
     /**
      * Serves as mod entrypoint on Forge and tells the server to ignore this mod.
      */
     public MoreMcmetaForge() {
+        CLASS_LOADER = new AnnotatedClassLoader(
+                () -> {
+                    Set<ModFileScanData.AnnotationData> annotationData = new HashSet<>();
+                    for (ModFileScanData scanData : ModList.get().getAllScanData()) {
+                        annotationData.addAll(scanData.getAnnotations());
+                    }
+                    return annotationData;
+                },
+                LogManager.getLogger()
+        );
 
         /* Make sure the mod being absent on the other network side does not
            cause the client to display the server as incompatible. */
@@ -95,11 +111,23 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     protected Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>>
             fetchTexturePlugins(Logger logger) {
 
-        List<MoreMcmetaTexturePlugin> texturePlugins = new ArrayList<>();
-        List<MoreMcmetaMetadataReaderPlugin> readerPlugins = new ArrayList<>();
-        FMLJavaModLoadingContext.get().getModEventBus().post(
-                new MoreMcmetaClientPluginRegisterEvent(texturePlugins, readerPlugins)
+        Collection<ClientPlugin> plugins = CLASS_LOADER.load(
+                MoreMcmetaClientPlugin.class,
+                ClientPlugin.class
         );
+
+        Collection<MoreMcmetaTexturePlugin> texturePlugins = new ArrayList<>();
+        Collection<MoreMcmetaMetadataReaderPlugin> readerPlugins = new ArrayList<>();
+        for (ClientPlugin plugin : plugins) {
+            if (plugin instanceof MoreMcmetaTexturePlugin) {
+                texturePlugins.add((MoreMcmetaTexturePlugin) plugin);
+            }
+
+            if (plugin instanceof MoreMcmetaMetadataReaderPlugin) {
+                readerPlugins.add((MoreMcmetaMetadataReaderPlugin) plugin);
+            }
+        }
+
         return Pair.of(texturePlugins, readerPlugins);
     }
 

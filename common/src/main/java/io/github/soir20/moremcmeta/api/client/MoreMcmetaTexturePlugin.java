@@ -29,7 +29,7 @@ import io.github.soir20.moremcmeta.api.client.texture.ComponentProvider;
  * @author soir20
  * @since 4.0.0
  */
-public interface MoreMcmetaTexturePlugin extends MoreMcmetaClientPlugin {
+public interface MoreMcmetaTexturePlugin extends ClientPlugin {
 
     /**
      * Gets the section name the plugin is tied to. If the section name is present in a texture's metadata,

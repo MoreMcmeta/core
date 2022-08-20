@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  * @since 4.0.0
  */
-public interface MoreMcmetaClientPlugin {
+public interface ClientPlugin {
 
     /**
      * Gets the display name for the plugin that will be used in logs. **This method may be called from

@@ -20,7 +20,7 @@ package io.github.soir20.moremcmeta.impl.client;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaClientPlugin;
+import io.github.soir20.moremcmeta.api.client.ClientPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.api.client.metadata.MetadataReader;
@@ -79,6 +79,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -105,13 +106,13 @@ public abstract class MoreMcmeta {
     /**
      * Begins the startup process, creating necessary objects and registering the
      * resource reload listener.
-     * @throws MoreMcmetaClientPlugin.InvalidPluginException if one of the plugins did not provide
+     * @throws ClientPlugin.InvalidPluginException if one of the plugins did not provide
      *         all required objects
-     * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins are not compatible for
+     * @throws ClientPlugin.ConflictingPluginsException if two plugins are not compatible for
      *         any reason
      */
-    public void start() throws MoreMcmetaClientPlugin.InvalidPluginException,
-            MoreMcmetaClientPlugin.ConflictingPluginsException {
+    public void start() throws ClientPlugin.InvalidPluginException,
+            ClientPlugin.ConflictingPluginsException {
 
         Minecraft minecraft = Minecraft.getInstance();
         Logger logger = LogManager.getLogger();
@@ -122,7 +123,6 @@ public abstract class MoreMcmeta {
 
         Collection<MoreMcmetaTexturePlugin> texturePlugins = plugins.getFirst();
         validateIndividualTexturePlugins(texturePlugins);
-        checkItemConflict(texturePlugins, MoreMcmetaClientPlugin::displayName, "display name");
         texturePlugins = removeOverriddenPlugins(
                 texturePlugins,
                 MoreMcmetaTexturePlugin::sectionName,
@@ -133,7 +133,6 @@ public abstract class MoreMcmeta {
 
         Collection<MoreMcmetaMetadataReaderPlugin> readerPlugins = plugins.getSecond();
         validateIndividualReaderPlugins(readerPlugins);
-        checkItemConflict(readerPlugins, MoreMcmetaClientPlugin::displayName, "display name");
         readerPlugins = removeOverriddenPlugins(
                 readerPlugins,
                 MoreMcmetaMetadataReaderPlugin::extension,
@@ -141,6 +140,9 @@ public abstract class MoreMcmeta {
                 logger
         );
         checkItemConflict(readerPlugins, MoreMcmetaMetadataReaderPlugin::extension, "extension");
+
+        List<ClientPlugin> allPlugins = Stream.concat(texturePlugins.stream(), readerPlugins.stream()).toList();
+        checkItemConflict(allPlugins, ClientPlugin::displayName, "display name");
 
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
@@ -279,7 +281,7 @@ public abstract class MoreMcmeta {
      * @param <P>   plugin type
      * @param <T>   item type
      */
-    private <P extends MoreMcmetaClientPlugin, T> Collection<P> removeOverriddenPlugins(
+    private <P extends ClientPlugin, T> Collection<P> removeOverriddenPlugins(
             Collection<P> plugins,
             Function<P, T> itemRetriever,
             Set<String> defaultPluginNames,
@@ -315,10 +317,10 @@ public abstract class MoreMcmeta {
     /**
      * Checks all the registered texture plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
-     * @throws MoreMcmetaClientPlugin.InvalidPluginException if a plugin is not valid
+     * @throws ClientPlugin.InvalidPluginException if a plugin is not valid
      */
     private void validateIndividualTexturePlugins(Collection<MoreMcmetaTexturePlugin> plugins)
-            throws MoreMcmetaClientPlugin.InvalidPluginException {
+            throws ClientPlugin.InvalidPluginException {
 
         // Validate individual plugins
         for (MoreMcmetaTexturePlugin plugin : plugins) {
@@ -333,10 +335,10 @@ public abstract class MoreMcmeta {
     /**
      * Checks all the reader registered plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
-     * @throws MoreMcmetaClientPlugin.InvalidPluginException if a plugin is not valid
+     * @throws ClientPlugin.InvalidPluginException if a plugin is not valid
      */
     private void validateIndividualReaderPlugins(Collection<MoreMcmetaMetadataReaderPlugin> plugins)
-            throws MoreMcmetaClientPlugin.InvalidPluginException {
+            throws ClientPlugin.InvalidPluginException {
 
         // Validate individual plugins
         for (MoreMcmetaMetadataReaderPlugin plugin : plugins) {
@@ -345,11 +347,11 @@ public abstract class MoreMcmeta {
             String extension = plugin.extension();
             validatePluginItem(extension, "extension", plugin.displayName());
             if (extension.contains(".")) {
-                throw new MoreMcmetaClientPlugin.InvalidPluginException("Extension cannot contain a period (.)");
+                throw new ClientPlugin.InvalidPluginException("Extension cannot contain a period (.)");
             }
 
             if (extension.length() == 0) {
-                throw new MoreMcmetaClientPlugin.InvalidPluginException("Extension cannot be empty");
+                throw new ClientPlugin.InvalidPluginException("Extension cannot be empty");
             }
 
             validatePluginItem(plugin.metadataReader(), "metadata reader", plugin.displayName());
@@ -362,32 +364,32 @@ public abstract class MoreMcmeta {
      * @param item          item to validate
      * @param itemName      display name of the item
      * @param pluginName    display name of the plugin
-     * @throws MoreMcmetaClientPlugin.InvalidPluginException if the item is not present
+     * @throws ClientPlugin.InvalidPluginException if the item is not present
      */
     private void validatePluginItem(Object item, String itemName, String pluginName)
-            throws MoreMcmetaClientPlugin.InvalidPluginException {
+            throws ClientPlugin.InvalidPluginException {
 
         if (item == null) {
-            throw new MoreMcmetaClientPlugin.InvalidPluginException("Plugin " + pluginName + " is missing " + itemName);
+            throw new ClientPlugin.InvalidPluginException("Plugin " + pluginName + " is missing " + itemName);
         }
     }
 
     /**
-     * Checks the provided plugins and throws a {@link MoreMcmetaClientPlugin.ConflictingPluginsException}
+     * Checks the provided plugins and throws a {@link ClientPlugin.ConflictingPluginsException}
      * if any two have a duplicate value for the property being checked.
      * @param plugins               the plugins to check
      * @param propertyAccessor      the function to use to access the property
      * @param propertyName          display name of the property
      * @param <P> type of plugin
      * @param <T> type of the property values
-     * @throws MoreMcmetaClientPlugin.ConflictingPluginsException if two plugins have the same value returned
+     * @throws ClientPlugin.ConflictingPluginsException if two plugins have the same value returned
      *                                                            by the propertyAccessor
      */
-    private <P extends MoreMcmetaClientPlugin, T> void checkItemConflict(
+    private <P extends ClientPlugin, T> void checkItemConflict(
             Collection<P> plugins,
             Function<P, T> propertyAccessor,
             String propertyName)
-            throws MoreMcmetaClientPlugin.ConflictingPluginsException {
+            throws ClientPlugin.ConflictingPluginsException {
 
         Map<T, List<P>> pluginsByProperty = plugins
                 .stream()
@@ -406,10 +408,10 @@ public abstract class MoreMcmeta {
         T conflictingProperty = conflictingPlugins.get().getKey();
         List<String> conflictingPluginNames = conflictingPlugins.get().getValue()
                 .stream()
-                .map(MoreMcmetaClientPlugin::displayName)
+                .map(ClientPlugin::displayName)
                 .toList();
 
-        throw new MoreMcmetaClientPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
+        throw new ClientPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
                 + " have conflicting " + propertyName + ": " + conflictingProperty);
     }
 
