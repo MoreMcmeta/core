@@ -8,7 +8,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        loader: [forge, fabric]
+        loader: [forge, fabric, common]
     steps:
       - uses: actions/checkout@v3
 
