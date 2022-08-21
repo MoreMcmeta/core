@@ -83,27 +83,6 @@ components.java {
     }
 }
 
-publishing {
-    publications {
-        mavenForge(MavenPublication) {
-            artifactId = project.mavenArtifactId
-            version = project.mavenVersion
-            from components.java
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/soir20/MoreMcmeta"
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-}
-
 if (System.getenv("CURSEFORGE_TOKEN") != null) {
     curseforge {
         apiKey = System.getenv("CURSEFORGE_TOKEN")
