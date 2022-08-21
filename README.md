@@ -1,5 +1,5 @@
 # MoreMcmeta
-![MoreMcmeta logo](https://github.com/soir20/MoreMcmeta/blob/main/info/img/moremcmeta-logo-black.png?raw=true)
+![MoreMcmeta logo](./info/img/moremcmeta-logo-black.png)
 
 Animate almost any texture with more options.
 
@@ -8,7 +8,7 @@ This means:
 * [a familiar animation format](https://github.com/soir20/MoreMcmeta/wiki/User-Docs:-Animation-Format)
 * not invasive—better compatibility with other mods
 
-![Mob, GUI, shadow, moon, and enchantment glint examples](https://github.com/soir20/MoreMcmeta/blob/main/info/img/demo.gif?raw=true)
+![Mob, GUI, shadow, moon, and enchantment glint examples](./info/img/demo.gif)
 
 ## Are You in the Right Place?
 If you're here to make a suggestion or bug report, find out how MoreMcmeta works, or contribute to its development, you're in the right place!
