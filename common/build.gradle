@@ -24,7 +24,3 @@ dependencies {
     // Do NOT use other classes from fabric loader
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabricLoaderVersion}"
 }
-
-java {
-    withSourcesJar()
-}
