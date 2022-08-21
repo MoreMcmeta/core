@@ -125,7 +125,7 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
 if (System.getenv("MODRINTH_TOKEN") != null) {
     modrinth {
         token = System.getenv("MODRINTH_TOKEN")
-        projectId = "moremcmeta"
+        projectId = project.modrinthId
         changelog = System.getenv("CHANGELOG")
         versionNumber = "v$version-forge"
         versionType = "release"
