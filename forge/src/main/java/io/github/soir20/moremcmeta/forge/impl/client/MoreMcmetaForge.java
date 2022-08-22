@@ -20,10 +20,7 @@ package io.github.soir20.moremcmeta.forge.impl.client;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.api.client.ClientPlugin;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.soir20.moremcmeta.forge.api.client.MoreMcmetaClientPlugin;
 import io.github.soir20.moremcmeta.forge.impl.client.event.ClientTicker;
 import io.github.soir20.moremcmeta.forge.impl.client.reflection.AnnotatedClassLoader;
@@ -54,7 +51,6 @@ import net.minecraftforge.network.NetworkConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -108,27 +104,11 @@ public final class MoreMcmetaForge extends MoreMcmeta {
      * @return all loaded plugins
      */
     @Override
-    protected Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>>
-            fetchTexturePlugins(Logger logger) {
-
-        Collection<ClientPlugin> plugins = CLASS_LOADER.load(
+    protected Collection<ClientPlugin> fetchTexturePlugins(Logger logger) {
+        return CLASS_LOADER.load(
                 MoreMcmetaClientPlugin.class,
                 ClientPlugin.class
         );
-
-        Collection<MoreMcmetaTexturePlugin> texturePlugins = new ArrayList<>();
-        Collection<MoreMcmetaMetadataReaderPlugin> readerPlugins = new ArrayList<>();
-        for (ClientPlugin plugin : plugins) {
-            if (plugin instanceof MoreMcmetaTexturePlugin) {
-                texturePlugins.add((MoreMcmetaTexturePlugin) plugin);
-            }
-
-            if (plugin instanceof MoreMcmetaMetadataReaderPlugin) {
-                readerPlugins.add((MoreMcmetaMetadataReaderPlugin) plugin);
-            }
-        }
-
-        return Pair.of(texturePlugins, readerPlugins);
     }
 
     /**

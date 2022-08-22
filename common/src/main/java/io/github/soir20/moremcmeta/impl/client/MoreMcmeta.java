@@ -118,8 +118,9 @@ public abstract class MoreMcmeta {
         Logger logger = LogManager.getLogger();
 
         // Fetch and validate plugins
-        Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>> plugins
-                = fetchTexturePlugins(logger);
+        Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>> plugins = dividePlugins(
+                fetchTexturePlugins(logger)
+        );
 
         Collection<MoreMcmetaTexturePlugin> texturePlugins = plugins.getFirst();
         validateIndividualTexturePlugins(texturePlugins);
@@ -213,8 +214,7 @@ public abstract class MoreMcmeta {
      * @param logger    logger to report errors
      * @return all loaded plugins
      */
-    protected abstract Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>>
-    fetchTexturePlugins(Logger logger);
+    protected abstract Collection<ClientPlugin> fetchTexturePlugins(Logger logger);
 
     /**
      * Gets the function that converts atlas sprites to their mipmap level.
@@ -270,6 +270,32 @@ public abstract class MoreMcmeta {
      * @param texManager        the manager to begin ticking
      */
     protected abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
+
+    /**
+     * Divides the collection of all plugins into their separate subtypes.
+     * @param plugins       the plugins to divide
+     * @return divided texture and metadata plugins
+     */
+    private Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>> dividePlugins(
+            Collection<ClientPlugin> plugins
+    ) {
+        Collection<MoreMcmetaTexturePlugin> texturePlugins = new ArrayList<>();
+        Collection<MoreMcmetaMetadataReaderPlugin> readerPlugins = new ArrayList<>();
+        for (ClientPlugin plugin : plugins) {
+            if (plugin instanceof MoreMcmetaTexturePlugin) {
+                texturePlugins.add((MoreMcmetaTexturePlugin) plugin);
+            }
+
+            /* If a plugin implements both interfaces, we will throw a conflicting name exception later
+               instead of ignoring the other interface. */
+            if (plugin instanceof MoreMcmetaMetadataReaderPlugin) {
+                readerPlugins.add((MoreMcmetaMetadataReaderPlugin) plugin);
+            }
+
+        }
+
+        return Pair.of(texturePlugins, readerPlugins);
+    }
 
     /**
      * Removes default plugins that are overridden by other plugins if they share an item.

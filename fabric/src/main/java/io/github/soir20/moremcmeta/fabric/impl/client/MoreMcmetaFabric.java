@@ -19,20 +19,18 @@ package io.github.soir20.moremcmeta.fabric.impl.client;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.datafixers.util.Pair;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
-import io.github.soir20.moremcmeta.api.client.MoreMcmetaTexturePlugin;
-import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
-import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
-import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
+import io.github.soir20.moremcmeta.api.client.ClientPlugin;
 import io.github.soir20.moremcmeta.fabric.impl.client.adapter.SimpleReloadListenerAdapter;
 import io.github.soir20.moremcmeta.fabric.impl.client.event.ResourceManagerInitializedCallback;
 import io.github.soir20.moremcmeta.fabric.impl.client.mixin.LoadingOverlayAccessor;
 import io.github.soir20.moremcmeta.fabric.impl.client.mixin.PackRepositoryAccessor;
 import io.github.soir20.moremcmeta.fabric.impl.client.mixin.SpriteAccessor;
 import io.github.soir20.moremcmeta.fabric.impl.client.mixin.TextureManagerAccessor;
+import io.github.soir20.moremcmeta.impl.client.MoreMcmeta;
+import io.github.soir20.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.soir20.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.soir20.moremcmeta.impl.client.texture.LazyTextureManager;
+import io.github.soir20.moremcmeta.impl.client.texture.TexturePreparer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -73,16 +71,13 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
 
     /**
      * Gets all loaded MoreMcmeta plugins from other mods.
-     * @param logger    logger to report errors
+     *
+     * @param logger logger to report errors
      * @return all loaded plugins
      */
     @Override
-    protected Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>>
-            fetchTexturePlugins(Logger logger) {
-        return Pair.of(
-                listPlugins(MoreMcmetaTexturePlugin.class, logger),
-                listPlugins(MoreMcmetaMetadataReaderPlugin.class, logger)
-        );
+    protected Collection<ClientPlugin> fetchTexturePlugins(Logger logger) {
+        return listPlugins(ClientPlugin.class, logger);
     }
 
     /**
@@ -182,6 +177,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return the list of all plugins added as an entrypoint
      * @param <T> type of plugin
      */
+    @SuppressWarnings("SameParameterValue")
     private <T> List<T> listPlugins(Class<T> pluginClass, Logger logger) {
         List<T> plugins = new ArrayList<>();
         FabricLoader.getInstance()
