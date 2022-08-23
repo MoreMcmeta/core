@@ -24,8 +24,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots or videos to help explain your problem.
 
 **Which Minecraft versions does this bug affect?**
-- [ ] 1.16
-- [ ] 1.17
+List Minecraft versions that this bug affects.
 
 **Mod loader**
 Which mod loaders does this bug affect?
