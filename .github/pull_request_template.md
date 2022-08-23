@@ -9,8 +9,7 @@
 ## Links to related issues
 
 ## Which Minecraft versions does this change apply to?
-- [ ] 1.16
-- [ ] 1.17
+List Minecraft versions that this change affects.
 
 ## Did you test this change on both mod loaders?
 - [ ] Forge

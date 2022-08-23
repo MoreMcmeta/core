@@ -17,9 +17,7 @@ A clear and concise description of what you want to happen.
 A clear and concise description of any alternative solutions or features you've considered.
 
 **Which Minecraft versions would this feature apply to?**
-Replace the space inside the brackets with an "x" to select a version.
-- [ ] 1.16
-- [ ] 1.17
+List Minecraft versions that the feature should be developed for.
 
 **Additional context**
 Add any other context or screenshots about the feature request here.
