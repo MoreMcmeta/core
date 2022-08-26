@@ -12,15 +12,15 @@ jobs:
       matrix:
         loader: [forge, fabric, common]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      - uses: actions/setup-java@5b36705a13905facb447b6812d613a06a07e371d
         with:
           java-version: 17
           distribution: temurin
 
       - name: Determine mod version from tag
         id: mod_version
-        uses: actions/github-script@v6
+        uses: actions/github-script@d50f485531ba88479582bc2da03ff424389af5c1
         with:
           script: |
             const tag_name = context.payload.release.tag_name;
@@ -34,19 +34,26 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v1.0.4
+        uses: gradle/wrapper-validation-action@859c33240bd026ce8d5f711f5adcc65c2f8eafc1
 
       - name: Publish to GitHub Packages
-        uses: gradle/gradle-build-action@v2.2.1
+        uses: gradle/gradle-build-action@8be955ee80297c9525ad04fe8610d12c3be14bb0
         with:
           arguments: :${{ matrix.loader }}:build :${{ matrix.loader }}:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MOD_VERSION: ${{ steps.mod_version.outputs.result }}
 
+      - name: Retrieve Minecraft version
+        id: mc_version
+        uses: soir20/read-properties@d61222ac599d7e46922a94dbbb35d181b7b208e1
+        with:
+          file: "./gradle.properties"
+          property: "minecraftVersion"
+
       - name: Publish to GitHub Releases
         if: matrix.loader != 'common'
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@ef2adfe8cb8ebfa540930c452c576b3819990faa
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./${{ matrix.loader }}/build/libs/moremcmeta-${{ env.MC_VERSION }}-${{ env.MOD_VERSION }}-${{ matrix.loader }}.jar
@@ -55,11 +62,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MOD_VERSION: ${{ steps.mod_version.outputs.result }}
-          MC_VERSION: 1.16.5
+          MC_VERSION: ${{ steps.mc_version.outputs.value }}
 
       - name: Publish to CurseForge
         if: matrix.loader != 'common'
-        uses: gradle/gradle-build-action@v2.2.1
+        uses: gradle/gradle-build-action@8be955ee80297c9525ad04fe8610d12c3be14bb0
         with:
           arguments: :${{ matrix.loader }}:curseforge
         env:
@@ -69,7 +76,7 @@ jobs:
 
       - name: Publish to Modrinth
         if: matrix.loader != 'common'
-        uses: gradle/gradle-build-action@v2.2.1
+        uses: gradle/gradle-build-action@8be955ee80297c9525ad04fe8610d12c3be14bb0
         with:
           arguments: :${{ matrix.loader }}:modrinth
         env:
