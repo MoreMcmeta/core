@@ -105,7 +105,7 @@ allprojects {
 
     publishing {
         publications {
-            mavenFabric(MavenPublication) {
+            maven(MavenPublication) {
                 artifactId = project.mavenArtifactId
                 version = project.mavenVersion
                 from components.java
