@@ -38,10 +38,6 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabricLoaderVersion}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabricApiVersion}"
 
-    if (project.includeDefaultPlugins) {
-        // TODO: include default plugins here
-    }
-
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 

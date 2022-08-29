@@ -65,6 +65,12 @@ subprojects {
         minecraft "com.mojang:minecraft:${project.minecraftVersion}"
         mappings loom.officialMojangMappings()
 
+        // Include plugins by default
+        def final INCLUDE_DEFAULT_PLUGINS = (System.getenv("INCLUDE_DEFAULT_PLUGINS") ?: "true").toBoolean()
+        if (INCLUDE_DEFAULT_PLUGINS) {
+            include "io.github.moremcmeta:json-reader-plugin-${project.name}:${project.jsonReaderVersion}"
+        }
+
         testImplementation "junit:junit:${project.junitVersion}"
         testImplementation "org.lwjgl:lwjgl:${rootProject.lwjglVersion}"
         testRuntimeOnly "org.lwjgl:lwjgl:${rootProject.lwjglVersion}:${lwjglNatives}"
@@ -91,9 +97,6 @@ allprojects {
             ? "${version.substring(0, version.length() - SNAPSHOT_SUFFIX.length())}-SNAPSHOT"
             : version
 
-    // Include plugins by default
-    project.ext.includeDefaultPlugins = (System.getenv("INCLUDE_DEFAULT_PLUGINS") ?: "true").toBoolean()
-
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
         options.release = project.javaVersion.toInteger()
@@ -101,6 +104,16 @@ allprojects {
 
     java {
         withSourcesJar()
+    }
+
+    repositories {
+        maven {
+            url "https://maven.pkg.github.com/moremcmeta/json-reader-plugin/"
+            credentials {
+                username System.getenv("MOREMCMETA_MAVEN_USER") ?: project.moremcmetaMavenUser
+                password System.getenv("MOREMCMETA_MAVEN_PASS") ?: project.moremcmetaMavenPass
+            }
+        }
     }
 
     publishing {

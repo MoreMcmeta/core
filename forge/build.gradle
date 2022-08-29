@@ -41,10 +41,6 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive false }
 
     testImplementation(project(path: ":common"))
-
-    if (project.includeDefaultPlugins) {
-        // TODO: include default plugins here
-    }
 }
 
 processResources {

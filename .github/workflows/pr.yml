@@ -3,6 +3,9 @@ on: [pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      MOREMCMETA_MAVEN_USER: ${{ secrets.MOREMCMETA_MAVEN_USER }}
+      MOREMCMETA_MAVEN_PASS: ${{ secrets.MOREMCMETA_MAVEN_PASS }}
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 

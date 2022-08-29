@@ -11,6 +11,9 @@ jobs:
     strategy:
       matrix:
         loader: [forge, fabric, common]
+    env:
+      MOREMCMETA_MAVEN_USER: ${{ secrets.MOREMCMETA_MAVEN_USER }}
+      MOREMCMETA_MAVEN_PASS: ${{ secrets.MOREMCMETA_MAVEN_PASS }}
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - uses: actions/setup-java@5b36705a13905facb447b6812d613a06a07e371d
