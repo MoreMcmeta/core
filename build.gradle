@@ -108,7 +108,7 @@ allprojects {
 
     repositories {
         maven {
-            url "https://maven.pkg.github.com/moremcmeta/json-reader-plugin/"
+            url "https://maven.pkg.github.com/moremcmeta/*/"
             credentials {
                 username System.getenv("MOREMCMETA_MAVEN_USER") ?: project.moremcmetaMavenUser
                 password System.getenv("MOREMCMETA_MAVEN_PASS") ?: project.moremcmetaMavenPass
