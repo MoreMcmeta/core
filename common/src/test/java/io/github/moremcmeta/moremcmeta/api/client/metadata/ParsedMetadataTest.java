@@ -48,11 +48,6 @@ public class ParsedMetadataTest {
     }
 
     @Test
-    public void invalidReason_NotOverridden_Empty() {
-        assertFalse((new ParsedMetadata() {}).invalidReason().isPresent());
-    }
-
-    @Test
     public void frameSizeConstruct_NegativeWidth_NegativeDimensionException() {
         expectedException.expect(NegativeDimensionException.class);
         new ParsedMetadata.FrameSize(-1, 2);

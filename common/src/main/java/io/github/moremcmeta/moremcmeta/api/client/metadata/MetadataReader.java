@@ -79,22 +79,4 @@ public interface MetadataReader {
 
     }
 
-    /**
-     * Signals that the metadata provided to the reader is invalid for some reason. It may be
-     * in an invalid format or have an incompatible combination of properties.
-     * @author soir20
-     * @since 4.0.0
-     */
-    final class InvalidMetadataException extends Exception {
-
-        /**
-         * Creates a new exception with a detail message.
-         * @param reason    the reason the metadata is invalid
-         */
-        public InvalidMetadataException(String reason) {
-            super(reason);
-        }
-
-    }
-
 }

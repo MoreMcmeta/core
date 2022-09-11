@@ -64,15 +64,6 @@ public interface ParsedMetadata {
     }
 
     /**
-     * Returns a string explaining why the metadata is invalid for some reason. The texture associated
-     * with the metadata will be skipped if this method does not return {@link Optional#empty()}.
-     * @return the reason the metadata is invalid or {@link Optional#empty()} if the metadata is valid
-     */
-    default Optional<String> invalidReason() {
-        return Optional.empty();
-    }
-
-    /**
      * Holds the frame width and height as a single object.
      * @author soir20
      * @since 4.0.0

@@ -38,7 +38,8 @@ public interface MetadataParser {
      *                      to access an attribute, a {@link MetadataView} for the section must be accessed
      *                      first.
      * @return an object with parsed data
+     * @throws InvalidMetadataException if the metadata is not valid
      */
-    ParsedMetadata parse(MetadataView metadata);
+    ParsedMetadata parse(MetadataView metadata) throws InvalidMetadataException;
 
 }

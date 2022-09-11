@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureReader;
 import net.minecraft.ResourceLocationException;
@@ -159,7 +160,7 @@ public class TextureLoader<R> {
                 if (results.containsKey(textureLocation)) {
                     results.remove(textureLocation);
 
-                    throw new MetadataReader.InvalidMetadataException(
+                    throw new InvalidMetadataException(
                             String.format(
                                     "Two metadata files found for same texture (%s). Neither will be applied",
                                     textureLocation
@@ -172,7 +173,7 @@ public class TextureLoader<R> {
         } catch (IOException ioException) {
             LOGGER.error("Texture associated with metadata in file {} is missing: {}",
                     metadataLocation, ioException);
-        } catch (MetadataReader.InvalidMetadataException metadataError) {
+        } catch (InvalidMetadataException metadataError) {
             LOGGER.error("Invalid metadata in file {}: {}", metadataLocation, metadataError);
         }
     }

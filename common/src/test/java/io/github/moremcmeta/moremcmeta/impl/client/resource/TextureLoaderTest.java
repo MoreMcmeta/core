@@ -19,6 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.moremcmeta.moremcmeta.impl.client.io.MockMetadataView;
 import net.minecraft.ResourceLocationException;
@@ -402,7 +403,7 @@ public class TextureLoaderTest {
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadataStream) -> {
                     if (texturesLoaded.getAndIncrement() < 1) {
-                        throw new MetadataReader.InvalidMetadataException("Dummy exception");
+                        throw new InvalidMetadataException("Dummy exception");
                     }
                     return 1;
                 },

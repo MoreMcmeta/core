@@ -17,7 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 
 import java.io.IOException;
@@ -37,9 +37,9 @@ public interface TextureReader<T> {
      * @param metadata          metadata associated with this texture
      * @return getter for retrieving an animated texture after all resources are loaded
      * @throws IOException failure reading from either input stream
-     * @throws MetadataReader.InvalidMetadataException if the metadata is not valid for some reason
+     * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
     T read(InputStream textureStream, MetadataView metadata)
-            throws IOException, MetadataReader.InvalidMetadataException;
+            throws IOException, InvalidMetadataException;
 
 }
