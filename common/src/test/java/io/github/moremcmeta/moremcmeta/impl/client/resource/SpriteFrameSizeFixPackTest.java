@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -92,8 +91,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void construct_NullRepo_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         expectedException.expect(NullPointerException.class);
         new SpriteFrameSizeFixPack(textures1, null);
@@ -107,8 +106,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void construct_EmptyRepo_NoException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         new SpriteFrameSizeFixPack(textures1, EMPTY_REPO);
     }
@@ -116,8 +115,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void construct_ServerRepo_NoException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         expectedException.expect(IllegalArgumentException.class);
         new SpriteFrameSizeFixPack(textures1, SERVER_REPO);
@@ -126,8 +125,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getRootResource_NullName_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         expectedException.expect(NullPointerException.class);
@@ -137,8 +136,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getRootResource_NonNullName_Null() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         assertNull(pack.getRootResource("one.png"));
@@ -147,8 +146,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getRootResource_EmptyName_Null() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         assertNull(pack.getRootResource(""));
@@ -157,8 +156,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_NullPackType_NullPointerException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         expectedException.expect(NullPointerException.class);
@@ -168,8 +167,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_NullLocation_NullPointerException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         expectedException.expect(NullPointerException.class);
@@ -179,8 +178,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_ServerPackTypeClientResource_IOException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         expectedException.expect(IOException.class);
@@ -190,8 +189,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_ServerPackTypeServerResource_IOException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         expectedException.expect(IOException.class);
@@ -201,8 +200,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_KnownVanillaMetadata_CorrectFrameSize() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -218,8 +217,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_KnownVanillaMetadata_HasSingleFrame() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -235,8 +234,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_UnknownVanillaMetadata_IOException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -247,8 +246,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_KnownTextureFirstPack_FoundResource() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         InputStream resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("one.png"));
@@ -260,8 +259,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_KnownTextureMiddlePack_FoundResource() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("four.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("four.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         InputStream resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("four.png"));
@@ -273,8 +272,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_KnownTextureLastPack_FoundResource() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         InputStream resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("five.png"));
@@ -286,8 +285,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_KnownTextureNotInRepo_IllegalStateException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("seven.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("seven.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -298,8 +297,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_KnownTextureNoRepo_IllegalStateException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("seven.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("seven.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, EMPTY_REPO);
 
@@ -310,8 +309,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResource_UnknownTexture_IOException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -322,8 +321,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResources_ServerPackType_NoResources() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -334,8 +333,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResources_NullPackType_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -346,8 +345,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResources_NullNamespace_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -358,8 +357,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResources_NullPathStart_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -370,8 +369,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResources_NullFilter_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -382,8 +381,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResources_DepthNegative_IllegalArgException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -394,8 +393,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResources_DepthZeroNoneMatch_NoneFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/folder/one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("textures/folder/five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/folder/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/folder/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -406,8 +405,8 @@ public class SpriteFrameSizeFixPackTest {
     @Test
     public void getResources_DepthZeroDirectlyWithinFolder_NoneFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
-        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+        textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -420,9 +419,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_DepthPositiveNoneMatch_NoneFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/folder2/folder3/folder4/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/folder2/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -435,9 +434,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_DepthPositiveTreeSameDepth_MatchingFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/folder2/folder3/folder4/folder5/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -451,9 +450,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_DepthPositiveTreeSmallerDepth_MatchingFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/folder2/folder3/folder4/folder5/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -468,9 +467,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_DepthMaxInt_MatchingFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/folder2/folder3/folder4/folder5/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -485,9 +484,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_DepthMultiFolderPathStart_DepthFromPathStart() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/folder/folder3/folder4/folder5/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/folder2/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -501,9 +500,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_NamespaceMismatch_DepthFromPathStart() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -516,9 +515,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_PathStartNotAtBeginning_NotMatched() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("/textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("/textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -531,9 +530,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_PathStartDifferent_NotMatched() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -546,9 +545,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_EmptyPathStart_Ignored() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -563,9 +562,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_PathStartSubstringOfBeginning_NotMatched() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -578,9 +577,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_PathStartEndsWithSlash_NotMatched() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -593,9 +592,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_PathFilteredMismatch_NotMatched() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -608,9 +607,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_PathFilteredSomeMismatch_MatchingFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -635,15 +634,15 @@ public class SpriteFrameSizeFixPackTest {
     public void getResources_AllParameters_SomeMatch() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.jpg"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/two.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("other", "textures/folder/three.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("other/folder/four.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -657,9 +656,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_NullPackType_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -671,9 +670,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_NullLocation_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -685,9 +684,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_ServerType_NotFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -698,9 +697,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_HasVanillaMetadata_Found() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -711,9 +710,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_MissingVanillaMetadata_NotFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -724,9 +723,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_HasOtherResource_Found() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png.moremcmeta"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -737,9 +736,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_MissingOtherResource_NotFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -750,9 +749,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_HasTexture_Found() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -763,9 +762,9 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_MissingTexture_NotFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
 
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
@@ -784,11 +783,11 @@ public class SpriteFrameSizeFixPackTest {
     public void hasResource_NotInRepo_Found() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/other.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/other.png")));
@@ -798,9 +797,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getNamespaces_NullPackType_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         expectedException.expect(NullPointerException.class);
@@ -811,13 +810,13 @@ public class SpriteFrameSizeFixPackTest {
     public void getNamespaces_ClientType_UniqueNamespaces() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("first", "textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("second", "textures/two.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("third", "textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         assertEquals(Set.of("first", "second", "third", "minecraft"), pack.getNamespaces(PackType.CLIENT_RESOURCES));
@@ -827,13 +826,13 @@ public class SpriteFrameSizeFixPackTest {
     public void getNamespaces_ServerType_None() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("first", "textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("second", "textures/two.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("third", "textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         assertEquals(0, pack.getNamespaces(PackType.SERVER_DATA).size());
@@ -850,9 +849,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getMetadataSection_NullSerializer_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         expectedException.expect(NullPointerException.class);
@@ -863,9 +862,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getMetadataSection_ProvidedSerializer_NullMetadata() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         assertNull(pack.getMetadataSection(PackMetadataSection.SERIALIZER));
@@ -875,9 +874,9 @@ public class SpriteFrameSizeFixPackTest {
     public void getName_OnePack_NameNotEmpty() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         assertNotEquals(0, pack.getName().length());
@@ -887,17 +886,17 @@ public class SpriteFrameSizeFixPackTest {
     public void getName_TwoPacks_SameName() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
 
         Map<ResourceLocation, TextureData<?>> textures2 = new HashMap<>();
         textures2.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures2.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack2 = new SpriteFrameSizeFixPack(textures2, DUMMY_REPO);
 
         assertEquals(pack.getName(), pack2.getName());
@@ -907,9 +906,9 @@ public class SpriteFrameSizeFixPackTest {
     public void close_NotYetClosed_NoException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         pack.close();
@@ -919,9 +918,9 @@ public class SpriteFrameSizeFixPackTest {
     public void close_AlreadyClosed_NoException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
-                new TextureData<>(new ParsedMetadata.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), List.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
         pack.close();

@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -33,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class TextureData<I extends CloseableImage> {
-    private final ParsedMetadata.FrameSize FRAME_SIZE;
+    private final FrameSize FRAME_SIZE;
     private final boolean BLUR;
     private final boolean CLAMP;
     private final I IMAGE;
@@ -48,7 +49,7 @@ public class TextureData<I extends CloseableImage> {
      * @param parsedSections    parsed metadata and component providers that will
      *                          process the metadata
      */
-    public TextureData(ParsedMetadata.FrameSize frameSize, boolean blur, boolean clamp, I image,
+    public TextureData(FrameSize frameSize, boolean blur, boolean clamp, I image,
                        List<Triple<String, ParsedMetadata, ComponentProvider>> parsedSections) {
         if (frameSize.width() > image.width()) {
             throw new IllegalArgumentException("Frame width cannot be larger than image width");
@@ -69,7 +70,7 @@ public class TextureData<I extends CloseableImage> {
      * Gets the size of a frame in the image.
      * @return the size of a frame in the image
      */
-    public ParsedMetadata.FrameSize frameSize() {
+    public FrameSize frameSize() {
         return FRAME_SIZE;
     }
 
@@ -104,6 +105,75 @@ public class TextureData<I extends CloseableImage> {
      */
     public List<Triple<String, ParsedMetadata, ComponentProvider>> parsedMetadata() {
         return PARSED_SECTIONS;
+    }
+
+    /**
+     * Holds the frame width and height as a single object.
+     * @author soir20
+     */
+    public static final class FrameSize {
+        private final int WIDTH;
+        private final int HEIGHT;
+
+        /**
+         * Creates a new object representing a frame size.
+         * @param width     width of a frame
+         * @param height    height of a frame
+         * @throws NegativeDimensionException if the width or the height is negative
+         */
+        public FrameSize(int width, int height) {
+            if (width < 0) {
+                throw new NegativeDimensionException(width);
+            }
+
+            if (height < 0) {
+                throw new NegativeDimensionException(height);
+            }
+
+            WIDTH = width;
+            HEIGHT = height;
+        }
+
+        /**
+         * Gets the width of a frame.
+         * @return the width of a frame
+         */
+        public int width() {
+            return WIDTH;
+        }
+
+        /**
+         * Gets the height of a frame.
+         * @return the height of a frame
+         */
+        public int height() {
+            return HEIGHT;
+        }
+
+        /**
+         * Checks if another object is equivalent to this frame size.
+         * @param other     the other object to compare this frame size to
+         * @return whether the other object represents an equivalent frame size
+         */
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof FrameSize otherSize)) {
+                return false;
+            }
+
+            return width() == otherSize.width() && height() == otherSize.height();
+        }
+
+        /**
+         * Gets a hash code for this frame size.
+         * @return a hash code for this frame size
+         * @see Object#hashCode()
+         */
+        @Override
+        public int hashCode() {
+            return 31 * WIDTH + HEIGHT;
+        }
+
     }
 
 }

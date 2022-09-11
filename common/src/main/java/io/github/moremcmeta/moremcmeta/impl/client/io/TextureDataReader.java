@@ -76,7 +76,8 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         requireNonNull(metadata, "Metadata cannot be null");
 
         List<Triple<String, ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
-        Optional<ParsedMetadata.FrameSize> frameSizeOptional = Optional.empty();
+        Optional<Integer> frameWidthOptional = Optional.empty();
+        Optional<Integer> frameHeightOptional = Optional.empty();
         Optional<Boolean> blurOptional = Optional.empty();
         Optional<Boolean> clampOptional = Optional.empty();
 
@@ -98,7 +99,8 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                     + " returned null for parsed metadata");
             parsedSections.add(Triple.of(plugin.displayName(), sectionData, plugin.componentProvider()));
 
-            frameSizeOptional = getIfCompatible(frameSizeOptional, sectionData.frameSize(), "frame size");
+            frameWidthOptional = getIfCompatible(frameWidthOptional, sectionData.frameWidth(), "frame width");
+            frameHeightOptional = getIfCompatible(frameHeightOptional, sectionData.frameHeight(), "frame width");
             blurOptional = getIfCompatible(blurOptional, sectionData.blur(), "blur");
             clampOptional = getIfCompatible(clampOptional, sectionData.clamp(), "clamp");
         }
@@ -109,18 +111,19 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         I image = IMAGE_READER.read(textureStream, blur, clamp);
         requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
 
-        ParsedMetadata.FrameSize frameSize = frameSizeOptional.orElse(
-                new ParsedMetadata.FrameSize(image.width(), image.height())
-        );
+        int frameWidth = frameWidthOptional.orElse(image.width());
+        int frameHeight = frameHeightOptional.orElse(image.height());
 
         // Check for frame size too large
-        if (frameSize.width() > image.width() || frameSize.height() > image.height()) {
+        if (frameWidth > image.width() || frameHeight > image.height()) {
             throw new InvalidMetadataException(String.format(
                     "%sx%s larger than %sx%s image",
-                    frameSize.width(), frameSize.height(),
+                    frameWidth, frameHeight,
                     image.width(), image.height()
             ));
         }
+
+        TextureData.FrameSize frameSize = new TextureData.FrameSize(frameWidth, frameHeight);
 
         return new TextureData<>(
                 frameSize,

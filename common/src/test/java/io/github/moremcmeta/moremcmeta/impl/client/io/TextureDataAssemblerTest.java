@@ -101,7 +101,7 @@ public class TextureDataAssemblerTest {
         };
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, false,
                 new MockCloseableImage(100, 100),
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -129,7 +129,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, false,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) ->
@@ -166,7 +166,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, false,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) ->
@@ -202,7 +202,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 true, false,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) ->
@@ -238,7 +238,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) ->
@@ -265,7 +265,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(MockCloseableImage.MockSubImageOutsideOriginalException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, false,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) ->
@@ -304,7 +304,7 @@ public class TextureDataAssemblerTest {
         );
 
         EventDrivenTexture texture = assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) ->
@@ -332,7 +332,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -359,7 +359,7 @@ public class TextureDataAssemblerTest {
         MutableFrameView[] frameView = new MutableFrameView[1];
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -387,7 +387,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -414,7 +414,7 @@ public class TextureDataAssemblerTest {
         MutableFrameView[] frameView = new MutableFrameView[1];
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -442,7 +442,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -468,7 +468,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(NullPointerException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -494,7 +494,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(NullPointerException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -520,7 +520,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(NullPointerException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -546,7 +546,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(NullPointerException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -572,7 +572,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -598,7 +598,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -624,7 +624,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -650,7 +650,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -675,7 +675,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -708,7 +708,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -734,7 +734,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -760,7 +760,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -786,7 +786,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -812,7 +812,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(ColorTransform.NonDependencyRequestException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -838,7 +838,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -876,7 +876,7 @@ public class TextureDataAssemblerTest {
         MutableFrameView[] frameView = new MutableFrameView[1];
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -905,7 +905,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -931,7 +931,7 @@ public class TextureDataAssemblerTest {
 
         expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
@@ -956,7 +956,7 @@ public class TextureDataAssemblerTest {
         );
 
         assembler.assemble(new TextureData<>(
-                new ParsedMetadata.FrameSize(30, 40),
+                new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {

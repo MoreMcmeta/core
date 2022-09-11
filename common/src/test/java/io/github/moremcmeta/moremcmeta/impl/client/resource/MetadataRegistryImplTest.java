@@ -46,7 +46,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -67,7 +67,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -88,7 +88,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("textures/block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -108,7 +108,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -130,7 +130,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("textures/block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -153,7 +153,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("textures/block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -174,7 +174,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("textures/block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -195,7 +195,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("textures/block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -215,7 +215,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("textures/block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -237,7 +237,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("textures/block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
@@ -272,7 +272,7 @@ public class MetadataRegistryImplTest {
         registry.set(ImmutableMap.of(
                 new ResourceLocation("textures/block.png"),
                 new TextureData<>(
-                        new ParsedMetadata.FrameSize(30, 40),
+                        new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
