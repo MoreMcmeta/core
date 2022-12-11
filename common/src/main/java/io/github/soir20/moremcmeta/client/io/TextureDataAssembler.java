@@ -165,8 +165,6 @@ public class TextureDataAssembler {
         List<RGBAImage.VisibleArea> visibleAreas = new ArrayList<>();
         FrameReader<RGBAImageFrame> frameReader = new FrameReader<>((frameData) -> {
 
-            /* The immutable list collector was marked as beta for a while,
-               and the marking was removed in a later version. */
             ImmutableList<RGBAImage> wrappedMipmaps = IntStream.rangeClosed(0, mipmap).mapToObj((level) -> {
                 int width = frameData.getWidth() >> level;
                 int height = frameData.getHeight() >> level;
