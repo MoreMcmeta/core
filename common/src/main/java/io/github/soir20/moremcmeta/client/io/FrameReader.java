@@ -20,6 +20,7 @@ package io.github.soir20.moremcmeta.client.io;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
+import net.minecraft.client.resources.metadata.animation.FrameSize;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,13 +59,22 @@ public class FrameReader<F> {
             throw new IllegalArgumentException("Image must not be empty");
         }
 
-        if (metadata.getFrameWidth(-1) == 0 || metadata.getFrameHeight(-1) == 0) {
+        FrameSize frameSize = metadata.calculateFrameSize(imageWidth, imageHeight);
+        int frameWidth = frameSize.width();
+        int frameHeight = frameSize.height();
+        if (frameWidth == 0 || frameHeight == 0) {
             throw new IllegalArgumentException("Frame width and height must not be empty");
         }
-
-        Pair<Integer, Integer> frameSize = metadata.getFrameSize(imageWidth, imageHeight);
-        int frameWidth = frameSize.getFirst();
-        int frameHeight = frameSize.getSecond();
+        if (isNotMultiple(imageWidth, frameWidth)) {
+            throw new IllegalArgumentException(
+                    String.format("Image width %d must be a multiple of frame width %d", imageWidth, frameWidth)
+            );
+        }
+        if (isNotMultiple(imageHeight, frameHeight)) {
+            throw new IllegalArgumentException(
+                    String.format("Image height %d must be a multiple of frame height %d", imageHeight, frameHeight)
+            );
+        }
 
         int numFramesX = imageWidth / frameWidth;
         int numFramesY = imageHeight / frameHeight;
@@ -77,6 +87,16 @@ public class FrameReader<F> {
         } else {
             return findFrames(metadata, frameWidth, frameHeight, numFramesX, numFramesY);
         }
+    }
+
+    /**
+     * Checks if the divisor is a multiple of the dividend.
+     * @param dividend      the dividend to check
+     * @param divisor       the divisor to check
+     * @return whether the divisor is a multiple of the dividend
+     */
+    private static boolean isNotMultiple(int dividend, int divisor) {
+        return dividend % divisor != 0;
     }
 
     /**

@@ -87,7 +87,9 @@ public class TextureDataAssembler {
         boolean clamp = textureMetadata.map(TextureMetadataSection::isClamp).orElse(false);
 
         // Create frames
-        List<NativeImage> mipmaps = Arrays.asList(MipmapGenerator.generateMipLevels(original, MAX_MIPMAP));
+        List<NativeImage> mipmaps = Arrays.asList(
+                MipmapGenerator.generateMipLevels(new NativeImage[] {original}, MAX_MIPMAP)
+        );
         RGBAImageFrame.SharedMipmapLevel sharedMipmapLevel = new RGBAImageFrame.SharedMipmapLevel(MAX_MIPMAP);
         ImmutableList<RGBAImageFrame> frames = getFrames(mipmaps, blur, clamp, sharedMipmapLevel, animationMetadata);
 
@@ -165,7 +167,6 @@ public class TextureDataAssembler {
 
             /* The immutable list collector was marked as beta for a while,
                and the marking was removed in a later version. */
-            @SuppressWarnings("UnstableApiUsage")
             ImmutableList<RGBAImage> wrappedMipmaps = IntStream.rangeClosed(0, mipmap).mapToObj((level) -> {
                 int width = frameData.getWidth() >> level;
                 int height = frameData.getHeight() >> level;

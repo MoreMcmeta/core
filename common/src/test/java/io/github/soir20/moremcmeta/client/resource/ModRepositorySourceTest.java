@@ -17,78 +17,85 @@
 
 package io.github.soir20.moremcmeta.client.resource;
 
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.DetectedVersion;
+import net.minecraft.SharedConstants;
+import net.minecraft.WorldVersion;
+import net.minecraft.server.packs.repository.PackCompatibility;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link ModRepositorySource}.
  * @author soir20
  */
 public class ModRepositorySourceTest {
-    private static final Pack.PackConstructor MOCK_CONSTRUCTOR =
-            (id, title, required, packSupplier, packMetadataSection, position, packSource) ->
-                    new Pack(id, title, required, packSupplier, packMetadataSection, PackType.CLIENT_RESOURCES,
-                            position, packSource);
+    private static final WorldVersion DUMMY_VERSION = DetectedVersion.BUILT_IN;
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
+    @Before
+    public void setUp() {
+        SharedConstants.setVersion(DUMMY_VERSION);
+    }
+
     @Test
     public void construct_NullPackGetter_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new ModRepositorySource(null);
+        new ModRepositorySource(null, DUMMY_VERSION);
+    }
+
+    @Test
+    public void construct_NullVersion_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new ModRepositorySource((id) -> new MockPackResources(), null);
     }
 
     @Test
     public void loadPacks_NullConsumer_NullPointerException() {
-        ModRepositorySource repositorySource = new ModRepositorySource(MockPackResources::new);
+        ModRepositorySource repositorySource = new ModRepositorySource((id) -> new MockPackResources(), DUMMY_VERSION);
 
         expectedException.expect(NullPointerException.class);
-        repositorySource.loadPacks(null, MOCK_CONSTRUCTOR);
-    }
-
-    @Test
-    public void loadPacks_NullPackConstructor_NullPointerExceptionPackNotSupplied() {
-        ModRepositorySource repositorySource = new ModRepositorySource(MockPackResources::new);
-
-        AtomicBoolean wasSet = new AtomicBoolean(false);
-
-        try {
-            expectedException.expect(NullPointerException.class);
-            repositorySource.loadPacks((pack) -> wasSet.set(true), null);
-        } finally {
-            assertFalse(wasSet.get());
-        }
+        repositorySource.loadPacks(null);
     }
 
     @Test
     public void loadPacks_ValidParameters_OnePackGiven() {
-        ModRepositorySource repositorySource = new ModRepositorySource(MockPackResources::new);
+        ModRepositorySource repositorySource = new ModRepositorySource((id) -> new MockPackResources(), DUMMY_VERSION);
 
         AtomicInteger packsConsumed = new AtomicInteger();
-        repositorySource.loadPacks((pack) -> packsConsumed.getAndIncrement(), MOCK_CONSTRUCTOR);
+        repositorySource.loadPacks((pack) -> packsConsumed.getAndIncrement());
 
         assertEquals(1, packsConsumed.get());
     }
 
     @Test
     public void loadPacks_ValidParameters_PackWithRightIdGiven() {
-        ModRepositorySource repositorySource = new ModRepositorySource(MockPackResources::new);
+        ModRepositorySource repositorySource = new ModRepositorySource((id) -> new MockPackResources(), DUMMY_VERSION);
 
         AtomicReference<String> packId = new AtomicReference<>("");
 
-        repositorySource.loadPacks((pack) -> packId.set(pack.getId()), MOCK_CONSTRUCTOR);
+        repositorySource.loadPacks((pack) -> packId.set(pack.getId()));
 
         assertEquals(ModRepositorySource.PACK_ID, packId.get());
+    }
+
+    @Test
+    public void loadPacks_ValidParameters_PackWithRightFormatVersionGiven() {
+        ModRepositorySource repositorySource = new ModRepositorySource((id) -> new MockPackResources(), DUMMY_VERSION);
+
+        AtomicReference<PackCompatibility> packCompatibility = new AtomicReference<>(null);
+
+        repositorySource.loadPacks((pack) -> packCompatibility.set(pack.getCompatibility()));
+
+        assertEquals(PackCompatibility.COMPATIBLE, packCompatibility.get());
     }
 
 }

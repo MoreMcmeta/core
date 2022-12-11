@@ -19,10 +19,10 @@ package io.github.soir20.moremcmeta.client.io;
 
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.datafixers.util.Pair;
 import io.github.soir20.moremcmeta.client.adapter.NativeImageAdapter;
 import io.github.soir20.moremcmeta.client.resource.ModAnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
+import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 import net.minecraft.server.packs.resources.ResourceMetadata;
 
@@ -68,11 +68,11 @@ public class TextureDataReader implements TextureReader<TextureData<NativeImageA
         TextureMetadataSection textureMetadata =
                 metadata.getSection(TextureMetadataSection.SERIALIZER).orElse(null);
 
-        Pair<Integer, Integer> frameSize = animationMetadata.getFrameSize(image.getWidth(), image.getHeight());
+        FrameSize frameSize = animationMetadata.calculateFrameSize(image.getWidth(), image.getHeight());
 
         TextureData<NativeImageAdapter> data = new TextureData<>(
-                frameSize.getFirst(),
-                frameSize.getSecond(),
+                frameSize.width(),
+                frameSize.height(),
                 new NativeImageAdapter(image, 0)
         );
 

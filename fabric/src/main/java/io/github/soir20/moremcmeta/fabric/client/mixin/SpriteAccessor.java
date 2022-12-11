@@ -18,6 +18,7 @@
 package io.github.soir20.moremcmeta.fabric.client.mixin;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -26,14 +27,14 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * Allows the {@link TextureAtlasSprite}'s mipmaps to be accessed.
  * @author soir20
  */
-@Mixin(TextureAtlasSprite.class)
+@Mixin(SpriteContents.class)
 public interface SpriteAccessor {
 
     /**
      * Makes the atlas sprite's mipmaps accessible.
      * @return the atlas sprite's mipmaps
      */
-    @Accessor("mainImage")
-    NativeImage[] getMainImage();
+    @Accessor("byMipLevel")
+    NativeImage[] getMipmaps();
 
 }

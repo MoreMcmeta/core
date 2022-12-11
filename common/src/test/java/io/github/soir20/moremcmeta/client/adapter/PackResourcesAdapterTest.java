@@ -22,6 +22,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.resources.IoSupplier;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -32,9 +33,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link PackResourcesAdapter}.
@@ -342,24 +344,19 @@ public class PackResourcesAdapterTest {
     private static class ExceptionPackResources implements PackResources {
 
         @Override
-        public InputStream getRootResource(String string) {
+        public IoSupplier<InputStream> getRootResource(String... strings) {
             throw new RuntimeException("dummy getRootResource exception");
         }
 
         @Override
-        public InputStream getResource(PackType packType, ResourceLocation resourceLocation) {
+        public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation resourceLocation) {
             throw new RuntimeException("dummy getResource exception");
         }
 
         @Override
-        public Collection<ResourceLocation> getResources(PackType packType, String namespace, String pathStart,
-                                                         Predicate<ResourceLocation> fileFilter) {
+        public void listResources(PackType packType, String namespace, String pathStart,
+                                  ResourceOutput resourceOutput) {
             throw new RuntimeException("dummy getResources exception");
-        }
-
-        @Override
-        public boolean hasResource(PackType packType, ResourceLocation resourceLocation) {
-            throw new RuntimeException("dummy hasResource exception");
         }
 
         @Override
@@ -373,7 +370,7 @@ public class PackResourcesAdapterTest {
         }
 
         @Override
-        public String getName() {
+        public String packId() {
             throw new RuntimeException("dummy getName exception");
         }
 

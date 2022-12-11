@@ -91,7 +91,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
                     return mipmaps.length - 1;
                 }
 
-                logger.error("Unable to retrieve mipmaps for TextureAtlasSprite " + sprite.getName()
+                logger.error("Unable to retrieve mipmaps for TextureAtlasSprite " + sprite.contents().name()
                         + ". Defaulting to mipmap level 0 for this sprite.");
             } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
                 logger.error("Unable to access TextureAtlasSprite's mipmap field. " +

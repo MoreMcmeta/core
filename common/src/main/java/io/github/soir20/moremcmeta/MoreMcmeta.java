@@ -35,6 +35,7 @@ import io.github.soir20.moremcmeta.client.texture.LazyTextureManager;
 import io.github.soir20.moremcmeta.client.texture.SpriteFinder;
 import io.github.soir20.moremcmeta.client.texture.TextureFinisher;
 import io.github.soir20.moremcmeta.client.texture.TexturePreparer;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
@@ -111,14 +112,17 @@ public abstract class MoreMcmeta {
                     .map(Pack::getId)
                     .toList();
 
-            ModRepositorySource source = new ModRepositorySource(() -> {
-                OrderedResourceRepository repository = getResourceRepository(packRepository);
+            ModRepositorySource source = new ModRepositorySource(
+                    (pack_id) -> {
+                        OrderedResourceRepository repository = getResourceRepository(packRepository);
 
-                List<String> currentPackIds = packIdGetter.get();
+                        List<String> currentPackIds = packIdGetter.get();
 
-                cache.load(repository, Set.of("textures", "optifine"), currentPackIds);
-                return new SpriteFrameSizeFixPack(cache.get(currentPackIds), repository);
-            });
+                        cache.load(repository, Set.of("textures", "optifine"), currentPackIds);
+                        return new SpriteFrameSizeFixPack(cache.get(currentPackIds), repository);
+                    },
+                    SharedConstants.getCurrentVersion()
+            );
 
             addRepositorySource(packRepository, source);
 

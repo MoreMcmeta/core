@@ -68,7 +68,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return the mipmap level getter
      */
     protected ToIntFunction<TextureAtlasSprite> getMipmapLevelGetter(Logger logger) {
-        return (sprite) -> ((SpriteAccessor) sprite).getMainImage().length - 1;
+        return (sprite) -> ((SpriteAccessor) sprite.contents()).getMipmaps().length - 1;
     }
 
     /**

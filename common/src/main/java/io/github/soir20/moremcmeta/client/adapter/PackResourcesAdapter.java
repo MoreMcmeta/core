@@ -21,10 +21,12 @@ import io.github.soir20.moremcmeta.client.resource.ResourceCollection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.IoSupplier;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -56,7 +58,13 @@ public class PackResourcesAdapter implements ResourceCollection {
     public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
-        return ORIGINAL.getResource(resourceType, location);
+
+        IoSupplier<InputStream> resourceSupplier = ORIGINAL.getResource(resourceType, location);
+        if (resourceSupplier == null) {
+            throw new IOException(String.format("Could not find %s in pack type %s", location, resourceType));
+        }
+
+        return resourceSupplier.get();
     }
 
     /**
@@ -69,7 +77,7 @@ public class PackResourcesAdapter implements ResourceCollection {
     public boolean hasResource(PackType resourceType, ResourceLocation location) {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
-        return ORIGINAL.hasResource(resourceType, location);
+        return ORIGINAL.getResource(resourceType, location) != null;
     }
 
     /**
@@ -87,7 +95,17 @@ public class PackResourcesAdapter implements ResourceCollection {
         requireNonNull(namespace, "Namespace cannot be null");
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(fileFilter, "File filter cannot be null");
-        return ORIGINAL.getResources(resourceType, namespace, pathStart, fileFilter);
+
+        Set<ResourceLocation> resources = new HashSet<>();
+        PackResources.ResourceOutput output = (location, resourceSupplier) -> {
+            if (fileFilter.test(location)) {
+                resources.add(location);
+            }
+        };
+
+        ORIGINAL.listResources(resourceType, namespace, pathStart, output);
+
+        return resources;
     }
 
 

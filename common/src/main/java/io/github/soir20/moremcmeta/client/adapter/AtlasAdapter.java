@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
@@ -74,12 +75,12 @@ public class AtlasAdapter implements Atlas {
         ResourceLocation properSpriteName = makeSpriteName(location);
 
         TextureAtlasSprite sprite = ATLAS.getSprite(properSpriteName);
-        if (sprite == null || sprite.getName() == MissingTextureAtlasSprite.getLocation()) {
+        if (sprite == null || sprite.contents().name() == MissingTextureAtlasSprite.getLocation()) {
             sprite = ATLAS.getSprite(location);
         }
 
         // Check the original location in case another mod added it by that name
-        if (sprite == null || sprite.getName() == MissingTextureAtlasSprite.getLocation()) {
+        if (sprite == null || sprite.contents().name() == MissingTextureAtlasSprite.getLocation()) {
             return Optional.empty();
         }
 
@@ -106,6 +107,7 @@ public class AtlasAdapter implements Atlas {
      */
     private static class SpriteAdapter implements Sprite {
         private final TextureAtlasSprite SPRITE;
+        private final AbstractTexture ATLAS;
         private final Point UPLOAD_POINT;
         private final int MIPMAP_LEVEL;
 
@@ -116,13 +118,24 @@ public class AtlasAdapter implements Atlas {
          */
         public SpriteAdapter(TextureAtlasSprite sprite, int mipmapLevel) {
             SPRITE = sprite;
-            UPLOAD_POINT = findUploadPoint();
+            UPLOAD_POINT = new Point(SPRITE.getX(), SPRITE.getY());
 
             if (mipmapLevel < 0) {
                 throw new IllegalArgumentException("Sprite cannot have negative mipmaps");
             }
-
             MIPMAP_LEVEL = mipmapLevel;
+
+            TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+            ATLAS = textureManager.getTexture(sprite.atlasLocation(), MissingTextureAtlasSprite.getTexture());
+            if (ATLAS == MissingTextureAtlasSprite.getTexture()) {
+                throw new IllegalStateException(
+                        String.format(
+                                "Sprite %s was created before its atlas %s",
+                                sprite.contents().name(),
+                                sprite.atlasLocation()
+                        )
+                );
+            }
         }
 
         /**
@@ -130,7 +143,7 @@ public class AtlasAdapter implements Atlas {
          */
         @Override
         public void bind() {
-            SPRITE.atlas().bind();
+            ATLAS.bind();
         }
 
         /**
@@ -139,7 +152,7 @@ public class AtlasAdapter implements Atlas {
          */
         @Override
         public ResourceLocation getName() {
-            return SPRITE.getName();
+            return SPRITE.contents().name();
         }
 
         /**
@@ -159,25 +172,6 @@ public class AtlasAdapter implements Atlas {
         @Override
         public int getMipmapLevel() {
             return MIPMAP_LEVEL;
-        }
-
-        /**
-         * Gets a sprite's x and y coordinates of its top left corner in its texture atlas.
-         * @return the x and y coordinates of the sprite's top left corner
-         */
-        private Point findUploadPoint() {
-            String spriteStr = SPRITE.toString();
-            int labelLength = 2;
-
-            int xLabelIndex = spriteStr.indexOf("x=");
-            int xDelimiterIndex = spriteStr.indexOf(',', xLabelIndex);
-            int x = Integer.parseInt(spriteStr.substring(xLabelIndex + labelLength, xDelimiterIndex));
-
-            int yLabelIndex = spriteStr.indexOf("y=");
-            int yDelimiterIndex = spriteStr.indexOf(',', yLabelIndex);
-            int y = Integer.parseInt(spriteStr.substring(yLabelIndex + labelLength, yDelimiterIndex));
-
-            return new Point(x, y);
         }
 
     }
