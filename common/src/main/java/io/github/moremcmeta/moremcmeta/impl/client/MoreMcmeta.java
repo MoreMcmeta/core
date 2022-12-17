@@ -145,6 +145,8 @@ public abstract class MoreMcmeta {
         List<ClientPlugin> allPlugins = Stream.concat(texturePlugins.stream(), readerPlugins.stream()).toList();
         checkItemConflict(allPlugins, ClientPlugin::displayName, "display name");
 
+        logPluginList(allPlugins, logger);
+
         // Texture manager
         SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
         TextureFinisher finisher = new TextureFinisher(spriteFinder, preparer());
@@ -458,6 +460,19 @@ public abstract class MoreMcmeta {
         }
 
         return readers.build();
+    }
+
+    /**
+     * Writes a list of all plugins to the log.
+     * @param plugins       list of loaded plugins
+     * @param logger        logger to use to log the list
+     */
+    private void logPluginList(Collection<ClientPlugin> plugins, Logger logger) {
+        String pluginList = plugins.stream()
+                .map((plugin) -> "\n\t- " + plugin.displayName())
+                .collect(Collectors.joining());
+
+        logger.info(String.format("Loading %s MoreMcmeta plugins:", plugins.size()) + pluginList);
     }
 
     /**
