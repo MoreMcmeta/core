@@ -127,14 +127,14 @@ public class AreaTest {
         expectedException.expect(NoSuchElementException.class);
         iterator.next();
     }@Test
-    public void buildVisibleArea_NoPoints_Empty() {
+    public void buildArea_NoPoints_Empty() {
         Area.Builder builder = new Area.Builder();
         Area area = builder.build();
         assertFalse(area.iterator().hasNext());
     }
 
     @Test
-    public void buildVisibleArea_OrderedPoints_AllAdded() {
+    public void buildArea_OrderedPoints_AllAdded() {
         Area.Builder builder = new Area.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
@@ -165,7 +165,7 @@ public class AreaTest {
     }
 
     @Test
-    public void buildVisibleArea_UnorderedPoints_AllAdded() {
+    public void buildArea_UnorderedPoints_AllAdded() {
         Area.Builder builder = new Area.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(2, 2));
@@ -196,7 +196,7 @@ public class AreaTest {
     }
 
     @Test
-    public void buildVisibleArea_NegativePoints_AllAdded() {
+    public void buildArea_NegativePoints_AllAdded() {
         Area.Builder builder = new Area.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(-2, 0));
@@ -226,7 +226,7 @@ public class AreaTest {
     }
 
     @Test
-    public void buildVisibleArea_DuplicatePoints_AreaDoesNotDuplicatePoints() {
+    public void buildArea_DuplicatePoints_AreaDoesNotDuplicatePoints() {
         Area.Builder builder = new Area.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
@@ -263,7 +263,7 @@ public class AreaTest {
     }
 
     @Test
-    public void buildVisibleArea_SinglePixelFirstInRow_AllAdded() {
+    public void buildArea_SinglePixelFirstInRow_AllAdded() {
         Area.Builder builder = new Area.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
@@ -293,7 +293,7 @@ public class AreaTest {
     }
 
     @Test
-    public void buildVisibleArea_SinglePixelMiddleInRow_AllAdded() {
+    public void buildArea_SinglePixelMiddleInRow_AllAdded() {
         Area.Builder builder = new Area.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
@@ -325,7 +325,7 @@ public class AreaTest {
     }
 
     @Test
-    public void buildVisibleArea_SinglePixelLastInRow_AllAdded() {
+    public void buildArea_SinglePixelLastInRow_AllAdded() {
         Area.Builder builder = new Area.Builder();
         List<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
