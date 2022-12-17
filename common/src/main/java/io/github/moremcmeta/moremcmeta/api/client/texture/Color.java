@@ -105,6 +105,24 @@ public final class Color {
     }
 
     /**
+     * Check whether this color is the same as another object. This method is identical to {@link #equals(Object)},
+     * but two {@link Color}s are considered equal if they are both fully transparent, even if their RGB components
+     * differ.
+     * @param other     the object to compare this color to
+     * @return true if the other object is a color with the same components or false otherwise
+     */
+    public boolean equalsOrBothInvisible(Object other) {
+        if (!(other instanceof Color otherAsColor)) {
+            return false;
+        }
+
+        return (alpha() == 0 && otherAsColor.alpha() == 0) || (alpha() == otherAsColor.alpha()
+                && red() == otherAsColor.red()
+                && green() == otherAsColor.green()
+                && blue() == otherAsColor.blue());
+    }
+
+    /**
      * Check whether this color is the same as another object.
      * @param other     the object to compare this color to
      * @return true if the other object is a color with the same components or false otherwise

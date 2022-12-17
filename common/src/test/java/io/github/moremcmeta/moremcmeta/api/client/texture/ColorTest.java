@@ -176,6 +176,61 @@ public class ColorTest {
     }
 
     @Test
+    public void equalsOrBothInvisible_SameColors_Reflexive() {
+        Color first = new Color(1, 2, 3, 4);
+        assertTrue(first.equalsOrBothInvisible(first));
+    }
+
+    @Test
+    public void equalsOrBothInvisible_SameColors_Symmetric() {
+        Color first = new Color(1, 2, 3, 4);
+        Color second = new Color(1, 2, 3, 4);
+        assertTrue(first.equalsOrBothInvisible(second));
+        assertTrue(second.equalsOrBothInvisible(first));
+    }
+
+    @Test
+    public void equalsOrBothInvisible_SameColors_Transitive() {
+        Color first = new Color(1, 2, 3, 4);
+        Color second = new Color(1, 2, 3, 4);
+        Color third = new Color(1, 2, 3, 4);
+        assertTrue(first.equalsOrBothInvisible(second));
+        assertTrue(second.equalsOrBothInvisible(third));
+        assertTrue(first.equalsOrBothInvisible(third));
+    }
+
+    @Test
+    public void equalsOrBothInvisible_DiffColors_Symmetric() {
+        Color first = new Color(1, 2, 3, 4);
+        Color second = new Color(4, 3, 2, 1);
+        assertFalse(first.equalsOrBothInvisible(second));
+        assertFalse(second.equalsOrBothInvisible(first));
+    }
+
+    @Test
+    public void equalsOrBothInvisible_DiffTypes_False() {
+        Color first = new Color(1, 2, 3, 4);
+        Object second = new Object();
+        assertFalse(first.equalsOrBothInvisible(second));
+    }
+
+    @Test
+    public void equalsOrBothInvisible_BothTransparentDiffComponents_Symmetric() {
+        Color first = new Color(4, 2, 3, 0);
+        Color second = new Color(7, 3, 5, 0);
+        assertTrue(first.equalsOrBothInvisible(second));
+        assertTrue(second.equalsOrBothInvisible(first));
+    }
+
+    @Test
+    public void equalsOrBothInvisible_BothPartiallyTransparentDiffComponents_Symmetric() {
+        Color first = new Color(4, 2, 3, 10);
+        Color second = new Color(7, 3, 5, 10);
+        assertFalse(first.equalsOrBothInvisible(second));
+        assertFalse(second.equalsOrBothInvisible(first));
+    }
+
+    @Test
     public void equals_SameColors_Reflexive() {
         Color first = new Color(1, 2, 3, 4);
         assertEquals(first, first);
