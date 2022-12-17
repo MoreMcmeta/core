@@ -68,7 +68,8 @@ subprojects {
         // Include plugins by default
         def final INCLUDE_DEFAULT_PLUGINS = (System.getenv("INCLUDE_DEFAULT_PLUGINS") ?: "true").toBoolean()
         if (INCLUDE_DEFAULT_PLUGINS) {
-            include "io.github.moremcmeta:json-reader-plugin-${project.name}:${project.jsonReaderVersion}"
+            modRuntimeOnly(include("io.github.moremcmeta:json-reader-plugin-${project.name}:${project.jsonReaderVersion}"))
+            modRuntimeOnly(include("io.github.moremcmeta:animation-plugin-${project.name}:${project.animationVersion}"))
         }
 
         testImplementation "junit:junit:${project.junitVersion}"
