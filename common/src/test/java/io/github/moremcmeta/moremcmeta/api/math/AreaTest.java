@@ -126,7 +126,9 @@ public class AreaTest {
 
         expectedException.expect(NoSuchElementException.class);
         iterator.next();
-    }@Test
+    }
+
+    @Test
     public void buildArea_NoPoints_Empty() {
         Area.Builder builder = new Area.Builder();
         Area area = builder.build();
