@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Represents an unordered collection of points.
  * @author soir20
@@ -135,6 +137,15 @@ public final class Area implements Iterable<Point> {
             }
 
             ROWS.get(y).add(x);
+        }
+
+        /**
+         * Adds a pixel to the area.
+         * @param point     coordinate of the pixel to add
+         */
+        public void addPixel(Point point) {
+            requireNonNull(point, "Point cannot be null");
+            addPixel(point.x(), point.y());
         }
 
         /**

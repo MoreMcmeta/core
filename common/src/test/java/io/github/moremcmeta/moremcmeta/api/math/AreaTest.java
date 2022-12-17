@@ -358,6 +358,236 @@ public class AreaTest {
         assertEquals(points.size(), areaPoints.size());
     }
 
+    @Test
+    public void buildAreaPointObjects_NullPoint_NullPointerException() {
+        Area.Builder builder = new Area.Builder();
+        expectedException.expect(NullPointerException.class);
+        builder.addPixel(null);
+    }
+
+    @Test
+    public void buildAreaPointObjects_OrderedPoints_AllAdded() {
+        Area.Builder builder = new Area.Builder();
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 1));
+        points.add(new Point(0, 2));
+        points.add(new Point(1, 3));
+        points.add(new Point(1, 4));
+        points.add(new Point(1, 8));
+        points.add(new Point(1, 9));
+        points.add(new Point(2, 0));
+        points.add(new Point(2, 1));
+        points.add(new Point(2, 2));
+        points.add(new Point(2, 3));
+
+        for (Point point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Point> areaPoints = new ArrayList<>();
+        for (Point point : area) {
+            areaPoints.add(point);
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+    }
+
+    @Test
+    public void buildAreaPointObjects_UnorderedPoints_AllAdded() {
+        Area.Builder builder = new Area.Builder();
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(2, 2));
+        points.add(new Point(0, 0));
+        points.add(new Point(1, 3));
+        points.add(new Point(2, 3));
+        points.add(new Point(1, 8));
+        points.add(new Point(0, 1));
+        points.add(new Point(2, 1));
+        points.add(new Point(1, 4));
+        points.add(new Point(0, 2));
+        points.add(new Point(2, 0));
+        points.add(new Point(1, 9));
+
+        for (Point point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Point> areaPoints = new ArrayList<>();
+        for (Point point : area) {
+            areaPoints.add(point);
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+    }
+
+    @Test
+    public void buildAreaPointObjects_NegativePoints_AllAdded() {
+        Area.Builder builder = new Area.Builder();
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(-2, 0));
+        points.add(new Point(-2, 1));
+        points.add(new Point(-2, 2));
+        points.add(new Point(-2, 3));
+        points.add(new Point(-1, -9));
+        points.add(new Point(-1, -8));
+        points.add(new Point(-1, -4));
+        points.add(new Point(-1, -3));
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 1));
+        points.add(new Point(0, 2));
+        for (Point point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Point> areaPoints = new ArrayList<>();
+        for (Point point : area) {
+            areaPoints.add(point);
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+    }
+
+    @Test
+    public void buildAreaPointObjects_DuplicatePoints_AreaDoesNotDuplicatePoints() {
+        Area.Builder builder = new Area.Builder();
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 1));
+        points.add(new Point(0, 1));
+        points.add(new Point(0, 2));
+        points.add(new Point(1, 3));
+        points.add(new Point(1, 4));
+        points.add(new Point(1, 8));
+        points.add(new Point(1, 9));
+        points.add(new Point(1, 9));
+        points.add(new Point(1, 9));
+        points.add(new Point(2, 0));
+        points.add(new Point(2, 1));
+        points.add(new Point(2, 2));
+        points.add(new Point(2, 2));
+        points.add(new Point(2, 2));
+        points.add(new Point(2, 3));
+        points.add(new Point(1, 9));
+        points.add(new Point(1, 9));
+        for (Point point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Point> areaPoints = new ArrayList<>();
+        for (Point point : area) {
+            areaPoints.add(point);
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertTrue(areaPoints.stream().allMatch(new HashSet<Point>()::add));
+    }
+
+    @Test
+    public void buildAreaPointObjects_SinglePixelFirstInRow_AllAdded() {
+        Area.Builder builder = new Area.Builder();
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 1));
+        points.add(new Point(0, 2));
+        points.add(new Point(1, 3));
+        points.add(new Point(1, 8));
+        points.add(new Point(1, 9));
+        points.add(new Point(2, 0));
+        points.add(new Point(2, 1));
+        points.add(new Point(2, 2));
+        points.add(new Point(2, 3));
+
+        for (Point point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Point> areaPoints = new ArrayList<>();
+        for (Point point : area) {
+            areaPoints.add(point);
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+    }
+
+    @Test
+    public void buildAreaPointObjects_SinglePixelMiddleInRow_AllAdded() {
+        Area.Builder builder = new Area.Builder();
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 1));
+        points.add(new Point(0, 2));
+        points.add(new Point(1, 3));
+        points.add(new Point(1, 4));
+        points.add(new Point(1, 8));
+        points.add(new Point(1, 12));
+        points.add(new Point(1, 13));
+        points.add(new Point(2, 0));
+        points.add(new Point(2, 1));
+        points.add(new Point(2, 2));
+        points.add(new Point(2, 3));
+
+        for (Point point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Point> areaPoints = new ArrayList<>();
+        for (Point point : area) {
+            areaPoints.add(point);
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+    }
+
+    @Test
+    public void buildAreaPointObjects_SinglePixelLastInRow_AllAdded() {
+        Area.Builder builder = new Area.Builder();
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 1));
+        points.add(new Point(0, 2));
+        points.add(new Point(1, 3));
+        points.add(new Point(1, 4));
+        points.add(new Point(1, 8));
+        points.add(new Point(1, 9));
+        points.add(new Point(1, 13));
+        points.add(new Point(2, 0));
+        points.add(new Point(2, 1));
+        points.add(new Point(2, 2));
+        points.add(new Point(2, 3));
+
+        for (Point point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Point> areaPoints = new ArrayList<>();
+        for (Point point : area) {
+            areaPoints.add(point);
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+    }
+
     private static void testIteratedRectangle(Area rect, int topLeftX, int topLeftY, int width, int height) {
         Set<Point> expectedPoints = new HashSet<>();
         for (int x = 0; x <= width - 1; x++) {
