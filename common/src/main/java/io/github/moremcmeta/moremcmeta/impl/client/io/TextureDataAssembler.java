@@ -48,8 +48,10 @@ import static java.util.Objects.requireNonNull;
  */
 public class TextureDataAssembler<I extends CloseableImage> {
 
-    // A close component is added in this class, and an upload component is added later
-    private final static int DEFAULT_COMPONENTS = 2;
+    /** An upload component is added later, so an additional layer is needed. */
+    public final static int EXTERNAL_DEFAULT_COMPONENTS = 1;
+
+    private final static int INTERNAL_DEFAULT_COMPONENTS = 1;
 
     private final ImageAllocator ALLOCATOR;
     private final Function<? super I, ? extends List<? extends I>> MIPMAP_GENERATOR;
@@ -81,7 +83,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
         boolean clamp = data.clamp();
 
         // Create frames
-        int layers = data.parsedMetadata().size() + DEFAULT_COMPONENTS;
+        int layers = data.parsedMetadata().size() + EXTERNAL_DEFAULT_COMPONENTS + INTERNAL_DEFAULT_COMPONENTS;
         List<? extends I> mipmaps = MIPMAP_GENERATOR.apply(original);
         ImmutableList<CloseableImageFrame> frames = getFrames(
                 mipmaps,

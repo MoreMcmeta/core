@@ -25,10 +25,11 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.CoreTextureComponent;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
 import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Rule;
 import org.junit.Test;
@@ -303,14 +304,14 @@ public class TextureDataAssemblerTest {
                 }
         );
 
-        EventDrivenTexture texture = assembler.assemble(new TextureData<>(
+        EventDrivenTexture texture = addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<>() {}
                 ))
-        )).build();
+        ))).build();
 
         allocatedImages.forEach((image) -> assertFalse(image.isClosed()));
         texture.close();
@@ -331,7 +332,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -339,7 +340,7 @@ public class TextureDataAssemblerTest {
                     assertEquals(30, frames.frame(0).width());
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
     }
 
     @Test
@@ -358,7 +359,7 @@ public class TextureDataAssemblerTest {
 
         MutableFrameView[] frameView = new MutableFrameView[1];
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -366,7 +367,7 @@ public class TextureDataAssemblerTest {
                     frameView[0] = frames.frame(0);
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
 
         expectedException.expect(FrameView.IllegalFrameReference.class);
         frameView[0].width();
@@ -386,7 +387,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -394,7 +395,7 @@ public class TextureDataAssemblerTest {
                     assertEquals(40, frames.frame(0).height());
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
     }
 
     @Test
@@ -413,7 +414,7 @@ public class TextureDataAssemblerTest {
 
         MutableFrameView[] frameView = new MutableFrameView[1];
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -421,7 +422,7 @@ public class TextureDataAssemblerTest {
                     frameView[0] = frames.frame(0);
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
 
         expectedException.expect(FrameView.IllegalFrameReference.class);
         frameView[0].height();
@@ -441,7 +442,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -449,7 +450,7 @@ public class TextureDataAssemblerTest {
                     assertEquals(1, (int) frames.frame(1).index().orElseThrow());
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
     }
 
     @Test
@@ -674,7 +675,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -682,7 +683,7 @@ public class TextureDataAssemblerTest {
                     frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0), new Point(20, 25)), Area.of());
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
 
         /* The CloseableImageFrame logic is already tested, so focus on just testing that the transformation was
            applied to the original image. Re-creating all the tests would be time-consuming while providing
@@ -837,7 +838,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -849,7 +850,7 @@ public class TextureDataAssemblerTest {
                     );
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
 
         /* The CloseableImageFrame logic is already tested, so focus on just testing that the transformation was
            applied to the original image. Re-creating all the tests would be time-consuming while providing
@@ -875,7 +876,7 @@ public class TextureDataAssemblerTest {
 
         MutableFrameView[] frameView = new MutableFrameView[1];
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -883,7 +884,7 @@ public class TextureDataAssemblerTest {
                     frameView[0] = frames.frame(0);
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
 
         expectedException.expect(FrameView.IllegalFrameReference.class);
         frameView[0].transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of());
@@ -955,7 +956,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        assembler.assemble(new TextureData<>(
+        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
@@ -963,7 +964,15 @@ public class TextureDataAssemblerTest {
                     assertEquals(6, frames.frames());
                     return new TextureComponent<>() {};
                 }))
-        )).build();
+        ))).build();
+    }
+
+    private EventDrivenTexture.Builder addExtraDefaultComponents(EventDrivenTexture.Builder builder) {
+        for (int index = 0; index < TextureDataAssembler.EXTERNAL_DEFAULT_COMPONENTS; index++) {
+            builder.add(new CoreTextureComponent() {});
+        }
+
+        return builder;
     }
 
 }
