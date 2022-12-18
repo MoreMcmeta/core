@@ -129,6 +129,13 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
             ));
         }
 
+        if (frameWidth <= 0) {
+            throw new InvalidMetadataException("Frame width cannot be zero or negative: " + frameWidth);
+        }
+        if (frameHeight <= 0) {
+            throw new InvalidMetadataException("Frame height cannot be zero or negative: " + frameHeight);
+        }
+
         TextureData.FrameSize frameSize = new TextureData.FrameSize(frameWidth, frameHeight);
 
         return new TextureData<>(

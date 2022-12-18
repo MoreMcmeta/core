@@ -861,10 +861,90 @@ public class TextureDataReaderTest {
     }
 
     @Test
+    public void read_FrameWidthZero_InvalidMetadataException() throws IOException, InvalidMetadataException {
+        List<MockPlugin> plugins = List.of(
+                new MockPlugin("animation", 0, 100, null, null, null),
+                new MockPlugin("texture", 0, 100, null, null, null)
+        );
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage(),
+                (image, blur, clamp) -> image
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        reader.read(
+                DEMO_TEXTURE_STREAM,
+                new MockMetadataView(Arrays.asList("animation", "texture"))
+        );
+    }
+
+    @Test
+    public void read_FrameWidthNegative_InvalidMetadataException() throws IOException, InvalidMetadataException {
+        List<MockPlugin> plugins = List.of(
+                new MockPlugin("animation", -100, 100, null, null, null),
+                new MockPlugin("texture", -100, 100, null, null, null)
+        );
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage(),
+                (image, blur, clamp) -> image
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        reader.read(
+                DEMO_TEXTURE_STREAM,
+                new MockMetadataView(Arrays.asList("animation", "texture"))
+        );
+    }
+
+    @Test
     public void read_FrameHeightLargerThanImage_InvalidMetadataException() throws IOException, InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", 100, 1000, null, null, null),
                 new MockPlugin("texture", 100, 1000, null, null, null)
+        );
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage(),
+                (image, blur, clamp) -> image
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        reader.read(
+                DEMO_TEXTURE_STREAM,
+                new MockMetadataView(Arrays.asList("animation", "texture"))
+        );
+    }
+
+    @Test
+    public void read_FrameHeightZero_InvalidMetadataException() throws IOException, InvalidMetadataException {
+        List<MockPlugin> plugins = List.of(
+                new MockPlugin("animation", 100, 0, null, null, null),
+                new MockPlugin("texture", 100, 0, null, null, null)
+        );
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage(),
+                (image, blur, clamp) -> image
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        reader.read(
+                DEMO_TEXTURE_STREAM,
+                new MockMetadataView(Arrays.asList("animation", "texture"))
+        );
+    }
+
+    @Test
+    public void read_FrameHeightNegative_InvalidMetadataException() throws IOException, InvalidMetadataException {
+        List<MockPlugin> plugins = List.of(
+                new MockPlugin("animation", 100, -100, null, null, null),
+                new MockPlugin("texture", 100, -100, null, null, null)
         );
 
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
