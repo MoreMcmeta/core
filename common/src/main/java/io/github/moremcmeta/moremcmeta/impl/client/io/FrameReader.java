@@ -24,7 +24,7 @@ import java.util.function.Function;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Creates all the frames in an animated texture. It is reusable for all images with the given type of frame.
+ * Creates all the frames in a multi-frame texture. It is reusable for all images with the given type of frame.
  * @param <F>   tickable texture type
  * @author soir20
  */
@@ -45,7 +45,7 @@ public class FrameReader<F> {
      * @param imageHeight       the height of the source image
      * @param frameWidth        the width of a frame in the source image
      * @param frameHeight       the height of a frame in the source image
-     * @return frames that can be used in an animated texture
+     * @return frames that can be used in a multi-frame texture
      */
     public ImmutableList<F> read(int imageWidth, int imageHeight, int frameWidth, int frameHeight) {
 

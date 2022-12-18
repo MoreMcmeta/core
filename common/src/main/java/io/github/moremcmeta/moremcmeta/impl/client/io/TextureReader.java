@@ -32,14 +32,13 @@ import java.io.InputStream;
 public interface TextureReader<T> {
 
     /**
-     * Reads an animated texture from file data.
+     * Reads a texture from file data.
      * @param textureStream     input stream of image data
      * @param metadata          metadata associated with this texture
-     * @return getter for retrieving an animated texture after all resources are loaded
+     * @return texture read from the stream
      * @throws IOException failure reading from either input stream
      * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
-    T read(InputStream textureStream, MetadataView metadata)
-            throws IOException, InvalidMetadataException;
+    T read(InputStream textureStream, MetadataView metadata) throws IOException, InvalidMetadataException;
 
 }

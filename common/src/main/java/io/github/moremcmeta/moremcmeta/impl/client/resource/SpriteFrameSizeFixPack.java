@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Provides dummy metadata for mod-animated atlas sprites when vanilla metadata is requested.
+ * Provides dummy metadata for MoreMcmeta-controlled atlas sprites when vanilla metadata is requested.
  * This prevents the atlas sprites from being "squished" because only the first frame is stitched
  * onto the atlas, not all of them.
  * @author soir20
@@ -110,7 +110,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
                     makeEmptyAnimationJson(frameWidth, frameHeight).getBytes(StandardCharsets.UTF_8)
             );
         } else if (!isKnownTexture) {
-            throw new IOException("Requested non-animated resource from MoreMcmeta's internal pack");
+            throw new IOException("Requested non-MoreMcmeta-controlled resource from MoreMcmeta's internal pack");
         }
 
         // Don't let a potential bug be silenced as an IOException

@@ -564,7 +564,7 @@ public abstract class MoreMcmeta {
         }
 
         /**
-         * Loads textures and adds the resource pack to fix animated sprites.
+         * Loads textures and adds the resource pack to fix MoreMcmeta-controlled sprites.
          * @param manager           Minecraft's resource manager
          * @param loadProfiler      load stage profiler
          * @param loadExecutor          asynchronously executes load stage tasks

@@ -204,10 +204,10 @@ public final class MoreMcmetaForge extends MoreMcmeta {
             );
         } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
             logger.error("Unable to access LoadingOverlay's reload instance field. " +
-                    "Animated atlas sprites will be squished!");
+                    "MoreMcmeta-controlled atlas sprites will be squished!");
         } catch (ObfuscationReflectionHelper.UnableToFindFieldException err) {
             logger.error("Unable to find LoadingOverlay's reload instance field. " +
-                    "Animated atlas sprites will be squished!");
+                    "MoreMcmeta-controlled atlas sprites will be squished!");
         }
 
         return Optional.empty();

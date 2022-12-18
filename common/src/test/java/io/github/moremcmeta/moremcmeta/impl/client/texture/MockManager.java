@@ -30,19 +30,19 @@ import java.util.Map;
  */
 public class MockManager<R> implements Manager<R> {
     private final Map<ResourceLocation, R> TEXTURES;
-    private final Map<ResourceLocation, Tickable> ANIMATED_TEXTURES;
+    private final Map<ResourceLocation, Tickable> TICKABLE_TEXTURES;
 
     public MockManager() {
         TEXTURES = new HashMap<>();
-        ANIMATED_TEXTURES = new HashMap<>();
+        TICKABLE_TEXTURES = new HashMap<>();
     }
 
     @Override
     public void register(ResourceLocation textureLocation, R textureObj) {
         TEXTURES.put(textureLocation, textureObj);
-        ANIMATED_TEXTURES.remove(textureLocation);
+        TICKABLE_TEXTURES.remove(textureLocation);
         if (textureObj instanceof Tickable) {
-            ANIMATED_TEXTURES.put(textureLocation, (Tickable) textureObj);
+            TICKABLE_TEXTURES.put(textureLocation, (Tickable) textureObj);
         }
     }
 
@@ -52,7 +52,7 @@ public class MockManager<R> implements Manager<R> {
     }
 
     public void tick() {
-        ANIMATED_TEXTURES.values().forEach(Tickable::tick);
+        TICKABLE_TEXTURES.values().forEach(Tickable::tick);
     }
 
     public R texture(ResourceLocation location) {

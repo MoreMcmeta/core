@@ -33,7 +33,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> implements Manager<I> {
     private final Manager<? super AbstractTexture> DELEGATE;
-    private final Map<ResourceLocation, CustomTickable> ANIMATED_TEXTURES;
+    private final Map<ResourceLocation, CustomTickable> TICKABLE_TEXTURES;
     private final Finisher<? super I, ? extends O> FINISHER;
 
     /**
@@ -44,7 +44,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
     public LazyTextureManager(Manager<? super AbstractTexture> delegate,
                               Finisher<? super I, ? extends O> finisher) {
         DELEGATE = requireNonNull(delegate, "Delegate manager cannot be null");
-        ANIMATED_TEXTURES = new HashMap<>();
+        TICKABLE_TEXTURES = new HashMap<>();
         FINISHER = requireNonNull(finisher, "Finisher cannot be null");
     }
 
@@ -77,7 +77,7 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
 
         textures.forEach((location, texture) -> {
             DELEGATE.register(location, texture);
-            ANIMATED_TEXTURES.put(location, texture);
+            TICKABLE_TEXTURES.put(location, texture);
         });
     }
 
@@ -90,15 +90,15 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
         requireNonNull(textureLocation, "Texture location cannot be null");
 
         DELEGATE.unregister(textureLocation);
-        ANIMATED_TEXTURES.remove(textureLocation);
+        TICKABLE_TEXTURES.remove(textureLocation);
     }
 
     /**
-     * Updates all animated textures that were loaded through this manager.
+     * Updates all tickable textures that were loaded through this manager.
      */
     @Override
     public void tick() {
-        ANIMATED_TEXTURES.values().forEach(CustomTickable::tick);
+        TICKABLE_TEXTURES.values().forEach(CustomTickable::tick);
     }
 
 }

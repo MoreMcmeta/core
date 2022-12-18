@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Loads animated textures during resource reloading.
+ * Loads textures during resource reloading.
  * @param <R> resource type
  * @author soir20
  */

@@ -41,7 +41,7 @@ public interface Manager<R> extends CustomTickable {
     void unregister(ResourceLocation location);
 
     /**
-     * Updates all animated resources that were loaded through this manager.
+     * Updates all tickable resources that were loaded through this manager.
      */
     void tick();
 
