@@ -100,7 +100,7 @@ public class FrameReaderTest {
     }
 
     @Test
-    public void findFrames_DefinedHeightNotMultipleOfSize_IllegalArgException() {
+    public void findFrames_DefinedHeightNotMultipleOfSize_ReadsFramesInBounds() {
         FrameReader<MockFrame> frameReader = new FrameReader<>(MockFrame::new);
         int frameWidth = 35;
         int frameHeight = 30;
