@@ -37,9 +37,11 @@ public interface MetadataParser {
      *                      metadata attributes themselves are stored within their section names. That is,
      *                      to access an attribute, a {@link MetadataView} for the section must be accessed
      *                      first.
+     * @param imageWidth    width of the image associated with the metadata
+     * @param imageHeight   height of the image associated with the metadata
      * @return an object with parsed data
      * @throws InvalidMetadataException if the metadata is not valid
      */
-    ParsedMetadata parse(MetadataView metadata) throws InvalidMetadataException;
+    ParsedMetadata parse(MetadataView metadata, int imageWidth, int imageHeight) throws InvalidMetadataException;
 
 }

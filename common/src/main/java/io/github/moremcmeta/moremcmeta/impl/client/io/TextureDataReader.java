@@ -44,20 +44,24 @@ import static java.util.Objects.requireNonNull;
 public class TextureDataReader<I extends CloseableImage> implements TextureReader<TextureData<I>> {
     private final Map<String, MoreMcmetaTexturePlugin> SECTION_TO_PLUGIN;
     private final ImageReader<? extends I> IMAGE_READER;
+    private final BlurClampApplier<? super I, ? extends I> BLUR_CLAMP_APPLIER;
 
     /**
      * Creates a new reader that is aware of the given plugins, if any.
      * @param plugins           plugins that the reader should use to parse texture data
      * @param imageReader       reads the image from the {@link InputStream} of texture data
+     * @param blurClampApplier  applies blur and clamp to an image
      */
     public TextureDataReader(Iterable<? extends MoreMcmetaTexturePlugin> plugins,
-                             ImageReader<? extends I> imageReader) {
+                             ImageReader<? extends I> imageReader,
+                             BlurClampApplier<? super I, ? extends I> blurClampApplier) {
 
         requireNonNull(plugins, "Plugins cannot be null");
         SECTION_TO_PLUGIN = new HashMap<>();
         plugins.forEach((plugin) -> SECTION_TO_PLUGIN.put(plugin.sectionName(), plugin));
 
         IMAGE_READER = requireNonNull(imageReader, "Image reader cannot be null");
+        BLUR_CLAMP_APPLIER = requireNonNull(blurClampApplier, "Blur-clamp applier cannot be null");
     }
 
     /**
@@ -75,6 +79,9 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         requireNonNull(textureStream, "Texture stream cannot be null");
         requireNonNull(metadata, "Metadata cannot be null");
 
+        I image = IMAGE_READER.read(textureStream);
+        requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
+
         List<Triple<String, ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
         Optional<Integer> frameWidthOptional = Optional.empty();
         Optional<Integer> frameHeightOptional = Optional.empty();
@@ -89,7 +96,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
             ParsedMetadata sectionData;
             try {
-                sectionData = plugin.parser().parse(metadata);
+                sectionData = plugin.parser().parse(metadata, image.width(), image.height());
             } catch (InvalidMetadataException err) {
                 throw new InvalidMetadataException(String.format("%s marked metadata as invalid: %s",
                         plugin.displayName(), err.getMessage()), err);
@@ -107,9 +114,8 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
         boolean blur = blurOptional.orElse(false);
         boolean clamp = clampOptional.orElse(false);
-
-        I image = IMAGE_READER.read(textureStream, blur, clamp);
-        requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
+        image = BLUR_CLAMP_APPLIER.apply(image, blur, clamp);
+        requireNonNull(image, "Blurred and clamped image cannot be null");
 
         int frameWidth = frameWidthOptional.orElse(image.width());
         int frameHeight = frameHeightOptional.orElse(image.height());

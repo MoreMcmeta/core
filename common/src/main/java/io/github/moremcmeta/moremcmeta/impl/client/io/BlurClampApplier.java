@@ -17,22 +17,21 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
- * Reads an image from an {@link InputStream}.
- * @param <I> type of image read
+ * Applies blur and clamp to an image.
+ * @param <I>   input image type
+ * @param <O>   output image type
  * @author soir20
  */
-public interface ImageReader<I> {
+public interface BlurClampApplier<I, O> {
 
     /**
-     * Reads an image from an {@link InputStream}.
-     * @param imageStream     the stream of image data
-     * @return the image read from the provided data
-     * @throws IOException if the image stream cannot be read as an image
+     * Applies blur and clamp to an image. Implementations may return a new image or the same (modified) image.
+     * @param image     image to apply blur and clamp to
+     * @param blur      whether to blur the image
+     * @param clamp     whether to clamp the image
+     * @return a new image or the modified image
      */
-    I read(InputStream imageStream) throws IOException;
+    O apply(I image, boolean blur, boolean clamp);
 
 }

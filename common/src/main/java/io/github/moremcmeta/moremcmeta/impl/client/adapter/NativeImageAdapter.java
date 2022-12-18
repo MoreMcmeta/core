@@ -37,21 +37,33 @@ public class NativeImageAdapter implements CloseableImage {
     private final int WIDTH;
     private final int HEIGHT;
     private final int MIPMAP_LEVEL;
-    private final boolean BLUR;
-    private final boolean CLAMP;
     private final boolean AUTO_CLOSE;
     private final AtomicBoolean CLOSED;
+    private boolean blur;
+    private boolean clamp;
 
     /**
      * Creates a new {@link NativeImage} wrapper for an entire image. The image
-     * is not blurred, clamped, or auto-closed, and it has no visible area.
+     * is not blurred, clamped, or auto-closed.
      * @param image             the image to wrap
      * @param mipmapLevel       mipmap level of the image
-     * @param blur              whether to blur the image
-     * @param clamp             whether to clamp the image
+     */
+    public NativeImageAdapter(NativeImage image, int mipmapLevel) {
+        this(image, 0, 0, image.getWidth(), image.getHeight(), mipmapLevel, false, new AtomicBoolean());
+    }
+
+    /**
+     * Creates a new {@link NativeImage} wrapper for an entire image. The image
+     * is not auto-closed.
+     * @param image             the image to wrap
+     * @param mipmapLevel       mipmap level of the image
+     * @param blur              whether to blur the image by default
+     * @param clamp             whether to clamp the image by default
      */
     public NativeImageAdapter(NativeImage image, int mipmapLevel, boolean blur, boolean clamp) {
-        this(image, 0, 0, image.getWidth(), image.getHeight(), mipmapLevel, blur, clamp, false, new AtomicBoolean());
+        this(image, 0, 0, image.getWidth(), image.getHeight(), mipmapLevel, false, new AtomicBoolean());
+        setBlur(blur);
+        setClamp(clamp);
     }
 
     /**
@@ -133,15 +145,19 @@ public class NativeImageAdapter implements CloseableImage {
      */
     @Override
     public CloseableImage subImage(int topLeftX, int topLeftY, int width, int height) {
-        return new NativeImageAdapter(
+        NativeImageAdapter subImage = new NativeImageAdapter(
                 IMAGE,
                 topLeftX, topLeftY,
                 width, height,
                 MIPMAP_LEVEL,
-                BLUR, CLAMP,
                 AUTO_CLOSE,
                 CLOSED
         );
+
+        subImage.setBlur(blur());
+        subImage.setClamp(clamp());
+
+        return subImage;
     }
 
     /**
@@ -161,7 +177,15 @@ public class NativeImageAdapter implements CloseableImage {
      * @return whether this image is blurred
      */
     public boolean blur() {
-        return BLUR;
+        return blur;
+    }
+
+    /**
+     * Sets whether this image is blurred.
+     * @param blur      whether to blur this image
+     */
+    public void setBlur(boolean blur) {
+        this.blur = blur;
     }
 
     /**
@@ -169,7 +193,15 @@ public class NativeImageAdapter implements CloseableImage {
      * @return whether this image is clamped
      */
     public boolean clamp() {
-        return CLAMP;
+        return clamp;
+    }
+
+    /**
+     * Sets whether this image is clamped.
+     * @param clamp     whether this image is clamped
+     */
+    public void setClamp(boolean clamp) {
+        this.clamp = clamp;
     }
 
     /**
@@ -190,14 +222,12 @@ public class NativeImageAdapter implements CloseableImage {
      * @param width                 width of the image
      * @param height                height of the image
      * @param mipmapLevel           mipmap level of the image
-     * @param blur                  whether to blur this image
-     * @param clamp                 whether to clamp this image
      * @param autoClose             whether to automatically close this image
      * @param sharedCloseStatus     shared status between all images connected to the same
      *                              {@link NativeImage}
      */
     private NativeImageAdapter(NativeImage image, int xOffset, int yOffset, int width, int height,
-                               int mipmapLevel, boolean blur, boolean clamp, boolean autoClose,
+                               int mipmapLevel, boolean autoClose,
                                AtomicBoolean sharedCloseStatus) {
         IMAGE = requireNonNull(image, "Image cannot be null");
 
@@ -231,8 +261,6 @@ public class NativeImageAdapter implements CloseableImage {
         WIDTH = width;
         HEIGHT = height;
         MIPMAP_LEVEL = mipmapLevel;
-        BLUR = blur;
-        CLAMP = clamp;
         AUTO_CLOSE = autoClose;
         CLOSED = requireNonNull(sharedCloseStatus, "Close status cannot be null");
     }
@@ -245,7 +273,7 @@ public class NativeImageAdapter implements CloseableImage {
     private void uploadImmediately(int uploadX, int uploadY) {
         IMAGE.upload(
                 MIPMAP_LEVEL, uploadX, uploadY, X_OFFSET, Y_OFFSET,
-                WIDTH, HEIGHT, BLUR, CLAMP, MIPMAP_LEVEL > 0, AUTO_CLOSE
+                WIDTH, HEIGHT, blur, clamp, MIPMAP_LEVEL > 0, AUTO_CLOSE
         );
     }
 

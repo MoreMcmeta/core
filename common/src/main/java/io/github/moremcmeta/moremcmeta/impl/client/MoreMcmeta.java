@@ -158,7 +158,12 @@ public abstract class MoreMcmeta {
         // Resource loaders
         TextureDataReader<NativeImageAdapter> reader = new TextureDataReader<>(
                 texturePlugins,
-                (stream, blur, clamp) -> new NativeImageAdapter(NativeImage.read(stream), 0, blur, clamp)
+                (stream) -> new NativeImageAdapter(NativeImage.read(stream), 0),
+                (image, blur, clamp) -> {
+                    image.setBlur(blur);
+                    image.setClamp(clamp);
+                    return image;
+                }
         );
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(
                 reader,
