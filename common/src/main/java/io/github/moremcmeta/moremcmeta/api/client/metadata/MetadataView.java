@@ -46,7 +46,9 @@ public interface MetadataView {
     int size();
 
     /**
-     * Gets all the top-level keys in this view.
+     * Gets all the top-level keys in this view. The iteration order of keys determines the order in which
+     * MoreMcmeta applies plugins. Minimally, it should always return a consistent order for a given view.
+     * It is advisable to implement some way for users to control the ordering of keys.
      * @return all the top-level keys in this view
      */
     Iterable<String> keys();
