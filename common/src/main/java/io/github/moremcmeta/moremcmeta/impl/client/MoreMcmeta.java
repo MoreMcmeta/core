@@ -191,7 +191,7 @@ public abstract class MoreMcmeta {
 
                 List<String> currentPackIds = packIdGetter.get();
 
-                cache.load(repository, Set.of("textures", "optifine"), currentPackIds);
+                cache.load(repository, currentPackIds, "textures", "optifine");
                 return new SpriteFrameSizeFixPack(cache.get(currentPackIds), repository);
             });
 

@@ -19,7 +19,9 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -27,99 +29,138 @@ import java.util.Optional;
  * @author soir20
  */
 public class MockMetadataView implements MetadataView {
-    private final List<String> SECTIONS;
+    private final Map<String, Object> SECTION_TO_VALUE;
 
     public MockMetadataView(List<String> sections) {
-        SECTIONS = sections;
+        SECTION_TO_VALUE = new LinkedHashMap<>();
+        for (String section : sections) {
+            SECTION_TO_VALUE.put(section, 1);
+        }
+    }
+
+    public MockMetadataView(Map<String, Object> sectionToValue) {
+        SECTION_TO_VALUE = sectionToValue;
     }
 
     @Override
     public int size() {
-        return SECTIONS.size();
+        return SECTION_TO_VALUE.size();
     }
 
     @Override
     public Iterable<String> keys() {
-        return SECTIONS;
+        return SECTION_TO_VALUE.keySet();
     }
 
     @Override
     public boolean hasKey(String key) {
-        return false;
+        return SECTION_TO_VALUE.containsKey(key);
     }
 
     @Override
     public boolean hasKey(int index) {
-        return false;
+        checkNegativeIndex(index);
+        return SECTION_TO_VALUE.size() > index;
     }
 
     @Override
     public Optional<String> stringValue(String key) {
-        return Optional.empty();
+        return getValueIfPresent(key, String.class);
     }
 
     @Override
     public Optional<String> stringValue(int index) {
-        return Optional.empty();
+        checkNegativeIndex(index);
+        return getValueIfPresent(index, String.class);
     }
 
     @Override
     public Optional<Integer> integerValue(String key) {
-        return Optional.empty();
+        return getValueIfPresent(key, Integer.class);
     }
 
     @Override
     public Optional<Integer> integerValue(int index) {
-        return Optional.empty();
+        checkNegativeIndex(index);
+        return getValueIfPresent(index, Integer.class);
     }
 
     @Override
     public Optional<Long> longValue(String key) {
-        return Optional.empty();
+        return getValueIfPresent(key, Long.class);
     }
 
     @Override
     public Optional<Long> longValue(int index) {
-        return Optional.empty();
+        checkNegativeIndex(index);
+        return getValueIfPresent(index, Long.class);
     }
 
     @Override
     public Optional<Float> floatValue(String key) {
-        return Optional.empty();
+        return getValueIfPresent(key, Float.class);
     }
 
     @Override
     public Optional<Float> floatValue(int index) {
-        return Optional.empty();
+        checkNegativeIndex(index);
+        return getValueIfPresent(index, Float.class);
     }
 
     @Override
     public Optional<Double> doubleValue(String key) {
-        return Optional.empty();
+        return getValueIfPresent(key, Double.class);
     }
 
     @Override
     public Optional<Double> doubleValue(int index) {
-        return Optional.empty();
+        checkNegativeIndex(index);
+        return getValueIfPresent(index, Double.class);
     }
 
     @Override
     public Optional<Boolean> booleanValue(String key) {
-        return Optional.empty();
+        return getValueIfPresent(key, Boolean.class);
     }
 
     @Override
     public Optional<Boolean> booleanValue(int index) {
-        return Optional.empty();
+        checkNegativeIndex(index);
+        return getValueIfPresent(index, Boolean.class);
     }
 
     @Override
     public Optional<MetadataView> subView(String key) {
-        return Optional.empty();
+        return getValueIfPresent(key, MetadataView.class);
     }
 
     @Override
     public Optional<MetadataView> subView(int index) {
-        return Optional.empty();
+        checkNegativeIndex(index);
+        return getValueIfPresent(index, MetadataView.class);
+    }
+
+    private <T> Optional<T> getValueIfPresent(String key, Class<T> expectedClass) {
+        if (!SECTION_TO_VALUE.containsKey(key)) {
+            return Optional.empty();
+        }
+
+        Object value = SECTION_TO_VALUE.get(key);
+        return expectedClass.isInstance(value) ? Optional.of(expectedClass.cast(value)) : Optional.empty();
+    }
+
+    private <T> Optional<T> getValueIfPresent(int index, Class<T> expectedClass) {
+        if (index >= SECTION_TO_VALUE.size()) {
+            return Optional.empty();
+        }
+
+        Object value = SECTION_TO_VALUE.values().toArray()[index];
+        return expectedClass.isInstance(value) ? Optional.of(expectedClass.cast(value)) : Optional.empty();
+    }
+
+    private void checkNegativeIndex(int index) {
+        if (index < 0) {
+            throw new NegativeKeyIndexException(index);
+        }
     }
 }

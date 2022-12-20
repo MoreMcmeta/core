@@ -71,7 +71,7 @@ public class TextureCacheTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        cache.load(null, Set.of("textures", "test"), 1);
+        cache.load(null, 1, "textures", "test");
     }
 
     @Test
@@ -88,7 +88,24 @@ public class TextureCacheTest {
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
 
         expectedException.expect(NullPointerException.class);
-        cache.load(repository, null, 1);
+        cache.load(repository, 1, (String[]) null);
+    }
+
+    @Test
+    public void load_NullPath_NullPointerException() {
+        AtomicInteger texturesRead = new AtomicInteger();
+        TextureCache<Integer, Integer> cache = new TextureCache<>(
+                new TextureLoader<>((texStream, metadataStream) -> {
+                    texturesRead.incrementAndGet();
+                    return 1;
+                }, MOCK_READERS, LOGGER)
+        );
+
+        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+                "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
+
+        expectedException.expect(NullPointerException.class);
+        cache.load(repository, 1, (String) null);
     }
 
     @Test
@@ -105,40 +122,7 @@ public class TextureCacheTest {
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
 
         expectedException.expect(NullPointerException.class);
-        cache.load(repository, Set.of("textures", "test"), null);
-    }
-
-    @Test
-    public void load_PreviousResultsContainSameTexture_CacheRetrieved() {
-        TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>(
-                        (texStream, metadataStream) -> 1,
-                        ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream) -> {
-                            if (metadataLocation.getPath().equals("test/bat2.png.moremcmeta")) {
-                                return new MetadataReader.ReadMetadata(
-                                        new ResourceLocation("textures/bat.png"),
-                                        new MockMetadataView(Collections.emptyList())
-                                );
-                            }
-
-                            return MOCK_READER.read(metadataLocation, metadataStream);
-                        }),
-                        LOGGER
-                )
-        );
-
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
-                "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta",
-                "test/bat2.png.moremcmeta"));
-
-        cache.load(repository, Set.of("textures", "test"), 1);
-
-        ImmutableMap<ResourceLocation, Integer> actual = cache.get(1);
-        ImmutableMap<ResourceLocation, Integer> expected = ImmutableMap.<ResourceLocation, Integer>builder()
-                .put(new ResourceLocation("test/creeper.png"), 1)
-                .build();
-
-        assertEquals(expected, actual);
+        cache.load(repository, null, "textures", "test");
     }
 
     @Test
@@ -156,8 +140,8 @@ public class TextureCacheTest {
         OrderedResourceRepository repository2 = makeMockRepository(Set.of("textures/cat.png",
                 "textures/cat.png.moremcmeta", "test/zombie.png", "test/zombie.png.moremcmeta"));
 
-        cache.load(repository, Set.of("textures", "test"), 2);
-        cache.load(repository2, Set.of("textures", "test"), 2);
+        cache.load(repository, 2, "textures", "test");
+        cache.load(repository2, 2, "textures", "test");
 
         assertEquals(2, texturesRead.get());
     }
@@ -171,7 +155,7 @@ public class TextureCacheTest {
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
 
-        cache.load(repository, Set.of("textures", "test"), 1);
+        cache.load(repository, 1, "textures", "test");
 
         ImmutableMap<ResourceLocation, Integer> actual = cache.get(1);
         ImmutableMap<ResourceLocation, Integer> expected = ImmutableMap.<ResourceLocation, Integer>builder()
@@ -199,7 +183,7 @@ public class TextureCacheTest {
         //noinspection LoopConditionNotUpdatedInsideLoop,StatementWithEmptyBody
         while (thread.getState() != Thread.State.WAITING) {}
 
-        cache.load(repository, Set.of("textures", "test"), 2);
+        cache.load(repository, 2, "textures", "test");
         thread.join();
 
         ImmutableMap<ResourceLocation, Integer> expected = ImmutableMap.<ResourceLocation, Integer>builder()
@@ -221,19 +205,19 @@ public class TextureCacheTest {
         OrderedResourceRepository repository2 = makeMockRepository(Set.of("textures/cat.png",
                 "textures/cat.png.moremcmeta", "test/zombie.png", "test/zombie.png.moremcmeta"));
 
-        cache.load(repository, Set.of("textures", "test"), 1);
+        cache.load(repository, 1, "textures", "test");
 
         AtomicReference<ImmutableMap<ResourceLocation, Integer>> actual = new AtomicReference<>();
         Thread thread = new Thread(() -> actual.set(cache.get(2)));
         thread.start();
 
-        cache.load(repository, Set.of("textures", "test"), 3);
+        cache.load(repository, 3, "textures", "test");
 
         // Use a simple spin wait to ensure the desired ordering
         //noinspection LoopConditionNotUpdatedInsideLoop,StatementWithEmptyBody
         while (thread.getState() != Thread.State.WAITING) {}
 
-        cache.load(repository2, Set.of("textures", "test"), 2);
+        cache.load(repository2, 2, "textures", "test");
         thread.join();
 
         ImmutableMap<ResourceLocation, Integer> expected = ImmutableMap.<ResourceLocation, Integer>builder()

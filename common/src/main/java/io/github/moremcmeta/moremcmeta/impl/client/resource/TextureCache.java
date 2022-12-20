@@ -22,7 +22,6 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -62,10 +61,10 @@ public class TextureCache<R, S> {
      * Loads all texture data at the provided paths into the cache, unless the
      * cache already contains the data for this state.
      * @param repository    repository with all resources
-     * @param paths         paths to load texture data from
      * @param newState      state associated with the data to be loaded
+     * @param paths         paths to load texture data from
      */
-    public void load(OrderedResourceRepository repository, Set<String> paths, S newState) {
+    public void load(OrderedResourceRepository repository, S newState, String... paths) {
         requireNonNull(repository, "Repository cannot be null");
         requireNonNull(paths, "Paths cannot be null");
         requireNonNull(newState, "State cannot be null");
@@ -77,10 +76,7 @@ public class TextureCache<R, S> {
             /* We would normally want to load data asynchronously during reloading. However, this
                portion of texture loading is efficient, even for large images. We have to do this
                before reloading starts to avoid a race with texture atlases. */
-            ImmutableMap<ResourceLocation, R> previousResults = ImmutableMap.of();
-            for (String path : paths) {
-                previousResults = LOADER.load(repository, path, previousResults);
-            }
+            ImmutableMap<ResourceLocation, R> previousResults = LOADER.load(repository, paths);
             CACHE.putAll(previousResults);
 
             state = newState;
