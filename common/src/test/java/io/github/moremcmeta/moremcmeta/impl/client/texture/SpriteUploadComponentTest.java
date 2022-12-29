@@ -17,12 +17,16 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
+import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 
@@ -59,7 +63,7 @@ public class SpriteUploadComponentTest {
     }
 
     @Test
-    public void upload_SecondUpload_FrameUploadedAtMipmappedPoints() {
+    public void upload_SecondUpload_FrameUploadedAtMipmappedPointsOnce() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3))));
 
@@ -71,7 +75,7 @@ public class SpriteUploadComponentTest {
         texture.upload();
         texture.upload();
 
-        assertEquals(2, frame.uploadCount());
+        assertEquals(1, frame.uploadCount());
         assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
         assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
         assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
@@ -101,11 +105,25 @@ public class SpriteUploadComponentTest {
     public void tick_SecondTick_BoundAndUploaded() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         MockSprite sprite = new MockSprite(new Point(2, 3));
+
+        AtomicInteger ticks = new AtomicInteger();
+        builder.add(new TextureComponent<>() {
+            @Override
+            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame,
+                               FrameGroup<PersistentFrameView> predefinedFrames) {
+
+                // Modify the current frame to ensure it is uploaded
+                currentFrame.replaceWith(ticks.incrementAndGet() % predefinedFrames.frames());
+
+            }
+        });
         builder.add(new SpriteUploadComponent(sprite));
 
-        MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
-        builder.setPredefinedFrames(List.of(frame));
-        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
+        int layers = 2;
+        MockCloseableImageFrame frame = new MockCloseableImageFrame(layers);
+        List<MockCloseableImageFrame> predefinedFrames = List.of(frame, frame);
+        builder.setPredefinedFrames(predefinedFrames);
+        builder.setGeneratedFrame(new MockCloseableImageFrame(layers));
         EventDrivenTexture texture = builder.build();
 
         texture.tick();

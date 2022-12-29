@@ -456,10 +456,8 @@ public class EventDrivenTextureTest {
     }
 
     @Test
-    public void upload_SecondUploadNotNeeded_UploadFiredInOrder() {
-
-        // The upload method should run regardless of whether an upload is needed
-        Integer[] expected = {4, 5, 6, 4, 5, 6};
+    public void upload_SecondUploadNotNeeded_FirstUploadOnly() {
+        Integer[] expected = {4, 5, 6};
         testExpectedOrder((texture) -> {texture.upload(); texture.upload();}, false, expected);
 
     }

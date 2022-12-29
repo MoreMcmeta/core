@@ -55,6 +55,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
     private boolean registered;
+    private boolean uploading;
 
     /**
      * Binds this texture or the texture it proxies to OpenGL. Fires upload listeners
@@ -71,7 +72,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             GlStateManager._bindTexture(super.getId());
         }
 
-        if (CURRENT_STATE.hasUpdatedSinceUpload) {
+        if (!uploading) {
             upload();
         }
     }
@@ -96,8 +97,18 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Fires upload listeners and marks the texture as not needing an upload.
      */
     public void upload() {
-        runListeners(TextureComponent::onUpload);
-        CURRENT_STATE.hasUpdatedSinceUpload = false;
+        uploading = true;
+
+        if (CURRENT_STATE.hasUpdatedSinceUpload) {
+            CURRENT_STATE.hasUpdatedSinceUpload = false;
+
+            runListeners(((textureComponent, textureAndFrameView) -> {
+                bind();
+                textureComponent.onUpload(textureAndFrameView);
+            }));
+        }
+
+        uploading = false;
     }
 
     /**
