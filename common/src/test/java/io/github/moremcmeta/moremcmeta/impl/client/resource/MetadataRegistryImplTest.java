@@ -58,7 +58,7 @@ public class MetadataRegistryImplTest {
         ));
 
         expectedException.expect(NullPointerException.class);
-        registry.getFromPath(null, new ResourceLocation("block.png"));
+        registry.metadataFromPath(null, new ResourceLocation("block.png"));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class MetadataRegistryImplTest {
         ));
 
         expectedException.expect(NullPointerException.class);
-        registry.getFromPath("plugin", null);
+        registry.metadataFromPath("plugin", null);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class MetadataRegistryImplTest {
                 )
         ));
 
-        assertFalse(registry.getFromPath("plugin", new ResourceLocation("block")).isPresent());
+        assertFalse(registry.metadataFromPath("plugin", new ResourceLocation("block")).isPresent());
     }
 
     @Test
@@ -119,7 +119,7 @@ public class MetadataRegistryImplTest {
                 )
         ));
 
-        assertFalse(registry.getFromPath("other", new ResourceLocation("block.png")).isPresent());
+        assertFalse(registry.metadataFromPath("other", new ResourceLocation("block.png")).isPresent());
     }
 
     @Test
@@ -143,7 +143,7 @@ public class MetadataRegistryImplTest {
 
         assertEquals(
                 expected,
-                registry.getFromPath("plugin", new ResourceLocation("textures/block.png")).orElseThrow()
+                registry.metadataFromPath("plugin", new ResourceLocation("textures/block.png")).orElseThrow()
         );
     }
 
@@ -165,7 +165,7 @@ public class MetadataRegistryImplTest {
         ));
 
         expectedException.expect(NullPointerException.class);
-        registry.getFromSpriteName(null, new ResourceLocation("block.png"));
+        registry.metadataFromSpriteName(null, new ResourceLocation("block.png"));
     }
 
     @Test
@@ -186,7 +186,7 @@ public class MetadataRegistryImplTest {
         ));
 
         expectedException.expect(NullPointerException.class);
-        registry.getFromSpriteName("plugin", null);
+        registry.metadataFromSpriteName("plugin", null);
     }
 
     @Test
@@ -206,7 +206,7 @@ public class MetadataRegistryImplTest {
                 )
         ));
 
-        assertFalse(registry.getFromSpriteName("plugin", new ResourceLocation("textures/block.png")).isPresent());
+        assertFalse(registry.metadataFromSpriteName("plugin", new ResourceLocation("textures/block.png")).isPresent());
     }
 
     @Test
@@ -226,7 +226,7 @@ public class MetadataRegistryImplTest {
                 )
         ));
 
-        assertFalse(registry.getFromSpriteName("other", new ResourceLocation("block")).isPresent());
+        assertFalse(registry.metadataFromSpriteName("other", new ResourceLocation("block")).isPresent());
     }
 
     @Test
@@ -250,7 +250,7 @@ public class MetadataRegistryImplTest {
 
         assertEquals(
                 expected,
-                registry.getFromSpriteName("plugin", new ResourceLocation("block")).orElseThrow()
+                registry.metadataFromSpriteName("plugin", new ResourceLocation("block")).orElseThrow()
         );
     }
 

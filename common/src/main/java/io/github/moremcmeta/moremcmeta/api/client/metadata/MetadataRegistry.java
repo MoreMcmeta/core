@@ -45,7 +45,7 @@ public interface MetadataRegistry {
      * @param textureLocation       full (non-sprite, including .png suffix) location of the texture
      * @return the metadata provided by the given plugin for the given texture, if there is any
      */
-    Optional<ParsedMetadata> getFromPath(String pluginName, ResourceLocation textureLocation);
+    Optional<ParsedMetadata> metadataFromPath(String pluginName, ResourceLocation textureLocation);
 
     /**
      * Retrieves the metadata provided by the given plugin for the given texture.
@@ -53,6 +53,6 @@ public interface MetadataRegistry {
      * @param spriteName            name of the sprite (omitting the textures/ prefix and .png suffix)
      * @return the metadata provided by the given plugin for the given texture, if there is any
      */
-    Optional<ParsedMetadata> getFromSpriteName(String pluginName, ResourceLocation spriteName);
+    Optional<ParsedMetadata> metadataFromSpriteName(String pluginName, ResourceLocation spriteName);
 
 }

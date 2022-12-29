@@ -53,7 +53,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
      * @return the metadata provided by the given plugin for the given texture, if there is any
      */
     @Override
-    public Optional<ParsedMetadata> getFromPath(String pluginName, ResourceLocation textureLocation) {
+    public Optional<ParsedMetadata> metadataFromPath(String pluginName, ResourceLocation textureLocation) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         requireNonNull(textureLocation, "Texture location cannot be null");
         return Optional.ofNullable(metadata.get(Pair.of(pluginName, textureLocation)));
@@ -66,7 +66,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
      * @return the metadata provided by the given plugin for the given texture, if there is any
      */
     @Override
-    public Optional<ParsedMetadata> getFromSpriteName(String pluginName, ResourceLocation spriteName) {
+    public Optional<ParsedMetadata> metadataFromSpriteName(String pluginName, ResourceLocation spriteName) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         requireNonNull(spriteName, "Sprite name cannot be null");
         return Optional.ofNullable(metadata.get(Pair.of(pluginName, Sprite.makeTextureLocation(spriteName))));
