@@ -59,6 +59,7 @@ public class SpriteUploadComponent implements CoreTextureComponent {
      */
     @Override
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        SPRITE.bind();
         currentFrame.upload(UPLOAD_POINT.x(), UPLOAD_POINT.y());
     }
 
@@ -72,7 +73,6 @@ public class SpriteUploadComponent implements CoreTextureComponent {
                        FrameGroup<PersistentFrameView> predefinedFrames) {
 
         // We need this listener because atlas sprites will never be bound
-        SPRITE.bind();
         currentFrame.texture().upload();
 
     }

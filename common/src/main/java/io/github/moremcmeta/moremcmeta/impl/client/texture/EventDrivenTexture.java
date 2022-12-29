@@ -83,8 +83,13 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     @Override
     public void load(@Nullable ResourceManager resourceManager) {
+
+        // Set the first frame as current by default, unless overwritten by the registration listeners
+        CURRENT_STATE.replaceWith(0);
+
         runListeners((component, view) -> component.onRegistration(view, CURRENT_STATE.predefinedFrames()));
         registered = true;
+        bind();
     }
 
     /**

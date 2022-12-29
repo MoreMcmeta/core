@@ -419,14 +419,14 @@ public class EventDrivenTextureTest {
     }
 
     @Test
-    public void register_FirstRegistration_RegisterFiredInOrder() {
-        Integer[] expected = {1, 2, 3};
+    public void register_FirstRegistration_RegisterAndUploadFiredInOrder() {
+        Integer[] expected = {1, 2, 3, 4, 5, 6};
         testExpectedOrder((texture) -> texture.load(null), false, expected);
     }
 
     @Test
-    public void register_SecondRegistration_RegisterFiredInOrder() {
-        Integer[] expected = {1, 2, 3, 1, 2, 3};
+    public void register_SecondRegistration_RegisterFiredInOrderNotUploadedAgain() {
+        Integer[] expected = {1, 2, 3, 4, 5, 6, 1, 2, 3};
         testExpectedOrder((texture) -> { texture.load(null);
             texture.load(null); }, false, expected);
     }
@@ -516,9 +516,6 @@ public class EventDrivenTextureTest {
         EventDrivenTexture texture = builder.build();
 
         texture.load(null);
-
-        // We have to bind once first because the texture is always uploaded on the first bind
-        texture.bind();
         assertEquals(1, currentFrameIndex.get());
 
         texture.tick();
