@@ -10,7 +10,7 @@ jobs:
       matrix:
         loader: [forge, fabric, common]
     steps:
-      - uses: actions/delete-package-versions@ec4518c513bda18aa7d8488f78731040ed63fce9
+      - uses: actions/delete-package-versions@c5e64443ea1242014b4011a563c5bccc90867ac8
         with:
           package-name: io.github.moremcmeta.moremcmeta-${{ matrix.loader }}
           min-versions-to-keep: 0
