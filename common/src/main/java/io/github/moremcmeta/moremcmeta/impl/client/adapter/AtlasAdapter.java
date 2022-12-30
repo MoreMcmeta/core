@@ -76,12 +76,12 @@ public class AtlasAdapter implements Atlas {
         ResourceLocation properSpriteName = Sprite.makeSpriteName(location);
 
         TextureAtlasSprite sprite = ATLAS.getSprite(properSpriteName);
-        if (sprite == null || sprite.getName() == MissingTextureAtlasSprite.getLocation()) {
+        if (sprite.getName().equals(MissingTextureAtlasSprite.getLocation())) {
             sprite = ATLAS.getSprite(location);
         }
 
         // Check the original location in case another mod added it by that name
-        if (sprite == null || sprite.getName() == MissingTextureAtlasSprite.getLocation()) {
+        if (sprite.getName().equals(MissingTextureAtlasSprite.getLocation())) {
             return Optional.empty();
         }
 
