@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.api.client.metadata;
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -51,5 +52,12 @@ public interface MetadataRegistry {
      * @return the metadata provided by the given plugin for the given texture, if there is any
      */
     Optional<ParsedMetadata> metadataFromSpriteName(String pluginName, ResourceLocation spriteName);
+
+    /**
+     * Retrieves all metadata associated with a given plugin.
+     * @param pluginName            name of the plugin that provided the metadata
+     * @return all metadata associated with a given plugin, by texture location, as an immutable map
+     */
+    Map<ResourceLocation, ParsedMetadata> metadataByPlugin(String pluginName);
 
 }

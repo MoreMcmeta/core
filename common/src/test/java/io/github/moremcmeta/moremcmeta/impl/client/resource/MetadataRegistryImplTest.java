@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -252,6 +253,82 @@ public class MetadataRegistryImplTest {
                 expected,
                 registry.metadataFromSpriteName("plugin", new ResourceLocation("block")).orElseThrow()
         );
+    }
+
+    @Test
+    public void getByPlugin_NullPluginName_NullPointerException() {
+        MetadataRegistryImpl registry = new MetadataRegistryImpl();
+        registry.set(ImmutableMap.of(
+                new ResourceLocation("textures/block.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "plugin",
+                                new ParsedMetadata() {},
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                )
+        ));
+
+        expectedException.expect(NullPointerException.class);
+        registry.metadataByPlugin(null);
+    }
+
+    @Test
+    public void getByPlugin_PluginHasNoMetadata_AllMetadataFound() {
+        MetadataRegistryImpl registry = new MetadataRegistryImpl();
+        registry.set(ImmutableMap.of(
+                new ResourceLocation("textures/block.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "plugin",
+                                new ParsedMetadata() {},
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                )
+        ));
+
+        Map<ResourceLocation, ParsedMetadata> metadata = registry.metadataByPlugin("plugin2");
+        assertTrue(metadata.isEmpty());
+    }
+
+    @Test
+    public void getByPlugin_PluginHasMetadata_AllMetadataFound() {
+        MetadataRegistryImpl registry = new MetadataRegistryImpl();
+        registry.set(ImmutableMap.of(
+                new ResourceLocation("textures/block.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "plugin",
+                                new ParsedMetadata() {},
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                ),
+                new ResourceLocation("textures/block2.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "plugin",
+                                new ParsedMetadata() {},
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                )
+        ));
+
+        Map<ResourceLocation, ParsedMetadata> metadata = registry.metadataByPlugin("plugin");
+        assertTrue(metadata.containsKey(new ResourceLocation("textures/block.png")));
+        assertTrue(metadata.containsKey(new ResourceLocation("textures/block2.png")));
+        assertEquals(2, metadata.size());
     }
 
     @Test

@@ -18,15 +18,16 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.util.Pair;
+import com.google.common.collect.Maps;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Triple;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class MetadataRegistryImpl implements MetadataRegistry {
-    private ImmutableMap<Pair<String, ResourceLocation>, ParsedMetadata> metadata;
+    private ImmutableMap<String, ImmutableMap<ResourceLocation, ParsedMetadata>> metadata;
 
     /**
      * Creates a new implementation of a {@link MetadataRegistry}.
@@ -56,7 +57,10 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     public Optional<ParsedMetadata> metadataFromPath(String pluginName, ResourceLocation textureLocation) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         requireNonNull(textureLocation, "Texture location cannot be null");
-        return Optional.ofNullable(metadata.get(Pair.of(pluginName, textureLocation)));
+        return Optional.ofNullable(
+                metadata.getOrDefault(pluginName, ImmutableMap.of())
+                        .get(textureLocation)
+        );
     }
 
     /**
@@ -69,7 +73,21 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     public Optional<ParsedMetadata> metadataFromSpriteName(String pluginName, ResourceLocation spriteName) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         requireNonNull(spriteName, "Sprite name cannot be null");
-        return Optional.ofNullable(metadata.get(Pair.of(pluginName, Sprite.makeTextureLocation(spriteName))));
+        return Optional.ofNullable(
+                metadata.getOrDefault(pluginName, ImmutableMap.of())
+                        .get(Sprite.makeTextureLocation(spriteName))
+        );
+    }
+
+    /**
+     * Retrieves all metadata associated with a given plugin.
+     * @param pluginName            name of the plugin that provided the metadata
+     * @return all metadata associated with a given plugin, by texture location, as an immutable map
+     */
+    @Override
+    public Map<ResourceLocation, ParsedMetadata> metadataByPlugin(String pluginName) {
+        requireNonNull(pluginName, "Plugin name cannot be null");
+        return metadata.getOrDefault(pluginName, ImmutableMap.of());
     }
 
     /**
@@ -79,7 +97,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     public void set(Map<? extends ResourceLocation, ? extends TextureData<?>> textureData) {
         requireNonNull(textureData, "Texture data cannot be null");
 
-        ImmutableMap.Builder<Pair<String, ResourceLocation>, ParsedMetadata> builder = ImmutableMap.builder();
+        Map<String, ImmutableMap.Builder<ResourceLocation, ParsedMetadata>> builders = new HashMap<>();
 
         for (Map.Entry<? extends ResourceLocation, ? extends TextureData<?>> entry : textureData.entrySet()) {
             ResourceLocation textureLocation = entry.getKey();
@@ -88,14 +106,14 @@ public class MetadataRegistryImpl implements MetadataRegistry {
                 String pluginName = pluginEntry.getLeft();
                 ParsedMetadata sectionData = pluginEntry.getMiddle();
 
-                builder.put(
-                        Pair.of(pluginName, textureLocation),
-                        sectionData
-                );
+                builders.computeIfAbsent(pluginName, (key) -> new ImmutableMap.Builder<>())
+                        .put(textureLocation, sectionData);
             }
         }
 
-        metadata = builder.build();
+        metadata = ImmutableMap.copyOf(
+                Maps.transformValues(builders, ImmutableMap.Builder::build)
+        );
     }
 
 }
