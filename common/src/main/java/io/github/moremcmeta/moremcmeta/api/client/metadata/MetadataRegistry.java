@@ -31,11 +31,8 @@ public interface MetadataRegistry {
 
     /**
      * The global {@link MetadataRegistry}. This metadata registry returned may contain
-     * different metadata after each resource reload. The registry is updated during the "load" stage
-     * of resource reloading as opposed to the "apply" stage. In other words, the registry will be
-     * current after
-     * {@link net.minecraft.server.packs.resources.PreparableReloadListener.PreparationBarrier#wait(Object)}
-     * completes for a particular resource reload.
+     * different metadata after each resource reload. The registry is updated *before* the "load" stage
+     * of resource reloading, so it is safe to access from a reload listener.
      */
     MetadataRegistry INSTANCE = MoreMcmeta.METADATA_REGISTRY;
 

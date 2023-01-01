@@ -192,6 +192,8 @@ public abstract class MoreMcmeta {
                 List<String> currentPackIds = packIdGetter.get();
 
                 cache.load(repository, currentPackIds, "textures", "optifine");
+                METADATA_REGISTRY.set(cache.get(packIdGetter.get()));
+
                 return new SpriteFrameSizeFixPack(cache.get(currentPackIds), repository);
             });
 
@@ -599,8 +601,6 @@ public abstract class MoreMcmeta {
                         return wrappedMipmaps;
                     }
             );
-
-            METADATA_REGISTRY.set(CACHE.get(PACK_ID_GETTER.get()));
 
             return CompletableFuture.supplyAsync(() -> CACHE.get(PACK_ID_GETTER.get()).entrySet()
                     .stream().parallel()
