@@ -36,7 +36,14 @@ configurations {
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabricLoaderVersion}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabricApiVersion}"
+
+    [
+            "fabric-api-base",
+            "fabric-lifecycle-events-v1",
+            "fabric-resource-loader-v0"
+    ].forEach {
+        modImplementation(include(fabricApi.module(it, rootProject.fabricApiVersion)))
+    }
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
@@ -111,8 +118,6 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         uploadFile = remapJar
         gameVersions = [project.minecraftVersion]
         loaders = ["fabric"]
-        dependencies {
-            required.project "fabric-api"
-        }
+        dependencies {}
     }
 }
