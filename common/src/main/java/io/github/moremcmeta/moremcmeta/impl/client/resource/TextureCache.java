@@ -73,14 +73,17 @@ public class TextureCache<R, S> {
         if (!newState.equals(state)) {
             CACHE.clear();
 
+            /* Update state before filling the cache to avoid a stack overflow if
+               TextureCache#load is called inside TextureLoader#load.  */
+            state = newState;
+
             /* We would normally want to load data asynchronously during reloading. However, this
                portion of texture loading is efficient, even for large images. We have to do this
                before reloading starts to avoid a race with texture atlases. */
             ImmutableMap<ResourceLocation, R> previousResults = LOADER.load(repository, paths);
             CACHE.putAll(previousResults);
 
-            state = newState;
-            IS_CURRENT.signal();
+            IS_CURRENT.signalAll();
         }
         LOCK.unlock();
     }
@@ -95,6 +98,9 @@ public class TextureCache<R, S> {
     public ImmutableMap<ResourceLocation, R> get(S newState) {
         requireNonNull(newState, "State cannot be null");
 
+        /* If the cache for the desired state is currently being loaded on another thread,
+           the loading thread will hold the lock, and this thread will proceed once the
+           loading thread releases the lock. */
         LOCK.lock();
         while (!newState.equals(state)) {
             IS_CURRENT.awaitUninterruptibly();
