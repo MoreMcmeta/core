@@ -52,13 +52,21 @@ public class SingleUploadComponent implements CoreTextureComponent {
     @Override
     public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
                                FrameGroup<PersistentFrameView> predefinedFrames) {
+
+        /* Ensure the current frame is only accessed in this method, as the
+           view may be invalidated if accessing them inside a render call. */
+        currentFrame.lowerMipmapLevel(0);
+        EventDrivenTexture texture = currentFrame.texture();
+        int frameWidth = currentFrame.width();
+        int frameHeight = currentFrame.height();
+
         if (!RenderSystem.isOnRenderThreadOrInit()) {
             RenderSystem.recordRenderCall(() -> {
-                prepareTexture(currentFrame);
+                prepareTexture(texture, frameWidth, frameHeight);
                 IS_PREPARED.set(true);
             });
         } else {
-            prepareTexture(currentFrame);
+            prepareTexture(texture, frameWidth, frameHeight);
             IS_PREPARED.set(true);
         }
     }
@@ -76,11 +84,12 @@ public class SingleUploadComponent implements CoreTextureComponent {
 
     /**
      * Prepares an individual texture on the current thread.
-     * @param currentFrame      the current frame of the texture
+     * @param texture      texture to prepare
+     * @param frameWidth   width of a frame in the texture
+     * @param frameHeight  height of a frame in the texture
      */
-    private void prepareTexture(EventDrivenTexture.TextureAndFrameView currentFrame) {
-        PREPARER.prepare(currentFrame.texture().getId(), 0, currentFrame.width(), currentFrame.height());
-        currentFrame.lowerMipmapLevel(0);
+    private void prepareTexture(EventDrivenTexture texture, int frameWidth, int frameHeight) {
+        PREPARER.prepare(texture.getId(), 0, frameWidth, frameHeight);
     }
 
 }
