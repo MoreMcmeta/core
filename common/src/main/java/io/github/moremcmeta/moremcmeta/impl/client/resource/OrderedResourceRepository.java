@@ -129,10 +129,6 @@ public class OrderedResourceRepository {
          */
         private ResourceCollectionResult(ResourceCollection collection, int index) {
             COLLECTION = requireNonNull(collection, "Resource collection cannot be null");
-
-            if (index < 0) {
-                throw new IllegalArgumentException("Index cannot be negative");
-            }
             INDEX = index;
         }
 
