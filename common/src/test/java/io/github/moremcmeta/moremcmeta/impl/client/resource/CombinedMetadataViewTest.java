@@ -73,12 +73,45 @@ public class CombinedMetadataViewTest {
     }
 
     @Test
-    public void construct_ConflictingKeys_IllegalArgException() {
-        expectedException.expect(IllegalArgumentException.class);
-        new CombinedMetadataView(List.of(
-                new MockMetadataView(List.of("one", "two")),
-                new MockMetadataView(List.of("three", "one"))
+    public void construct_ConflictingKeys_KeyMethodsUseFirstViewWithKey() {
+        CombinedMetadataView view = new CombinedMetadataView(List.of(
+                new MockMetadataView(ImmutableMap.of("one", 1, "two", 2.0f)),
+                new MockMetadataView(ImmutableMap.of("three", "3", "one", true)),
+                new MockMetadataView(ImmutableMap.of("three", 5L, "four", 6.0D)),
+                new MockMetadataView(ImmutableMap.of("three", MOCK_SUB_VIEW))
         ));
+
+        assertTrue(view.hasKey("one"));
+        assertTrue(view.hasKey("two"));
+        assertTrue(view.hasKey("three"));
+
+        assertEquals(1, (int) view.integerValue("one").orElseThrow());
+        assertTrue(view.booleanValue("one").isEmpty());
+
+        assertEquals("3", view.stringValue("three").orElseThrow());
+        assertTrue(view.longValue("three").isEmpty());
+        assertTrue(view.subView("three").isEmpty());
+    }
+
+    @Test
+    public void construct_ConflictingKeys_IndexMethodsUseFirstViewWithKey() {
+        CombinedMetadataView view = new CombinedMetadataView(List.of(
+                new MockMetadataView(ImmutableMap.of("one", 1, "two", 2.0f)),
+                new MockMetadataView(ImmutableMap.of("three", "3", "one", true)),
+                new MockMetadataView(ImmutableMap.of("three", 5L, "four", 6.0D)),
+                new MockMetadataView(ImmutableMap.of("three", MOCK_SUB_VIEW))
+        ));
+
+        assertTrue(view.hasKey("one"));
+        assertTrue(view.hasKey("two"));
+        assertTrue(view.hasKey("three"));
+
+        assertEquals(1, (int) view.integerValue(0).orElseThrow());
+        assertTrue(view.booleanValue(0).isEmpty());
+
+        assertEquals("3", view.stringValue(2).orElseThrow());
+        assertTrue(view.longValue(2).isEmpty());
+        assertTrue(view.subView(2).isEmpty());
     }
 
     @Test

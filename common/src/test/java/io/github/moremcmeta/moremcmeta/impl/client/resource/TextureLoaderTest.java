@@ -58,7 +58,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TextureLoaderTest {
     private final Logger LOGGER = LogManager.getLogger();
-    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream) -> new MetadataReader.ReadMetadata(
+    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream) -> Map.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".moremcmeta", "")
@@ -270,7 +270,7 @@ public class TextureLoaderTest {
                 },
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream) -> {
                     if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
-                        return new MetadataReader.ReadMetadata(
+                        return Map.of(
                                 new ResourceLocation("textures/bat.png"),
                                 new MockMetadataView(List.of("four", "five", "six"))
                         );
@@ -289,21 +289,24 @@ public class TextureLoaderTest {
 
     @Test
     public void load_TwoConflictingMetadataFilesForSameTexture_ConflictingTextureSkipped() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
-                "textures/bat.png",
-                "textures/bat.png.moremcmeta",
-                "textures/bat2.png.moremcmeta",
-                "textures/creeper.png",
-                "textures/creeper.png.moremcmeta",
-                "textures/zombie.png",
-                "textures/zombie.png.moremcmeta"
-        ));
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of(
+                    "textures/bat.png",
+                    "textures/bat.png.moremcmeta",
+                    "textures/bat2.png.moremcmeta",
+                    "textures/creeper.png",
+                    "textures/creeper.png.moremcmeta",
+                    "textures/zombie.png",
+                    "textures/zombie.png.moremcmeta"
+                ),
+                Set.of("textures/bat.png.moremcmeta")
+        );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadata) -> 1,
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream) -> {
                     if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
-                        return new MetadataReader.ReadMetadata(
+                        return Map.of(
                                 new ResourceLocation("textures/bat.png"),
                                 new MockMetadataView(List.of("four", "one", "six"))
                         );
@@ -319,6 +322,46 @@ public class TextureLoaderTest {
         assertEquals(2, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
         assertTrue(locations.containsKey(new ResourceLocation("textures/creeper.png")));
+    }
+
+    @Test
+    public void load_TwoConflictingMetadataFilesForSameTextureInLowerPack_DoesNotSkip() {
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of(
+                        "textures/bat.png",
+                        "textures/bat.png.moremcmeta",
+                        "textures/creeper.png",
+                        "textures/creeper.png.moremcmeta",
+                        "textures/zombie.png",
+                        "textures/zombie.png.moremcmeta"
+                ),
+                Set.of(
+                        "textures/bat.png.moremcmeta",
+                        "textures/bat2.png.moremcmeta"
+                )
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream) -> {
+                    if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
+                        return Map.of(
+                                new ResourceLocation("textures/bat.png"),
+                                new MockMetadataView(List.of("four", "one", "six"))
+                        );
+                    }
+
+                    return MOCK_READER.read(metadataLocation, metadataStream);
+                }),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+
+        assertEquals(3, locations.size());
+        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
     }
 
     @Test
@@ -691,7 +734,7 @@ public class TextureLoaderTest {
     }
 
     @Test
-    public void load_TextureAndMetadataInDifferentPacks_SkipsSeparatedTextures() {
+    public void load_TextureAndMetadataInDifferentPacks_DoesNotSkipSeparatedTextures() {
         OrderedResourceRepository repository = makeMockRepository(
                 Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/creeper.png", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta"),
@@ -706,13 +749,14 @@ public class TextureLoaderTest {
 
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
-        assertEquals(2, results.size());
+        assertEquals(3, results.size());
         assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
         assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
     }
 
     @Test
-    public void load_LaterPackHasMetadataAndTexture_SkipsSeparatedTextures() {
+    public void load_LaterPackHasMetadataAndTexture_DoesNotSkipSeparatedTextures() {
         OrderedResourceRepository repository = makeMockRepository(
                 Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/creeper.png", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta"),
@@ -728,9 +772,10 @@ public class TextureLoaderTest {
 
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
-        assertEquals(2, results.size());
+        assertEquals(3, results.size());
         assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
         assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
     }
 
     @Test

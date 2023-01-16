@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,7 +41,7 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 public class TextureCacheTest {
-    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream) -> new MetadataReader.ReadMetadata(
+    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream) -> Map.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".moremcmeta", "")

@@ -119,7 +119,11 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertEquals(collections.get(1), repository.getFirstCollectionWith(new ResourceLocation("two.png")));
+        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+                new ResourceLocation("two.png")
+        );
+        assertEquals(collections.get(1), result.collection());
+        assertEquals(1, result.collectionIndex());
     }
 
     @Test
@@ -131,7 +135,11 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertEquals(collections.get(0), repository.getFirstCollectionWith(new ResourceLocation("one.png")));
+        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+                new ResourceLocation("one.png")
+        );
+        assertEquals(collections.get(0), result.collection());
+        assertEquals(0, result.collectionIndex());
     }
 
     @Test
@@ -143,7 +151,11 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertEquals(collections.get(1), repository.getFirstCollectionWith(new ResourceLocation("two.png")));
+        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+                new ResourceLocation("two.png")
+        );
+        assertEquals(collections.get(1), result.collection());
+        assertEquals(1, result.collectionIndex());
     }
 
     @Test
@@ -155,7 +167,11 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertEquals(collections.get(2), repository.getFirstCollectionWith(new ResourceLocation("three.png")));
+        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+                new ResourceLocation("three.png")
+        );
+        assertEquals(collections.get(2), result.collection());
+        assertEquals(2, result.collectionIndex());
     }
 
     @Test
@@ -168,7 +184,11 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertEquals(collections.get(1), repository.getFirstCollectionWith(new ResourceLocation("two.png")));
+        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+                new ResourceLocation("two.png")
+        );
+        assertEquals(collections.get(1), result.collection());
+        assertEquals(1, result.collectionIndex());
     }
 
     @Test
@@ -181,7 +201,11 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        assertEquals(collections.get(1), repository.getFirstCollectionWith(new ResourceLocation("two.png")));
+        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+                new ResourceLocation("two.png")
+        );
+        assertEquals(collections.get(1), result.collection());
+        assertEquals(1, result.collectionIndex());
     }
 
     @Test

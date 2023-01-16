@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -119,7 +120,7 @@ public class TextureLoader<R> {
      */
     private ImmutableMap<ResourceLocation, R> makeTextures(Collection<? extends ResourceLocation> candidates,
                                                            OrderedResourceRepository resourceRepository) {
-        Map<ResourceLocation, MetadataReader.ReadMetadata> locationToMetadata = new ConcurrentHashMap<>();
+        Map<ResourceLocation, ReadMetadataFile> locationToMetadata = new ConcurrentHashMap<>();
 
         // Read metadata from unique candidates
         candidates.stream().distinct().parallel().forEach(
@@ -142,29 +143,24 @@ public class TextureLoader<R> {
      * @param results              filled with the result, must support concurrent modification
      */
     private void readMetadata(OrderedResourceRepository resourceRepository, ResourceLocation metadataLocation,
-                              Map<ResourceLocation, MetadataReader.ReadMetadata> results) {
+                              Map<ResourceLocation, ReadMetadataFile> results) {
         PackType resourceType = resourceRepository.resourceType();
 
         try {
-            ResourceCollection metadataResources = resourceRepository.getFirstCollectionWith(metadataLocation);
+            OrderedResourceRepository.ResourceCollectionResult metadataResources = resourceRepository
+                    .getFirstCollectionWith(metadataLocation);
 
             String metadataPath = metadataLocation.getPath();
             String extension = metadataPath.substring(metadataPath.lastIndexOf('.'));
 
             // There must be a reader for this extension since we only retrieved files with readers' extensions
-            InputStream metadataStream = metadataResources.getResource(resourceType, metadataLocation);
-            MetadataReader.ReadMetadata metadata = METADATA_READERS
+            InputStream metadataStream = metadataResources.collection().getResource(resourceType, metadataLocation);
+            Map<ResourceLocation, MetadataView> metadata = METADATA_READERS
                     .get(extension)
                     .read(metadataLocation, metadataStream);
             metadataStream.close();
 
-            ResourceLocation textureLocation = metadata.textureLocation();
-
-            // Ignore metadata that is in a lower pack than the texture
-            if (resourceRepository.getFirstCollectionWith(textureLocation).equals(metadataResources)) {
-                results.put(metadataLocation, metadata);
-            }
-
+            results.put(metadataLocation, new ReadMetadataFile(metadata, metadataResources.collectionIndex()));
         } catch (IOException ioException) {
             LOGGER.error("Texture associated with metadata in file {} is missing: {}",
                     metadataLocation, ioException);
@@ -179,16 +175,17 @@ public class TextureLoader<R> {
      * @return combined metadata by texture
      */
     private Map<ResourceLocation, MetadataView> combineByTexture(
-            Map<ResourceLocation, MetadataReader.ReadMetadata> locationToMetadata
+            Map<ResourceLocation, ReadMetadataFile> locationToMetadata
     ) {
 
         // Organize metadata by textures; use a tree map to sort by metadata location
-        Map<ResourceLocation, Map<ResourceLocation, MetadataView>> textureToAllMetadata = new HashMap<>();
-        locationToMetadata.forEach(
-                (metadataLocation, metadata) ->
+        Map<ResourceLocation, Map<ResourceLocation, MetadataViewAndIndex>> textureToAllMetadata = new HashMap<>();
+        locationToMetadata.forEach((metadataLocation, file) ->
+                file.METADATA_BY_TEXTURE.forEach((textureLocation, metadata) ->
                         textureToAllMetadata
-                                .computeIfAbsent(metadata.textureLocation(), (textureLocation) -> new TreeMap<>())
-                                .put(metadataLocation, metadata.metadata())
+                                .computeIfAbsent(textureLocation, (location) -> new TreeMap<>())
+                                .put(metadataLocation, new MetadataViewAndIndex(metadata, file.COLLECTION_INDEX))
+                )
         );
 
         // Combine the metadata
@@ -197,14 +194,19 @@ public class TextureLoader<R> {
             Optional<String> duplicateKey = findDuplicateKey(allMetadata.values());
             if (duplicateKey.isPresent()) {
                 LOGGER.error(
-                        "Two metadata files for the same texture {} have conflicting keys: {}",
+                        "Two metadata files for the same texture {} in the same pack have conflicting keys: {}",
                         textureLocation,
                         duplicateKey.get()
                 );
                 return;
             }
 
-            textureToCombinedMetadata.put(textureLocation, new CombinedMetadataView(allMetadata.values()));
+            textureToCombinedMetadata.put(textureLocation, new CombinedMetadataView(
+                    allMetadata.values().stream()
+                            .sorted(Comparator.comparingInt((viewAndIndex) -> viewAndIndex.COLLECTION_INDEX))
+                            .map((viewAndIndex) -> viewAndIndex.VIEW)
+                            .toList()
+            ));
         });
 
         return textureToCombinedMetadata;
@@ -215,18 +217,27 @@ public class TextureLoader<R> {
      * @param metadataViews     metadata views to check for duplicates
      * @return duplicate key, if any
      */
-    private Optional<String> findDuplicateKey(Collection<MetadataView> metadataViews) {
-        Set<String> uniqueKeys = new HashSet<>();
+    private Optional<String> findDuplicateKey(Collection<MetadataViewAndIndex> metadataViews) {
+        Map<String, Integer> smallestIndex = new HashMap<>();
+        Map<String, Integer> countByIndex = new HashMap<>();
 
-        for (MetadataView view : metadataViews) {
-            for (String key : view.keys()) {
-                if (!uniqueKeys.add(key)) {
-                    return Optional.of(key);
+        for (MetadataViewAndIndex viewAndIndex : metadataViews) {
+            for (String key : viewAndIndex.VIEW.keys()) {
+                int previousSmallestIndex = smallestIndex.getOrDefault(key, Integer.MAX_VALUE);
+                int currentIndex = viewAndIndex.COLLECTION_INDEX;
+                if (currentIndex < previousSmallestIndex) {
+                    smallestIndex.put(key, currentIndex);
+                    countByIndex.put(key, 1);
+                } else if (currentIndex == previousSmallestIndex) {
+                    countByIndex.put(key, countByIndex.get(key) + 1);
                 }
             }
         }
 
-        return Optional.empty();
+        return countByIndex.entrySet().stream()
+                .filter((entry) -> entry.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .findAny();
     }
 
     /**
@@ -243,6 +254,7 @@ public class TextureLoader<R> {
         try {
             InputStream textureStream = resourceRepository
                     .getFirstCollectionWith(textureLocation)
+                    .collection()
                     .getResource(resourceType, textureLocation);
             R texture = TEXTURE_READER.read(textureStream, metadata);
             textureStream.close();
@@ -254,6 +266,48 @@ public class TextureLoader<R> {
         } catch (InvalidMetadataException metadataError) {
             LOGGER.error("Invalid metadata for texture {}: {}", textureLocation, metadataError);
         }
+    }
+
+    /**
+     * Holds multiple {@link MetadataView}s and the index of the
+     * collection that contains the metadata file they came from.
+     * @author soir20
+     */
+    private static class ReadMetadataFile {
+        public final Map<ResourceLocation, MetadataView> METADATA_BY_TEXTURE;
+        public final int COLLECTION_INDEX;
+
+        /**
+         * Creates a new wrapper for {@link MetadataView}s and collection index.
+         * @param metadataByTexture         metadata views according to the path of their associated texture
+         * @param collectionIndex           index of the collection that the metadata views came from
+         */
+        public ReadMetadataFile(Map<ResourceLocation, MetadataView> metadataByTexture, int collectionIndex) {
+            METADATA_BY_TEXTURE = metadataByTexture;
+            COLLECTION_INDEX = collectionIndex;
+        }
+
+    }
+
+    /**
+     * Holds a {@link MetadataView} and the index of the
+     * collection that contains the metadata file it came from.
+     * @author soir20
+     */
+    private static class MetadataViewAndIndex {
+        public final MetadataView VIEW;
+        public final int COLLECTION_INDEX;
+
+        /**
+         * Creates a new wrapper for a {@link MetadataView} and collection index.
+         * @param view      metadata view
+         * @param index     index of the collection that the metadata view came from
+         */
+        public MetadataViewAndIndex(MetadataView view, int index) {
+            VIEW = view;
+            COLLECTION_INDEX = index;
+        }
+
     }
 
 }

@@ -120,8 +120,9 @@ public class SpriteFrameSizeFixPack implements PackResources {
         }
 
         // If the texture is controlled by the mod, we already know it's in the topmost pack
-        return RESOURCE_REPOSITORY.getFirstCollectionWith(textureLocation).getResource(PackType.CLIENT_RESOURCES,
-                textureLocation);
+        return RESOURCE_REPOSITORY.getFirstCollectionWith(textureLocation)
+                .collection()
+                .getResource(PackType.CLIENT_RESOURCES, textureLocation);
 
     }
 

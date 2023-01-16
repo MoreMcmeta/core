@@ -17,14 +17,15 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -36,7 +37,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class CombinedMetadataView implements MetadataView {
     private final Map<String, MetadataView> KEY_TO_VIEW;
-    private final NavigableMap<Integer, MetadataView> INDEX_TO_VIEW;
+    private final List<Pair<String, MetadataView>> INDEX_TO_VIEW;
 
     /**
      * Creates a new combined metadata view.
@@ -47,20 +48,15 @@ public class CombinedMetadataView implements MetadataView {
 
         // The LinkedHashMap will keep the keys in insertion order
         KEY_TO_VIEW = new LinkedHashMap<>();
-        INDEX_TO_VIEW = new TreeMap<>();
+        INDEX_TO_VIEW = new ArrayList<>();
 
-        int keysProcessed = 0;
         for (MetadataView view : metadataViews) {
             requireNonNull(view, "Metadata view cannot be null");
-            INDEX_TO_VIEW.put(keysProcessed, view);
 
             for (String key : view.keys()) {
-                if (KEY_TO_VIEW.put(key, view) != null) {
-                    throw new IllegalArgumentException(
-                            "Two metadata files for the same texture have conflicting keys: " + key
-                    );
+                if (KEY_TO_VIEW.putIfAbsent(key, view) == null) {
+                    INDEX_TO_VIEW.add(Pair.of(key, view));
                 }
-                keysProcessed++;
             }
         }
     }
@@ -82,7 +78,7 @@ public class CombinedMetadataView implements MetadataView {
 
     @Override
     public boolean hasKey(int index) {
-        return value(index, MetadataView::hasKey);
+        return value(index, MetadataView::hasKey, false);
     }
 
     @Override
@@ -92,7 +88,7 @@ public class CombinedMetadataView implements MetadataView {
 
     @Override
     public Optional<String> stringValue(int index) {
-        return value(index, MetadataView::stringValue);
+        return value(index, MetadataView::stringValue, Optional.empty());
     }
 
     @Override
@@ -102,7 +98,7 @@ public class CombinedMetadataView implements MetadataView {
 
     @Override
     public Optional<Integer> integerValue(int index) {
-        return value(index, MetadataView::integerValue);
+        return value(index, MetadataView::integerValue, Optional.empty());
     }
 
     @Override
@@ -112,7 +108,7 @@ public class CombinedMetadataView implements MetadataView {
 
     @Override
     public Optional<Long> longValue(int index) {
-        return value(index, MetadataView::longValue);
+        return value(index, MetadataView::longValue, Optional.empty());
     }
 
     @Override
@@ -122,7 +118,7 @@ public class CombinedMetadataView implements MetadataView {
 
     @Override
     public Optional<Float> floatValue(int index) {
-        return value(index, MetadataView::floatValue);
+        return value(index, MetadataView::floatValue, Optional.empty());
     }
 
     @Override
@@ -132,7 +128,7 @@ public class CombinedMetadataView implements MetadataView {
 
     @Override
     public Optional<Double> doubleValue(int index) {
-        return value(index, MetadataView::doubleValue);
+        return value(index, MetadataView::doubleValue, Optional.empty());
     }
 
     @Override
@@ -142,7 +138,7 @@ public class CombinedMetadataView implements MetadataView {
 
     @Override
     public Optional<Boolean> booleanValue(int index) {
-        return value(index, MetadataView::booleanValue);
+        return value(index, MetadataView::booleanValue, Optional.empty());
     }
 
     @Override
@@ -152,7 +148,7 @@ public class CombinedMetadataView implements MetadataView {
 
     @Override
     public Optional<MetadataView> subView(int index) {
-        return value(index, MetadataView::subView);
+        return value(index, MetadataView::subView, Optional.empty());
     }
 
     /**
@@ -175,17 +171,22 @@ public class CombinedMetadataView implements MetadataView {
     /**
      * Retrieves a value at the given index.
      * @param index         index of the value to retrieve
-     * @param valueGetter   function to get value using the index
+     * @param valueGetter   function to get value using the key at the given index
+     * @param defaultValue  default value if the value is not found
      * @return value at the provided index
      * @param <T> type of value to retrieve
      */
-    private <T> T value(int index, BiFunction<MetadataView, Integer, T> valueGetter) {
+    private <T> T value(int index, BiFunction<MetadataView, String, T> valueGetter, T defaultValue) {
         if (index < 0) {
             throw new NegativeKeyIndexException(index);
         }
 
-        Map.Entry<Integer, MetadataView> startIndexAndView = INDEX_TO_VIEW.floorEntry(index);
-        return valueGetter.apply(startIndexAndView.getValue(), index - startIndexAndView.getKey());
+        if (index >= size()) {
+            return defaultValue;
+        }
+
+        Pair<String, MetadataView> keyAndView = INDEX_TO_VIEW.get(index);
+        return valueGetter.apply(keyAndView.getSecond(), keyAndView.getFirst());
     }
 
 }

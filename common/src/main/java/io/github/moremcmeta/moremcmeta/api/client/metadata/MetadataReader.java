@@ -20,8 +20,7 @@ package io.github.moremcmeta.moremcmeta.api.client.metadata;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.InputStream;
-
-import static java.util.Objects.requireNonNull;
+import java.util.Map;
 
 /**
  * Reads metadata from a file or throws a {@link InvalidMetadataException} if it is not valid.
@@ -37,46 +36,10 @@ public interface MetadataReader {
      * This reader should *not* throw exceptions that are not {@link InvalidMetadataException}.
      * @param metadataLocation      location of the metadata file
      * @param metadataStream        data in the metadata file
-     * @return an immutable view of the read metadata
+     * @return an immutable view of the read metadata by texture path
      * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
-    ReadMetadata read(ResourceLocation metadataLocation, InputStream metadataStream) throws InvalidMetadataException;
-
-    /**
-     * Contains the result of {@link MetadataReader#read(ResourceLocation, InputStream)} if it was successful.
-     * @author soir20
-     * @since 4.0.0
-     */
-    final class ReadMetadata {
-        private final ResourceLocation TEXTURE_LOCATION;
-        private final MetadataView METADATA;
-
-        /**
-         * Creates a new container for the results of metadata reading.
-         * @param textureLocation       location of the texture associated with this metadata
-         * @param metadata              a view of the metadata
-         */
-        public ReadMetadata(ResourceLocation textureLocation, MetadataView metadata) {
-            TEXTURE_LOCATION = requireNonNull(textureLocation, "Texture location cannot be null");
-            METADATA = requireNonNull(metadata, "Metadata cannot be null");
-        }
-
-        /**
-         * Gets the location of the texture associated with this metadata.
-         * @return the location of the texture associated with this metadata
-         */
-        public ResourceLocation textureLocation() {
-            return TEXTURE_LOCATION;
-        }
-
-        /**
-         * Gets the metadata that was read.
-         * @return the metadata that was read
-         */
-        public MetadataView metadata() {
-            return METADATA;
-        }
-
-    }
+    Map<ResourceLocation, MetadataView> read(ResourceLocation metadataLocation, InputStream metadataStream)
+            throws InvalidMetadataException;
 
 }

@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -29,6 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -38,7 +38,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class OrderedResourceRepository {
     private final PackType RESOURCE_TYPE;
-    private final ImmutableCollection<ResourceCollection> COLLECTIONS;
+    private final ImmutableList<ResourceCollection> COLLECTIONS;
 
     /**
      * Creates a new ordered group of {@link ResourceCollection}s.
@@ -70,12 +70,12 @@ public class OrderedResourceRepository {
      * @return the collection with the given resource
      * @throws IOException if the resource is not found in any collection
      */
-    public ResourceCollection getFirstCollectionWith(ResourceLocation location) throws IOException {
+    public ResourceCollectionResult getFirstCollectionWith(ResourceLocation location) throws IOException {
         requireNonNull(location, "Location cannot be null");
 
-        Optional<ResourceCollection> collectionWithResource = COLLECTIONS.stream().filter((collection) ->
-                collection.hasResource(RESOURCE_TYPE, location)
-        ).findFirst();
+        Optional<ResourceCollectionResult> collectionWithResource = IntStream.range(0, COLLECTIONS.size())
+                .filter((index) -> COLLECTIONS.get(index).hasResource(RESOURCE_TYPE, location))
+                .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index)).findFirst();
 
         if (collectionWithResource.isEmpty()) {
             throw new IOException("Resource not found in any collection: " + location);
@@ -112,6 +112,46 @@ public class OrderedResourceRepository {
                         (namespace) -> collection.getResources(RESOURCE_TYPE, namespace, pathStart, fileFilter).stream()
                 )
         ).collect(Collectors.toSet());
+    }
+
+    /**
+     * Contains the result of a {@link ResourceCollection} search.
+     * @author soir20
+     */
+    public static class ResourceCollectionResult {
+        private final ResourceCollection COLLECTION;
+        private final int INDEX;
+
+        /**
+         * Creates a new collection result.
+         * @param collection        collection that was found
+         * @param index             index of the collection (where lower indices are higher packs)
+         */
+        private ResourceCollectionResult(ResourceCollection collection, int index) {
+            COLLECTION = requireNonNull(collection, "Resource collection cannot be null");
+
+            if (index < 0) {
+                throw new IllegalArgumentException("Index cannot be negative");
+            }
+            INDEX = index;
+        }
+
+        /**
+         * Gets the collection from this result.
+         * @return collection that was found
+         */
+        public ResourceCollection collection() {
+            return COLLECTION;
+        }
+
+        /**
+         * Gets the index of the collection that was found (lower indices are higher packs).
+         * @return index of the collection that was found
+         */
+        public int collectionIndex() {
+            return INDEX;
+        }
+
     }
 
 }
