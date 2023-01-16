@@ -18,13 +18,16 @@
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ResourceCollection;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -36,13 +39,16 @@ import static java.util.Objects.requireNonNull;
  */
 public class PackResourcesAdapter implements ResourceCollection {
     private final PackResources ORIGINAL;
+    private final Logger LOGGER;
 
     /**
      * Creates an adapter for resource packs.
      * @param original      the original pack to delegate to
+     * @param logger        logger to log warnings or errors
      */
-    public PackResourcesAdapter(PackResources original) {
+    public PackResourcesAdapter(PackResources original, Logger logger) {
         ORIGINAL = requireNonNull(original, "Original pack cannot be null");
+        LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
 
     /**
@@ -87,7 +93,20 @@ public class PackResourcesAdapter implements ResourceCollection {
         requireNonNull(namespace, "Namespace cannot be null");
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(fileFilter, "File filter cannot be null");
-        return ORIGINAL.getResources(resourceType, namespace, pathStart, Integer.MAX_VALUE, fileFilter);
+
+
+        /* We should catch ResourceLocation errors to prevent bad texture names/paths from
+           removing all resource packs. We can't filter invalid folder names, so we don't filter
+           invalid texture names for consistency.
+           NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
+        try {
+            return ORIGINAL.getResources(resourceType, namespace, pathStart, Integer.MAX_VALUE, fileFilter);
+        } catch (ResourceLocationException error) {
+            LOGGER.error("Found texture with invalid name in pack {}; cannot return any resources " +
+                            "from this pack: {}", ORIGINAL.getName(), error.toString());
+            return List.of();
+        }
+
     }
 
 

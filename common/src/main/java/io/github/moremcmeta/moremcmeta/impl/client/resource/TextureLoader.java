@@ -22,7 +22,6 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataExcept
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureReader;
-import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import org.apache.logging.log4j.Logger;
@@ -92,21 +91,11 @@ public class TextureLoader<R> {
 
         Set<ResourceLocation> textureCandidates = new HashSet<>();
 
-        /* We should catch ResourceLocation errors to prevent bad texture names/paths from
-           removing all resource packs. We can't filter invalid folder names, so we don't filter
-           invalid texture names for consistency.
-           NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
-        try {
-            for (String path : paths) {
-                textureCandidates.addAll(resourceRepository.listResources(
-                        path,
-                        fileName -> METADATA_READERS.keySet().stream().anyMatch(fileName::endsWith)
-                ));
-            }
-        } catch (ResourceLocationException error) {
-            LOGGER.error("Found texture with invalid name; no textures will be loaded: {}",
-                    error.toString());
-            return ImmutableMap.of();
+        for (String path : paths) {
+            textureCandidates.addAll(resourceRepository.listResources(
+                    path,
+                    fileName -> METADATA_READERS.keySet().stream().anyMatch(fileName::endsWith)
+            ));
         }
 
         return makeTextures(textureCandidates, resourceRepository);

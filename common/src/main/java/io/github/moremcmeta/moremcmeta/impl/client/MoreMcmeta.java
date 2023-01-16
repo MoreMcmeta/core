@@ -187,7 +187,7 @@ public abstract class MoreMcmeta {
                     .toList();
 
             ModRepositorySource source = new ModRepositorySource(() -> {
-                OrderedResourceRepository repository = getResourceRepository(packRepository);
+                OrderedResourceRepository repository = getResourceRepository(packRepository, logger);
 
                 List<String> currentPackIds = packIdGetter.get();
 
@@ -484,15 +484,16 @@ public abstract class MoreMcmeta {
 
     /**
      * Gets the repository containing all the game's resources except the pack this mod adds.
-     * @param packRepository the repository containing all packs
+     * @param packRepository    the repository containing all packs
+     * @param logger            logger to log warnings and errors
      * @return the repository with all resources
      */
-    private OrderedResourceRepository getResourceRepository(PackRepository packRepository) {
+    private OrderedResourceRepository getResourceRepository(PackRepository packRepository, Logger logger) {
         List<PackResourcesAdapter> otherPacks = new ArrayList<>(packRepository.getSelectedPacks()
                 .stream()
                 .filter((pack) -> !pack.getId().equals(ModRepositorySource.PACK_ID))
                 .map(Pack::open)
-                .map(PackResourcesAdapter::new)
+                .map((pack) -> new PackResourcesAdapter(pack, logger))
                 .toList());
 
         Collections.reverse(otherPacks);

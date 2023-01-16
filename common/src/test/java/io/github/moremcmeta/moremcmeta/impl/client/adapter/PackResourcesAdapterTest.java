@@ -17,11 +17,15 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MockPackResources;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -41,25 +45,33 @@ import static org.junit.Assert.*;
  * @author soir20
  */
 public class PackResourcesAdapterTest {
+    private static final Logger LOGGER = LogManager.getLogger();
+    
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void construct_OriginalNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new PackResourcesAdapter(null);
+        new PackResourcesAdapter(null, LOGGER);
+    }
+
+    @Test
+    public void construct_LoggerNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new PackResourcesAdapter(new MockPackResources(), null);
     }
 
     @Test
     public void getResource_ResourceTypeNull_NullPointerException() throws IOException {
-        PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources());
+        PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources(), LOGGER);
         expectedException.expect(NullPointerException.class);
         adapter.getResource(null, new ResourceLocation("testing"));
     }
 
     @Test
     public void getResource_LocationNull_NullPointerException() throws IOException {
-        PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources());
+        PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources(), LOGGER);
         expectedException.expect(NullPointerException.class);
         adapter.getResource(PackType.CLIENT_RESOURCES, null);
     }
@@ -112,7 +124,7 @@ public class PackResourcesAdapterTest {
     @Test
     public void getResource_OriginalThrowsException_ThrowsException() throws IOException {
         PackResources original = new ExceptionPackResources();
-        PackResourcesAdapter adapter = new PackResourcesAdapter(original);
+        PackResourcesAdapter adapter = new PackResourcesAdapter(original, LOGGER);
 
         ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
 
@@ -122,14 +134,14 @@ public class PackResourcesAdapterTest {
 
     @Test
     public void hasResource_ResourceTypeNull_NullPointerException() {
-        PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources());
+        PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources(), LOGGER);
         expectedException.expect(NullPointerException.class);
         adapter.hasResource(null, new ResourceLocation("testing"));
     }
 
     @Test
     public void hasResource_LocationNull_NullPointerException() {
-        PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources());
+        PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources(), LOGGER);
         expectedException.expect(NullPointerException.class);
         adapter.hasResource(PackType.CLIENT_RESOURCES, null);
     }
@@ -172,7 +184,7 @@ public class PackResourcesAdapterTest {
     @Test
     public void hasResource_OriginalThrowsException_ThrowsException() {
         PackResources original = new ExceptionPackResources();
-        PackResourcesAdapter adapter = new PackResourcesAdapter(original);
+        PackResourcesAdapter adapter = new PackResourcesAdapter(original, LOGGER);
 
         ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
 
@@ -254,6 +266,42 @@ public class PackResourcesAdapterTest {
 
         assertEquals(0, resources.size());
     }
+    @Test
+    public void getResources_OriginalThrowsResourceLocationException_NoneFound() {
+        PackResourcesAdapter adapter = new PackResourcesAdapter(
+                new MockPackResources(
+                        Set.of("image.png", "info.txt", "readme.md"),
+                        ImmutableMap.of(
+                                PackType.CLIENT_RESOURCES,
+                                Set.of(new ResourceLocation("textures/hello.png"),
+                                        new ResourceLocation("textures/block/sea/rock/gravel.png"),
+                                        new ResourceLocation("sea", "textures/block/coral.png"),
+                                        new ResourceLocation("lang/en/us/words.txt")),
+                                PackType.SERVER_DATA,
+                                Set.of(new ResourceLocation("settings/server/network/config.json"),
+                                        new ResourceLocation("lang/en/us/words.txt"),
+                                        new ResourceLocation("sea", "textures/block/coral.png"),
+                                        new ResourceLocation("textures/block/sea/rock/gravel.png")
+                                )
+                        ),
+                        "test_pack"
+                ) {
+                    @Override
+                    public Collection<ResourceLocation> getResources(PackType packType, String namespace,
+                                                                     String pathStart, int maxDepth,
+                                                                     Predicate<String> pathFilter) {
+                        throw new ResourceLocationException("dummy exception");
+                    }
+
+                },
+                LOGGER
+        );
+
+        Collection<ResourceLocation> resources = adapter.getResources(PackType.CLIENT_RESOURCES, "minecraft",
+                "textures", (file) -> file.endsWith(".png"));
+
+        assertTrue(resources.isEmpty());
+    }
 
     @Test
     public void getResources_EmptyNamespace_NoExceptionIfOriginalAccepts() {
@@ -290,7 +338,7 @@ public class PackResourcesAdapterTest {
     @Test
     public void getResources_OriginalThrowsException_ThrowsException() {
         PackResources original = new ExceptionPackResources();
-        PackResourcesAdapter adapter = new PackResourcesAdapter(original);
+        PackResourcesAdapter adapter = new PackResourcesAdapter(original, LOGGER);
 
         expectedException.expect(RuntimeException.class);
         adapter.getResources(PackType.CLIENT_RESOURCES, "minecraft",
@@ -332,7 +380,7 @@ public class PackResourcesAdapterTest {
 
         PackResources original = new MockPackResources(rootResources, regularResources, "pack name");
 
-        return new PackResourcesAdapter(original);
+        return new PackResourcesAdapter(original, LOGGER);
     }
 
     /**

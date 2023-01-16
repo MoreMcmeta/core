@@ -779,7 +779,7 @@ public class TextureLoaderTest {
     }
 
     @Test
-    public void load_ResourceLocationException_NothingLoaded() {
+    public void load_ResourceLocationException_ExceptionNotCaught() {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
                 Set.of(new MockResourceCollection(Set.of(
                         new ResourceLocation("textures/bat.png"),
@@ -801,7 +801,11 @@ public class TextureLoaderTest {
                 MOCK_READERS,
                 LOGGER
         );
-        assertTrue(loader.load(repository, "textures").isEmpty());
+
+        // Individual packs should catch these exceptions, not the loader
+        expectedException.expect(ResourceLocationException.class);
+        loader.load(repository, "textures");
+
     }
 
     @Test
