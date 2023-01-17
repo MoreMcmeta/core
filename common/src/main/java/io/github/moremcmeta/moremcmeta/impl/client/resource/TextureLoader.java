@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
@@ -89,54 +90,72 @@ public class TextureLoader<R> {
             throw new IllegalArgumentException("Path cannot be empty or start with a slash: "+ invalidPath.get());
         }
 
-        Set<ResourceLocation> textureCandidates = new HashSet<>();
+        Set<ResourceLocation> textureCandidates = searchResources(
+                resourceRepository,
+                paths,
+                (fileName) -> METADATA_READERS.keySet().stream().anyMatch(fileName::endsWith)
+        );
+
+        return makeTextures(textureCandidates, resourceRepository, paths);
+    }
+
+    /**
+     * Searches the repository for resources at the given paths that match the given filter.
+     * @param repository            repository containing resources
+     * @param paths                 start of paths to search in (must not be empty)
+     * @param fileNameFilter        filter that returns true when a file should be included
+     * @return locations of all matching resources
+     */
+    private Set<ResourceLocation> searchResources(OrderedResourceRepository repository, String[] paths,
+                                                  Predicate<String> fileNameFilter) {
+        Set<ResourceLocation> results = new HashSet<>();
 
         for (String path : paths) {
-            textureCandidates.addAll(resourceRepository.listResources(
-                    path,
-                    fileName -> METADATA_READERS.keySet().stream().anyMatch(fileName::endsWith)
-            ));
+            results.addAll(repository.listResources(path, fileNameFilter));
         }
 
-        return makeTextures(textureCandidates, resourceRepository);
+        return results;
     }
 
     /**
      * Creates all valid textures from candidates.
      * @param candidates           possible locations of textures
-     * @param resourceRepository   resources to search through
+     * @param repository           resources to search through
+     * @param paths                paths to search for textures in
      * @return a mapping of texture location to the texture itself
      */
     private ImmutableMap<ResourceLocation, R> makeTextures(Collection<? extends ResourceLocation> candidates,
-                                                           OrderedResourceRepository resourceRepository) {
+                                                           OrderedResourceRepository repository,
+                                                           String... paths) {
         Map<ResourceLocation, ReadMetadataFile> locationToMetadata = new ConcurrentHashMap<>();
 
         // Read metadata from unique candidates
         candidates.stream().distinct().parallel().forEach(
-                (metadataLocation) -> readMetadata(resourceRepository, metadataLocation, locationToMetadata)
+                (metadataLocation) -> readMetadata(repository, metadataLocation, locationToMetadata, paths)
         );
 
         Map<ResourceLocation, R> textures = new ConcurrentHashMap<>();
         combineByTexture(locationToMetadata).entrySet()
                 .stream()
                 .parallel()
-                .forEach((entry) -> readTexture(resourceRepository, entry.getKey(), entry.getValue(), textures));
+                .forEach((entry) -> readTexture(repository, entry.getKey(), entry.getValue(), textures));
 
         return ImmutableMap.copyOf(textures);
     }
 
     /**
      * Gets a texture from a file and places it in the provided map.
-     * @param resourceRepository   resource manager to get textures/metadata from
+     * @param repository           resource manager to get textures/metadata from
      * @param metadataLocation     file location of the metadata
      * @param results              filled with the result, must support concurrent modification
+     * @param paths                paths to search for textures in
      */
-    private void readMetadata(OrderedResourceRepository resourceRepository, ResourceLocation metadataLocation,
-                              Map<ResourceLocation, ReadMetadataFile> results) {
-        PackType resourceType = resourceRepository.resourceType();
+    private void readMetadata(OrderedResourceRepository repository, ResourceLocation metadataLocation,
+                              Map<ResourceLocation, ReadMetadataFile> results, String... paths) {
+        PackType resourceType = repository.resourceType();
 
         try {
-            OrderedResourceRepository.ResourceCollectionResult metadataResources = resourceRepository
+            OrderedResourceRepository.ResourceCollectionResult metadataResources = repository
                     .getFirstCollectionWith(metadataLocation);
 
             String metadataPath = metadataLocation.getPath();
@@ -146,7 +165,7 @@ public class TextureLoader<R> {
             InputStream metadataStream = metadataResources.collection().getResource(resourceType, metadataLocation);
             Map<ResourceLocation, MetadataView> metadata = METADATA_READERS
                     .get(extension)
-                    .read(metadataLocation, metadataStream);
+                    .read(metadataLocation, metadataStream, (filter) -> searchResources(repository, paths, filter));
             metadataStream.close();
 
             results.put(metadataLocation, new ReadMetadataFile(metadata, metadataResources.collectionIndex()));

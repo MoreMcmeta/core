@@ -41,7 +41,7 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 public class TextureCacheTest {
-    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream) -> Map.of(
+    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream, resourceSearcher) -> Map.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".moremcmeta", "")
