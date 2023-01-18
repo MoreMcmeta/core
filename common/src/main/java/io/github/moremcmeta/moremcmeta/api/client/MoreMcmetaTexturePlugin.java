@@ -56,4 +56,24 @@ public interface MoreMcmetaTexturePlugin extends ClientPlugin {
      * @return plugin's component provider
      */
     ComponentProvider componentProvider();
+
+    /**
+     * Indicates whether this plugin will be applied when a texture file and this plugin's metadata section
+     * are in different resource packs. This method should always return the same boolean value; the plugin
+     * must either always or never allow the texture and metadata section to be separated.
+     *
+     * **Most plugin authors should not override this method.** While allowing the metadata and texture file
+     * to be in different packs may seem like a feature, enabling it may lead to strange behavior. For example,
+     * say an animation plugin allows the metadata and texture to be in different packs. If a resource pack
+     * overrides only the texture but not the animation metadata, the animation will apply to the overridden
+     * texture. The animation will likely appear incorrect and odd to the user, and it may be difficult for
+     * them to track down which resource pack is causing the issue. Enabling this feature is best used for
+     * overlays or other types of metadata that are barely dependent on the texture file.
+     * @return whether this plugin will be applied when a texture file and this plugin's metadata section
+     *         are in different resource packs
+     */
+    default boolean allowTextureAndSectionInDifferentPacks() {
+        return false;
+    }
+
 }

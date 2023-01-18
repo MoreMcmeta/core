@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -66,18 +67,22 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
     /**
      * Reads texture data from texture and metadata byte streams.
-     * @param textureStream     input stream of image data
-     * @param metadata          metadata associated with this texture
+     * @param textureStream                 input stream of image data
+     * @param metadata                      metadata associated with this texture
+     * @param sectionsInSamePack            set of metadata sections that are in the same pack
+     *                                      as the texture
      * @return minimum texture data
      * @throws IOException if the image could not be read
      * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
     @Override
-    public TextureData<I> read(InputStream textureStream, MetadataView metadata)
+    public TextureData<I> read(InputStream textureStream, MetadataView metadata,
+                               Set<String> sectionsInSamePack)
             throws IOException, InvalidMetadataException {
 
         requireNonNull(textureStream, "Texture stream cannot be null");
         requireNonNull(metadata, "Metadata cannot be null");
+        requireNonNull(sectionsInSamePack, "Set of sections in same pack cannot be null");
 
         I image = IMAGE_READER.read(textureStream);
         requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
@@ -90,7 +95,8 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
         for (String section : metadata.keys()) {
             MoreMcmetaTexturePlugin plugin = SECTION_TO_PLUGIN.get(section);
-            if (plugin == null) {
+            boolean texAndSectionInDiffPack = !sectionsInSamePack.contains(section);
+            if (plugin == null || (!plugin.allowTextureAndSectionInDifferentPacks() && texAndSectionInDiffPack)) {
                 continue;
             }
 

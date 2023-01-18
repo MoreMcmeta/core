@@ -65,7 +65,7 @@ public class TextureCacheTest {
     public void load_NullRepository_NullPointerException() {
         AtomicInteger texturesRead = new AtomicInteger();
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> {
+                new TextureLoader<>((texStream, metadata, texAndMetadataInSamePack) -> {
                     texturesRead.incrementAndGet();
                     return 1;
                 }, MOCK_READERS, LOGGER)
@@ -79,7 +79,7 @@ public class TextureCacheTest {
     public void load_NullPaths_NullPointerException() {
         AtomicInteger texturesRead = new AtomicInteger();
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> {
+                new TextureLoader<>((texStream, metadata, texAndMetadataInSamePack) -> {
                     texturesRead.incrementAndGet();
                     return 1;
                 }, MOCK_READERS, LOGGER)
@@ -96,7 +96,7 @@ public class TextureCacheTest {
     public void load_NullPath_NullPointerException() {
         AtomicInteger texturesRead = new AtomicInteger();
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> {
+                new TextureLoader<>((texStream, metadata, texAndMetadataInSamePack) -> {
                     texturesRead.incrementAndGet();
                     return 1;
                 }, MOCK_READERS, LOGGER)
@@ -113,7 +113,7 @@ public class TextureCacheTest {
     public void load_NullState_NullPointerException() {
         AtomicInteger texturesRead = new AtomicInteger();
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> {
+                new TextureLoader<>((texStream, metadata, texAndMetadataInSamePack) -> {
                     texturesRead.incrementAndGet();
                     return 1;
                 }, MOCK_READERS, LOGGER)
@@ -130,7 +130,7 @@ public class TextureCacheTest {
     public void load_LoadTwiceSameState_LoaderUsedOnce() {
         AtomicInteger texturesRead = new AtomicInteger();
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> {
+                new TextureLoader<>((texStream, metadata, texAndMetadataInSamePack) -> {
                     texturesRead.incrementAndGet();
                     return 1;
                 }, MOCK_READERS, LOGGER)
@@ -150,7 +150,7 @@ public class TextureCacheTest {
     @Test
     public void load_GetAfterLoad_CacheRetrieved() {
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> 1, MOCK_READERS, LOGGER)
+                new TextureLoader<>((texStream, metadata, texAndMetadataInSamePack) -> 1, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
@@ -170,7 +170,7 @@ public class TextureCacheTest {
     @Test
     public void load_LoadAfterGet_CacheRetrieved() throws InterruptedException {
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> 1, MOCK_READERS, LOGGER)
+                new TextureLoader<>((texStream, metadata, texAndMetadataInSamePack) -> 1, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
@@ -198,7 +198,7 @@ public class TextureCacheTest {
     @Test
     public void load_GetAndLoadAfterDifferentStateLoaded_SecondCacheRetrieved() throws InterruptedException {
         TextureCache<Integer, Integer> cache = new TextureCache<>(
-                new TextureLoader<>((texStream, metadataStream) -> 1, MOCK_READERS, LOGGER)
+                new TextureLoader<>((texStream, metadata, texAndMetadataInSamePack) -> 1, MOCK_READERS, LOGGER)
         );
 
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",

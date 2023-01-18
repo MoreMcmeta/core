@@ -85,7 +85,7 @@ public class TextureLoaderTest {
     public void construct_MetadataReadersNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 null,
                 LOGGER
         );
@@ -95,7 +95,7 @@ public class TextureLoaderTest {
     public void construct_LoggerNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 null
         );
@@ -105,7 +105,7 @@ public class TextureLoaderTest {
     public void construct_ExtensionWithoutPeriod_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
         new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 ImmutableMap.of("moremcmeta", MOCK_READER),
                 LOGGER
         );
@@ -115,7 +115,7 @@ public class TextureLoaderTest {
     public void construct_ExtensionWithPeriodNotAtStart_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
         new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 ImmutableMap.of("png.moremcmeta", MOCK_READER),
                 LOGGER
         );
@@ -125,7 +125,7 @@ public class TextureLoaderTest {
     public void construct_ExtensionWithMultiplePeriods_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
         new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 ImmutableMap.of(".png.moremcmeta", MOCK_READER),
                 LOGGER
         );
@@ -135,7 +135,7 @@ public class TextureLoaderTest {
     public void construct_ExtensionWithJustPeriod_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
         new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 ImmutableMap.of(".", MOCK_READER),
                 LOGGER
         );
@@ -144,7 +144,7 @@ public class TextureLoaderTest {
     @Test
     public void load_ResourceManagerNull_NullPointerException() {
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -159,7 +159,7 @@ public class TextureLoaderTest {
                 "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -174,7 +174,7 @@ public class TextureLoaderTest {
                 "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -189,7 +189,7 @@ public class TextureLoaderTest {
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1, 
+                (texStream, metadata, sectionsInSamePack) -> 1, 
                 MOCK_READERS,
                 LOGGER
         );
@@ -204,7 +204,7 @@ public class TextureLoaderTest {
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -219,7 +219,7 @@ public class TextureLoaderTest {
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -240,7 +240,7 @@ public class TextureLoaderTest {
         ));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -262,7 +262,7 @@ public class TextureLoaderTest {
         ));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> {
+                (texStream, metadata, sectionsInSamePack) -> {
                     assertEquals(
                             List.of("one", "two", "three", "four", "five", "six"),
                             Lists.newArrayList(metadata.keys())
@@ -304,7 +304,7 @@ public class TextureLoaderTest {
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceSearcher) -> {
                     if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
                         return Map.of(
@@ -343,7 +343,7 @@ public class TextureLoaderTest {
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceSearcher) -> {
                     if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
                         return Map.of(
@@ -377,7 +377,7 @@ public class TextureLoaderTest {
         ));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -396,7 +396,7 @@ public class TextureLoaderTest {
                 "creeper.moremcmeta", "zombie.jpg", "zombie.jpg.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -417,7 +417,7 @@ public class TextureLoaderTest {
         ));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceSearcher) -> {
                     Set<ResourceLocation> locations = resourceSearcher.apply(
                             (fileName) -> fileName.endsWith("_abcd.png")
@@ -444,7 +444,7 @@ public class TextureLoaderTest {
                 "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -461,7 +461,7 @@ public class TextureLoaderTest {
                 "textures/creeper.png", "textures/zombie.png"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -484,7 +484,7 @@ public class TextureLoaderTest {
         ));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceSearcher) -> {
                     if (metadataLocation.getPath().contains("creeper")) {
                         throw new InvalidMetadataException("Dummy exception");
@@ -514,7 +514,7 @@ public class TextureLoaderTest {
 
         AtomicInteger texturesLoaded = new AtomicInteger();
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> {
+                (texStream, metadata, sectionsInSamePack) -> {
                     if (texturesLoaded.getAndIncrement() < 1) {
                         throw new InvalidMetadataException("Dummy exception");
                     }
@@ -541,7 +541,7 @@ public class TextureLoaderTest {
 
         AtomicInteger texturesLoaded = new AtomicInteger();
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> {
+                (texStream, metadata, sectionsInSamePack) -> {
                     if (texturesLoaded.getAndIncrement() < 1) {
                         throw new IOException("Dummy exception");
                     }
@@ -568,7 +568,7 @@ public class TextureLoaderTest {
 
         AtomicInteger texturesLoaded = new AtomicInteger();
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> {
+                (texStream, metadata, sectionsInSamePack) -> {
                     if (texturesLoaded.getAndIncrement() < 1) {
                         throw new RuntimeException("Dummy exception");
                     }
@@ -601,7 +601,7 @@ public class TextureLoaderTest {
         };
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -635,7 +635,7 @@ public class TextureLoaderTest {
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -668,7 +668,7 @@ public class TextureLoaderTest {
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -711,7 +711,7 @@ public class TextureLoaderTest {
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -756,7 +756,7 @@ public class TextureLoaderTest {
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -774,7 +774,7 @@ public class TextureLoaderTest {
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -797,7 +797,7 @@ public class TextureLoaderTest {
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -808,6 +808,34 @@ public class TextureLoaderTest {
         assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
         assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
         assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+    }
+
+    @Test
+    public void load_TwoMetadataFilesForSameTextureInDiffPacks_SeparatedSectionNotInSet() {
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of("textures/bat.png", "textures/bat.png.moremcmeta"),
+                Set.of("textures/bat2.png.moremcmeta")
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata, sectionsInSamePack) -> {
+                    assertEquals(Set.of("one", "two", "three"), sectionsInSamePack);
+                    return 1;
+                },
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceSearcher) -> {
+                    if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
+                        return Map.of(
+                                new ResourceLocation("textures/bat.png"),
+                                new MockMetadataView(List.of("four", "five", "six"))
+                        );
+                    }
+
+                    return MOCK_READER.read(metadataLocation, metadataStream, resourceSearcher);
+                }),
+                LOGGER
+        );
+
+        loader.load(repository, "textures");
     }
 
     @Test
@@ -829,7 +857,7 @@ public class TextureLoaderTest {
         };
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
@@ -851,7 +879,7 @@ public class TextureLoaderTest {
                 "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
-                (texStream, metadata) -> 1,
+                (texStream, metadata, sectionsInSamePack) -> 1,
                 MOCK_READERS,
                 LOGGER
         );
