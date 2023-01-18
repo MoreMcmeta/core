@@ -811,7 +811,7 @@ public class TextureLoaderTest {
     }
 
     @Test
-    public void load_TwoMetadataFilesForSameTextureInDiffPacks_SeparatedSectionNotInSet() {
+    public void load_SomeMetadataForTextureInLowerPack_SeparatedSectionNotInSet() {
         OrderedResourceRepository repository = makeMockRepository(
                 Set.of("textures/bat.png", "textures/bat.png.moremcmeta"),
                 Set.of("textures/bat2.png.moremcmeta")
@@ -820,6 +820,34 @@ public class TextureLoaderTest {
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadata, sectionsInSamePack) -> {
                     assertEquals(Set.of("one", "two", "three"), sectionsInSamePack);
+                    return 1;
+                },
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceSearcher) -> {
+                    if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
+                        return Map.of(
+                                new ResourceLocation("textures/bat.png"),
+                                new MockMetadataView(List.of("four", "five", "six"))
+                        );
+                    }
+
+                    return MOCK_READER.read(metadataLocation, metadataStream, resourceSearcher);
+                }),
+                LOGGER
+        );
+
+        loader.load(repository, "textures");
+    }
+
+    @Test
+    public void load_SomeMetadataForTextureInHigherPack_SeparatedSectionNotInSet() {
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of("textures/bat.png.moremcmeta"),
+                Set.of("textures/bat.png", "textures/bat2.png.moremcmeta")
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata, sectionsInSamePack) -> {
+                    assertEquals(Set.of("four", "five", "six"), sectionsInSamePack);
                     return 1;
                 },
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceSearcher) -> {
