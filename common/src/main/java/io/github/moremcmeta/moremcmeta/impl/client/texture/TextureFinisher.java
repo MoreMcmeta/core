@@ -88,7 +88,7 @@ public class TextureFinisher implements Finisher<EventDrivenTexture.Builder, Eve
     private EventDrivenTexture finishOne(ResourceLocation location, EventDrivenTexture.Builder builder) {
         Optional<Sprite> sprite = SPRITE_FINDER.findSprite(location);
         if (sprite.isPresent()) {
-            builder.add(new SpriteUploadComponent(sprite.get()));
+            builder.add(new SpriteUploadComponent(sprite.get(), PREPARER));
         } else {
             builder.add(new SingleUploadComponent(PREPARER));
         }

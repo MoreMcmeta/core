@@ -34,14 +34,25 @@ public class SingleUploadComponent implements CoreTextureComponent {
     private static final Point UPLOAD_POINT = new Point(0, 0);
     private final TexturePreparer PREPARER;
     private final AtomicBoolean IS_PREPARED;
+    private final int MIPMAP;
 
     /**
      * Creates a new upload component for an independent texture.
      * @param preparer      prepares the texture for OpenGL on registration
      */
     public SingleUploadComponent(TexturePreparer preparer) {
+        this(preparer, 0);
+    }
+
+    /**
+     * Creates a new upload component for an independent texture.
+     * @param preparer      prepares the texture for OpenGL on registration
+     * @param mipmap        mipmap level of the texture
+     */
+    protected SingleUploadComponent(TexturePreparer preparer, int mipmap) {
         PREPARER = requireNonNull(preparer, "Preparer cannot be null");
         IS_PREPARED = new AtomicBoolean();
+        MIPMAP = mipmap;
     }
 
     /**
@@ -55,7 +66,7 @@ public class SingleUploadComponent implements CoreTextureComponent {
 
         /* Ensure the current frame is only accessed in this method, as the
            view may be invalidated if accessing them inside a render call. */
-        currentFrame.lowerMipmapLevel(0);
+        currentFrame.lowerMipmapLevel(MIPMAP);
         EventDrivenTexture texture = currentFrame.texture();
         int frameWidth = currentFrame.width();
         int frameHeight = currentFrame.height();
@@ -89,7 +100,7 @@ public class SingleUploadComponent implements CoreTextureComponent {
      * @param frameHeight  height of a frame in the texture
      */
     private void prepareTexture(EventDrivenTexture texture, int frameWidth, int frameHeight) {
-        PREPARER.prepare(texture.getId(), 0, frameWidth, frameHeight);
+        PREPARER.prepare(texture.getId(), MIPMAP, frameWidth, frameHeight);
     }
 
 }

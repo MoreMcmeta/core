@@ -35,19 +35,27 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 public class SpriteUploadComponentTest {
+    private static final TexturePreparer DUMMY_PREPARER =  (id, mipmap, width, height) -> {};
+
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void construct_NullSprite_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new SpriteUploadComponent(null);
+        new SpriteUploadComponent(null, DUMMY_PREPARER);
+    }
+
+    @Test
+    public void construct_NullPreparer_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new SpriteUploadComponent(new MockSprite(new Point(2, 3)), null);
     }
 
     @Test
     public void upload_FirstUpload_FrameUploadedAtMipmappedPoints() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3))));
+        builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3)), DUMMY_PREPARER));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
@@ -65,7 +73,7 @@ public class SpriteUploadComponentTest {
     @Test
     public void upload_SecondUpload_FrameUploadedAtMipmappedPointsOnce() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3))));
+        builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3)), DUMMY_PREPARER));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
@@ -85,7 +93,7 @@ public class SpriteUploadComponentTest {
     public void tick_FirstTick_BoundAndUploaded() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         MockSprite sprite = new MockSprite(new Point(2, 3));
-        builder.add(new SpriteUploadComponent(sprite));
+        builder.add(new SpriteUploadComponent(sprite, DUMMY_PREPARER));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
@@ -117,7 +125,7 @@ public class SpriteUploadComponentTest {
 
             }
         });
-        builder.add(new SpriteUploadComponent(sprite));
+        builder.add(new SpriteUploadComponent(sprite, DUMMY_PREPARER));
 
         int layers = 2;
         MockCloseableImageFrame frame = new MockCloseableImageFrame(layers);
@@ -140,7 +148,7 @@ public class SpriteUploadComponentTest {
     public void register_AllImages_MipmapLoweredToSprite() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         MockSprite sprite = new MockSprite(1);
-        builder.add(new SpriteUploadComponent(sprite));
+        builder.add(new SpriteUploadComponent(sprite, DUMMY_PREPARER));
 
         MockCloseableImageFrame frame1 = new MockCloseableImageFrame(1);
         MockCloseableImageFrame frame2 = new MockCloseableImageFrame(1);

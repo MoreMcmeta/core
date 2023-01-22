@@ -27,7 +27,7 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture to an atlas sprite.
  * @author soir20
  */
-public class SpriteUploadComponent implements CoreTextureComponent {
+public class SpriteUploadComponent extends SingleUploadComponent {
     private final Sprite SPRITE;
     private final Point UPLOAD_POINT;
 
@@ -36,21 +36,12 @@ public class SpriteUploadComponent implements CoreTextureComponent {
      * The upload point of the sprite provided should not change at any
      * point in the future.
      * @param sprite        the sprite to upload the texture to
+     * @param preparer      prepares the texture for OpenGL on registration
      */
-    public SpriteUploadComponent(Sprite sprite) {
-        SPRITE = requireNonNull(sprite, "Sprite cannot be null");
+    public SpriteUploadComponent(Sprite sprite, TexturePreparer preparer) {
+        super(preparer, requireNonNull(sprite, "Sprite cannot be null").mipmapLevel());
+        SPRITE = sprite;
         UPLOAD_POINT = SPRITE.uploadPoint();
-    }
-
-    /**
-     * Releases unnecessary memory by lowering the frame's mipmap level to be the same as the sprite.
-     * @param currentFrame      view of the texture's current frame
-     * @param predefinedFrames  persistent views of the predefined frames
-     */
-    @Override
-    public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
-                               FrameGroup<PersistentFrameView> predefinedFrames) {
-        currentFrame.lowerMipmapLevel(SPRITE.mipmapLevel());
     }
 
     /**
@@ -59,6 +50,7 @@ public class SpriteUploadComponent implements CoreTextureComponent {
      */
     @Override
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+        super.onUpload(currentFrame);
         SPRITE.bind();
         currentFrame.upload(UPLOAD_POINT.x(), UPLOAD_POINT.y());
     }
@@ -71,6 +63,7 @@ public class SpriteUploadComponent implements CoreTextureComponent {
     @Override
     public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame,
                        FrameGroup<PersistentFrameView> predefinedFrames) {
+        super.onTick(currentFrame, predefinedFrames);
 
         // We need this listener because atlas sprites will never be bound
         currentFrame.texture().upload();
