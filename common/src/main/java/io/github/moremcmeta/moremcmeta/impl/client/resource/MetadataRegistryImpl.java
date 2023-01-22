@@ -22,8 +22,8 @@ import com.google.common.collect.Maps;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.SpriteName;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -75,7 +75,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
         requireNonNull(spriteName, "Sprite name cannot be null");
         return Optional.ofNullable(
                 metadata.getOrDefault(pluginName, ImmutableMap.of())
-                        .get(Sprite.makeTextureLocation(spriteName))
+                        .get(SpriteName.toTexturePath(spriteName))
         );
     }
 

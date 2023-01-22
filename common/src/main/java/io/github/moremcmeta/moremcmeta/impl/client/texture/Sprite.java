@@ -50,29 +50,4 @@ public interface Sprite {
      */
     int mipmapLevel();
 
-    /**
-     * Converts a standard texture location (with textures/ prefix and .png suffix) to a
-     * sprite name.
-     * @param location      the location to convert
-     * @return that location as the name of a sprite in a texture atlas
-     */
-    static ResourceLocation makeSpriteName(ResourceLocation location) {
-        String originalPath = location.getPath();
-        String cutPath = originalPath
-                .replace("textures/", "")
-                .replace(".png", "");
-        return new ResourceLocation(location.getNamespace(), cutPath);
-    }
-
-    /**
-     * Converts a sprite name to a standard texture location (with textures/ prefix and .png suffix).
-     * @param location      the sprite name to convert
-     * @return the texture location corresponding to the sprite
-     */
-    static ResourceLocation makeTextureLocation(ResourceLocation location) {
-        String originalPath = location.getPath();
-        String fullPath = "textures/" + originalPath + ".png";
-        return new ResourceLocation(location.getNamespace(), fullPath);
-    }
-
 }

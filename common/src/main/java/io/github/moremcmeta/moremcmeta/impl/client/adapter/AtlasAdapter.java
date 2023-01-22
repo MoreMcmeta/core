@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
+import io.github.moremcmeta.moremcmeta.api.client.texture.SpriteName;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.Atlas;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
@@ -73,7 +74,7 @@ public class AtlasAdapter implements Atlas {
             return Optional.empty();
         }
 
-        ResourceLocation properSpriteName = Sprite.makeSpriteName(location);
+        ResourceLocation properSpriteName = SpriteName.fromTexturePath(location);
 
         TextureAtlasSprite sprite = ATLAS.getSprite(properSpriteName);
         if (sprite.getName().equals(MissingTextureAtlasSprite.getLocation())) {
