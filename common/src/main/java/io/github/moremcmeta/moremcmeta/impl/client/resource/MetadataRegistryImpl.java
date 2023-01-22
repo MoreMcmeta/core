@@ -73,6 +73,15 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     public Optional<ParsedMetadata> metadataFromSpriteName(String pluginName, ResourceLocation spriteName) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         requireNonNull(spriteName, "Sprite name cannot be null");
+
+        /* If the sprite name is actually a texture location, toTexturePath() would return that name, and
+           the metadata would be retrieved. For consistency, this method should return Optional.empty()
+           when the provided location is not a sprite name since metadataFromPath() does not work with
+           sprite names.*/
+        if (!SpriteName.isSpriteName(spriteName)) {
+            return Optional.empty();
+        }
+
         return Optional.ofNullable(
                 metadata.getOrDefault(pluginName, ImmutableMap.of())
                         .get(SpriteName.toTexturePath(spriteName))

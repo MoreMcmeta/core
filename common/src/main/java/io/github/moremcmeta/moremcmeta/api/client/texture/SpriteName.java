@@ -71,7 +71,7 @@ public class SpriteName {
         requireNonNull(spriteName, "Sprite name cannot be null");
 
         String path = spriteName.getPath();
-        if (path.startsWith(TEX_PATH_PREFIX) || path.endsWith(TEX_PATH_SUFFIX)) {
+        if (!isSpriteName(spriteName)) {
             return spriteName;
         }
 
@@ -79,6 +79,18 @@ public class SpriteName {
                 spriteName.getNamespace(),
                 String.format("%s%s%s", TEX_PATH_PREFIX, path, TEX_PATH_SUFFIX)
         );
+    }
+
+    /**
+     * Checks if a resource location represents a valid sprite name. This method returns true when
+     * the conversion in {@link SpriteName#toTexturePath(ResourceLocation)} will succeed.
+     * @param location       resource location that might be a sprite name
+     * @return true if the location is a valid sprite name
+     */
+    public static boolean isSpriteName(ResourceLocation location) {
+        requireNonNull(location, "Location cannot be null");
+        String path = location.getPath();
+        return !path.startsWith(TEX_PATH_PREFIX) && !path.endsWith(TEX_PATH_SUFFIX) && path.length() > 0;
     }
 
     /**

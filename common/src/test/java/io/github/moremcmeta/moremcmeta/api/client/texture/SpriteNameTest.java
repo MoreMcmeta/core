@@ -116,4 +116,35 @@ public class SpriteNameTest {
         );
     }
 
+    @Test
+    public void isSpriteName_NullLocation_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        SpriteName.isSpriteName(null);
+    }
+
+    @Test
+    public void isSpriteName_NoPrefixNoSuffix_True() {
+        assertTrue(SpriteName.isSpriteName(new ResourceLocation("test", "block/glass/clear")));
+    }
+
+    @Test
+    public void isSpriteName_HasPrefix_False() {
+        assertFalse(SpriteName.isSpriteName(new ResourceLocation("test", "textures/block/glass/clear")));
+    }
+
+    @Test
+    public void isSpriteName_HasSuffix_False() {
+        assertFalse(SpriteName.isSpriteName(new ResourceLocation("test", "block/glass/clear.png")));
+    }
+
+    @Test
+    public void isSpriteName_HasPrefixHasSuffix_False() {
+        assertFalse(SpriteName.isSpriteName(new ResourceLocation("test", "textures/block/glass/clear.png")));
+    }
+
+    @Test
+    public void isSpriteName_BlankPath_False() {
+        assertFalse(SpriteName.isSpriteName(new ResourceLocation("test", "")));
+    }
+
 }
