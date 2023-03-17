@@ -20,17 +20,17 @@ package io.github.moremcmeta.moremcmeta.impl.adt;
 import java.util.BitSet;
 
 /**
- * Stores integers in a two-dimensional matrix. At each position, an integer may or may not be set.
+ * <p>Stores integers in a two-dimensional matrix. At each position, an integer may or may not be set.
  * By default, no integers are set. The integer at a position cannot be retrieved until it is set.
  * This class is designed to handle integers that are sparse. A 2D array may be a more suitable
  * data structure when the integers are dense or when there is a default value for integers that have
- * not been set.
+ * not been set.</p>
  *
- * The sparse matrix stores integers in square "sectors" of equal size. When the first integer inside
+ * <p>The sparse matrix stores integers in square "sectors" of equal size. When the first integer inside
  * the sector is set, the entire sector is allocated. The length of the side of each sector is a power
  * of 2. This power is called the sector power; for example, if sectors are 8x8, the sector power is 3
  * because 2^3 = 8. The maximum sector power is configurable, but a smaller power may be used if the
- * maximum power is unnecessarily large or too large to work correctly with the provided dimensions.
+ * maximum power is unnecessarily large or too large to work correctly with the provided dimensions.</p>
  * @author soir20
  */
 public class SparseIntMatrix {

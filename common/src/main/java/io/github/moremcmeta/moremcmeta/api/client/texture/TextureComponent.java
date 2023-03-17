@@ -39,15 +39,15 @@ public interface TextureComponent<V, U> {
     default void onTick(V currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {}
 
     /**
-     * Responds to the upload event of the associated texture. The upload event occurs when the texture is
+     * <p>Responds to the upload event of the associated texture. The upload event occurs when the texture is
      * updated with respect to OpenGL. The upload event does not necessarily occur for every transform applied
      * in other events. Note that the lifetime of the {@link UploadableFrameView} provided to this method is limited
      * to the call of this method. Attempting to retain and use a {@link UploadableFrameView} at a later point will
-     * cause a {@link FrameView.IllegalFrameReference} exception to be thrown.
+     * cause a {@link FrameView.IllegalFrameReference} exception to be thrown.</p>
      *
-     * Before uploading, {@link AbstractTexture#bind()} the texture you want to upload the frame to. Internally,
+     * <p>Before uploading, {@link AbstractTexture#bind()} the texture you want to upload the frame to. Internally,
      * MoreMcmeta already uploads to the texture with the same name as the original image. Uploading the frame is
-     * only necessary if you need to upload to different textures.
+     * only necessary if you need to upload to different textures.</p>
      * @param currentFrame      view of the texture's current frame
      */
     default void onUpload(U currentFrame) {}

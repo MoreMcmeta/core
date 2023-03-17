@@ -41,12 +41,12 @@ import java.util.function.BiConsumer;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A flexible texture "shell" for mixing {@link CoreTextureComponent}s. Listeners in each
- * component provide texture implementation.
+ * <p>A flexible texture "shell" for mixing {@link CoreTextureComponent}s. Listeners in each
+ * component provide texture implementation.</p>
  *
- * No listeners are fired on the render thread. Wrap listener code with calls to
+ * <p>No listeners are fired on the render thread. Wrap listener code with calls to
  * {@link com.mojang.blaze3d.systems.RenderSystem} if it must be executed on the
- * render thread.
+ * render thread.</p>
  * @author soir20
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {

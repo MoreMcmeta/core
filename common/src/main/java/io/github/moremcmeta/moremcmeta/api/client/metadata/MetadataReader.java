@@ -34,9 +34,9 @@ import java.util.function.Predicate;
 public interface MetadataReader {
 
     /**
-     * Reads metadata from a file, provided as an input stream.
+     * <p>Reads metadata from a file, provided as an input stream.</p>
      *
-     * This reader should *not* throw exceptions that are not {@link InvalidMetadataException}.
+     * <p>This reader should *not* throw exceptions that are not {@link InvalidMetadataException}.</p>
      * @param metadataLocation      location of the metadata file
      * @param metadataStream        data in the metadata file
      * @param resourceSearcher      searches for resources that exist in any currently-applied resource pack

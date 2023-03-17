@@ -20,11 +20,11 @@ package io.github.moremcmeta.moremcmeta.api.client;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 
 /**
- * A user-provided plugin that reads custom metadata formats using the MoreMcmeta loader.
+ * <p>A user-provided plugin that reads custom metadata formats using the MoreMcmeta loader.</p>
  *
- * MoreMcmeta avoids using `null`. Unless otherwise specified, neither parameters nor return values provided
+ * <p>MoreMcmeta avoids using `null`. Unless otherwise specified, neither parameters nor return values provided
  * by MoreMcmeta or by plugins should ever be `null`. In cases where the absence of a value is permissible,
- * {@link java.util.Optional} is used instead of `null`.
+ * {@link java.util.Optional} is used instead of `null`.</p>
  * @author soir20
  * @since 4.0.0
  */

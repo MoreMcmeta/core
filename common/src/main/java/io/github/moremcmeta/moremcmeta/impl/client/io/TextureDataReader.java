@@ -144,13 +144,13 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
     }
 
     /**
-     * Compares the current value and a possible new value to check if
+     * <p>Compares the current value and a possible new value to check if
      * they are compatible. The two values are not compatible if and
      * only if they are not both empty, and they contain different
-     * items according to {@link Object#equals(Object)}.
+     * items according to {@link Object#equals(Object)}.</p>
      *
-     * If the two values are not compatible, an exception is thrown.
-     * Otherwise, the new value is returned.
+     * <p>If the two values are not compatible, an exception is thrown.
+     * Otherwise, the new value is returned.</p>
      * @param currentVal    current value
      * @param newVal        new value that may be returned
      * @param propName      property name describing what is contained in the values

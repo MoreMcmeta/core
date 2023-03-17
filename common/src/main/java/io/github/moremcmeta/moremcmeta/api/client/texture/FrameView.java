@@ -20,14 +20,14 @@ package io.github.moremcmeta.moremcmeta.api.client.texture;
 import java.util.Optional;
 
 /**
- * A view of information about a texture frame without any underlying implementation detail. This interface
+ * <p>A view of information about a texture frame without any underlying implementation detail. This interface
  * specifies an immutable view of a frame, but sub-interfaces may specify additional methods that make the
  * view mutable. A view may have a limited lifetime, after which {@link IllegalFrameReference} exceptions
- * are thrown when the view's methods are called, specified by its implementation.
+ * are thrown when the view's methods are called, specified by its implementation.</p>
  *
- * Note about coordinate points: The top-left corner of the frame is considered to be at (0, 0), and
+ * <p>Note about coordinate points: The top-left corner of the frame is considered to be at (0, 0), and
  * only positive coordinate values are within bounds. That is, the bottom right corner of the frame is at
- * (width - 1, height - 1).
+ * (width - 1, height - 1).</p>
  * @author soir20
  * @since 4.0.0
  */

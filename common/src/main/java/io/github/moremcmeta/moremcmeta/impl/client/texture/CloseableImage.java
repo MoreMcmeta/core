@@ -92,11 +92,11 @@ public interface CloseableImage {
     CloseableImage subImage(int topLeftX, int topLeftY, int width, int height);
 
     /**
-     * Closes any resources associated with this image. Implementations should be idempotent.
+     * <p>Closes any resources associated with this image. Implementations should be idempotent.</p>
      *
-     * Currently, no image implementations need to throw exceptions, and {@link AutoCloseable} is not
+     * <p>Currently, no image implementations need to throw exceptions, and {@link AutoCloseable} is not
      * idempotent. An image is not an I/O resource like {@link java.io.Closeable}. Hence, this interface
-     * has its own close() method instead of extending one of the existing closeable interfaces.
+     * has its own close() method instead of extending one of the existing closeable interfaces.</p>
      */
     void close();
 

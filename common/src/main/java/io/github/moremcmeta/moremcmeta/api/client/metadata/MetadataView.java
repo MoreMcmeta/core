@@ -20,20 +20,20 @@ package io.github.moremcmeta.moremcmeta.api.client.metadata;
 import java.util.Optional;
 
 /**
- * Provides immutable access to texture metadata. A view acts like an object and an array. As an object,
+ * <p>Provides immutable access to texture metadata. A view acts like an object and an array. As an object,
  * the view provides direct access to keys by name. As an array, the view's keys are ordered based on
  * highest section priority (at the topmost level) or lexicographically (at all lower levels) and can be
- * accessed by index.
+ * accessed by index.</p>
  *
- * No underlying file format or file location for this metadata is guaranteed. Arrays in the underlying
- * format are treated as views with the keys "0", "1", etc. for each item in the array.
+ * <p>No underlying file format or file location for this metadata is guaranteed. Arrays in the underlying
+ * format are treated as views with the keys "0", "1", etc. for each item in the array.</p>
  *
- * All index-based methods throw {@link NegativeKeyIndexException} if the provided index is negative. It
+ * <p>All index-based methods throw {@link NegativeKeyIndexException} if the provided index is negative. It
  * is always an error to access a key with a negative index. In contrast, these methods return
  * {@link Optional#empty()} if a positive index out of bounds is provided, as a positive index would be
  * valid under some circumstances, even though a key at that index does not exist for this particular view.
  * Similarly, the string-based methods return {@link Optional#empty()} for keys that could exist but
- * don't in this particular view.
+ * don't in this particular view.</p>
  * @author soir20
  * @since 4.0.0
  */
@@ -71,13 +71,13 @@ public interface MetadataView {
     boolean hasKey(int index);
 
     /**
-     * Retrieves the value of a string for the given key if any exists. If there is no such key or
+     * <p>Retrieves the value of a string for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid string, this method returns {@link Optional#empty()}.
      * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
-     * not a string.
+     * not a string.</p>
      *
-     * Any value that is not a sub-view can be converted to a string, so this method will return a
-     * string whenever {@link #hasKey(String)} returns true.
+     * <p>Any value that is not a sub-view can be converted to a string, so this method will return a
+     * string whenever {@link #hasKey(String)} returns true.</p>
      * @param key       the key whose string value to retrieve
      * @return An {@link Optional} containing the string value or {@link Optional#empty()} if there is
      *         string value associated with the key. The string inside the {@link Optional} will never
@@ -86,13 +86,13 @@ public interface MetadataView {
     Optional<String> stringValue(String key);
 
     /**
-     * Retrieves the value of a string for the key at the given index if any exists. If there is no such
+     * <p>Retrieves the value of a string for the key at the given index if any exists. If there is no such
      * key or the key's associated value is not a valid string, this method returns {@link Optional#empty()}.
      * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
-     * not a string.
+     * not a string.</p>
      *
-     * Any value that is not a sub-view can be converted to a string, so this method will return a
-     * string whenever {@link #hasKey(int)} returns true.
+     * <p>Any value that is not a sub-view can be converted to a string, so this method will return a
+     * string whenever {@link #hasKey(int)} returns true.</p>
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the string value or {@link Optional#empty()} if there is
      *         string value associated with the key. The string inside the {@link Optional} will never
@@ -202,13 +202,13 @@ public interface MetadataView {
     Optional<Double> doubleValue(int index);
 
     /**
-     * Retrieves the value of a boolean for the given key if any exists. If there is no such key or
+     * <p>Retrieves the value of a boolean for the given key if any exists. If there is no such key or
      * the key's associated value is not a valid boolean, this method returns {@link Optional#empty()}.
      * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
-     * not a boolean.
+     * not a boolean.</p>
      *
-     * A value is considered true if it is equivalent to the string "true" (case-insensitive). Otherwise,
-     * the value is considered false. However, a sub-view is not considered a valid boolean.
+     * <p>A value is considered true if it is equivalent to the string "true" (case-insensitive). Otherwise,
+     * the value is considered false. However, a sub-view is not considered a valid boolean.</p>
      * @param key       the key whose boolean value to retrieve
      * @return An {@link Optional} containing the boolean value or {@link Optional#empty()} if there is
      *         boolean value associated with the key. The boolean inside the {@link Optional} will never
@@ -217,13 +217,13 @@ public interface MetadataView {
     Optional<Boolean> booleanValue(String key);
 
     /**
-     * Retrieves the value of a boolean for the key at the given index if any exists. If there is no such
+     * <p>Retrieves the value of a boolean for the key at the given index if any exists. If there is no such
      * key or the key's associated value is not a valid boolean, this method returns {@link Optional#empty()}.
      * {@link #hasKey(int)} can be used to determine whether the key is present or the value is
-     * not a boolean.
+     * not a boolean.</p>
      *
-     * A value is considered true if it is equivalent to the string "true" (case-insensitive). Otherwise,
-     * the value is considered false. However, a sub-view is not considered a valid boolean.
+     * <p>A value is considered true if it is equivalent to the string "true" (case-insensitive). Otherwise,
+     * the value is considered false. However, a sub-view is not considered a valid boolean.</p>
      * @param index       the index of the key whose boolean value to retrieve
      * @return An {@link Optional} containing the boolean value or {@link Optional#empty()} if there is
      *         boolean value associated with the key. The boolean inside the {@link Optional} will never
