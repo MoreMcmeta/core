@@ -33,17 +33,17 @@ public interface MoreMcmetaMetadataReaderPlugin extends ClientPlugin {
     /**
      * Gets the file extension the plugin is tied to (without a period). If a metadata file has this extension,
      * the plugin will read that metadata. If the extension is not present, the plugin is not applied
-     * to that metadata. Two installed plugins may not have the same extension. **This method may be
+     * to that metadata. Two installed plugins may not have the same extension. <b>This method may be
      * called from multiple threads concurrently. If there is any state shared between calls, it must be
-     * synchronized properly for concurrent usage.**
+     * synchronized properly for concurrent usage.</b>
      * @return plugin's section name
      */
     String extension();
 
     /**
-     * Gets the {@link MetadataReader} for this plugin. **This method may be called from multiple threads
+     * Gets the {@link MetadataReader} for this plugin. <b>This method may be called from multiple threads
      * concurrently. If there is any state shared between calls, it must be synchronized properly for
-     * concurrent usage.**
+     * concurrent usage.</b>
      * @return plugin's metadata reader
      */
     MetadataReader metadataReader();

@@ -20,9 +20,9 @@ package io.github.moremcmeta.moremcmeta.api.client.metadata;
 import java.util.Optional;
 
 /**
- * Contains data parsed by the {@link MetadataParser}. **There may be multiple instances being used
+ * Contains data parsed by the {@link MetadataParser}. <b>There may be multiple instances being used
  * by different threads concurrently. If there is any state shared between instances, it must be
- * synchronized properly for concurrent usage.**
+ * synchronized properly for concurrent usage.</b>
  * @author soir20
  * @since 4.0.0
  */

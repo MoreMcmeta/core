@@ -31,9 +31,9 @@ import static java.util.Objects.requireNonNull;
 public interface ClientPlugin {
 
     /**
-     * Gets the display name for the plugin that will be used in logs. **This method may be called from
+     * Gets the display name for the plugin that will be used in logs. <b>This method may be called from
      * multiple threads concurrently. If there is any state shared between calls, it must be synchronized
-     * properly for concurrent usage.**
+     * properly for concurrent usage.</b>
      * @return plugin's display name
      */
     String displayName();

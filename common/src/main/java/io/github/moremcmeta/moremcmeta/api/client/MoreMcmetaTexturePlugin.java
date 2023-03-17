@@ -34,25 +34,25 @@ public interface MoreMcmetaTexturePlugin extends ClientPlugin {
     /**
      * Gets the section name the plugin is tied to. If the section name is present in a texture's metadata,
      * the plugin is applied to that texture. If the section name is not present, the plugin is not applied
-     * to that texture. Two installed plugins may not have the same section name. **This method may be
+     * to that texture. Two installed plugins may not have the same section name. <b>This method may be
      * called from multiple threads concurrently. If there is any state shared between calls, it must be
-     * synchronized properly for concurrent usage.**
+     * synchronized properly for concurrent usage.</b>
      * @return plugin's section name
      */
     String sectionName();
 
     /**
-     * Gets the {@link MetadataParser} for this plugin. **This method may be called from multiple threads
+     * Gets the {@link MetadataParser} for this plugin. <b>This method may be called from multiple threads
      * concurrently. If there is any state shared between calls, it must be synchronized properly for
-     * concurrent usage.**
+     * concurrent usage.</b>
      * @return plugin's metadata parser
      */
     MetadataParser parser();
 
     /**
-     * Gets the {@link ComponentProvider} for this plugin. **This method may be called from multiple
+     * Gets the {@link ComponentProvider} for this plugin. <b>This method may be called from multiple
      * threads concurrently. If there is any state shared between calls, it must be synchronized properly
-     * for concurrent usage.**
+     * for concurrent usage.</b>
      * @return plugin's component provider
      */
     ComponentProvider componentProvider();
@@ -60,9 +60,11 @@ public interface MoreMcmetaTexturePlugin extends ClientPlugin {
     /**
      * <p>Indicates whether this plugin will be applied when a texture file and this plugin's metadata section
      * are in different resource packs. This method should always return the same boolean value; the plugin
-     * must either always or never allow the texture and metadata section to be separated.</p>
+     * must either always or never allow the texture and metadata section to be separated. <b>This method
+     * may be called from multiple threads concurrently. If there is any state shared between calls, it must
+     * be synchronized properly for concurrent usage.</b></p>
      *
-     * <p>**Most plugin authors should not override this method.** While allowing the metadata and texture file
+     * <p><b>Most plugin authors should not override this method.</b> While allowing the metadata and texture file
      * to be in different packs may seem like a feature, enabling it may lead to strange behavior. For example,
      * say an animation plugin allows the metadata and texture to be in different packs. If a resource pack
      * overrides only the texture but not the animation metadata, the animation will apply to the overridden

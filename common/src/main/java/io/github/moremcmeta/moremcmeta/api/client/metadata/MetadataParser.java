@@ -29,9 +29,9 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 public interface MetadataParser {
 
     /**
-     * Converts the original metadata into a more usable form. **This method may be called from multiple
+     * Converts the original metadata into a more usable form. <b>This method may be called from multiple
      * threads concurrently. If there is any state shared between calls, it must be synchronized properly
-     * for concurrent usage.**
+     * for concurrent usage.</b>
      * @param metadata      the original, immutable metadata. This metadata contains all metadata for
      *                      the texture, not just the metadata in this plugin's section name. The actual
      *                      metadata attributes themselves are stored within their section names. That is,
