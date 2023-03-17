@@ -29,7 +29,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class SpriteUploadComponent extends SingleUploadComponent {
     private final Sprite SPRITE;
-    private final Point UPLOAD_POINT;
+    private final int UPLOAD_X;
+    private final int UPLOAD_Y;
 
     /**
      * Creates a new component for uploading a texture to an atlas sprite.
@@ -41,7 +42,8 @@ public class SpriteUploadComponent extends SingleUploadComponent {
     public SpriteUploadComponent(Sprite sprite, TexturePreparer preparer) {
         super(preparer, requireNonNull(sprite, "Sprite cannot be null").mipmapLevel());
         SPRITE = sprite;
-        UPLOAD_POINT = SPRITE.uploadPoint();
+        UPLOAD_X = Point.x(SPRITE.uploadPoint());
+        UPLOAD_Y = Point.y(SPRITE.uploadPoint());
     }
 
     /**
@@ -52,7 +54,7 @@ public class SpriteUploadComponent extends SingleUploadComponent {
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
         super.onUpload(currentFrame);
         SPRITE.bind();
-        currentFrame.upload(UPLOAD_POINT.x(), UPLOAD_POINT.y());
+        currentFrame.upload(UPLOAD_X, UPLOAD_Y);
     }
 
     /**

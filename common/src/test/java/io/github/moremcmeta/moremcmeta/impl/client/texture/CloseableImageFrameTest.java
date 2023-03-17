@@ -24,8 +24,8 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -409,26 +409,6 @@ public class CloseableImageFrameTest {
     }
 
     @Test
-    public void upload_NullPoint_NullPointerException() {
-        ImmutableList<CloseableImage> mipmaps = ImmutableList.of(
-                new MockCloseableImage(128, 256),
-                new MockCloseableImage(64, 128),
-                new MockCloseableImage(32, 64),
-                new MockCloseableImage(16, 32),
-                new MockCloseableImage(8, 16)
-        );
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(128, 256, 30, 40),
-                mipmaps,
-                1
-        );
-
-        expectedException.expect(NullPointerException.class);
-        frame.uploadAt(null);
-    }
-
-    @Test
     public void upload_NegativeXPoint_IllegalArgException() {
         ImmutableList<CloseableImage> mipmaps = ImmutableList.of(
                 new MockCloseableImage(128, 256),
@@ -445,7 +425,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.uploadAt(new Point(-1, 2));
+        frame.uploadAt(-1, 2);
     }
 
     @Test
@@ -465,7 +445,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.uploadAt(new Point(1, -2));
+        frame.uploadAt(1, -2);
     }
 
     @Test
@@ -485,7 +465,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.uploadAt(new Point(-1, -2));
+        frame.uploadAt(-1, -2);
     }
 
     @Test
@@ -504,13 +484,13 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(0, 0));
+        frame.uploadAt(0, 0);
 
-        assertEquals(new Point(0, 0), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(3).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(4).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(4).lastUploadPoint());
     }
 
     @Test
@@ -529,13 +509,13 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(6, 4));
+        frame.uploadAt(6, 4);
 
-        assertEquals(new Point(6, 4), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(3, 2), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(1, 1), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(3).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(4).lastUploadPoint());
+        assertEquals((Long) Point.pack(6, 4), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(3, 2), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(4).lastUploadPoint());
     }
 
     @Test
@@ -554,13 +534,13 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(55, 40));
+        frame.uploadAt(55, 40);
 
-        assertEquals(new Point(55, 40), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(27, 20), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(13, 10), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(6, 5), mipmaps.get(3).lastUploadPoint());
-        assertEquals(new Point(3, 2), mipmaps.get(4).lastUploadPoint());
+        assertEquals((Long) Point.pack(55, 40), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(27, 20), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(13, 10), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(6, 5), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(3, 2), mipmaps.get(4).lastUploadPoint());
     }
 
     @Test
@@ -579,13 +559,13 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(55, 40));
+        frame.uploadAt(55, 40);
 
-        assertEquals(new Point(55, 40), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(27, 20), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(13, 10), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(6, 5), mipmaps.get(3).lastUploadPoint());
-        assertEquals(new Point(3, 2), mipmaps.get(4).lastUploadPoint());
+        assertEquals((Long) Point.pack(55, 40), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(27, 20), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(13, 10), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(6, 5), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(3, 2), mipmaps.get(4).lastUploadPoint());
     }
 
     @Test
@@ -604,12 +584,12 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(4, 16));
+        frame.uploadAt(4, 16);
 
-        assertEquals(new Point(4, 16), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(2, 8), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(1, 4), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(0, 2), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(4, 16), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 8), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 4), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 2), mipmaps.get(3).lastUploadPoint());
         assertNull(mipmaps.get(4).lastUploadPoint());
     }
 
@@ -629,12 +609,12 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(8, 8));
+        frame.uploadAt(8, 8);
 
-        assertEquals(new Point(8, 8), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(4, 4), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(2, 2), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(1, 1), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(8, 8), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(4, 4), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 2), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), mipmaps.get(3).lastUploadPoint());
         assertNull(mipmaps.get(4).lastUploadPoint());
     }
 
@@ -654,12 +634,12 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(8, 16));
+        frame.uploadAt(8, 16);
 
-        assertEquals(new Point(8, 16), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(4, 8), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(2, 4), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(1, 2), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(8, 16), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(4, 8), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 4), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 2), mipmaps.get(3).lastUploadPoint());
         assertNull(null, mipmaps.get(4).lastUploadPoint());
     }
 
@@ -679,12 +659,12 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(5, 5));
+        frame.uploadAt(5, 5);
 
-        assertEquals(new Point(5, 5), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(2, 2), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(1, 1), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(5, 5), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 2), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(3).lastUploadPoint());
         assertNull(mipmaps.get(4).lastUploadPoint());
     }
 
@@ -704,12 +684,12 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(5, 5));
+        frame.uploadAt(5, 5);
 
-        assertEquals(new Point(5, 5), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(2, 2), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(1, 1), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(5, 5), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 2), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(3).lastUploadPoint());
         assertNull(mipmaps.get(4).lastUploadPoint());
     }
 
@@ -729,12 +709,12 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(5, 5));
+        frame.uploadAt(5, 5);
 
-        assertEquals(new Point(5, 5), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(2, 2), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(1, 1), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(5, 5), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 2), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(3).lastUploadPoint());
         assertNull(mipmaps.get(4).lastUploadPoint());
     }
 
@@ -754,12 +734,12 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(500, 500));
+        frame.uploadAt(500, 500);
 
-        assertEquals(new Point(500, 500), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(250, 250), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(125, 125), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(62, 62), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(500, 500), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(250, 250), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(125, 125), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(62, 62), mipmaps.get(3).lastUploadPoint());
         assertNull(mipmaps.get(4).lastUploadPoint());
     }
 
@@ -779,12 +759,12 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(new Point(5, 5));
+        frame.uploadAt(5, 5);
 
-        assertEquals(new Point(5, 5), mipmaps.get(0).lastUploadPoint());
-        assertEquals(new Point(2, 2), mipmaps.get(1).lastUploadPoint());
-        assertEquals(new Point(1, 1), mipmaps.get(2).lastUploadPoint());
-        assertEquals(new Point(0, 0), mipmaps.get(3).lastUploadPoint());
+        assertEquals((Long) Point.pack(5, 5), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 2), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), mipmaps.get(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(3).lastUploadPoint());
         assertNull(mipmaps.get(4).lastUploadPoint());
     }
 
@@ -807,7 +787,7 @@ public class CloseableImageFrameTest {
         frame.close();
 
         expectedException.expect(IllegalStateException.class);
-        frame.uploadAt(new Point(55, 40));
+        frame.uploadAt(55, 40);
     }
 
     @Test
@@ -1380,7 +1360,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), null, Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), null, Area.of(), 0);
     }
 
     @Test
@@ -1396,7 +1376,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(), -1);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), -1);
     }
 
     @Test
@@ -1412,7 +1392,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(), 5);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), 5);
     }
 
     @Test
@@ -1428,7 +1408,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(), 128);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), 128);
     }
 
     @Test
@@ -1444,7 +1424,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(100, 50)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(100, 50)), Area.of(), 0);
     }
 
     @Test
@@ -1460,7 +1440,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 200)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 200)), Area.of(), 0);
     }
 
     @Test
@@ -1476,7 +1456,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(-1, 50)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(-1, 50)), Area.of(), 0);
     }
 
     @Test
@@ -1492,7 +1472,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, -1)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, -1)), Area.of(), 0);
     }
 
     @Test
@@ -1508,7 +1488,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 50)), null, 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), null, 0);
     }
 
     @Test
@@ -1524,7 +1504,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(100, 50)), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(100, 50)), 0);
     }
 
     @Test
@@ -1540,7 +1520,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, 200)), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 200)), 0);
     }
 
     @Test
@@ -1556,7 +1536,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(-1, 50)), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(-1, 50)), 0);
     }
 
     @Test
@@ -1572,7 +1552,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 50)), Area.of(new Point(50, -1)), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, -1)), 0);
     }
 
     @Test
@@ -1588,10 +1568,10 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(ColorTransform.NonDependencyRequestException.class);
-        frame.applyTransform((point, depFunction) -> {
-            depFunction.applyAsInt(new Point(50, 50));
+        frame.applyTransform((x, y, depFunction) -> {
+            depFunction.color(50, 50);
             return Color.rgba(100, 100, 100, 100);
-        }, Area.of(new Point(50, 50)), Area.of(new Point(50, 100)), 0);
+        }, Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 100)), 0);
     }
 
     @Test
@@ -1610,9 +1590,9 @@ public class CloseableImageFrameTest {
         );
 
         frame.applyTransform(
-                (point, depFunction) -> depFunction.applyAsInt(new Point(50, 50)) / 2,
-                Area.of(new Point(50, 50)),
-                Area.of(new Point(50, 50)),
+                (x, y, depFunction) -> depFunction.color(50, 50) / 2,
+                Area.of(Point.pack(50, 50)),
+                Area.of(Point.pack(50, 50)),
                 0
         );
     }
@@ -1631,21 +1611,21 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        Object2IntMap<Point> pointToColor = new Object2IntOpenHashMap<>();
-        pointToColor.put(new Point(0, 0), 1767640594);
-        pointToColor.put(new Point(0, 1), 1177013896);
-        pointToColor.put(new Point(1, 0), -557109892);
-        pointToColor.put(new Point(1, 1), -172022466);
+        Long2IntMap pointToColor = new Long2IntOpenHashMap();
+        pointToColor.put(Point.pack(0, 0), 1767640594);
+        pointToColor.put(Point.pack(0, 1), 1177013896);
+        pointToColor.put(Point.pack(1, 0), -557109892);
+        pointToColor.put(Point.pack(1, 1), -172022466);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> pointToColor.getOrDefault(point, 1013857456),
+                (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
                 Area.of(),
                 0
         );
 
-        for (Point point : pointToColor.keySet()) {
-            assertEquals(pointToColor.getInt(point), images.get(0).color(point.x(), point.y()));
+        for (long point : pointToColor.keySet()) {
+            assertEquals(pointToColor.get(point), images.get(0).color(Point.x(point), Point.y(point)));
         }
         assertEquals(ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466), images.get(1).color(0, 0));
     }
@@ -1664,33 +1644,33 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        Object2IntMap<Point> pointToColor = new Object2IntOpenHashMap<>();
-        pointToColor.put(new Point(48, 100), 1767640594);
-        pointToColor.put(new Point(48, 101), 1177013896);
-        pointToColor.put(new Point(48, 102), 721898013);
-        pointToColor.put(new Point(48, 103), 450605672);
-        pointToColor.put(new Point(49, 100), -557109892);
-        pointToColor.put(new Point(49, 101), -172022466);
-        pointToColor.put(new Point(49, 102), -2092001461);
-        pointToColor.put(new Point(49, 103), 208915787);
-        pointToColor.put(new Point(50, 100), 673006803);
-        pointToColor.put(new Point(50, 101), -1839062270);
-        pointToColor.put(new Point(50, 102), -997731251);
-        pointToColor.put(new Point(50, 103), 796332458);
-        pointToColor.put(new Point(51, 100), -1242096477);
-        pointToColor.put(new Point(51, 101), -327745376);
-        pointToColor.put(new Point(51, 102), -1450384761);
-        pointToColor.put(new Point(51, 103), 1864744117);
+        Long2IntMap pointToColor = new Long2IntOpenHashMap();
+        pointToColor.put(Point.pack(48, 100), 1767640594);
+        pointToColor.put(Point.pack(48, 101), 1177013896);
+        pointToColor.put(Point.pack(48, 102), 721898013);
+        pointToColor.put(Point.pack(48, 103), 450605672);
+        pointToColor.put(Point.pack(49, 100), -557109892);
+        pointToColor.put(Point.pack(49, 101), -172022466);
+        pointToColor.put(Point.pack(49, 102), -2092001461);
+        pointToColor.put(Point.pack(49, 103), 208915787);
+        pointToColor.put(Point.pack(50, 100), 673006803);
+        pointToColor.put(Point.pack(50, 101), -1839062270);
+        pointToColor.put(Point.pack(50, 102), -997731251);
+        pointToColor.put(Point.pack(50, 103), 796332458);
+        pointToColor.put(Point.pack(51, 100), -1242096477);
+        pointToColor.put(Point.pack(51, 101), -327745376);
+        pointToColor.put(Point.pack(51, 102), -1450384761);
+        pointToColor.put(Point.pack(51, 103), 1864744117);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> pointToColor.getOrDefault(point, 1013857456),
+                (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
                 Area.of(),
                 0
         );
 
-        for (Point point : pointToColor.keySet()) {
-            assertEquals(pointToColor.getInt(point), images.get(0).color(point.x(), point.y()));
+        for (long point : pointToColor.keySet()) {
+            assertEquals(pointToColor.get(point), images.get(0).color(Point.x(point), Point.y(point)));
         }
     }
 
@@ -1708,26 +1688,26 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        Object2IntMap<Point> pointToColor = new Object2IntOpenHashMap<>();
-        pointToColor.put(new Point(48, 100), 1767640594);
-        pointToColor.put(new Point(48, 101), 1177013896);
-        pointToColor.put(new Point(48, 102), 721898013);
-        pointToColor.put(new Point(48, 103), 450605672);
-        pointToColor.put(new Point(49, 100), -557109892);
-        pointToColor.put(new Point(49, 101), -172022466);
-        pointToColor.put(new Point(49, 102), -2092001461);
-        pointToColor.put(new Point(49, 103), 208915787);
-        pointToColor.put(new Point(50, 100), 673006803);
-        pointToColor.put(new Point(50, 101), -1839062270);
-        pointToColor.put(new Point(50, 102), -997731251);
-        pointToColor.put(new Point(50, 103), 796332458);
-        pointToColor.put(new Point(51, 100), -1242096477);
-        pointToColor.put(new Point(51, 101), -327745376);
-        pointToColor.put(new Point(51, 102), -1450384761);
-        pointToColor.put(new Point(51, 103), 1864744117);
+        Long2IntMap pointToColor = new Long2IntOpenHashMap();
+        pointToColor.put(Point.pack(48, 100), 1767640594);
+        pointToColor.put(Point.pack(48, 101), 1177013896);
+        pointToColor.put(Point.pack(48, 102), 721898013);
+        pointToColor.put(Point.pack(48, 103), 450605672);
+        pointToColor.put(Point.pack(49, 100), -557109892);
+        pointToColor.put(Point.pack(49, 101), -172022466);
+        pointToColor.put(Point.pack(49, 102), -2092001461);
+        pointToColor.put(Point.pack(49, 103), 208915787);
+        pointToColor.put(Point.pack(50, 100), 673006803);
+        pointToColor.put(Point.pack(50, 101), -1839062270);
+        pointToColor.put(Point.pack(50, 102), -997731251);
+        pointToColor.put(Point.pack(50, 103), 796332458);
+        pointToColor.put(Point.pack(51, 100), -1242096477);
+        pointToColor.put(Point.pack(51, 101), -327745376);
+        pointToColor.put(Point.pack(51, 102), -1450384761);
+        pointToColor.put(Point.pack(51, 103), 1864744117);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> pointToColor.getOrDefault(point, 1013857456),
+                (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
                 Area.of(),
                 0
@@ -1766,26 +1746,26 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        Object2IntMap<Point> pointToColor = new Object2IntOpenHashMap<>();
-        pointToColor.put(new Point(48, 100), 1767640594);
+        Long2IntMap pointToColor = new Long2IntOpenHashMap();
+        pointToColor.put(Point.pack(48, 100), 1767640594);
         images.get(0).setColor(48, 101, 1177013896);
-        pointToColor.put(new Point(48, 102), 721898013);
+        pointToColor.put(Point.pack(48, 102), 721898013);
         images.get(0).setColor(48, 103, 450605672);
         images.get(0).setColor(49, 100, -557109892);
-        pointToColor.put(new Point(49, 101), -172022466);
+        pointToColor.put(Point.pack(49, 101), -172022466);
         images.get(0).setColor(49, 102, -2092001461);
-        pointToColor.put(new Point(49, 103), 208915787);
+        pointToColor.put(Point.pack(49, 103), 208915787);
         images.get(0).setColor(50, 100, 673006803);
-        pointToColor.put(new Point(50, 101), -1839062270);
+        pointToColor.put(Point.pack(50, 101), -1839062270);
         images.get(0).setColor(50, 102, -997731251);
         images.get(0).setColor(50, 103, 796332458);
         images.get(0).setColor(51, 100, -1242096477);
-        pointToColor.put(new Point(51, 101), -327745376);
+        pointToColor.put(Point.pack(51, 101), -327745376);
         images.get(0).setColor(51, 102, -1450384761);
-        pointToColor.put(new Point(51, 103), 1864744117);
+        pointToColor.put(Point.pack(51, 103), 1864744117);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> pointToColor.getOrDefault(point, 1013857456),
+                (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
                 Area.of(),
                 0
@@ -1823,26 +1803,26 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        Object2IntMap<Point> pointToColor = new Object2IntOpenHashMap<>();
-        pointToColor.put(new Point(48, 100), 1767640594);
+        Long2IntMap pointToColor = new Long2IntOpenHashMap();
+        pointToColor.put(Point.pack(48, 100), 1767640594);
         images.get(0).setColor(48, 101, 1177013896);
-        pointToColor.put(new Point(48, 102), 721898013);
+        pointToColor.put(Point.pack(48, 102), 721898013);
         images.get(0).setColor(48, 103, 450605672);
         images.get(0).setColor(49, 100, -557109892);
-        pointToColor.put(new Point(49, 101), -172022466);
+        pointToColor.put(Point.pack(49, 101), -172022466);
         images.get(0).setColor(49, 102, -2092001461);
-        pointToColor.put(new Point(49, 103), 208915787);
+        pointToColor.put(Point.pack(49, 103), 208915787);
         images.get(0).setColor(50, 100, 673006803);
-        pointToColor.put(new Point(50, 101), -1839062270);
+        pointToColor.put(Point.pack(50, 101), -1839062270);
         images.get(0).setColor(50, 102, -997731251);
         images.get(0).setColor(50, 103, 796332458);
         images.get(0).setColor(51, 100, -1242096477);
-        pointToColor.put(new Point(51, 101), -327745376);
+        pointToColor.put(Point.pack(51, 101), -327745376);
         images.get(0).setColor(51, 102, -1450384761);
-        pointToColor.put(new Point(51, 103), 1864744117);
+        pointToColor.put(Point.pack(51, 103), 1864744117);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> pointToColor.getOrDefault(point, 1013857456),
+                (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
                 Area.of(),
                 0
@@ -1885,8 +1865,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 2
         );
@@ -1894,9 +1874,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 0
         );
 
@@ -1921,8 +1901,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 2
         );
@@ -1930,9 +1910,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 2
         );
 
@@ -1957,8 +1937,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 2
         );
@@ -1966,9 +1946,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 2
         );
 
@@ -1995,8 +1975,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 1
         );
@@ -2004,9 +1984,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 0
         );
 
@@ -2031,8 +2011,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 1
         );
@@ -2040,9 +2020,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 1
         );
 
@@ -2067,8 +2047,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 1
         );
@@ -2076,9 +2056,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 2
         );
 
@@ -2103,8 +2083,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 0
         );
@@ -2112,9 +2092,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 0
         );
 
@@ -2139,8 +2119,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 0
         );
@@ -2148,9 +2128,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 1
         );
 
@@ -2175,8 +2155,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 103, 450605672);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 103)),
                 Area.of(),
                 0
         );
@@ -2184,9 +2164,9 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 103));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> dependencyGetter.applyAsInt(new Point(48, 103)),
-                Area.of(new Point(48, 101)),
-                Area.of(new Point(48, 103)),
+                (x, y, depFunction) -> depFunction.color(48, 103),
+                Area.of(Point.pack(48, 101)),
+                Area.of(Point.pack(48, 103)),
                 2
         );
 
@@ -2210,8 +2190,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 2
         );
@@ -2219,8 +2199,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 0
         );
@@ -2245,8 +2225,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 2
         );
@@ -2254,8 +2234,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 1
         );
@@ -2280,8 +2260,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 2
         );
@@ -2289,8 +2269,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 2
         );
@@ -2315,8 +2295,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 1
         );
@@ -2324,8 +2304,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 0
         );
@@ -2350,8 +2330,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 1
         );
@@ -2359,8 +2339,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 1
         );
@@ -2385,8 +2365,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 1
         );
@@ -2394,8 +2374,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 2
         );
@@ -2420,8 +2400,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 0
         );
@@ -2429,8 +2409,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 0
         );
@@ -2455,8 +2435,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 0
         );
@@ -2464,8 +2444,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 1
         );
@@ -2490,8 +2470,8 @@ public class CloseableImageFrameTest {
         images.get(0).setColor(48, 101, 1177013896);
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 796332458,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 796332458,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 0
         );
@@ -2499,8 +2479,8 @@ public class CloseableImageFrameTest {
         assertEquals(796332458, images.get(0).color(48, 101));
 
         frame.applyTransform(
-                (point, dependencyGetter) -> 450605672,
-                Area.of(new Point(48, 101)),
+                (x, y, depFunction) -> 450605672,
+                Area.of(Point.pack(48, 101)),
                 Area.of(),
                 2
         );
@@ -2523,7 +2503,7 @@ public class CloseableImageFrameTest {
         frame.close();
 
         expectedException.expect(IllegalStateException.class);
-        frame.applyTransform((point, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(new Point(50, 100)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 100)), Area.of(), 0);
     }
 
     @Test

@@ -20,7 +20,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
-import io.github.moremcmeta.moremcmeta.api.math.Point;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -31,7 +30,8 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class SingleUploadComponent implements CoreTextureComponent {
-    private static final Point UPLOAD_POINT = new Point(0, 0);
+    private static final int UPLOAD_X = 0;
+    private static final int UPLOAD_Y = 0;
     private final TexturePreparer PREPARER;
     private final AtomicBoolean IS_PREPARED;
     private final int MIPMAP;
@@ -89,7 +89,7 @@ public class SingleUploadComponent implements CoreTextureComponent {
     @Override
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
         if (IS_PREPARED.get()) {
-            currentFrame.upload(UPLOAD_POINT.x(), UPLOAD_POINT.y());
+            currentFrame.upload(UPLOAD_X, UPLOAD_Y);
         }
     }
 

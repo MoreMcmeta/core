@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
-import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -42,7 +41,7 @@ public interface Sprite {
      * Gets the position of the sprite's top-left corner on its atlas.
      * @return the sprite's upload point
      */
-    Point uploadPoint();
+    long uploadPoint();
 
     /**
      * Gets the mipmap level of the sprite.

@@ -27,7 +27,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
-import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
@@ -424,7 +423,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 throw new NegativeUploadPointException(x, y);
             }
 
-            STATE.uploadAt(new Point(x, y));
+            STATE.uploadAt(x, y);
         }
 
         /**
@@ -578,14 +577,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Uploads the current frame at the given point. This should only
          * be called when the correct texture (usually this texture) is
          * bound in OpenGL.
-         * @param uploadPoint   point to upload the frame at
+         * @param x   x-coordinate of the point to upload the frame at
+         * @param y   y-coordinate of the point to upload the frame at
          */
-        public void uploadAt(Point uploadPoint) {
-            requireNonNull(uploadPoint, "Upload point cannot be null");
+        public void uploadAt(int x, int y) {
             if (currentFrame() == GENERATED_FRAME) {
                 updateGeneratedFrame();
             }
-            currentFrame().uploadAt(uploadPoint);
+            currentFrame().uploadAt(x, y);
         }
 
         /**

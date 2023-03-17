@@ -75,7 +75,7 @@ public class TextureFinisherTest {
     public void queueAndFinish_AllSprites_SpriteUploadComponentAdded() {
         TextureFinisher finisher = new TextureFinisher(
                 new SpriteFinder((atlasLocation) -> (spriteLocation) ->
-                        Optional.of(new MockSprite(spriteLocation, new Point(2, 3)))
+                        Optional.of(new MockSprite(spriteLocation, Point.pack(2, 3)))
                 ),
                 (id, mipmap, width, height) -> {}
         );
@@ -102,7 +102,7 @@ public class TextureFinisherTest {
 
         for (MockCloseableImageFrame frame : frames) {
             MockCloseableImage mockImage = frame.mipmap(0);
-            assertEquals(new Point(2, 3), mockImage.lastUploadPoint());
+            assertEquals((Long) Point.pack(2, 3), mockImage.lastUploadPoint());
             assertEquals(1, frame.uploadCount());
         }
 

@@ -23,66 +23,49 @@ package io.github.moremcmeta.moremcmeta.api.math;
  * @since 4.0.0
  */
 public final class Point {
-    private final int X_POS;
-    private final int Y_POS;
+    private static final long COORD_MASK = 0b11111111_11111111_11111111_11111111L;
+    private static final int X_OFFSET = 32;
 
     /**
-     * Creates a new point.
-     * @param xPos      horizontal coordinate of the point
-     * @param yPos      vertical coordinate of the point
+     * Packs a point into a long primitive.
+     * @param x     x-coordinate of the point
+     * @param y     y-coordinate of the point
+     * @return the point as a single long
      */
-    public Point(int xPos, int yPos) {
-        X_POS = xPos;
-        Y_POS = yPos;
+    public static long pack(int x, int y) {
+        return ((long) x << X_OFFSET) | (y & COORD_MASK);
     }
 
     /**
      * Gets the horizontal coordinate of the point.
+     * @param point     point to retrieve the x-coordinate of
      * @return x-coordinate of the point
      */
-    public int x() {
-        return X_POS;
+    public static int x(long point) {
+        return (int) (point >> X_OFFSET);
     }
 
     /**
      * Gets the vertical coordinate of the point.
+     * @param point     point to retrieve the y-coordinate of
      * @return y-coordinate of the point
      */
-    public int y() {
-        return Y_POS;
-    }
-
-    /**
-     * Determines if another object is the same as this point. Two points
-     * are equal if their x and y-coordinates are the same.
-     * @param other     the other object to compare this point with
-     * @return whether this point and the other object are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Point otherPoint)) {
-            return false;
-        }
-
-        return X_POS == otherPoint.X_POS && Y_POS == otherPoint.Y_POS;
-    }
-
-    /**
-     * Gets the hash code for this point.
-     * @return the hash code for this point
-     */
-    @Override
-    public int hashCode() {
-        return 31 * X_POS + Y_POS;
+    public static int y(long point) {
+        return (int) point;
     }
 
     /**
      * Converts this point to a string in the form (x, y).
+     * @param point     point to convert
      * @return this point as a string
      */
-    @Override
-    public String toString() {
-        return "(" + X_POS + ", " + Y_POS + ")";
+    public static String toString(long point) {
+        return "(" + Point.x(point) + ", " + Point.y(point) + ")";
     }
+
+    /**
+     * Prevents Point from being constructed.
+     */
+    private Point() {}
 
 }

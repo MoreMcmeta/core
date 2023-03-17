@@ -28,7 +28,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
 public class MockCloseableImageFrame extends CloseableImageFrame {
     private final ImmutableList<MockCloseableImage> MIPMAPS;
     private int uploads;
-    private Point lastUploadPoint;
+    private long lastUploadPoint;
 
     public MockCloseableImageFrame(int width, int height, int layers) {
         this(ImmutableList.of(
@@ -52,17 +52,17 @@ public class MockCloseableImageFrame extends CloseableImageFrame {
     }
 
     @Override
-    public void uploadAt(Point point) {
-        super.uploadAt(point);
+    public void uploadAt(int x, int y) {
+        super.uploadAt(x, y);
         uploads++;
-        lastUploadPoint = point;
+        lastUploadPoint = Point.pack(x, y);
     }
 
     public int uploadCount() {
         return uploads;
     }
 
-    public Point lastUploadPoint() {
+    public Long lastUploadPoint() {
         return lastUploadPoint;
     }
 

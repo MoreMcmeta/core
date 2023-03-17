@@ -17,10 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
-import io.github.moremcmeta.moremcmeta.api.math.Point;
-
-import java.util.function.ToIntFunction;
-
 /**
  * Calculates a new RGBA color for an individual pixel in a frame.
  * @author soir20
@@ -34,7 +30,8 @@ public interface ColorTransform {
      * While this method only takes the x and y-coordinates of the pixel, a {@link FrameView} for
      * the frame being modified is available in contexts where a {@link ColorTransform} would be
      * provided.
-     * @param overwritePoint        location of the pixel whose color will be replaced
+     * @param overwriteX            x-coordinate of the location of the pixel whose color will be replaced
+     * @param overwriteY            y-coordinate of the location of the pixel whose color will be replaced
      * @param dependencyFunction    function to retrieve the color of a dependency. If a point
      *                              not given as a dependency when this transform was applied is
      *                              requested, it will throw a {@link NonDependencyRequestException}.
@@ -42,7 +39,25 @@ public interface ColorTransform {
      *                              was applied to any points.
      * @return the new color of the pixel at (x, y) in the format
      */
-    int transform(Point overwritePoint, ToIntFunction<Point> dependencyFunction);
+    int transform(int overwriteX, int overwriteY, DependencyFunction dependencyFunction);
+
+    /**
+     * Function that retrieves a color at the given point,
+     */
+    interface DependencyFunction {
+
+        /**
+         * Retrieves the color of the pixel at the given point, assuming that point was requested
+         * as a dependency.
+         * @param x     x-coordinate of the pixel to retrieve the color of
+         * @param y     y-coordinate of the pixel to retrieve the color of
+         * @return the color at the given point
+         * @throws NonDependencyRequestException if a point not given as a dependency when this transform
+         *                                       was applied
+         */
+        int color(int x, int y) throws NonDependencyRequestException;
+
+    }
 
     /**
      * Indicates that a transform requested the current color of a point that is not its dependency.

@@ -34,7 +34,7 @@ public class MockCloseableImage implements CloseableImage {
     private final int HEIGHT;
     private final int X_OFFSET;
     private final int Y_OFFSET;
-    private Point uploadPoint;
+    private Long uploadPoint;
     private final AtomicBoolean CLOSED;
 
     public MockCloseableImage() {
@@ -122,7 +122,7 @@ public class MockCloseableImage implements CloseableImage {
             throw new IllegalStateException("Mock image closed");
         }
 
-        uploadPoint = new Point(uploadX, uploadY);
+        uploadPoint = Point.pack(uploadX, uploadY);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class MockCloseableImage implements CloseableImage {
         return CLOSED.get();
     }
 
-    public Point lastUploadPoint() {
+    public Long lastUploadPoint() {
         return uploadPoint;
     }
 

@@ -17,6 +17,8 @@
 
 package io.github.moremcmeta.moremcmeta.api.math;
 
+import it.unimi.dsi.fastutil.longs.LongIterable;
+import it.unimi.dsi.fastutil.longs.LongIterator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -27,25 +29,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Represents an unordered collection of points.
  * @author soir20
  * @since 4.0.0
  */
-public final class Area implements Iterable<Point> {
+public final class Area implements LongIterable {
 
     /**
      * Creates an area from a predefined list of points.
      * @param points        the points that make up the area
      * @return an area containing only these points
      */
-    public static Area of(Point... points) {
+    public static Area of(long... points) {
         Area.Builder builder = new Builder();
 
-        for (Point point : points) {
-            builder.addPixel(point.x(), point.y());
+        for (long point : points) {
+            builder.addPixel(Point.x(point), Point.y(point));
         }
 
         return builder.build();
@@ -56,11 +56,11 @@ public final class Area implements Iterable<Point> {
      * @param points        the points that make up the area
      * @return an area containing only these points
      */
-    public static Area of(Iterable<Point> points) {
+    public static Area of(Iterable<Long> points) {
         Area.Builder builder = new Builder();
 
-        for (Point point : points) {
-            builder.addPixel(point.x(), point.y());
+        for (long point : points) {
+            builder.addPixel(Point.x(point), Point.y(point));
         }
 
         return builder.build();
@@ -101,11 +101,11 @@ public final class Area implements Iterable<Point> {
 
     /**
      * Gets the iterator for all the points in this area. The points are not in a guaranteed order.
-     * @return  the iterator for all points in this area
+     *
+     * @return the iterator for all points in this area
      */
     @Override
-    @NotNull
-    public Iterator<Point> iterator() {
+    public @NotNull LongIterator iterator() {
         return new PointIterator(ROWS);
     }
 
@@ -143,9 +143,8 @@ public final class Area implements Iterable<Point> {
          * Adds a pixel to the area.
          * @param point     coordinate of the pixel to add
          */
-        public void addPixel(Point point) {
-            requireNonNull(point, "Point cannot be null");
-            addPixel(point.x(), point.y());
+        public void addPixel(long point) {
+            addPixel(Point.x(point), Point.y(point));
         }
 
         /**
@@ -261,7 +260,7 @@ public final class Area implements Iterable<Point> {
      * Iterates over all the points in a {@link Area}.
      * @author soir20
      */
-    private static class PointIterator implements Iterator<Point> {
+    private static class PointIterator implements LongIterator {
         private final Iterator<Row> rowIterator;
         private Row currentRow;
         private int pixelCount;
@@ -288,14 +287,14 @@ public final class Area implements Iterable<Point> {
          * @return  the next point in an area
          */
         @Override
-        public Point next() {
+        public long nextLong() {
             if (currentRow == null || pixelCount == currentRow.WIDTH) {
                 currentRow = rowIterator.next();
                 pixelCount = 0;
             }
 
             pixelCount++;
-            return new Point(currentRow.X + pixelCount - 1, currentRow.Y);
+            return Point.pack(currentRow.X + pixelCount - 1, currentRow.Y);
         }
 
     }

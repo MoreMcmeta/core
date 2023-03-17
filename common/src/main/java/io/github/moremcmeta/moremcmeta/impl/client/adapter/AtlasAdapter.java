@@ -95,7 +95,7 @@ public class AtlasAdapter implements Atlas {
      */
     private static class SpriteAdapter implements Sprite {
         private final TextureAtlasSprite SPRITE;
-        private final Point UPLOAD_POINT;
+        private final long UPLOAD_POINT;
         private final int MIPMAP_LEVEL;
 
         /**
@@ -137,7 +137,7 @@ public class AtlasAdapter implements Atlas {
          * @return the sprite's upload point
          */
         @Override
-        public Point uploadPoint() {
+        public long uploadPoint() {
             return UPLOAD_POINT;
         }
 
@@ -154,7 +154,7 @@ public class AtlasAdapter implements Atlas {
          * Gets a sprite's x and y-coordinates of its top left corner in its texture atlas.
          * @return the x and y-coordinates of the sprite's top left corner
          */
-        private Point findUploadPoint() {
+        private long findUploadPoint() {
             String spriteStr = SPRITE.toString();
             int labelLength = 2;
 
@@ -166,7 +166,7 @@ public class AtlasAdapter implements Atlas {
             int yDelimiterIndex = spriteStr.indexOf(',', yLabelIndex);
             int y = Integer.parseInt(spriteStr.substring(yLabelIndex + labelLength, yDelimiterIndex));
 
-            return new Point(x, y);
+            return Point.pack(x, y);
         }
 
     }

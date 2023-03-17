@@ -49,13 +49,13 @@ public class SpriteUploadComponentTest {
     @Test
     public void construct_NullPreparer_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new SpriteUploadComponent(new MockSprite(new Point(2, 3)), null);
+        new SpriteUploadComponent(new MockSprite(Point.pack(2, 3)), null);
     }
 
     @Test
     public void upload_FirstUpload_FrameUploadedAtMipmappedPoints() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3)), DUMMY_PREPARER));
+        builder.add(new SpriteUploadComponent(new MockSprite(Point.pack(2, 3)), DUMMY_PREPARER));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
@@ -65,15 +65,15 @@ public class SpriteUploadComponentTest {
         texture.upload();
 
         assertEquals(1, frame.uploadCount());
-        assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
-        assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
-        assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 3), frame.mipmap(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), frame.mipmap(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), frame.mipmap(2).lastUploadPoint());
     }
 
     @Test
     public void upload_SecondUpload_FrameUploadedAtMipmappedPointsOnce() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new SpriteUploadComponent(new MockSprite(new Point(2, 3)), DUMMY_PREPARER));
+        builder.add(new SpriteUploadComponent(new MockSprite(Point.pack(2, 3)), DUMMY_PREPARER));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
@@ -84,15 +84,15 @@ public class SpriteUploadComponentTest {
         texture.upload();
 
         assertEquals(1, frame.uploadCount());
-        assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
-        assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
-        assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 3), frame.mipmap(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), frame.mipmap(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), frame.mipmap(2).lastUploadPoint());
     }
 
     @Test
     public void tick_FirstTick_BoundAndUploaded() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        MockSprite sprite = new MockSprite(new Point(2, 3));
+        MockSprite sprite = new MockSprite(Point.pack(2, 3));
         builder.add(new SpriteUploadComponent(sprite, DUMMY_PREPARER));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
@@ -104,15 +104,15 @@ public class SpriteUploadComponentTest {
 
         assertEquals(1, sprite.bindCount());
         assertEquals(1, frame.uploadCount());
-        assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
-        assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
-        assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 3), frame.mipmap(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), frame.mipmap(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), frame.mipmap(2).lastUploadPoint());
     }
 
     @Test
     public void tick_SecondTick_BoundAndUploaded() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        MockSprite sprite = new MockSprite(new Point(2, 3));
+        MockSprite sprite = new MockSprite(Point.pack(2, 3));
 
         AtomicInteger ticks = new AtomicInteger();
         builder.add(new TextureComponent<>() {
@@ -139,9 +139,9 @@ public class SpriteUploadComponentTest {
 
         assertEquals(2, sprite.bindCount());
         assertEquals(2, frame.uploadCount());
-        assertEquals(new Point(2, 3), frame.mipmap(0).lastUploadPoint());
-        assertEquals(new Point(1, 1), frame.mipmap(1).lastUploadPoint());
-        assertEquals(new Point(0, 0), frame.mipmap(2).lastUploadPoint());
+        assertEquals((Long) Point.pack(2, 3), frame.mipmap(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(1, 1), frame.mipmap(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), frame.mipmap(2).lastUploadPoint());
     }
 
     @Test

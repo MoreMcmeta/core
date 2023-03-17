@@ -24,11 +24,10 @@ import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.adt.SparseIntMatrix;
 import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-
-import java.util.ArrayDeque;
-import java.util.Queue;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
+import it.unimi.dsi.fastutil.longs.LongPriorityQueue;
 
 import static java.util.Objects.requireNonNull;
 
@@ -124,21 +123,20 @@ public class CloseableImageFrame {
 
     /**
      * Uploads this frame at a given position in the active texture.
-     * @param point     point to upload the top-left corner of this frame at
+     * @param x     x-coordinate of the point to upload the top-left corner of this frame at
+     * @param y     y-coordinate of the point to upload the top-left corner of this frame at
      * @throws IllegalStateException if this frame has been closed
      */
-    public void uploadAt(Point point) {
+    public void uploadAt(int x, int y) {
         checkOpen();
 
-        requireNonNull(point, "Point cannot be null");
-
-        if (point.x() < 0 || point.y() < 0) {
+        if (x < 0 || y < 0) {
             throw new IllegalArgumentException("Point coordinates must be greater than zero");
         }
 
         for (int level = 0; level < mipmaps.size(); level++) {
-            int mipmappedX = point.x() >> level;
-            int mipmappedY = point.y() >> level;
+            int mipmappedX = x >> level;
+            int mipmappedY = y >> level;
 
             CloseableImage mipmap = mipmaps.get(level);
             int mipmappedWidth = mipmap.width();
@@ -263,26 +261,29 @@ public class CloseableImageFrame {
         }
 
         Layer layerBelow = layerBelow(layer);
-        Object2IntMap<Point> previousColors = new Object2IntOpenHashMap<>();
+        Long2IntMap previousColors = new Long2IntOpenHashMap();
         dependencies.forEach((point) -> {
-            requireNonNull(point, "Dependency point cannot be null");
-            checkPointInBounds(point);
+            int x = Point.x(point);
+            int y = Point.y(point);
+            checkPointInBounds(x, y);
 
-            previousColors.put(point, layerBelow.read(point.x(), point.y()));
+            previousColors.put(point, layerBelow.read(x, y));
         });
 
         // Apply transformation to the original image
         Layer thisLayer = layer == TOP_LAYER_INDEX ? TOP_LAYER : LOWER_LAYERS.get(layer);
         applyArea.forEach((point) -> {
-            requireNonNull(point, "Apply area point cannot be null");
-            checkPointInBounds(point);
+            int x = Point.x(point);
+            int y = Point.y(point);
+            checkPointInBounds(x, y);
 
             int newColor = transform.transform(
-                    point,
-                    (requestedPoint) -> colorIfDependency(requestedPoint, previousColors)
+                    x,
+                    y,
+                    (depX, depY) -> colorIfDependency(Point.pack(depX, depY), previousColors)
             );
 
-            thisLayer.write(point.x(), point.y(), newColor);
+            thisLayer.write(x, y, newColor);
         });
 
         /* Update corresponding mipmap pixels.
@@ -291,10 +292,10 @@ public class CloseableImageFrame {
            complexity. Instead, we can efficiently calculate the mipmaps
            ourselves. */
         while (!TOP_LAYER.lastModified().isEmpty()) {
-            Point point = TOP_LAYER.lastModified().remove();
+            long point = TOP_LAYER.lastModified().dequeueLong();
 
-            int x = point.x();
-            int y = point.y();
+            int x = Point.x(point);
+            int y = Point.y(point);
             for (int level = 1; level <= mipmapLevel(); level++) {
 
                 // Don't try to set a color when the mipmap is empty
@@ -370,12 +371,13 @@ public class CloseableImageFrame {
 
     /**
      * Checks if a point is inside this layer's boundaries.
-     * @param point     the point to check
+     * @param x     x-coordinate of the point to check
+     * @param y     y-coordinate of the point to check
      * @throws FrameView.PixelOutOfBoundsException if the point is out of bounds
      */
-    private void checkPointInBounds(Point point) throws FrameView.PixelOutOfBoundsException {
-        if (point.x() < 0 || point.y() < 0 || point.x() >= WIDTH || point.y() >= HEIGHT) {
-            throw new FrameView.PixelOutOfBoundsException(point.x(), point.y());
+    private void checkPointInBounds(int x, int y) throws FrameView.PixelOutOfBoundsException {
+        if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
+            throw new FrameView.PixelOutOfBoundsException(x, y);
         }
     }
 
@@ -388,12 +390,12 @@ public class CloseableImageFrame {
      * @throws ColorTransform.NonDependencyRequestException if the point is not a dependency
      *                                                     of the transform
      */
-    private int colorIfDependency(Point requestedPoint, Object2IntMap<Point> dependencies) {
+    private int colorIfDependency(long requestedPoint, Long2IntMap dependencies) {
         if (!dependencies.containsKey(requestedPoint)) {
             throw new ColorTransform.NonDependencyRequestException();
         }
 
-        return dependencies.getInt(requestedPoint);
+        return dependencies.get(requestedPoint);
     }
 
     /**
@@ -534,7 +536,7 @@ public class CloseableImageFrame {
         private final int WIDTH;
         private final byte INDEX;
         private final byte[] MODIFIED_BY;
-        private final Queue<Point> LAST_MODIFIED;
+        private final LongPriorityQueue LAST_MODIFIED;
         private BottomLayer bottomLayer;
 
         /**
@@ -549,7 +551,7 @@ public class CloseableImageFrame {
             WIDTH = width;
             INDEX = index;
             MODIFIED_BY = new byte[width * height];
-            LAST_MODIFIED = new ArrayDeque<>();
+            LAST_MODIFIED = new LongArrayFIFOQueue();
         }
 
         /**
@@ -565,7 +567,7 @@ public class CloseableImageFrame {
          * queue is mutable. Note that it is possible for the queue to contain duplicates.
          * @return the modified points in the topmost layer
          */
-        public Queue<Point> lastModified() {
+        public LongPriorityQueue lastModified() {
             return LAST_MODIFIED;
         }
 
@@ -606,7 +608,7 @@ public class CloseableImageFrame {
 
             IMAGE.setColor(x, y, color);
             MODIFIED_BY[pointIndex] = layer;
-            LAST_MODIFIED.add(new Point(x, y));
+            LAST_MODIFIED.enqueue(Point.pack(x, y));
         }
 
         @Override
