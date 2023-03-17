@@ -37,7 +37,7 @@ public final class Color {
      * @param alpha     the alpha component of the color, must be in [0, 255]
      * @return an integer representing the 32-bit color
      */
-    public static int rgba(int red, int green, int blue, int alpha) {
+    public static int pack(int red, int green, int blue, int alpha) {
         checkComponent(red);
         checkComponent(green);
         checkComponent(blue);

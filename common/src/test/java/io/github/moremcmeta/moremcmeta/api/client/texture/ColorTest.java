@@ -33,7 +33,7 @@ public class ColorTest {
 
     @Test
     public void constructSeparate_0Red_IllegalRGBAComponentException() {
-        int first = Color.rgba(0, 200, 50, 100);
+        int first = Color.pack(0, 200, 50, 100);
         assertEquals(0, Color.red(first));
         assertEquals(200, Color.green(first));
         assertEquals(50, Color.blue(first));
@@ -43,18 +43,18 @@ public class ColorTest {
     @Test
     public void constructSeparate_TooHighRed_IllegalRGBAComponentException() {
         expectedException.expect(Color.IllegalRGBAComponentException.class);
-        Color.rgba(256, 200, 50, 100);
+        Color.pack(256, 200, 50, 100);
     }
 
     @Test
     public void constructSeparate_NegativeRed_CorrectComponents() {
         expectedException.expect(Color.IllegalRGBAComponentException.class);
-        Color.rgba(-1, 200, 50, 100);
+        Color.pack(-1, 200, 50, 100);
     }
 
     @Test
     public void constructSeparate_0Green_CorrectComponents() {
-        int first = Color.rgba(75, 0, 50, 100);
+        int first = Color.pack(75, 0, 50, 100);
         assertEquals(75, Color.red(first));
         assertEquals(0, Color.green(first));
         assertEquals(50, Color.blue(first));
@@ -64,18 +64,18 @@ public class ColorTest {
     @Test
     public void constructSeparate_TooHighGreen_IllegalRGBAComponentException() {
         expectedException.expect(Color.IllegalRGBAComponentException.class);
-        Color.rgba(75, 256, 50, 100);
+        Color.pack(75, 256, 50, 100);
     }
 
     @Test
     public void constructSeparate_NegativeGreen_CorrectComponents() {
         expectedException.expect(Color.IllegalRGBAComponentException.class);
-        Color.rgba(75, -1, 50, 100);
+        Color.pack(75, -1, 50, 100);
     }
 
     @Test
     public void constructSeparate_0Blue_CorrectComponents() {
-        int first = Color.rgba(75, 200, 0, 100);
+        int first = Color.pack(75, 200, 0, 100);
         assertEquals(75, Color.red(first));
         assertEquals(200, Color.green(first));
         assertEquals(0, Color.blue(first));
@@ -85,18 +85,18 @@ public class ColorTest {
     @Test
     public void constructSeparate_TooHighBlue_IllegalRGBAComponentException() {
         expectedException.expect(Color.IllegalRGBAComponentException.class);
-        Color.rgba(75, 200, 256, 100);
+        Color.pack(75, 200, 256, 100);
     }
 
     @Test
     public void constructSeparate_NegativeBlue_CorrectComponents() {
         expectedException.expect(Color.IllegalRGBAComponentException.class);
-        Color.rgba(75, 200, -1, 100);
+        Color.pack(75, 200, -1, 100);
     }
 
     @Test
     public void constructSeparate_0Alpha_CorrectComponents() {
-        int first = Color.rgba(75, 200, 50, 0);
+        int first = Color.pack(75, 200, 50, 0);
         assertEquals(75, Color.red(first));
         assertEquals(200, Color.green(first));
         assertEquals(50, Color.blue(first));
@@ -106,34 +106,34 @@ public class ColorTest {
     @Test
     public void constructSeparate_TooHighAlpha_IllegalRGBAComponentException() {
         expectedException.expect(Color.IllegalRGBAComponentException.class);
-        Color.rgba(75, 200, 50, 256);
+        Color.pack(75, 200, 50, 256);
     }
 
     @Test
     public void constructSeparate_NegativeAlpha_CorrectComponents() {
         expectedException.expect(Color.IllegalRGBAComponentException.class);
-        Color.rgba(75, 200, 50, -1);
+        Color.pack(75, 200, 50, -1);
     }
 
     @Test
     public void equalsOrBothInvisible_SameColors_Reflexive() {
-        int first = Color.rgba(1, 2, 3, 4);
+        int first = Color.pack(1, 2, 3, 4);
         assertTrue(Color.equalsOrBothInvisible(first, first));
     }
 
     @Test
     public void equalsOrBothInvisible_SameColors_Symmetric() {
-        int first = Color.rgba(1, 2, 3, 4);
-        int second = Color.rgba(1, 2, 3, 4);
+        int first = Color.pack(1, 2, 3, 4);
+        int second = Color.pack(1, 2, 3, 4);
         assertTrue(Color.equalsOrBothInvisible(first, second));
         assertTrue(Color.equalsOrBothInvisible(second, first));
     }
 
     @Test
     public void equalsOrBothInvisible_SameColors_Transitive() {
-        int first = Color.rgba(1, 2, 3, 4);
-        int second = Color.rgba(1, 2, 3, 4);
-        int third = Color.rgba(1, 2, 3, 4);
+        int first = Color.pack(1, 2, 3, 4);
+        int second = Color.pack(1, 2, 3, 4);
+        int third = Color.pack(1, 2, 3, 4);
         assertTrue(Color.equalsOrBothInvisible(first, second));
         assertTrue(Color.equalsOrBothInvisible(second, third));
         assertTrue(Color.equalsOrBothInvisible(first, third));
@@ -141,47 +141,47 @@ public class ColorTest {
 
     @Test
     public void equalsOrBothInvisible_DiffColors_Symmetric() {
-        int first = Color.rgba(1, 2, 3, 4);
-        int second = Color.rgba(4, 3, 2, 1);
+        int first = Color.pack(1, 2, 3, 4);
+        int second = Color.pack(4, 3, 2, 1);
         assertFalse(Color.equalsOrBothInvisible(first, second));
         assertFalse(Color.equalsOrBothInvisible(second, first));
     }
 
     @Test
     public void equalsOrBothInvisible_BothTransparentDiffComponents_Symmetric() {
-        int first = Color.rgba(4, 2, 3, 0);
-        int second = Color.rgba(7, 3, 5, 0);
+        int first = Color.pack(4, 2, 3, 0);
+        int second = Color.pack(7, 3, 5, 0);
         assertTrue(Color.equalsOrBothInvisible(first, second));
         assertTrue(Color.equalsOrBothInvisible(second, first));
     }
 
     @Test
     public void equalsOrBothInvisible_BothPartiallyTransparentDiffComponents_Symmetric() {
-        int first = Color.rgba(4, 2, 3, 10);
-        int second = Color.rgba(7, 3, 5, 10);
+        int first = Color.pack(4, 2, 3, 10);
+        int second = Color.pack(7, 3, 5, 10);
         assertFalse(Color.equalsOrBothInvisible(first, second));
         assertFalse(Color.equalsOrBothInvisible(second, first));
     }
 
     @Test
     public void equals_SameColors_Reflexive() {
-        int first = Color.rgba(1, 2, 3, 4);
+        int first = Color.pack(1, 2, 3, 4);
         assertEquals(first, first);
     }
 
     @Test
     public void equals_SameColors_Symmetric() {
-        int first = Color.rgba(1, 2, 3, 4);
-        int second = Color.rgba(1, 2, 3, 4);
+        int first = Color.pack(1, 2, 3, 4);
+        int second = Color.pack(1, 2, 3, 4);
         assertEquals(first, second);
         assertEquals(second, first);
     }
 
     @Test
     public void equals_SameColors_Transitive() {
-        int first = Color.rgba(1, 2, 3, 4);
-        int second = Color.rgba(1, 2, 3, 4);
-        int third = Color.rgba(1, 2, 3, 4);
+        int first = Color.pack(1, 2, 3, 4);
+        int second = Color.pack(1, 2, 3, 4);
+        int third = Color.pack(1, 2, 3, 4);
         assertEquals(first, second);
         assertEquals(second, third);
         assertEquals(first, third);
@@ -189,15 +189,15 @@ public class ColorTest {
 
     @Test
     public void equals_DiffColors_Symmetric() {
-        int first = Color.rgba(1, 2, 3, 4);
-        int second = Color.rgba(4, 3, 2, 1);
+        int first = Color.pack(1, 2, 3, 4);
+        int second = Color.pack(4, 3, 2, 1);
         assertNotEquals(first, second);
         assertNotEquals(second, first);
     }
 
     @Test
     public void equals_DiffTypes_Symmetric() {
-        int first = Color.rgba(1, 2, 3, 4);
+        int first = Color.pack(1, 2, 3, 4);
         Object second = new Object();
         assertNotEquals(first, second);
         assertNotEquals(second, first);

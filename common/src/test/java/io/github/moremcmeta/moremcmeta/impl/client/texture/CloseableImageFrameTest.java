@@ -1360,7 +1360,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), null, Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), null, Area.of(), 0);
     }
 
     @Test
@@ -1376,7 +1376,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), -1);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), -1);
     }
 
     @Test
@@ -1392,7 +1392,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), 5);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), 5);
     }
 
     @Test
@@ -1408,7 +1408,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), 128);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), 128);
     }
 
     @Test
@@ -1424,7 +1424,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(100, 50)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(100, 50)), Area.of(), 0);
     }
 
     @Test
@@ -1440,7 +1440,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 200)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 200)), Area.of(), 0);
     }
 
     @Test
@@ -1456,7 +1456,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(-1, 50)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(-1, 50)), Area.of(), 0);
     }
 
     @Test
@@ -1472,7 +1472,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, -1)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, -1)), Area.of(), 0);
     }
 
     @Test
@@ -1488,7 +1488,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), null, 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), null, 0);
     }
 
     @Test
@@ -1504,7 +1504,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(100, 50)), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(100, 50)), 0);
     }
 
     @Test
@@ -1520,7 +1520,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 200)), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 200)), 0);
     }
 
     @Test
@@ -1536,7 +1536,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(-1, 50)), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(-1, 50)), 0);
     }
 
     @Test
@@ -1552,7 +1552,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, -1)), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, -1)), 0);
     }
 
     @Test
@@ -1570,7 +1570,7 @@ public class CloseableImageFrameTest {
         expectedException.expect(ColorTransform.NonDependencyRequestException.class);
         frame.applyTransform((x, y, depFunction) -> {
             depFunction.color(50, 50);
-            return Color.rgba(100, 100, 100, 100);
+            return Color.pack(100, 100, 100, 100);
         }, Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 100)), 0);
     }
 
@@ -1581,7 +1581,7 @@ public class CloseableImageFrameTest {
                 new MockCloseableImage(50, 100),
                 new MockCloseableImage(25, 50)
         );
-        images.get(0).setColor(50, 50, Color.rgba(200, 200, 200, 200));
+        images.get(0).setColor(50, 50, Color.pack(200, 200, 200, 200));
 
         CloseableImageFrame frame = new CloseableImageFrame(
                 new FrameReader.FrameData(100, 200, 0, 0),
@@ -2503,7 +2503,7 @@ public class CloseableImageFrameTest {
         frame.close();
 
         expectedException.expect(IllegalStateException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.rgba(100, 100, 100, 100), Area.of(Point.pack(50, 100)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 100)), Area.of(), 0);
     }
 
     @Test

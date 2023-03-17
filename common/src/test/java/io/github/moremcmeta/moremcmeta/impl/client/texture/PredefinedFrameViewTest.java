@@ -79,10 +79,10 @@ public class PredefinedFrameViewTest {
     @Test
     public void color_ColorInBounds_GetsColor() {
         MockCloseableImageFrame frame = new MockCloseableImageFrame(100, 200, 1);
-        frame.mipmap(0).setColor(25, 30, Color.rgba(100, 100, 100, 100));
+        frame.mipmap(0).setColor(25, 30, Color.pack(100, 100, 100, 100));
 
         PredefinedFrameView view = new PredefinedFrameView(frame, 1);
-        assertEquals(Color.rgba(100, 100, 100, 100), view.color(25, 30));
+        assertEquals(Color.pack(100, 100, 100, 100), view.color(25, 30));
     }
 
 }

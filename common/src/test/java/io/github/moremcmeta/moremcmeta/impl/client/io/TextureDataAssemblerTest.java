@@ -800,7 +800,7 @@ public class TextureDataAssemblerTest {
     @Test
     public void assemble_ValidDependencyPoint_PointRetrieved() {
         MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-        originalImage.setColor(25, 30, Color.rgba(100, 100, 100, 100));
+        originalImage.setColor(25, 30, Color.pack(100, 100, 100, 100));
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
@@ -829,8 +829,8 @@ public class TextureDataAssemblerTest {
         /* The CloseableImageFrame logic is already tested, so focus on just testing that the transformation was
            applied to the original image. Re-creating all the tests would be time-consuming while providing
            limited value. */
-        assertEquals(Color.rgba(100, 100, 100, 100), originalImage.color(0, 0));
-        assertEquals(Color.rgba(100, 100, 100, 100), originalImage.color(20, 25));
+        assertEquals(Color.pack(100, 100, 100, 100), originalImage.color(0, 0));
+        assertEquals(Color.pack(100, 100, 100, 100), originalImage.color(20, 25));
 
     }
 
