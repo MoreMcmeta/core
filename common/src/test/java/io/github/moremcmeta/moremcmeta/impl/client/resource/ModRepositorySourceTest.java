@@ -42,12 +42,14 @@ public class ModRepositorySourceTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void construct_NullPackGetter_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new ModRepositorySource(null);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void loadPacks_NullConsumer_NullPointerException() {
         ModRepositorySource repositorySource = new ModRepositorySource(MockPackResources::new);
@@ -56,6 +58,7 @@ public class ModRepositorySourceTest {
         repositorySource.loadPacks(null, MOCK_CONSTRUCTOR);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void loadPacks_NullPackConstructor_NullPointerExceptionPackNotSupplied() {
         ModRepositorySource repositorySource = new ModRepositorySource(MockPackResources::new);

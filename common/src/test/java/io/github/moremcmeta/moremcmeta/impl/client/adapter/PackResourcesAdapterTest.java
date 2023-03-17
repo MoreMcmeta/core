@@ -27,6 +27,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -289,9 +290,9 @@ public class PackResourcesAdapterTest {
                         "test_pack"
                 ) {
                     @Override
-                    public Collection<ResourceLocation> getResources(PackType packType, String namespace,
-                                                                     String pathStart, int maxDepth,
-                                                                     Predicate<String> pathFilter) {
+                    public @NotNull Collection<ResourceLocation> getResources(@NotNull PackType packType, @NotNull String namespace,
+                                                                              @NotNull String pathStart, int maxDepth,
+                                                                              @NotNull Predicate<String> pathFilter) {
                         throw new ResourceLocationException("dummy exception");
                     }
 

@@ -17,12 +17,14 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +41,8 @@ import java.util.stream.Collectors;
  * Mock {@link PackResources} implementation for testing.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class MockPackResources implements PackResources {
     private final Set<String> ROOT_RESOURCES;
     private final Map<PackType, Set<ResourceLocation>> REGULAR_RESOURCES;

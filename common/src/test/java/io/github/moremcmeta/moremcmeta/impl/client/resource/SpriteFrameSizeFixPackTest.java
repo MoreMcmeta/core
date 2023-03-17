@@ -82,12 +82,14 @@ public class SpriteFrameSizeFixPackTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void construct_NullTextures_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new SpriteFrameSizeFixPack(null, DUMMY_REPO);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void construct_NullRepo_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -122,6 +124,7 @@ public class SpriteFrameSizeFixPackTest {
         new SpriteFrameSizeFixPack(textures1, SERVER_REPO);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getRootResource_NullName_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -153,6 +156,7 @@ public class SpriteFrameSizeFixPackTest {
         assertNull(pack.getRootResource(""));
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getResource_NullPackType_NullPointerException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -164,6 +168,7 @@ public class SpriteFrameSizeFixPackTest {
         pack.getResource(null, new ResourceLocation("one.png"));
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getResource_NullLocation_NullPointerException() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -330,6 +335,7 @@ public class SpriteFrameSizeFixPackTest {
                 20, (fileName) -> true).size());
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getResources_NullPackType_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -342,6 +348,7 @@ public class SpriteFrameSizeFixPackTest {
         pack.getResources(null, "minecraft", "textures", 20, (fileName) -> true);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getResources_NullNamespace_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -354,6 +361,7 @@ public class SpriteFrameSizeFixPackTest {
         pack.getResources(PackType.CLIENT_RESOURCES, null, "textures", 20, (fileName) -> true);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getResources_NullPathStart_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -366,6 +374,7 @@ public class SpriteFrameSizeFixPackTest {
         pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", null, 20, (fileName) -> true);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getResources_NullFilter_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -652,6 +661,7 @@ public class SpriteFrameSizeFixPackTest {
         assertTrue(results.contains(new ResourceLocation("textures/folder/two.png")));
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void hasResource_NullPackType_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -666,6 +676,7 @@ public class SpriteFrameSizeFixPackTest {
         pack.hasResource(null, new ResourceLocation("textures/one.png"));
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void hasResource_NullLocation_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -793,6 +804,7 @@ public class SpriteFrameSizeFixPackTest {
         assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/other.png")));
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getNamespaces_NullPackType_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
@@ -845,6 +857,7 @@ public class SpriteFrameSizeFixPackTest {
         assertEquals(0, pack.getNamespaces(PackType.CLIENT_RESOURCES).size());
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void getMetadataSection_NullSerializer_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
