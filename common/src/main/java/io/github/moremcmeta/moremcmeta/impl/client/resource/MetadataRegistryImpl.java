@@ -52,7 +52,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
         requireNonNull(pluginName, "Plugin name cannot be null");
         requireNonNull(textureLocation, "Texture location cannot be null");
         return Optional.ofNullable(
-                metadata.getOrDefault(pluginName, ImmutableMap.of())
+                requireNonNull(metadata.getOrDefault(pluginName, ImmutableMap.of()), "Metadata should never be null")
                         .get(textureLocation)
         );
     }
@@ -71,7 +71,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
         }
 
         return Optional.ofNullable(
-                metadata.getOrDefault(pluginName, ImmutableMap.of())
+                requireNonNull(metadata.getOrDefault(pluginName, ImmutableMap.of()), "Metadata should never be null")
                         .get(SpriteName.toTexturePath(spriteName))
         );
     }
