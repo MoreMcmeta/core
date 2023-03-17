@@ -94,7 +94,7 @@ public class OrderedResourceRepositoryTest {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         expectedException.expect(NullPointerException.class);
-        repository.getFirstCollectionWith(null);
+        repository.firstCollectionWith(null);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class OrderedResourceRepositoryTest {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         expectedException.expect(IOException.class);
-        repository.getFirstCollectionWith(new ResourceLocation("four.png"));
+        repository.firstCollectionWith(new ResourceLocation("four.png"));
     }
 
     @Test
@@ -119,7 +119,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+        OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
                 new ResourceLocation("two.png")
         );
         assertEquals(collections.get(1), result.collection());
@@ -135,7 +135,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+        OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
                 new ResourceLocation("one.png")
         );
         assertEquals(collections.get(0), result.collection());
@@ -151,7 +151,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+        OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
                 new ResourceLocation("two.png")
         );
         assertEquals(collections.get(1), result.collection());
@@ -167,7 +167,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+        OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
                 new ResourceLocation("three.png")
         );
         assertEquals(collections.get(2), result.collection());
@@ -184,7 +184,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+        OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
                 new ResourceLocation("two.png")
         );
         assertEquals(collections.get(1), result.collection());
@@ -201,7 +201,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        OrderedResourceRepository.ResourceCollectionResult result = repository.getFirstCollectionWith(
+        OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
                 new ResourceLocation("two.png")
         );
         assertEquals(collections.get(1), result.collection());
@@ -218,7 +218,7 @@ public class OrderedResourceRepositoryTest {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         expectedException.expect(NullPointerException.class);
-        repository.hasResource(null);
+        repository.contains(null);
     }
 
     @Test
@@ -230,7 +230,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertFalse(repository.hasResource(new ResourceLocation("four.png")));
+        assertFalse(repository.contains(new ResourceLocation("four.png")));
     }
 
     @Test
@@ -242,7 +242,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertTrue(repository.hasResource(new ResourceLocation("one.png")));
+        assertTrue(repository.contains(new ResourceLocation("one.png")));
     }
 
     @Test
@@ -254,7 +254,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertTrue(repository.hasResource(new ResourceLocation("two.png")));
+        assertTrue(repository.contains(new ResourceLocation("two.png")));
     }
 
     @Test
@@ -266,7 +266,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertTrue(repository.hasResource(new ResourceLocation("three.png")));
+        assertTrue(repository.contains(new ResourceLocation("three.png")));
     }
 
     @Test
@@ -278,7 +278,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        assertTrue(repository.hasResource(new ResourceLocation("one.png")));
+        assertTrue(repository.contains(new ResourceLocation("one.png")));
     }
 
     @Test
@@ -290,7 +290,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        assertTrue(repository.hasResource(new ResourceLocation("two.png")));
+        assertTrue(repository.contains(new ResourceLocation("two.png")));
     }
 
     @Test
@@ -302,7 +302,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        assertTrue(repository.hasResource(new ResourceLocation("three.png")));
+        assertTrue(repository.contains(new ResourceLocation("three.png")));
     }
 
     @Test
@@ -315,7 +315,7 @@ public class OrderedResourceRepositoryTest {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         expectedException.expect(NullPointerException.class);
-        repository.listResources(null, (file) -> true);
+        repository.list(null, (file) -> true);
     }
 
     @Test
@@ -328,7 +328,7 @@ public class OrderedResourceRepositoryTest {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         expectedException.expect(NullPointerException.class);
-        repository.listResources("textures", null);
+        repository.list("textures", null);
     }
 
     @Test
@@ -341,7 +341,7 @@ public class OrderedResourceRepositoryTest {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         // The mock resource collections don't add a slash, so this should match if passed exactly
-        Collection<ResourceLocation> results = repository.listResources("text", (file) -> true);
+        Collection<ResourceLocation> results = repository.list("text", (file) -> true);
 
         assertEquals(3, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/one.png")));
@@ -359,7 +359,7 @@ public class OrderedResourceRepositoryTest {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         // The mock resource collections don't add a slash, so this should match if passed exactly
-        Collection<ResourceLocation> results = repository.listResources("", (file) -> true);
+        Collection<ResourceLocation> results = repository.list("", (file) -> true);
 
         assertEquals(3, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/one.png")));
@@ -376,7 +376,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("ext", (file) -> true);
+        Collection<ResourceLocation> results = repository.list("ext", (file) -> true);
         assertEquals(0, results.size());
     }
 
@@ -389,7 +389,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.endsWith(".png"));
+        Collection<ResourceLocation> results = repository.list("textures", (file) -> file.endsWith(".png"));
         assertEquals(2, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/one.png")));
         assertTrue(results.contains(new ResourceLocation("textures/three.png")));
@@ -404,7 +404,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.endsWith(".jpg"));
+        Collection<ResourceLocation> results = repository.list("textures", (file) -> file.endsWith(".jpg"));
         assertEquals(0, results.size());
     }
 
@@ -417,7 +417,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.endsWith(".png"));
+        Collection<ResourceLocation> results = repository.list("textures", (file) -> file.endsWith(".png"));
         assertEquals(1, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/one.png")));
     }
@@ -431,7 +431,7 @@ public class OrderedResourceRepositoryTest {
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        Collection<ResourceLocation> results = repository.listResources("textures", (file) -> file.endsWith(".png"));
+        Collection<ResourceLocation> results = repository.list("textures", (file) -> file.endsWith(".png"));
         assertEquals(1, results.size());
         assertTrue(results.contains(new ResourceLocation("textures/three.png")));
     }

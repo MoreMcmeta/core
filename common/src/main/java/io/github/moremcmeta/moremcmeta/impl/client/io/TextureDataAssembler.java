@@ -85,7 +85,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
         // Create frames
         int layers = data.parsedMetadata().size() + EXTERNAL_DEFAULT_COMPONENTS + INTERNAL_DEFAULT_COMPONENTS;
         List<? extends I> mipmaps = MIPMAP_GENERATOR.apply(original);
-        ImmutableList<CloseableImageFrame> frames = getFrames(
+        ImmutableList<CloseableImageFrame> frames = readFrames(
                 mipmaps,
                 frameWidth,
                 frameHeight,
@@ -135,8 +135,8 @@ public class TextureDataAssembler<I extends CloseableImage> {
      * @param layers                number of layers in the image
      * @return the frames based on the texture image in chronological order
      */
-    private ImmutableList<CloseableImageFrame> getFrames(List<? extends I> mipmaps, int frameWidth,
-                                                         int frameHeight, int layers) {
+    private ImmutableList<CloseableImageFrame> readFrames(List<? extends I> mipmaps, int frameWidth,
+                                                          int frameHeight, int layers) {
         int mipmap = mipmaps.size() - 1;
 
         FrameReader<CloseableImageFrame> frameReader = new FrameReader<>((frameData) -> {

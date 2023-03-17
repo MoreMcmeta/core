@@ -118,15 +118,15 @@ public class SpriteFrameSizeFixPack implements PackResources {
         }
 
         // Don't let a potential bug be silenced as an IOException
-        if (!RESOURCE_REPOSITORY.hasResource(textureLocation)) {
+        if (!RESOURCE_REPOSITORY.contains(textureLocation)) {
             throw new IllegalStateException("A texture given to the sprite fix pack as one being controlled by this " +
                     "mod does not actually exist");
         }
 
         // If the texture is controlled by the mod, we already know it's in the topmost pack
-        return RESOURCE_REPOSITORY.getFirstCollectionWith(textureLocation)
+        return RESOURCE_REPOSITORY.firstCollectionWith(textureLocation)
                 .collection()
-                .getResource(PackType.CLIENT_RESOURCES, textureLocation);
+                .find(PackType.CLIENT_RESOURCES, textureLocation);
 
     }
 

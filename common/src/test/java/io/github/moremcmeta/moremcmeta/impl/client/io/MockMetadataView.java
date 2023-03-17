@@ -65,82 +65,82 @@ public class MockMetadataView implements MetadataView {
 
     @Override
     public Optional<String> stringValue(String key) {
-        return getValueIfPresent(key, String.class);
+        return valueIfPresent(key, String.class);
     }
 
     @Override
     public Optional<String> stringValue(int index) {
         checkNegativeIndex(index);
-        return getValueIfPresent(index, String.class);
+        return valueIfPresent(index, String.class);
     }
 
     @Override
     public Optional<Integer> integerValue(String key) {
-        return getValueIfPresent(key, Integer.class);
+        return valueIfPresent(key, Integer.class);
     }
 
     @Override
     public Optional<Integer> integerValue(int index) {
         checkNegativeIndex(index);
-        return getValueIfPresent(index, Integer.class);
+        return valueIfPresent(index, Integer.class);
     }
 
     @Override
     public Optional<Long> longValue(String key) {
-        return getValueIfPresent(key, Long.class);
+        return valueIfPresent(key, Long.class);
     }
 
     @Override
     public Optional<Long> longValue(int index) {
         checkNegativeIndex(index);
-        return getValueIfPresent(index, Long.class);
+        return valueIfPresent(index, Long.class);
     }
 
     @Override
     public Optional<Float> floatValue(String key) {
-        return getValueIfPresent(key, Float.class);
+        return valueIfPresent(key, Float.class);
     }
 
     @Override
     public Optional<Float> floatValue(int index) {
         checkNegativeIndex(index);
-        return getValueIfPresent(index, Float.class);
+        return valueIfPresent(index, Float.class);
     }
 
     @Override
     public Optional<Double> doubleValue(String key) {
-        return getValueIfPresent(key, Double.class);
+        return valueIfPresent(key, Double.class);
     }
 
     @Override
     public Optional<Double> doubleValue(int index) {
         checkNegativeIndex(index);
-        return getValueIfPresent(index, Double.class);
+        return valueIfPresent(index, Double.class);
     }
 
     @Override
     public Optional<Boolean> booleanValue(String key) {
-        return getValueIfPresent(key, Boolean.class);
+        return valueIfPresent(key, Boolean.class);
     }
 
     @Override
     public Optional<Boolean> booleanValue(int index) {
         checkNegativeIndex(index);
-        return getValueIfPresent(index, Boolean.class);
+        return valueIfPresent(index, Boolean.class);
     }
 
     @Override
     public Optional<MetadataView> subView(String key) {
-        return getValueIfPresent(key, MetadataView.class);
+        return valueIfPresent(key, MetadataView.class);
     }
 
     @Override
     public Optional<MetadataView> subView(int index) {
         checkNegativeIndex(index);
-        return getValueIfPresent(index, MetadataView.class);
+        return valueIfPresent(index, MetadataView.class);
     }
 
-    private <T> Optional<T> getValueIfPresent(String key, Class<T> expectedClass) {
+    private <T> Optional<T> valueIfPresent(String key, Class<T> expectedClass) {
         if (!SECTION_TO_VALUE.containsKey(key)) {
             return Optional.empty();
         }
@@ -149,7 +149,7 @@ public class MockMetadataView implements MetadataView {
         return expectedClass.isInstance(value) ? Optional.of(expectedClass.cast(value)) : Optional.empty();
     }
 
-    private <T> Optional<T> getValueIfPresent(int index, Class<T> expectedClass) {
+    private <T> Optional<T> valueIfPresent(int index, Class<T> expectedClass) {
         if (index >= SECTION_TO_VALUE.size()) {
             return Optional.empty();
         }

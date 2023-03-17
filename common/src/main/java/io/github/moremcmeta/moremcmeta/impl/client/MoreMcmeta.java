@@ -189,7 +189,7 @@ public abstract class MoreMcmeta {
                     .toList();
 
             ModRepositorySource source = new ModRepositorySource(() -> {
-                OrderedResourceRepository repository = getResourceRepository(packRepository, logger);
+                OrderedResourceRepository repository = makeResourceRepository(packRepository, logger);
 
                 List<String> currentPackIds = packIdGetter.get();
 
@@ -490,7 +490,7 @@ public abstract class MoreMcmeta {
      * @param logger            logger to log warnings and errors
      * @return the repository with all resources
      */
-    private OrderedResourceRepository getResourceRepository(PackRepository packRepository, Logger logger) {
+    private OrderedResourceRepository makeResourceRepository(PackRepository packRepository, Logger logger) {
         List<PackResourcesAdapter> otherPacks = new ArrayList<>(packRepository.getSelectedPacks()
                 .stream()
                 .filter((pack) -> !pack.getId().equals(ModRepositorySource.PACK_ID))

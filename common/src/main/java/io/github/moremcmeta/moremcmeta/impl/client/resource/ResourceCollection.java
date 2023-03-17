@@ -39,7 +39,7 @@ public interface ResourceCollection {
      * @return the resource as a stream
      * @throws IOException if the resource does not exist
      */
-    InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException;
+    InputStream find(PackType resourceType, ResourceLocation location) throws IOException;
 
     /**
      * Checks if this collection has a resource.
@@ -47,7 +47,7 @@ public interface ResourceCollection {
      * @param location          the location of the resource to search for
      * @return whether this collection contains the resource
      */
-    boolean hasResource(PackType resourceType, ResourceLocation location);
+    boolean contains(PackType resourceType, ResourceLocation location);
 
     /**
      * Gets all the resource locations in this collection that match the provided filters.
@@ -57,8 +57,8 @@ public interface ResourceCollection {
      * @param fileFilter        filter for the file name
      * @return all the matching resource locations
      */
-    Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
-                                              Predicate<String> fileFilter);
+    Collection<ResourceLocation> list(PackType resourceType, String namespace, String pathStart,
+                                      Predicate<String> fileFilter);
 
     /**
      * Gets the namespaces of all resources in this collection.

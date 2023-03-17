@@ -50,8 +50,8 @@ public class MockResourceCollection implements ResourceCollection {
     }
 
     @Override
-    public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
-        if (hasResource(resourceType, location)) {
+    public InputStream find(PackType resourceType, ResourceLocation location) throws IOException {
+        if (contains(resourceType, location)) {
             return new ByteArrayInputStream(location.toString().getBytes(StandardCharsets.UTF_8));
         }
 
@@ -59,7 +59,7 @@ public class MockResourceCollection implements ResourceCollection {
     }
 
     @Override
-    public boolean hasResource(PackType resourceType, ResourceLocation location) {
+    public boolean contains(PackType resourceType, ResourceLocation location) {
         boolean hasClientResource = resourceType == PackType.CLIENT_RESOURCES
                 && CLIENT_RESOURCES.contains(location);
         boolean hasServerResource = resourceType == PackType.SERVER_DATA
@@ -69,8 +69,8 @@ public class MockResourceCollection implements ResourceCollection {
     }
 
     @Override
-    public Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
-                                                     Predicate<String> fileFilter) {
+    public Collection<ResourceLocation> list(PackType resourceType, String namespace, String pathStart,
+                                             Predicate<String> fileFilter) {
         Collection<ResourceLocation> locationsOfType = resourceType == PackType.CLIENT_RESOURCES ?
                 CLIENT_RESOURCES : SERVER_RESOURCES;
         return locationsOfType.stream()

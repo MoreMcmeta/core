@@ -113,7 +113,7 @@ public class TextureLoader<R> {
         Set<ResourceLocation> results = new HashSet<>();
 
         for (String path : paths) {
-            results.addAll(repository.listResources(path, fileNameFilter));
+            results.addAll(repository.list(path, fileNameFilter));
         }
 
         return results;
@@ -162,13 +162,13 @@ public class TextureLoader<R> {
 
         try {
             OrderedResourceRepository.ResourceCollectionResult metadataResources = repository
-                    .getFirstCollectionWith(metadataLocation);
+                    .firstCollectionWith(metadataLocation);
 
             String metadataPath = metadataLocation.getPath();
             String extension = metadataPath.substring(metadataPath.lastIndexOf('.'));
 
             // There must be a reader for this extension since we only retrieved files with readers' extensions
-            InputStream metadataStream = metadataResources.collection().getResource(resourceType, metadataLocation);
+            InputStream metadataStream = metadataResources.collection().find(resourceType, metadataLocation);
             Map<ResourceLocation, MetadataView> metadata = METADATA_READERS
                     .get(extension)
                     .read(metadataLocation, metadataStream, (filter) -> searchResources(repository, paths, filter));
@@ -286,7 +286,7 @@ public class TextureLoader<R> {
 
         try {
             OrderedResourceRepository.ResourceCollectionResult collectionResult = resourceRepository
-                    .getFirstCollectionWith(textureLocation);
+                    .firstCollectionWith(textureLocation);
 
             int textureCollectionIndex = collectionResult.collectionIndex();
             Set<String> sectionsInSameCollection = collectionIndexBySection
@@ -298,7 +298,7 @@ public class TextureLoader<R> {
 
             InputStream textureStream = collectionResult
                     .collection()
-                    .getResource(resourceType, textureLocation);
+                    .find(resourceType, textureLocation);
             R texture = TEXTURE_READER.read(textureStream, metadata, sectionsInSameCollection);
             textureStream.close();
 

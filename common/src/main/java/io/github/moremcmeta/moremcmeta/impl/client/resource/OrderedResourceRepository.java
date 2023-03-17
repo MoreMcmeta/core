@@ -70,11 +70,11 @@ public class OrderedResourceRepository {
      * @return the collection with the given resource
      * @throws IOException if the resource is not found in any collection
      */
-    public ResourceCollectionResult getFirstCollectionWith(ResourceLocation location) throws IOException {
+    public ResourceCollectionResult firstCollectionWith(ResourceLocation location) throws IOException {
         requireNonNull(location, "Location cannot be null");
 
         Optional<ResourceCollectionResult> collectionWithResource = IntStream.range(0, COLLECTIONS.size())
-                .filter((index) -> COLLECTIONS.get(index).hasResource(RESOURCE_TYPE, location))
+                .filter((index) -> COLLECTIONS.get(index).contains(RESOURCE_TYPE, location))
                 .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index)).findFirst();
 
         if (collectionWithResource.isEmpty()) {
@@ -89,11 +89,11 @@ public class OrderedResourceRepository {
      * @param location      the resource to check for
      * @return whether this repository has that resource
      */
-    public boolean hasResource(ResourceLocation location) {
+    public boolean contains(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
 
         return COLLECTIONS.stream().anyMatch((collection) ->
-                collection.hasResource(RESOURCE_TYPE, location)
+                collection.contains(RESOURCE_TYPE, location)
         );
     }
 
@@ -103,13 +103,13 @@ public class OrderedResourceRepository {
      * @param fileFilter    filter for the file name
      * @return all matching resource locations
      */
-    public Set<ResourceLocation> listResources(String pathStart, Predicate<String> fileFilter) {
+    public Set<ResourceLocation> list(String pathStart, Predicate<String> fileFilter) {
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(fileFilter, "Path filter cannot be null");
 
         return COLLECTIONS.stream().flatMap(
                 (collection) -> collection.namespaces(RESOURCE_TYPE).stream().flatMap(
-                        (namespace) -> collection.getResources(RESOURCE_TYPE, namespace, pathStart, fileFilter).stream()
+                        (namespace) -> collection.list(RESOURCE_TYPE, namespace, pathStart, fileFilter).stream()
                 )
         ).collect(Collectors.toSet());
     }

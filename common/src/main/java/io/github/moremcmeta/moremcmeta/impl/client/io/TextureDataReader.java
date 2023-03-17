@@ -102,10 +102,10 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                     + " returned null for parsed metadata");
             parsedSections.add(Triple.of(plugin.displayName(), sectionData, plugin.componentProvider()));
 
-            frameWidthOptional = getIfCompatible(frameWidthOptional, sectionData.frameWidth(), "frame width");
-            frameHeightOptional = getIfCompatible(frameHeightOptional, sectionData.frameHeight(), "frame width");
-            blurOptional = getIfCompatible(blurOptional, sectionData.blur(), "blur");
-            clampOptional = getIfCompatible(clampOptional, sectionData.clamp(), "clamp");
+            frameWidthOptional = unwrapIfCompatible(frameWidthOptional, sectionData.frameWidth(), "frame width");
+            frameHeightOptional = unwrapIfCompatible(frameHeightOptional, sectionData.frameHeight(), "frame width");
+            blurOptional = unwrapIfCompatible(blurOptional, sectionData.blur(), "blur");
+            clampOptional = unwrapIfCompatible(clampOptional, sectionData.clamp(), "clamp");
         }
 
         boolean blur = blurOptional.orElse(false);
@@ -159,7 +159,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
      * @throws InvalidMetadataException if the values are not compatible
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private <T> Optional<T> getIfCompatible(Optional<T> currentVal, Optional<T> newVal, String propName)
+    private <T> Optional<T> unwrapIfCompatible(Optional<T> currentVal, Optional<T> newVal, String propName)
             throws InvalidMetadataException {
         if (currentVal.isPresent() && newVal.isPresent() && !currentVal.get().equals(newVal.get())) {
             throw new InvalidMetadataException(String.format("%s was given conflicting values by two plugins: %s %s",

@@ -52,22 +52,22 @@ public class PackResourcesAdapter implements ResourceCollection {
     }
 
     @Override
-    public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
+    public InputStream find(PackType resourceType, ResourceLocation location) throws IOException {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
         return ORIGINAL.getResource(resourceType, location);
     }
 
     @Override
-    public boolean hasResource(PackType resourceType, ResourceLocation location) {
+    public boolean contains(PackType resourceType, ResourceLocation location) {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
         return ORIGINAL.hasResource(resourceType, location);
     }
 
     @Override
-    public Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
-                                                     Predicate<String> fileFilter) {
+    public Collection<ResourceLocation> list(PackType resourceType, String namespace, String pathStart,
+                                             Predicate<String> fileFilter) {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(namespace, "Namespace cannot be null");
         requireNonNull(pathStart, "Path start cannot be null");
