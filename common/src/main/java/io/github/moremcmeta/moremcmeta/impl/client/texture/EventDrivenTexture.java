@@ -345,55 +345,30 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final int LAYER;
         private boolean valid;
 
-        /**
-         * Applies the provided transformation to the current frame to generate
-         * a new frame, which will become the current frame.
-         * @param transform     the transformation to apply to the current frame
-         * @param applyArea     area to apply the transformation to
-         * @param dependencies  the points whose current colors this transformation depends on
-         */
         @Override
         public void generateWith(ColorTransform transform, Area applyArea, Area dependencies) {
             checkValid();
             STATE.generateWith(transform, applyArea, dependencies, LAYER);
         }
 
-        /**
-         * Replace the current frame with one of the predefined frames.
-         * @param index     the index of the predefined frame to make
-         *                  the current frame
-         */
         @Override
         public void replaceWith(int index) {
             checkValid();
             STATE.replaceWith(index);
         }
 
-        /**
-         * Gets the width of a frame. All frames have the same width.
-         * @return the width of a frame
-         */
         @Override
         public int width() {
             checkValid();
             return STATE.width();
         }
 
-        /**
-         * Gets the height of a frame. All frames have the same height.
-         * @return the height of a frame
-         */
         @Override
         public int height() {
             checkValid();
             return STATE.height();
         }
 
-        /**
-         * Gets the index of the current frame if it is a predefined frame.
-         * Otherwise, the frame is a generated frame, so empty is returned.
-         * @return the index of the predefined frame or empty if generated
-         */
         @Override
         public Optional<Integer> index() {
             checkValid();

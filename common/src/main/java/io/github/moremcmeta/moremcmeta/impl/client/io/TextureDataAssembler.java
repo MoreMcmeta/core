@@ -238,43 +238,24 @@ public class TextureDataAssembler<I extends CloseableImage> {
             valid = true;
         }
 
-        /**
-         * Gets the width of the frame.
-         * @return width of the frame
-         */
         @Override
         public int width() {
             checkValid();
             return FRAME.width();
         }
 
-        /**
-         * Gets the height of the frame.
-         * @return height of the frame
-         */
         @Override
         public int height() {
             checkValid();
             return FRAME.height();
         }
 
-        /**
-         * Gets the index of the frame. Always exists since it
-         * is a predefined frame by definition.
-         * @return index of the frame
-         */
         @Override
         public Optional<Integer> index() {
             checkValid();
             return Optional.of(INDEX);
         }
 
-        /**
-         * Modifies this frame with the given function over the given apply area.
-         * @param transform     transformation to apply to this frame
-         * @param applyArea     area to apply the transformation to
-         * @param dependencies  the points whose current colors this transformation depends on
-         */
         @Override
         public void transform(ColorTransform transform, Area applyArea, Area dependencies) {
             checkValid();

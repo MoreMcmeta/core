@@ -49,11 +49,6 @@ public class TextureManagerAdapter implements Manager<AbstractTexture> {
         UNREGISTER_ACTION = requireNonNull(unregisterAction, "Unregister action cannot be null");
     }
 
-    /**
-     * Registers a texture to the texture manager
-     * @param location      file location of resource identical to how it is used in an entity/GUI/map
-     * @param texture       the texture to register
-     */
     @Override
     public void register(ResourceLocation location, AbstractTexture texture) {
         requireNonNull(location, "Location cannot be null");
@@ -61,19 +56,12 @@ public class TextureManagerAdapter implements Manager<AbstractTexture> {
         manager().register(location, texture);
     }
 
-    /**
-     * Removes a texture from the manager using the provided unregister action.
-     * @param location   file location of resource to delete
-     */
     @Override
     public void unregister(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
         UNREGISTER_ACTION.accept(manager(), location);
     }
 
-    /**
-     * Updates all textures in the texture manager.
-     */
     @Override
     public void tick() {
         manager().tick();

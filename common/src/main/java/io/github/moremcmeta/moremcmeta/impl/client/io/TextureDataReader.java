@@ -65,16 +65,6 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         BLUR_CLAMP_APPLIER = requireNonNull(blurClampApplier, "Blur-clamp applier cannot be null");
     }
 
-    /**
-     * Reads texture data from texture and metadata byte streams.
-     * @param textureStream                 input stream of image data
-     * @param metadata                      metadata associated with this texture
-     * @param sectionsInSamePack            set of metadata sections that are in the same pack
-     *                                      as the texture
-     * @return minimum texture data
-     * @throws IOException if the image could not be read
-     * @throws InvalidMetadataException if the metadata is not valid for some reason
-     */
     @Override
     public TextureData<I> read(InputStream textureStream, MetadataView metadata,
                                Set<String> sectionsInSamePack)

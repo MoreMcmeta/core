@@ -66,13 +66,6 @@ public class NativeImageAdapter implements CloseableImage {
         setClamp(clamp);
     }
 
-    /**
-     * Gets the color of a pixel in the image.
-     * @param x     x-coordinate of the pixel
-     * @param y     y-coordinate of the pixel
-     * @return  the color of the given pixel
-     * @throws IllegalStateException if this image has been closed
-     */
     @Override
     public int color(int x, int y) {
         checkOpen();
@@ -80,13 +73,6 @@ public class NativeImageAdapter implements CloseableImage {
         return IMAGE.getPixelRGBA(x + X_OFFSET, y + Y_OFFSET);
     }
 
-    /**
-     * Sets the color of a pixel in the image.
-     * @param x         x-coordinate of the pixel
-     * @param y         y-coordinate of the pixel
-     * @param color     new color of the pixel
-     * @throws IllegalStateException if this image has been closed
-     */
     @Override
     public void setColor(int x, int y, int color) {
         checkOpen();
@@ -94,34 +80,18 @@ public class NativeImageAdapter implements CloseableImage {
         IMAGE.setPixelRGBA(x + X_OFFSET, y + Y_OFFSET, color);
     }
 
-    /**
-     * Gets the width of the image.
-     * @return  the width of the image in pixels
-     * @throws IllegalStateException if this image has been closed
-     */
     @Override
     public int width() {
         checkOpen();
         return WIDTH;
     }
 
-    /**
-     * Gets the height of the image.
-     * @return  the height of the image in pixels
-     * @throws IllegalStateException if this image has been closed
-     */
     @Override
     public int height() {
         checkOpen();
         return HEIGHT;
     }
 
-    /**
-     * Uploads the top-left corner of this image at the given coordinates on the render thread.
-     * @param uploadX       horizontal position to upload at
-     * @param uploadY       vertical position to upload at
-     * @throws IllegalStateException if this image has been closed
-     */
     @Override
     public void upload(int uploadX, int uploadY) {
         checkOpen();
@@ -133,16 +103,6 @@ public class NativeImageAdapter implements CloseableImage {
 
     }
 
-    /**
-     * Takes a portion of this image as a separate {@link CloseableImage}. This image will be
-     * closed when the sub-image is closed and vice versa. Changes in the original image or any of
-     * its sub-images will be reflected in all the sub-images.
-     * @param topLeftX      x-coordinate of the top-left corner of the sub-image
-     * @param topLeftY      y-coordinate of the top-left corner of the sub-image
-     * @param width         width of the sub-image
-     * @param height        height of the sub-image
-     * @return the corresponding sub-image
-     */
     @Override
     public CloseableImage subImage(int topLeftX, int topLeftY, int width, int height) {
         NativeImageAdapter subImage = new NativeImageAdapter(
@@ -160,9 +120,6 @@ public class NativeImageAdapter implements CloseableImage {
         return subImage;
     }
 
-    /**
-     * Closes the underlying {@link NativeImage} and any other related resources. Idempotent.
-     */
     @Override
     public void close() {
 

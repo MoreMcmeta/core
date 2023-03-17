@@ -150,11 +150,6 @@ public class TextureData<I extends CloseableImage> {
             return HEIGHT;
         }
 
-        /**
-         * Checks if another object is equivalent to this frame size.
-         * @param other     the other object to compare this frame size to
-         * @return whether the other object represents an equivalent frame size
-         */
         @Override
         public boolean equals(Object other) {
             if (!(other instanceof FrameSize otherSize)) {
@@ -164,11 +159,6 @@ public class TextureData<I extends CloseableImage> {
             return width() == otherSize.width() && height() == otherSize.height();
         }
 
-        /**
-         * Gets a hash code for this frame size.
-         * @return a hash code for this frame size
-         * @see Object#hashCode()
-         */
         @Override
         public int hashCode() {
             return 31 * WIDTH + HEIGHT;

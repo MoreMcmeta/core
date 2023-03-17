@@ -69,13 +69,6 @@ public class FrameGroupImpl<F extends FrameView> implements FrameGroup<F> {
         );
     }
 
-    /**
-     * Gets a frame in this group by its index.
-     * @param index     index of the frame to retrieve
-     * @return the frame at this index in the group
-     * @throws FrameView.FrameIndexOutOfBoundsException if the provided index is outside
-     *                                                  the range of legal frame indices
-     */
     @Override
     public F frame(int index) {
         if (index < 0 || index >= FRAMES.size()) {
@@ -85,10 +78,6 @@ public class FrameGroupImpl<F extends FrameView> implements FrameGroup<F> {
         return FRAMES.get(index);
     }
 
-    /**
-     * Gets the number of frames in this group.
-     * @return number of frames in this group
-     */
     @Override
     public int frames() {
         return FRAMES.size();

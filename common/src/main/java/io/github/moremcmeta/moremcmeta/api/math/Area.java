@@ -101,7 +101,6 @@ public final class Area implements LongIterable {
 
     /**
      * Gets the iterator for all the points in this area. The points are not in a guaranteed order.
-     *
      * @return the iterator for all points in this area
      */
     @Override
@@ -231,20 +230,11 @@ public final class Area implements LongIterable {
             WIDTH = width;
         }
 
-        /**
-         * Gets the hash code of this row.
-         * @return  the hash code of this row
-         */
         @Override
         public int hashCode() {
             return Objects.hash(X, Y, WIDTH);
         }
 
-        /**
-         * Determines if this row is the same as another object.
-         * @param other     the other object to test
-         * @return  whether the two objects are identical rows
-         */
         @Override
         public boolean equals(Object other) {
             if (!(other instanceof Row otherRow)) {
@@ -273,10 +263,6 @@ public final class Area implements LongIterable {
             rowIterator = rows.iterator();
         }
 
-        /**
-         * Determines whether there are any points left to iterate over.
-         * @return  whether this iterator has any remaining points
-         */
         @Override
         public boolean hasNext() {
             return rowIterator.hasNext() || (currentRow != null && pixelCount < currentRow.WIDTH);

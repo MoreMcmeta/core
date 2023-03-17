@@ -46,10 +46,6 @@ public class SpriteUploadComponent extends SingleUploadComponent {
         UPLOAD_Y = Point.y(SPRITE.uploadPoint());
     }
 
-    /**
-     * Uploads the texture when it needs to be uploaded.
-     * @param currentFrame      view of the texture's current frame
-     */
     @Override
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
         super.onUpload(currentFrame);
@@ -57,11 +53,6 @@ public class SpriteUploadComponent extends SingleUploadComponent {
         currentFrame.upload(UPLOAD_X, UPLOAD_Y);
     }
 
-    /**
-     * Uploads the texture to the atlas on tick since the sprite will never be bound.
-     * @param currentFrame      view of the texture's current frame
-     * @param predefinedFrames  persistent views of the predefined frames
-     */
     @Override
     public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame,
                        FrameGroup<PersistentFrameView> predefinedFrames) {

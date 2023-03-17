@@ -50,16 +50,6 @@ public class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListe
         FABRIC_ID = requireNonNull(fabricId, "Fabric ID cannot be null");
     }
 
-    /**
-     * Executes the load and apply tasks in order when the resource manager reloads.
-     * @param barrier           barrier between data gathering and using that data
-     * @param manager           Minecraft's resource manager
-     * @param loadProfiler      profiler for load stage
-     * @param applyProfiler     profiler for apply stage
-     * @param loadExecutor      asynchronously executes load stage tasks
-     * @param applyExecutor     asynchronously executes apply stage tasks
-     * @return a task for both the load and apply stages
-     */
     @Override
     public CompletableFuture<Void> reload(PreparationBarrier barrier, ResourceManager manager,
                                           ProfilerFiller loadProfiler, ProfilerFiller applyProfiler,
@@ -68,13 +58,6 @@ public class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListe
                 applyExecutor);
     }
 
-    /**
-     * Load stage that gathers resources.
-     * @param manager           Minecraft's resource manager
-     * @param loadProfiler      profiler for load stage
-     * @param loadExecutor      asynchronously executes load stage tasks
-     * @return the task for the load stage returning the retrieved data
-     */
     @Override
     public CompletableFuture<T> load(ResourceManager manager, ProfilerFiller loadProfiler, Executor loadExecutor) {
 
@@ -83,14 +66,6 @@ public class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListe
 
     }
 
-    /**
-     * Apply stage that uses resources from the load stage.
-     * @param data              the retrieved data from the load stage
-     * @param manager           Minecraft's resource manager
-     * @param applyProfiler     profiler for apply stage
-     * @param applyExecutor     asynchronously executes apply stage tasks
-     * @return the task for the "apply" stage that does not return anything
-     */
     @Override
     public CompletableFuture<Void> apply(T data, ResourceManager manager, ProfilerFiller applyProfiler,
                                          Executor applyExecutor) {
@@ -100,10 +75,6 @@ public class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListe
 
     }
 
-    /**
-     * Gets the unique identifier for this listener that other mods can depend on.
-     * @return unique identifier for this listener
-     */
     @Override
     public ResourceLocation getFabricId() {
         return FABRIC_ID;

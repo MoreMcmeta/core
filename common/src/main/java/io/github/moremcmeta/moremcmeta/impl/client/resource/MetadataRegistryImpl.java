@@ -47,12 +47,6 @@ public class MetadataRegistryImpl implements MetadataRegistry {
         metadata = ImmutableMap.of();
     }
 
-    /**
-     * Retrieves the metadata provided by the given plugin for the given texture.
-     * @param pluginName            name of the plugin that provided the metadata
-     * @param textureLocation       full (non-sprite, including .png suffix) location of the texture
-     * @return the metadata provided by the given plugin for the given texture, if there is any
-     */
     @Override
     public Optional<ParsedMetadata> metadataFromPath(String pluginName, ResourceLocation textureLocation) {
         requireNonNull(pluginName, "Plugin name cannot be null");
@@ -63,12 +57,6 @@ public class MetadataRegistryImpl implements MetadataRegistry {
         );
     }
 
-    /**
-     * Retrieves the metadata provided by the given plugin for the given texture.
-     * @param pluginName            name of the plugin that provided the metadata
-     * @param spriteName            name of the sprite (omitting the textures/ prefix and .png suffix)
-     * @return the metadata provided by the given plugin for the given texture, if there is any
-     */
     @Override
     public Optional<ParsedMetadata> metadataFromSpriteName(String pluginName, ResourceLocation spriteName) {
         requireNonNull(pluginName, "Plugin name cannot be null");
@@ -88,11 +76,6 @@ public class MetadataRegistryImpl implements MetadataRegistry {
         );
     }
 
-    /**
-     * Retrieves all metadata associated with a given plugin.
-     * @param pluginName            name of the plugin that provided the metadata
-     * @return all metadata associated with a given plugin, by texture location, as an immutable map
-     */
     @Override
     public Map<ResourceLocation, ParsedMetadata> metadataByPlugin(String pluginName) {
         requireNonNull(pluginName, "Plugin name cannot be null");

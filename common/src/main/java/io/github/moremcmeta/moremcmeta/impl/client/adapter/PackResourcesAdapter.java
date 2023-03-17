@@ -51,13 +51,6 @@ public class PackResourcesAdapter implements ResourceCollection {
         LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
 
-    /**
-     * Gets a resource from this pack.
-     * @param resourceType      the type of resources to search
-     * @param location          the location of the resource to get
-     * @return the resource as a stream
-     * @throws IOException if the resource does not exist
-     */
     @Override
     public InputStream getResource(PackType resourceType, ResourceLocation location) throws IOException {
         requireNonNull(resourceType, "Resource type cannot be null");
@@ -65,12 +58,6 @@ public class PackResourcesAdapter implements ResourceCollection {
         return ORIGINAL.getResource(resourceType, location);
     }
 
-    /**
-     * Checks if this pack has a resource.
-     * @param resourceType      the type of resources to search
-     * @param location          the location of the resource to search for
-     * @return whether this pack contains the resource
-     */
     @Override
     public boolean hasResource(PackType resourceType, ResourceLocation location) {
         requireNonNull(resourceType, "Resource type cannot be null");
@@ -78,14 +65,6 @@ public class PackResourcesAdapter implements ResourceCollection {
         return ORIGINAL.hasResource(resourceType, location);
     }
 
-    /**
-     * Gets all the resource locations in this pack that match the provided filters.
-     * @param resourceType      type of resources to look for
-     * @param namespace         namespace of resources
-     * @param pathStart         start of the path of the resources (not including the namespace)
-     * @param fileFilter        filter for the file name
-     * @return all the matching resource locations
-     */
     @Override
     public Collection<ResourceLocation> getResources(PackType resourceType, String namespace, String pathStart,
                                                      Predicate<String> fileFilter) {
@@ -109,12 +88,6 @@ public class PackResourcesAdapter implements ResourceCollection {
 
     }
 
-
-    /**
-     * Gets the namespaces of all resources in this pack.
-     * @param resourceType      the type of resources to search
-     * @return the unique namespaces of all resources in this pack
-     */
     @Override
     public Set<String> namespaces(PackType resourceType) {
         requireNonNull(resourceType, "Resource type cannot be null");

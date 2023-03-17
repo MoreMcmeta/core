@@ -60,12 +60,6 @@ public class AtlasAdapter implements Atlas {
         }
     }
 
-    /**
-     * Gets a sprite from its location.
-     * @param location      the location of the sprite without its extension
-     *                      or the texture's directory prefix
-     * @return the sprite if found
-     */
     @Override
     public Optional<Sprite> sprite(ResourceLocation location) {
         requireNonNull(location, "Sprite location cannot be null");
@@ -114,37 +108,21 @@ public class AtlasAdapter implements Atlas {
             MIPMAP_LEVEL = mipmapLevel;
         }
 
-        /**
-         * Binds this sprite (actually its atlas) to OpenGL.
-         */
         @Override
         public void bind() {
             SPRITE.atlas().bind();
         }
 
-        /**
-         * Gets the name of this sprite.
-         * @return the sprite's name
-         */
         @Override
         public ResourceLocation name() {
             return SPRITE.getName();
         }
 
-        /**
-         * Gets the coordinates of the top-left corner of this sprite
-         * on its atlas, which is where it should be uploaded to.
-         * @return the sprite's upload point
-         */
         @Override
         public long uploadPoint() {
             return UPLOAD_POINT;
         }
 
-        /**
-         * Gets the mipmap level of the sprite.
-         * @return the mipmap level of the sprite
-         */
         @Override
         public int mipmapLevel() {
             return MIPMAP_LEVEL;

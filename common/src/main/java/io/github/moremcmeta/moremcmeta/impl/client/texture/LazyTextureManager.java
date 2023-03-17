@@ -48,12 +48,6 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
         FINISHER = requireNonNull(finisher, "Finisher cannot be null");
     }
 
-    /**
-     * Registers a texture that needs to be finished. What happens when duplicate locations are added
-     * depends on the provided {@link Finisher}.
-     * @param textureLocation   file location of texture identical to how it is used in an entity/GUI/map
-     * @param builder           unfinished texture
-     */
     @Override
     public void register(ResourceLocation textureLocation, I builder) {
         requireNonNull(textureLocation, "Texture location cannot be null");
@@ -81,10 +75,6 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
         });
     }
 
-    /**
-     * Deletes a texture so Minecraft is no longer aware of it. This also allows the texture to be replaced.
-     * @param textureLocation   file location of texture to delete
-     */
     @Override
     public void unregister(ResourceLocation textureLocation) {
         requireNonNull(textureLocation, "Texture location cannot be null");
@@ -93,9 +83,6 @@ public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> i
         TICKABLE_TEXTURES.remove(textureLocation);
     }
 
-    /**
-     * Updates all tickable textures that were loaded through this manager.
-     */
     @Override
     public void tick() {
         TICKABLE_TEXTURES.values().forEach(CustomTickable::tick);

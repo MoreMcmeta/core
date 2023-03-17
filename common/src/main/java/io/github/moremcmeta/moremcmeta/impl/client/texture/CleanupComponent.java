@@ -37,11 +37,6 @@ public class CleanupComponent implements CoreTextureComponent {
         CLOSE_ACTION = requireNonNull(closeAction, "Close action cannot be null");
     }
 
-    /**
-     * Cleans up resources associated with the texture when it is closed.
-     * @param currentFrame      view of the texture's current frame
-     * @param predefinedFrames  persistent views of predefined frames
-     */
     @Override
     public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame,
                         FrameGroup<PersistentFrameView> predefinedFrames) {

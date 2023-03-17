@@ -61,20 +61,11 @@ import java.util.function.ToIntFunction;
 public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer {
     private static final String PLUGIN_ENTRYPOINT = MODID + "-client";
 
-    /**
-     * Begins the startup process on the client.
-     */
     @Override
     public void onInitializeClient() {
         start();
     }
 
-    /**
-     * Gets all loaded MoreMcmeta plugins from other mods.
-     *
-     * @param logger logger to report errors
-     * @return all loaded plugins
-     */
     @Override
     protected Collection<ClientPlugin> fetchTexturePlugins(Logger logger) {
         return listPlugins(ClientPlugin.class, logger);
@@ -96,10 +87,6 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
         return TextureUtil::prepareImage;
     }
 
-    /**
-     * Gets the action that should be executed to unregister a texture on Fabric.
-     * @return the action that will unregister textures
-     */
     @Override
     protected BiConsumer<TextureManager, ResourceLocation> unregisterAction() {
         return (manager, location) -> {
@@ -109,20 +96,11 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
         };
     }
 
-    /**
-     * Executes a callback when the vanilla resource manager is initialized in Fabric.
-     * @param callback      the callback to execute
-     */
     @Override
     protected void onResourceManagerInitialized(Consumer<Minecraft> callback) {
         ResourceManagerInitializedCallback.EVENT.register(callback::accept);
     }
 
-    /**
-     * Adds a repository source to Minecraft's {@link PackRepository}.
-     * @param packRepository        the repository to add a source to
-     * @param repositorySource      the source to add
-     */
     @Override
     protected void addRepositorySource(PackRepository packRepository, RepositorySource repositorySource) {
         PackRepositoryAccessor accessor = (PackRepositoryAccessor) packRepository;
@@ -137,11 +115,6 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
 
     }
 
-    /**
-     * Wraps the given resource reload listener in any Fabric-specific interfaces, if necessary.
-     * @param original      the original resource reload listener to wrap
-     * @return the wrapped resource reload listener
-     */
     @Override
     protected StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
             StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
@@ -150,21 +123,11 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
                 new ResourceLocation("moremcmeta", "texture_reload_listener"));
     }
 
-    /**
-     * Gets the current reload instance.
-     * @param overlay    the overlay containing the instance
-     * @param logger     a logger to write output
-     * @return the current reload instance
-     */
     @Override
     protected Optional<ReloadInstance> reloadInstance(LoadingOverlay overlay, Logger logger) {
         return Optional.of(((LoadingOverlayAccessor) overlay).getReloadInstance());
     }
 
-    /**
-     * Begins ticking the {@link LazyTextureManager} on Fabric.
-     * @param texManager        the manager to begin ticking
-     */
     @Override
     protected void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
         ClientTickEvents.START_CLIENT_TICK.register((client) -> texManager.tick());

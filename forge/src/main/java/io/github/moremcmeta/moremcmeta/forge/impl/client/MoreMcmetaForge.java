@@ -98,11 +98,6 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> this::start);
     }
 
-    /**
-     * Gets all loaded MoreMcmeta plugins from other mods.
-     * @param logger    logger to report errors
-     * @return all loaded plugins
-     */
     @Override
     protected Collection<ClientPlugin> fetchTexturePlugins(Logger logger) {
         return CLASS_LOADER.load(
@@ -147,10 +142,6 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         return TextureUtil::prepareImage;
     }
 
-    /**
-     * Gets the action that should be executed to unregister a texture on Forge.
-     * @return the action that will unregister textures
-     */
     @Override
     protected BiConsumer<TextureManager, ResourceLocation> unregisterAction() {
 
@@ -159,30 +150,16 @@ public final class MoreMcmetaForge extends MoreMcmeta {
 
     }
 
-    /**
-     * Executes a callback when the vanilla resource manager is initialized in Forge.
-     * @param callback      the callback to execute
-     */
     @Override
     protected void onResourceManagerInitialized(Consumer<Minecraft> callback) {
         callback.accept(Minecraft.getInstance());
     }
 
-    /**
-     * Adds a repository source to Minecraft's {@link PackRepository}.
-     * @param packRepository        the repository to add a source to
-     * @param repositorySource      the source to add
-     */
     @Override
     protected void addRepositorySource(PackRepository packRepository, RepositorySource repositorySource) {
         packRepository.addPackFinder(repositorySource);
     }
 
-    /**
-     * Wraps the given resource reload listener in any Forge-specific interfaces, if necessary.
-     * @param original      the original resource reload listener to wrap
-     * @return the wrapped resource reload listener
-     */
     @Override
     protected StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> wrapListener(
             StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
@@ -190,12 +167,6 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         return original;
     }
 
-    /**
-     * Gets the current reload instance.
-     * @param overlay    the overlay containing the instance
-     * @param logger     a logger to write output
-     * @return the current reload instance
-     */
     @Override
     protected Optional<ReloadInstance> reloadInstance(LoadingOverlay overlay, Logger logger) {
         try {
@@ -213,10 +184,6 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         return Optional.empty();
     }
 
-    /**
-     * Begins ticking the {@link LazyTextureManager} on Forge.
-     * @param texManager        the manager to begin ticking
-     */
     @Override
     protected void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
         new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS, TickEvent.Phase.START, () -> true);

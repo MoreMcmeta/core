@@ -55,11 +55,6 @@ public class SingleUploadComponent implements CoreTextureComponent {
         MIPMAP = mipmap;
     }
 
-    /**
-     * Prepares an OpenGL image for the texture when it is registered.
-     * @param currentFrame      view of the texture's current frame
-     * @param predefinedFrames  persistent views of predefined frames
-     */
     @Override
     public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
                                FrameGroup<PersistentFrameView> predefinedFrames) {
@@ -82,10 +77,6 @@ public class SingleUploadComponent implements CoreTextureComponent {
         }
     }
 
-    /**
-     * Uploads the texture when it needs to be uploaded.
-     * @param currentFrame      view of the texture's current frame
-     */
     @Override
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
         if (IS_PREPARED.get()) {

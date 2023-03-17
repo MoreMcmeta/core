@@ -48,11 +48,6 @@ public class TextureFinisher implements Finisher<EventDrivenTexture.Builder, Eve
         PREPARER = requireNonNull(preparer, "Preparer cannot be null");
     }
 
-    /**
-     * Queues a texture that needs to be finished with an upload component.
-     * @param location      texture location
-     * @param builder       texture builder
-     */
     @Override
     public void queue(ResourceLocation location, EventDrivenTexture.Builder builder) {
         requireNonNull(location, "Location cannot be null");
@@ -61,10 +56,6 @@ public class TextureFinisher implements Finisher<EventDrivenTexture.Builder, Eve
         QUEUED_BUILDERS.add(new Pair<>(location, builder));
     }
 
-    /**
-     * Finishes all currently-queued textures.
-     * @return a map of all textures
-     */
     @Override
     public Map<ResourceLocation, EventDrivenTexture> finish() {
         Map<ResourceLocation, EventDrivenTexture> builtTextures = new HashMap<>();

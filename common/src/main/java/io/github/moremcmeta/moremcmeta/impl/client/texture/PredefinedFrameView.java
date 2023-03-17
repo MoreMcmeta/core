@@ -47,41 +47,21 @@ public class PredefinedFrameView implements PersistentFrameView {
         INDEX = index;
     }
 
-    /**
-     * Gets the width of this frame.
-     * @return the width of this frame
-     */
     @Override
     public int width() {
         return FRAME.width();
     }
 
-    /**
-     * Gets the height of this frame.
-     * @return the height of this frame
-     */
     @Override
     public int height() {
         return FRAME.height();
     }
 
-    /**
-     * Gets the index of this frame among all predefined frames (always present).
-     * @return the index of this frame
-     */
     @Override
     public Optional<Integer> index() {
         return Optional.of(INDEX);
     }
 
-    /**
-     * Gets the color at a specific pixel in this frame.
-     * @param x     x-coordinate of the pixel
-     * @param y     y-coordinate of the pixel
-     * @return the color of the pixel
-     * @throws PixelOutOfBoundsException if the requested pixel is outside
-     *                                             the frame's bounds
-     */
     @Override
     public int color(int x, int y) {
         return FRAME.color(x, y);

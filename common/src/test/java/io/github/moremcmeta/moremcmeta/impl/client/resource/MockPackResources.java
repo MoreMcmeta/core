@@ -57,7 +57,6 @@ public class MockPackResources implements PackResources {
         NAME = name;
     }
 
-
     @Override
     public InputStream getRootResource(String string) throws IOException {
         if (ROOT_RESOURCES.contains(string)) {
