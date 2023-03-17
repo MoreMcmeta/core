@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.repository.Pack;
@@ -24,6 +25,7 @@ import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -33,6 +35,8 @@ import static java.util.Objects.requireNonNull;
  * Supplies the {@link Pack} (and thus {@link PackResources}) added by this mod.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ModRepositorySource implements RepositorySource {
 
     /**

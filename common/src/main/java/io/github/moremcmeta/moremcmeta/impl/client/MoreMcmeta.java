@@ -25,6 +25,13 @@ import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
+import io.github.moremcmeta.moremcmeta.impl.client.adapter.AtlasAdapter;
+import io.github.moremcmeta.moremcmeta.impl.client.adapter.NativeImageAdapter;
+import io.github.moremcmeta.moremcmeta.impl.client.adapter.PackResourcesAdapter;
+import io.github.moremcmeta.moremcmeta.impl.client.adapter.TextureManagerAdapter;
+import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
+import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataAssembler;
+import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataReader;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MetadataRegistryImpl;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ModRepositorySource;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.OrderedResourceRepository;
@@ -37,13 +44,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.LazyTextureManager;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.SpriteFinder;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureFinisher;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
-import io.github.moremcmeta.moremcmeta.impl.client.adapter.AtlasAdapter;
-import io.github.moremcmeta.moremcmeta.impl.client.adapter.NativeImageAdapter;
-import io.github.moremcmeta.moremcmeta.impl.client.adapter.PackResourcesAdapter;
-import io.github.moremcmeta.moremcmeta.impl.client.adapter.TextureManagerAdapter;
-import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
-import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataAssembler;
-import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataReader;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
@@ -62,6 +63,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -539,6 +541,8 @@ public abstract class MoreMcmeta {
      * no longer have metadata for this mod.
      * @author soir20
      */
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     private class TextureResourceReloadListener
             implements StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> {
         private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();

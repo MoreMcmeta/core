@@ -19,6 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -26,6 +27,7 @@ import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +47,8 @@ import static java.util.Objects.requireNonNull;
  * onto the atlas, not all of them.
  * @author soir20
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
