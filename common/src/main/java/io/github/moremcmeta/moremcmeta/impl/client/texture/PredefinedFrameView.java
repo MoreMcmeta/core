@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
-import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 
 import java.util.Optional;
@@ -84,8 +83,8 @@ public class PredefinedFrameView implements PersistentFrameView {
      *                                             the frame's bounds
      */
     @Override
-    public Color color(int x, int y) {
-        return new Color(FRAME.color(x, y));
+    public int color(int x, int y) {
+        return FRAME.color(x, y);
     }
 
 }

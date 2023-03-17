@@ -19,7 +19,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
@@ -538,8 +537,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param y     y-coordinate of the pixel (from the top left)
          * @return the color of the pixel at the given coordinate
          */
-        public Color color(int x, int y) {
-            return new Color(currentFrame().color(x, y));
+        public int color(int x, int y) {
+            return currentFrame().color(x, y);
         }
 
         /**

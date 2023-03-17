@@ -18,17 +18,16 @@
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
-import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.adt.SparseIntMatrix;
 import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Queue;
 
 import static java.util.Objects.requireNonNull;
@@ -264,12 +263,12 @@ public class CloseableImageFrame {
         }
 
         Layer layerBelow = layerBelow(layer);
-        Map<Point, Color> previousColors = new HashMap<>();
+        Object2IntMap<Point> previousColors = new Object2IntOpenHashMap<>();
         dependencies.forEach((point) -> {
             requireNonNull(point, "Dependency point cannot be null");
             checkPointInBounds(point);
 
-            previousColors.put(point, new Color(layerBelow.read(point.x(), point.y())));
+            previousColors.put(point, layerBelow.read(point.x(), point.y()));
         });
 
         // Apply transformation to the original image
@@ -278,12 +277,12 @@ public class CloseableImageFrame {
             requireNonNull(point, "Apply area point cannot be null");
             checkPointInBounds(point);
 
-            Color newColor = transform.transform(
+            int newColor = transform.transform(
                     point,
                     (requestedPoint) -> colorIfDependency(requestedPoint, previousColors)
             );
 
-            thisLayer.write(point.x(), point.y(), newColor.combine());
+            thisLayer.write(point.x(), point.y(), newColor);
         });
 
         /* Update corresponding mipmap pixels.
@@ -389,14 +388,12 @@ public class CloseableImageFrame {
      * @throws ColorTransform.NonDependencyRequestException if the point is not a dependency
      *                                                     of the transform
      */
-    private Color colorIfDependency(Point requestedPoint, Map<Point, Color> dependencies) {
-        Color color = dependencies.get(requestedPoint);
-
-        if (color == null) {
+    private int colorIfDependency(Point requestedPoint, Object2IntMap<Point> dependencies) {
+        if (!dependencies.containsKey(requestedPoint)) {
             throw new ColorTransform.NonDependencyRequestException();
         }
 
-        return color;
+        return dependencies.getInt(requestedPoint);
     }
 
     /**

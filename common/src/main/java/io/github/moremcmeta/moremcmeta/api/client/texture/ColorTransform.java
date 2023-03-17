@@ -19,7 +19,7 @@ package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 
-import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 /**
  * Calculates a new RGBA color for an individual pixel in a frame.
@@ -42,7 +42,7 @@ public interface ColorTransform {
      *                              was applied to any points.
      * @return the new color of the pixel at (x, y) in the format
      */
-    Color transform(Point overwritePoint, Function<Point, Color> dependencyFunction);
+    int transform(Point overwritePoint, ToIntFunction<Point> dependencyFunction);
 
     /**
      * Indicates that a transform requested the current color of a point that is not its dependency.

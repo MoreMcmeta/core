@@ -32,6 +32,6 @@ public interface PersistentFrameView extends FrameView {
      * @throws FrameView.PixelOutOfBoundsException if the requested pixel is outside
      *                                             the frame's bounds
      */
-    Color color(int x, int y);
+    int color(int x, int y);
 
 }

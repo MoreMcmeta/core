@@ -17,8 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
-import java.util.Objects;
-
 /**
  * Represents an RGBA color.
  * @author soir20
@@ -31,135 +29,83 @@ public final class Color {
     private final static int BLUE_OFFSET = 0;
     private final static int ALPHA_OFFSET = 24;
 
-    private final int RED;
-    private final int GREEN;
-    private final int BLUE;
-    private final int ALPHA;
-    private final int COMBINED;
-
     /**
      * Creates a new color using individual components.
      * @param red       the red component of the color, must be in [0, 255]
      * @param green     the green component of the color, must be in [0, 255]
      * @param blue      the blue component of the color, must be in [0, 255]
      * @param alpha     the alpha component of the color, must be in [0, 255]
+     * @return an integer representing the 32-bit color
      */
-    public Color(int red, int green, int blue, int alpha) {
-        RED = checkComponent(red);
-        GREEN = checkComponent(green);
-        BLUE = checkComponent(blue);
-        ALPHA = checkComponent(alpha);
-        COMBINED = (ALPHA << ALPHA_OFFSET) | (RED << RED_OFFSET) | (GREEN << GREEN_OFFSET) | (BLUE << BLUE_OFFSET);
-    }
-
-    /**
-     * Creates a new color from the AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB (32 bits) combined format.
-     * @param combined      the color in combined format
-     */
-    public Color(int combined) {
-        RED = (combined >> RED_OFFSET) & COMPONENT_MASK;
-        GREEN = (combined >> GREEN_OFFSET) & COMPONENT_MASK;
-        BLUE = (combined >> BLUE_OFFSET) & COMPONENT_MASK;
-        ALPHA = (combined >> ALPHA_OFFSET) & COMPONENT_MASK;
-        COMBINED = combined;
+    public static int rgba(int red, int green, int blue, int alpha) {
+        checkComponent(red);
+        checkComponent(green);
+        checkComponent(blue);
+        checkComponent(alpha);
+        return (alpha << ALPHA_OFFSET) | (red << RED_OFFSET) | (green << GREEN_OFFSET) | (blue << BLUE_OFFSET);
     }
 
     /**
      * Gets the red component of the color.
+     * @param color     the color to get the component of
      * @return red component of the color
      */
-    public int red() {
-        return RED;
+    public static int red(int color) {
+        return (color >> RED_OFFSET) & COMPONENT_MASK;
     }
 
     /**
      * Gets the green component of the color.
+     * @param color     the color to get the component of
      * @return green component of the color
      */
-    public int green() {
-        return GREEN;
+    public static int green(int color) {
+        return (color >> GREEN_OFFSET) & COMPONENT_MASK;
     }
 
     /**
      * Gets the blue component of the color.
+     * @param color     the color to get the component of
      * @return blue component of the color
      */
-    public int blue() {
-        return BLUE;
+    public static int blue(int color) {
+        return (color >> BLUE_OFFSET) & COMPONENT_MASK;
     }
 
     /**
      * Gets the blue component of the color.
+     * @param color     the color to get the component of
      * @return blue component of the color
      */
-    public int alpha() {
-        return ALPHA;
+    public static int alpha(int color) {
+        return (color >> ALPHA_OFFSET) & COMPONENT_MASK;
     }
 
     /**
-     * Gets the color in the AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB (32 bits) combined format.
-     * @return the color in combined format
-     */
-    public int combine() {
-        return COMBINED;
-    }
-
-    /**
-     * Check whether this color is the same as another object. This method is identical to {@link #equals(Object)},
-     * but two {@link Color}s are considered equal if they are both fully transparent, even if their RGB components
-     * differ.
-     * @param other     the object to compare this color to
+     * Check whether this color is the same as another color. Two colors are considered equal if
+     * they are both fully transparent, even if their RGB components differ.
+     * @param color1        the first color to compare
+     * @param color2        the second color to compare
      * @return true if the other object is a color with the same components or false otherwise
      */
-    public boolean equalsOrBothInvisible(Object other) {
-        if (!(other instanceof Color otherAsColor)) {
-            return false;
-        }
-
-        return (alpha() == 0 && otherAsColor.alpha() == 0) || (alpha() == otherAsColor.alpha()
-                && red() == otherAsColor.red()
-                && green() == otherAsColor.green()
-                && blue() == otherAsColor.blue());
+    public static boolean equalsOrBothInvisible(int color1, int color2) {
+        return color1 == color2 || (alpha(color1) == 0 && alpha(color2) == 0);
     }
 
     /**
-     * Check whether this color is the same as another object.
-     * @param other     the object to compare this color to
-     * @return true if the other object is a color with the same components or false otherwise
+     * Prevents a Color from being constructed.
      */
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Color otherAsColor)) {
-            return false;
-        }
-
-        return alpha() == otherAsColor.alpha()
-                && red() == otherAsColor.red()
-                && green() == otherAsColor.green()
-                && blue() == otherAsColor.blue();
-    }
-
-    /**
-     * Gets the hash code for this color.
-     * @return the hash code for this color
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(ALPHA, RED, GREEN, BLUE);
-    }
+    private Color() {}
 
     /**
      * Checks that an individual component is in the [0, 255] range.
-     * @param component     the component to check
-     * @return the component if it is valid
+     * @param component the component to check
      * @throws IllegalRGBAComponentException if the component is outside the required range
      */
-    private static int checkComponent(int component) {
+    private static void checkComponent(int component) {
         if (component < 0 || component > 255) {
             throw new IllegalRGBAComponentException(component);
         }
-
-        return component;
     }
 
     /**

@@ -499,7 +499,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), null, Area.of());
+                    frames.frame(0).transform((point, depFunction) -> 100, null, Area.of());
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -525,33 +525,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(), null);
-                    return new TextureComponent<>() {};
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_TransformReturnsNull_NullPointerException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        expectedException.expect(NullPointerException.class);
-        assembler.assemble(new TextureData<>(
-                new TextureData.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> null, Area.of(new Point(0, 0)), Area.of());
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(), null);
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -577,7 +551,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(-1, 0)), Area.of());
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(-1, 0)), Area.of());
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -603,7 +577,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, -1)), Area.of());
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(0, -1)), Area.of());
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -629,7 +603,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(30, 0)), Area.of());
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(30, 0)), Area.of());
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -655,7 +629,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 40)), Area.of());
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(0, 40)), Area.of());
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -680,7 +654,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0), new Point(20, 25)), Area.of());
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(0, 0), new Point(20, 25)), Area.of());
                     return new TextureComponent<>() {};
                 }))
         ))).build();
@@ -713,7 +687,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of(new Point(-1, 0)));
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(0, 0)), Area.of(new Point(-1, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -739,7 +713,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of(new Point(0, -1)));
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(0, 0)), Area.of(new Point(0, -1)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -765,7 +739,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of(new Point(30, 0)));
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(0, 0)), Area.of(new Point(30, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -791,7 +765,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of(new Point(0, 40)));
+                    frames.frame(0).transform((point, depFunction) -> 100, Area.of(new Point(0, 0)), Area.of(new Point(0, 40)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -817,7 +791,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((point, depFunction) -> depFunction.apply(new Point(25, 0)), Area.of(new Point(0, 0)), Area.of(new Point(0, 25)));
+                    frames.frame(0).transform((point, depFunction) -> depFunction.applyAsInt(new Point(25, 0)), Area.of(new Point(0, 0)), Area.of(new Point(0, 25)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -826,7 +800,7 @@ public class TextureDataAssemblerTest {
     @Test
     public void assemble_ValidDependencyPoint_PointRetrieved() {
         MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-        originalImage.setColor(25, 30, new Color(100, 100, 100, 100).combine());
+        originalImage.setColor(25, 30, Color.rgba(100, 100, 100, 100));
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
@@ -844,7 +818,7 @@ public class TextureDataAssemblerTest {
                 originalImage,
                 List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform(
-                            (point, depFunction) -> depFunction.apply(new Point(25, 30)),
+                            (point, depFunction) -> depFunction.applyAsInt(new Point(25, 30)),
                             Area.of(new Point(0, 0), new Point(20, 25)), 
                             Area.of(new Point(25, 30))
                     );
@@ -855,8 +829,8 @@ public class TextureDataAssemblerTest {
         /* The CloseableImageFrame logic is already tested, so focus on just testing that the transformation was
            applied to the original image. Re-creating all the tests would be time-consuming while providing
            limited value. */
-        assertEquals(new Color(100, 100, 100, 100).combine(), originalImage.color(0, 0));
-        assertEquals(new Color(100, 100, 100, 100).combine(), originalImage.color(20, 25));
+        assertEquals(Color.rgba(100, 100, 100, 100), originalImage.color(0, 0));
+        assertEquals(Color.rgba(100, 100, 100, 100), originalImage.color(20, 25));
 
     }
 
@@ -887,7 +861,7 @@ public class TextureDataAssemblerTest {
         ))).build();
 
         expectedException.expect(FrameView.IllegalFrameReference.class);
-        frameView[0].transform((point, depFunction) -> new Color(100), Area.of(new Point(0, 0)), Area.of());
+        frameView[0].transform((point, depFunction) -> 100, Area.of(new Point(0, 0)), Area.of());
     }
 
     @Test
