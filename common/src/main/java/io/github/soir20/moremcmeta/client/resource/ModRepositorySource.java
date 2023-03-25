@@ -61,7 +61,7 @@ public class ModRepositorySource implements RepositorySource {
     public void loadPacks(Consumer<Pack> consumer) {
         requireNonNull(consumer, "Pack consumer cannot be null");
 
-        int packVersion = PackType.CLIENT_RESOURCES.getVersion(CURRENT_VERSION);
+        int packVersion = CURRENT_VERSION.getPackVersion(PackType.CLIENT_RESOURCES);
         Pack pack = Pack.create(
                 PACK_ID,
                 Component.literal("MoreMcmeta Internal"),

@@ -1,5 +1,8 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/moremcmeta",
+  "1.19.4": {
+    "1.19.4-3.0.6": "Update to 1.19.4."
+  },
   "1.19.3": {
     "1.19.3-3.0.6": "Fix stack overflow when other mods scan all resources while opening resource packs",
     "1.19.3-3.0.5": "Update to 1.19.3."
@@ -44,6 +47,7 @@
     "1.16.4-1.0.0": "Initial release"
   },
   "promos": {
+    "1.19.4-recommended": "1.19.4-3.0.6",
     "1.19.3-recommended": "1.19.3-3.0.6",
     "1.19-recommended": "1.19-3.0.5",
     "1.18.2-recommended": "1.18.2-3.0.6",

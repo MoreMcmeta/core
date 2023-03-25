@@ -115,23 +115,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
            probably being used in RenderSystem#setShaderTexture(). That RenderSystem method
            binds the ID directly instead of this texture, preventing the title screen
            textures from animating normally. */
-        if (!isCurrentlyBound() && registered) {
+        if (registered) {
             bind();
         }
 
         return id;
-    }
-
-    /**
-     * Checks if this texture is currently bound to OpenGL.
-     * @return whether this texture is bound
-     */
-    private boolean isCurrentlyBound() {
-
-        // The GlStateManager adds this character when it returns the active texture
-        char offset = '蓀';
-
-        return GlStateManager._getTextureId(GlStateManager._getActiveTexture() - offset) == id;
     }
 
     /**
