@@ -22,9 +22,9 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
-import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import org.junit.Rule;
@@ -1487,7 +1487,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(UploadableFrameView.NegativeUploadPointException.class);
+        expectedException.expect(NegativeUploadPointException.class);
         texture.tick();
     }
 
@@ -1507,7 +1507,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(UploadableFrameView.NegativeUploadPointException.class);
+        expectedException.expect(NegativeUploadPointException.class);
         texture.tick();
     }
 

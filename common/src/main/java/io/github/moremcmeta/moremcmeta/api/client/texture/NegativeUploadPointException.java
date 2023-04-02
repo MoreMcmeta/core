@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2022 soir20
+ * Copyright (C) 2023 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,21 +18,19 @@
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 /**
- * A {@link FrameView} that represents a frame that can be uploaded.
+ * Indicates that negative coordinates were used for an upload point.
  * @author soir20
  * @since 4.0.0
  */
-public interface UploadableFrameView extends FrameView {
+public final class NegativeUploadPointException extends IllegalArgumentException {
 
     /**
-     * Uploads the current frame to the texture currently bound in OpenGL.
-     * @param x     x-coordinate of the point to upload to
-     * @param y     y-coordinate of the point to upload to
-     * @throws IllegalFrameReference if this view is no longer valid
-     * @throws NegativeUploadPointException if the provided upload point is negative. The upload point may
-     *                                      still be positive and out of bounds even if no exception is
-     *                                      thrown.
+     * Creates a new exception to indicates that negative coordinates were used for an upload point.
+     * @param x x-coordinate of the point accessed
+     * @param y y-coordinate of the point accessed
      */
-    void upload(int x, int y);
+    public NegativeUploadPointException(int x, int y) {
+        super("Point (" + x + ", " + y + ") is negative and thus out of bounds");
+    }
 
 }

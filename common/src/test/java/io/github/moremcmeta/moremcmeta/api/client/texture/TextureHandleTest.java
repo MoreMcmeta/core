@@ -17,10 +17,15 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
+import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests the {@link TextureHandle}.
@@ -40,6 +45,92 @@ public class TextureHandleTest {
     @Test
     public void find_ModNotLoaded_NothingReturned() {
         TextureHandle.find(new ResourceLocation("bat.png"));
+    }
+
+    @Test
+    public void construct_NullBindFunction_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new TextureHandle(null, 10, 20, 30, 40);
+    }
+
+    @Test
+    public void construct_NegativeMinX_NegativeCoordinateException() {
+        expectedException.expect(NegativeUploadPointException.class);
+        new TextureHandle(() -> {}, -1, 20, 30, 40);
+    }
+
+    @Test
+    public void construct_NegativeMinY_NegativeCoordinateException() {
+        expectedException.expect(NegativeUploadPointException.class);
+        new TextureHandle(() -> {}, 10, -1, 30, 40);
+    }
+
+    @Test
+    public void construct_NegativeWidth_NegativeDimensionException() {
+        expectedException.expect(NegativeDimensionException.class);
+        new TextureHandle(() -> {}, 10, 20, -1, 40);
+    }
+
+    @Test
+    public void construct_NegativeHeight_NegativeDimensionException() {
+        expectedException.expect(NegativeDimensionException.class);
+        new TextureHandle(() -> {}, 10, 20, 30, -1);
+    }
+
+    @Test
+    public void construct_ZeroMinX_NoException() {
+        TextureHandle handle = new TextureHandle(() -> {}, 0, 20, 30, 40);
+        assertEquals(0, handle.minX());
+    }
+
+    @Test
+    public void construct_ZeroMinY_NoException() {
+        TextureHandle handle = new TextureHandle(() -> {}, 10, 0, 30, 40);
+        assertEquals(0, handle.minY());
+    }
+
+    @Test
+    public void construct_ZeroWidth_NoException() {
+        TextureHandle handle = new TextureHandle(() -> {}, 10, 20, 0, 40);
+        assertEquals(0, handle.width());
+    }
+
+    @Test
+    public void construct_ZeroHeight_NoException() {
+        TextureHandle handle = new TextureHandle(() -> {}, 10, 20, 30, 0);
+        assertEquals(0, handle.height());
+    }
+
+    @Test
+    public void construct_PositiveMinX_NoException() {
+        TextureHandle handle = new TextureHandle(() -> {}, 10, 20, 30, 40);
+        assertEquals(10, handle.minX());
+    }
+
+    @Test
+    public void construct_PositiveMinY_NoException() {
+        TextureHandle handle = new TextureHandle(() -> {}, 10, 20, 30, 40);
+        assertEquals(20, handle.minY());
+    }
+
+    @Test
+    public void construct_PositiveWidth_NoException() {
+        TextureHandle handle = new TextureHandle(() -> {}, 10, 20, 30, 40);
+        assertEquals(30, handle.width());
+    }
+
+    @Test
+    public void construct_PositiveHeight_NoException() {
+        TextureHandle handle = new TextureHandle(() -> {}, 10, 20, 30, 40);
+        assertEquals(40, handle.height());
+    }
+
+    @Test
+    public void construct_ValidBind_BindExecuted() {
+        AtomicBoolean ran = new AtomicBoolean();
+        TextureHandle handle = new TextureHandle(() -> ran.set(true), 10, 20, 30, 40);
+        handle.bind();
+        assertTrue(ran.get());
     }
 
 }

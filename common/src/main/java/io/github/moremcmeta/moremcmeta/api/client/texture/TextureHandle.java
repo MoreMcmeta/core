@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 import com.google.common.collect.ImmutableList;
+import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
@@ -34,6 +35,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * References a texture (sprite or individual texture) without providing direct access.
  * @author soir20
+ * @since 4.0.0
  */
 public final class TextureHandle {
     private final Runnable BIND_FUNCTION;
@@ -75,6 +77,33 @@ public final class TextureHandle {
         }
 
         return handles.build();
+    }
+
+    /**
+     * Creates a new texture handle.
+     * @param bindFunction      function to bind this texture in OpenGL
+     * @param minX              x-coordinate of the top-left corner of the texture
+     * @param minY              y-coordinate of the top-left corner of the texture
+     * @param width             width of the texture
+     * @param height            height of the texture
+     */
+    public TextureHandle(Runnable bindFunction, int minX, int minY, int width, int height) {
+        BIND_FUNCTION = requireNonNull(bindFunction, "Bind function cannot be null");
+        MIN_X = minX;
+        MIN_Y = minY;
+        if (MIN_X < 0 || MIN_Y < 0) {
+            throw new NegativeUploadPointException(MIN_X, MIN_Y);
+        }
+
+        WIDTH = width;
+        if (WIDTH < 0) {
+            throw new NegativeDimensionException(WIDTH);
+        }
+
+        HEIGHT = height;
+        if (HEIGHT < 0) {
+            throw new NegativeDimensionException(HEIGHT);
+        }
     }
 
     /**
@@ -122,22 +151,6 @@ public final class TextureHandle {
      */
     public int height() {
         return HEIGHT;
-    }
-
-    /**
-     * Creates a new texture handle.
-     * @param bindFunction      function to bind this texture in OpenGL
-     * @param minX              x-coordinate of the top-left corner of the texture
-     * @param minY              y-coordinate of the top-left corner of the texture
-     * @param width             width of the texture
-     * @param height            height of the texture
-     */
-    private TextureHandle(Runnable bindFunction, int minX, int minY, int width, int height) {
-        BIND_FUNCTION = bindFunction;
-        MIN_X = minX;
-        MIN_Y = minY;
-        WIDTH = width;
-        HEIGHT = height;
     }
 
 }
