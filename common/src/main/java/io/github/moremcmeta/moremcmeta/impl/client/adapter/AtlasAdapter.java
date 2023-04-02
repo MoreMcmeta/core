@@ -128,6 +128,16 @@ public class AtlasAdapter implements Atlas {
             return MIPMAP_LEVEL;
         }
 
+        @Override
+        public int width() {
+            return SPRITE.getWidth();
+        }
+
+        @Override
+        public int height() {
+            return SPRITE.getHeight();
+        }
+
         /**
          * Gets a sprite's x and y-coordinates of its top left corner in its texture atlas.
          * @return the x and y-coordinates of the sprite's top left corner

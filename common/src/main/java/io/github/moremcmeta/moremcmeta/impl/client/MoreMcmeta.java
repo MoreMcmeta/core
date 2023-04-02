@@ -103,7 +103,17 @@ public abstract class MoreMcmeta {
      */
     public static final MetadataRegistryImpl METADATA_REGISTRY = new MetadataRegistryImpl();
 
+    private static SpriteFinder spriteFinder;
+
     private final Set<String> DEFAULT_PLUGINS = Set.of();
+
+    /**
+     * Gets the {@link SpriteFinder} for this mod or returns null prior to startup.
+     * @return sprite finder for this mod or null
+     */
+    public static SpriteFinder spriteFinder() {
+        return spriteFinder;
+    }
 
     /**
      * Begins the startup process, creating necessary objects and registering the
@@ -150,7 +160,7 @@ public abstract class MoreMcmeta {
         logPluginList(allPlugins, logger);
 
         // Texture manager
-        SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
+        spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
         TextureFinisher finisher = new TextureFinisher(spriteFinder, preparer());
         LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager = new LazyTextureManager<>(
                 new TextureManagerAdapter(minecraft::getTextureManager, unregisterAction()),

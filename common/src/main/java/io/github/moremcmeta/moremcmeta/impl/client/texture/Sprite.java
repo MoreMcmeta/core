@@ -49,4 +49,16 @@ public interface Sprite {
      */
     int mipmapLevel();
 
+    /**
+     * Gets the width of the sprite.
+     * @return the width of the sprite
+     */
+    int width();
+
+    /**
+     * Gets the height of the sprite.
+     * @return the height of the sprite
+     */
+    int height();
+
 }

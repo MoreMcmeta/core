@@ -72,6 +72,16 @@ public class MockSprite implements Sprite {
         return MIPMAP_LEVEL;
     }
 
+    @Override
+    public int width() {
+        return 16;
+    }
+
+    @Override
+    public int height() {
+        return 32;
+    }
+
     public int bindCount() {
         return timesBound;
     }
