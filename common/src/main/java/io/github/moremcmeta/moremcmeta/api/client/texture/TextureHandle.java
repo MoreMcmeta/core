@@ -27,7 +27,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
@@ -49,7 +49,7 @@ public final class TextureHandle {
      * @param texturePath       full path of the texture (with .png suffix)
      * @return handles to all textures matching that location
      */
-    public static List<TextureHandle> find(ResourceLocation texturePath) {
+    public static Collection<TextureHandle> find(ResourceLocation texturePath) {
         requireNonNull(texturePath, "Texture path cannot be null");
         ImmutableList.Builder<TextureHandle> handles = new ImmutableList.Builder<>();
 
