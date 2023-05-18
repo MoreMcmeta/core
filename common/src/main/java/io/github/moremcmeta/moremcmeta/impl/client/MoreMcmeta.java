@@ -59,6 +59,7 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Mth;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -601,7 +602,10 @@ public abstract class MoreMcmeta {
                         return new NativeImageAdapter(image, mipmapLevel, blur, clamp);
                     },
                     (image) -> {
-                        int maxMipmap = Minecraft.getInstance().options.mipmapLevels;
+                        int maxMipmapSettings = Minecraft.getInstance().options.mipmapLevels;
+                        int maxMipmapX = Mth.log2(image.width());
+                        int maxMipmapY = Mth.log2(image.height());
+                        int maxMipmap = Math.min(maxMipmapSettings, Math.min(maxMipmapX, maxMipmapY));
                         NativeImage[] mipmaps = MipmapGenerator.generateMipLevels(image.image(), maxMipmap);
 
                         List<NativeImageAdapter> wrappedMipmaps = new ArrayList<>();
