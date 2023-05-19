@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
@@ -59,7 +60,7 @@ public class TextureDataAssemblerTest {
         expectedException.expect(NullPointerException.class);
         new TextureDataAssembler<>(
                 null,
-                List::of
+                (image, mipmap) -> ImmutableList.of(image)
         );
     }
 
@@ -76,7 +77,7 @@ public class TextureDataAssemblerTest {
     public void assemble_NullData_NullPointerException() {
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                List::of
+                (image, mipmap) -> ImmutableList.of(image)
         );
         expectedException.expect(NullPointerException.class);
         assembler.assemble(null);
@@ -86,7 +87,7 @@ public class TextureDataAssemblerTest {
     public void assemble_DataGiven_GeneratesCorrectFrameSize() {
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                List::of
+                (image, mipmap) -> ImmutableList.of(image)
         );
 
         AtomicBoolean checked = new AtomicBoolean();
@@ -126,7 +127,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> { checkFunction.accept(original); return List.of(original); }
+                (original, mipmap) -> { checkFunction.accept(original); return List.of(original); }
         );
 
         assembler.assemble(new TextureData<>(
@@ -158,7 +159,7 @@ public class TextureDataAssemblerTest {
                     checkFunction.accept(Triple.of(width, height, mipmap));
                     return new MockCloseableImage(width, height);
                 },
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -194,7 +195,7 @@ public class TextureDataAssemblerTest {
                     checkFunction.accept(Pair.of(blur, clamp));
                     return new MockCloseableImage(width, height);
                 },
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -230,7 +231,7 @@ public class TextureDataAssemblerTest {
                     checkFunction.accept(Pair.of(blur, clamp));
                     return new MockCloseableImage(width, height);
                 },
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -256,7 +257,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(20, 20),
                         new MockCloseableImage(20, 20),
@@ -288,7 +289,7 @@ public class TextureDataAssemblerTest {
                     allocatedImages.add(image);
                     return image;
                 },
-                (original) -> {
+                (original, mipmap) -> {
                     List<MockCloseableImage> mipmaps = List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
@@ -324,7 +325,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -349,7 +350,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -379,7 +380,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -404,7 +405,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -434,7 +435,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -459,7 +460,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -485,7 +486,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -511,7 +512,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -537,7 +538,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -563,7 +564,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -589,7 +590,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -615,7 +616,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -641,7 +642,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -673,7 +674,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -699,7 +700,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -725,7 +726,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -751,7 +752,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -777,7 +778,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -804,7 +805,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -840,7 +841,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -870,7 +871,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -896,7 +897,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -922,7 +923,7 @@ public class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original) -> List.of(
+                (original, mipmap) -> List.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),

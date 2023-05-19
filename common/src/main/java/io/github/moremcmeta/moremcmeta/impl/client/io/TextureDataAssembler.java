@@ -32,11 +32,12 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImageFrame;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.FrameGroupImpl;
+import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
@@ -54,7 +55,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
     private final static int INTERNAL_DEFAULT_COMPONENTS = 1;
 
     private final ImageAllocator ALLOCATOR;
-    private final Function<? super I, ? extends List<? extends I>> MIPMAP_GENERATOR;
+    private final BiFunction<? super I, Integer, ? extends List<? extends I>> MIPMAP_GENERATOR;
 
     /**
      * Creates a new texture assembler.
@@ -62,7 +63,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
      * @param mipmapGenerator   generates mipmaps from an original image, the number of which
      */
     public TextureDataAssembler(ImageAllocator allocator,
-                                Function<? super I, ? extends List<? extends I>> mipmapGenerator) {
+                                BiFunction<? super I, Integer, ? extends List<? extends I>> mipmapGenerator) {
         ALLOCATOR = requireNonNull(allocator, "Allocator cannot be null");
         MIPMAP_GENERATOR = requireNonNull(mipmapGenerator, "Mipmap generator cannot be null");
     }
@@ -82,9 +83,12 @@ public class TextureDataAssembler<I extends CloseableImage> {
         boolean blur = data.blur();
         boolean clamp = data.clamp();
 
+        int maxMipmapX = Mth.log2(frameWidth);
+        int maxMipmapY = Mth.log2(frameHeight);
+
         // Create frames
         int layers = data.parsedMetadata().size() + EXTERNAL_DEFAULT_COMPONENTS + INTERNAL_DEFAULT_COMPONENTS;
-        List<? extends I> mipmaps = MIPMAP_GENERATOR.apply(original);
+        List<? extends I> mipmaps = MIPMAP_GENERATOR.apply(original, Math.min(maxMipmapX, maxMipmapY));
         ImmutableList<CloseableImageFrame> frames = readFrames(
                 mipmaps,
                 frameWidth,
