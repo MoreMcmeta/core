@@ -18,6 +18,10 @@
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * Responds to basic events for a particular texture.
@@ -49,8 +53,9 @@ public interface TextureComponent<V, U> {
      * MoreMcmeta already uploads to the texture with the same name as the original image. Uploading the frame is
      * only necessary if you need to upload to different textures.</p>
      * @param currentFrame      view of the texture's current frame
+     * @param textureLookup     function to look up textures associated with a given location
      */
-    default void onUpload(U currentFrame) {}
+    default void onUpload(U currentFrame, Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {}
 
     /**
      * Responds to the close event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}

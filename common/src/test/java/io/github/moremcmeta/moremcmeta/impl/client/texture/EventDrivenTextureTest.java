@@ -25,17 +25,21 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
+import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -118,7 +122,8 @@ public class EventDrivenTextureTest {
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrame.generateWith((x, y, depFunction) -> 0, Area.of(), Area.of());
                 currentFrame.upload(0, 0);
             }
@@ -347,7 +352,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 timesUploaded.incrementAndGet();
             }
         });
@@ -377,7 +383,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 timesUploaded.incrementAndGet();
             }
         });
@@ -504,7 +511,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrameIndex.set(currentFrame.index().orElseThrow());
             }
         });
@@ -604,7 +612,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrame.upload(0, 0);
             }
         });
@@ -790,7 +799,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrame.upload(0, 0);
             }
         });
@@ -840,7 +850,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrame.upload(0, 0);
             }
         });
@@ -906,7 +917,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrame.upload(0, 0);
             }
         });
@@ -982,7 +994,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrame.upload(0, 0);
             }
         });
@@ -1044,7 +1057,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrame.upload(0, 0);
             }
         });
@@ -1122,7 +1136,8 @@ public class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 currentFrame.upload(0, 0);
             }
         });
@@ -1207,7 +1222,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 view.replaceWith(1);
                 currentFrame.upload(0, 0);
             }
@@ -1240,7 +1256,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 view.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(0, 0)), Area.of());
                 currentFrame.upload(0, 0);
             }
@@ -1292,7 +1309,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 view.width();
             }
         });
@@ -1338,7 +1356,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 view.height();
             }
         });
@@ -1408,7 +1427,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 view.index();
             }
         });
@@ -1456,7 +1476,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 view.texture();
             }
         });
@@ -1544,7 +1565,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 view.upload(0, 0);
             }
         });
@@ -1647,7 +1669,8 @@ public class EventDrivenTextureTest {
             }
 
             @Override
-            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+            public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                 Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                 view.lowerMipmapLevel(0);
             }
         });
@@ -1697,7 +1720,8 @@ public class EventDrivenTextureTest {
                 }
 
                 @Override
-                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+                public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                                     Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(UPLOAD_ID_BASE + finalIndex);
                 }

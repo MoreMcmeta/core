@@ -17,18 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
-import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
-import io.github.moremcmeta.moremcmeta.api.math.Point;
-import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.Collection;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -43,41 +32,6 @@ public final class TextureHandle {
     private final int MIN_Y;
     private final int WIDTH;
     private final int HEIGHT;
-
-    /**
-     * Finds all textures whose names match the provided location.
-     * @param texturePath       full path of the texture (with .png suffix)
-     * @return handles to all textures matching that location
-     */
-    public static Collection<TextureHandle> find(ResourceLocation texturePath) {
-        requireNonNull(texturePath, "Texture path cannot be null");
-        ImmutableList.Builder<TextureHandle> handles = new ImmutableList.Builder<>();
-
-        if (MoreMcmeta.spriteFinder() == null) {
-            return handles.build();
-        }
-
-        Optional<Sprite> spriteOptional = MoreMcmeta.spriteFinder().findSprite(texturePath);
-        if (spriteOptional.isPresent()) {
-            Sprite sprite = spriteOptional.get();
-            int minX = Point.x(sprite.uploadPoint());
-            int minY = Point.y(sprite.uploadPoint());
-            handles.add(new TextureHandle(sprite::bind, minX, minY, sprite.width(), sprite.height()));
-        }
-
-        AbstractTexture texture = Minecraft.getInstance().getTextureManager()
-                .getTexture(texturePath, MissingTextureAtlasSprite.getTexture());
-        if (texture != MissingTextureAtlasSprite.getTexture()) {
-
-            /* Currently, there is no way to retrieve the dimensions of a texture w/o Mixins.
-               The max integer value is used to reserve the interface w/ dimensions in case
-               the real dimensions are retrieved in the future. */
-            handles.add(new TextureHandle(texture::bind, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE));
-
-        }
-
-        return handles.build();
-    }
 
     /**
      * Creates a new texture handle.

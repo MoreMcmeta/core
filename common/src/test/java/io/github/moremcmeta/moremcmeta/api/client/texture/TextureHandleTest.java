@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
+import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,12 +40,12 @@ public class TextureHandleTest {
     @Test
     public void find_NullPath_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        TextureHandle.find(null);
+        MoreMcmeta.findTextures(null);
     }
 
     @Test
     public void find_ModNotLoaded_NothingReturned() {
-        TextureHandle.find(new ResourceLocation("bat.png"));
+        MoreMcmeta.findTextures(new ResourceLocation("bat.png"));
     }
 
     @Test

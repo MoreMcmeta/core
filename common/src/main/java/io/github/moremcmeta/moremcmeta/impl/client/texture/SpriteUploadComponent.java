@@ -19,7 +19,12 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.Collection;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -47,8 +52,9 @@ public class SpriteUploadComponent extends SingleUploadComponent {
     }
 
     @Override
-    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
-        super.onUpload(currentFrame);
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                         Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
+        super.onUpload(currentFrame, textureLookup);
         SPRITE.bind();
         currentFrame.upload(UPLOAD_X, UPLOAD_Y);
     }

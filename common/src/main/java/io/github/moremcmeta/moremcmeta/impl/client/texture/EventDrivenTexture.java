@@ -26,18 +26,23 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
+import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -51,6 +56,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
+    private static final Function<ResourceLocation, Collection<TextureHandle>> LOOKUP = MoreMcmeta::findTextures;
     private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
     private boolean registered;
@@ -103,7 +109,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
             runListeners(((textureComponent, textureAndFrameView) -> {
                 bind();
-                textureComponent.onUpload(textureAndFrameView);
+                textureComponent.onUpload(textureAndFrameView, LOOKUP);
             }));
         }
 
@@ -261,8 +267,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 }
 
                 @Override
-                public void onUpload(TextureAndFrameView currentFrame) {
-                    component.onUpload(currentFrame);
+                public void onUpload(TextureAndFrameView currentFrame,
+                                     Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
+                    component.onUpload(currentFrame, textureLookup);
                 }
 
                 @Override

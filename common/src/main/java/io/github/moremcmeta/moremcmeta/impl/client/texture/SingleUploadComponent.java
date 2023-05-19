@@ -20,8 +20,12 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
+import net.minecraft.resources.ResourceLocation;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -78,7 +82,8 @@ public class SingleUploadComponent implements CoreTextureComponent {
     }
 
     @Override
-    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame) {
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
+                         Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
         if (IS_PREPARED.get()) {
             currentFrame.upload(UPLOAD_X, UPLOAD_Y);
         }

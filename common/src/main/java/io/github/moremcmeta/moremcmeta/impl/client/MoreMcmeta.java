@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
@@ -25,6 +26,8 @@ import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
+import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.PackResourcesAdapter;
@@ -41,6 +44,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureCache;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureLoader;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.LazyTextureManager;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.SpriteFinder;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureFinisher;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
@@ -48,7 +52,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
@@ -109,11 +115,38 @@ public abstract class MoreMcmeta {
     private final Set<String> DEFAULT_PLUGINS = Set.of();
 
     /**
-     * Gets the {@link SpriteFinder} for this mod or returns null prior to startup.
-     * @return sprite finder for this mod or null
+     * Finds all textures whose names match the provided location.
+     * @param texturePath       full path of the texture (with .png suffix)
+     * @return handles to all textures matching that location
      */
-    public static SpriteFinder spriteFinder() {
-        return spriteFinder;
+    public static Collection<TextureHandle> findTextures(ResourceLocation texturePath) {
+        requireNonNull(texturePath, "Texture path cannot be null");
+        ImmutableList.Builder<TextureHandle> handles = new ImmutableList.Builder<>();
+
+        if (spriteFinder == null) {
+            return handles.build();
+        }
+
+        Optional<Sprite> spriteOptional = spriteFinder.findSprite(texturePath);
+        if (spriteOptional.isPresent()) {
+            Sprite sprite = spriteOptional.get();
+            int minX = Point.x(sprite.uploadPoint());
+            int minY = Point.y(sprite.uploadPoint());
+            handles.add(new TextureHandle(sprite::bind, minX, minY, sprite.width(), sprite.height()));
+        }
+
+        AbstractTexture texture = Minecraft.getInstance().getTextureManager()
+                .getTexture(texturePath, MissingTextureAtlasSprite.getTexture());
+        if (texture != MissingTextureAtlasSprite.getTexture()) {
+
+            /* Currently, there is no way to retrieve the dimensions of a texture w/o Mixins.
+               The max integer value is used to reserve the interface w/ dimensions in case
+               the real dimensions are retrieved in the future. */
+            handles.add(new TextureHandle(texture::bind, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE));
+
+        }
+
+        return handles.build();
     }
 
     /**
