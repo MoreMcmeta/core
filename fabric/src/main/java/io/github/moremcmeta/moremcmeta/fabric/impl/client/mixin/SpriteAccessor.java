@@ -34,6 +34,6 @@ public interface SpriteAccessor {
      * @return the atlas sprite's mipmaps
      */
     @Accessor("mainImage")
-    NativeImage[] getMainImage();
+    NativeImage[] moremcmeta_mainImage();
 
 }

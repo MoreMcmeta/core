@@ -34,6 +34,6 @@ public interface LoadingOverlayAccessor {
      * @return the current reload instance
      */
     @Accessor("reload")
-    ReloadInstance getReloadInstance();
+    ReloadInstance moremcmeta_reloadInstance();
 
 }

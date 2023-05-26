@@ -37,6 +37,6 @@ public interface TextureManagerAccessor {
      * @return the texture manager's internal texture list
      */
     @Accessor("byPath")
-    Map<ResourceLocation, AbstractTexture> getByPath();
+    Map<ResourceLocation, AbstractTexture> moremcmeta_byPath();
 
 }

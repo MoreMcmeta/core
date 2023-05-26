@@ -76,7 +76,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
      * @return the mipmap level getter
      */
     protected ToIntFunction<TextureAtlasSprite> mipmapLevelGetter(Logger logger) {
-        return (sprite) -> ((SpriteAccessor) sprite).getMainImage().length - 1;
+        return (sprite) -> ((SpriteAccessor) sprite).moremcmeta_mainImage().length - 1;
     }
 
     /**
@@ -91,7 +91,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     protected BiConsumer<TextureManager, ResourceLocation> unregisterAction() {
         return (manager, location) -> {
             TextureManagerAccessor accessor = (TextureManagerAccessor) manager;
-            accessor.getByPath().remove(location);
+            accessor.moremcmeta_byPath().remove(location);
             manager.release(location);
         };
     }
@@ -107,11 +107,11 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
 
         // The vanilla list of sources is immutable, so we need to create a new set.
         ImmutableSet.Builder<RepositorySource> sources = new ImmutableSet.Builder<>();
-        sources.addAll(accessor.getSources());
+        sources.addAll(accessor.moremcmeta_sources());
         sources.add(repositorySource);
 
         // Restore immutability
-        accessor.setSources(sources.build());
+        accessor.moremcmeta_setSources(sources.build());
 
     }
 
@@ -125,7 +125,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
 
     @Override
     protected Optional<ReloadInstance> reloadInstance(LoadingOverlay overlay, Logger logger) {
-        return Optional.of(((LoadingOverlayAccessor) overlay).getReloadInstance());
+        return Optional.of(((LoadingOverlayAccessor) overlay).moremcmeta_reloadInstance());
     }
 
     @Override

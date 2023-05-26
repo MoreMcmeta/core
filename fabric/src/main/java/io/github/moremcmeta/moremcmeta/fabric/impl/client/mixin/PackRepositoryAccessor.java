@@ -37,7 +37,7 @@ public interface PackRepositoryAccessor {
      * @return the pack resources in the repository
      */
     @Accessor("sources")
-    Set<RepositorySource> getSources();
+    Set<RepositorySource> moremcmeta_sources();
 
     /**
      * Replaces the pack sources in the repository.
@@ -45,6 +45,6 @@ public interface PackRepositoryAccessor {
      */
     @Accessor("sources")
     @Mutable
-    void setSources(Set<RepositorySource> sources);
+    void moremcmeta_setSources(Set<RepositorySource> sources);
 
 }

@@ -39,7 +39,7 @@ public class ManagerInitializationMixin {
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackRepository;reload()V"),
             method = "<init>*")
     @SuppressWarnings("ConstantConditions")
-    public void onReloaded(CallbackInfo info) {
+    public void moremcmeta_onReloaded(CallbackInfo info) {
         ResourceManagerInitializedCallback.EVENT.invoker().onManagerInitialized((Minecraft) (Object) this);
     }
 
