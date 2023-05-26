@@ -17,7 +17,10 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
+import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
@@ -28,6 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -329,6 +333,238 @@ public class MetadataRegistryImplTest {
         assertTrue(metadata.containsKey(new ResourceLocation("textures/block.png")));
         assertTrue(metadata.containsKey(new ResourceLocation("textures/block2.png")));
         assertEquals(2, metadata.size());
+    }
+
+    @Test
+    public void bases_NullLocation_NullPointerException() {
+        MetadataRegistryImpl registry = new MetadataRegistryImpl();
+
+        expectedException.expect(NullPointerException.class);
+        registry.bases(null);
+    }
+
+    @Test
+    public void bases_NoMetadata_NoneFound() {
+        MetadataRegistryImpl registry = new MetadataRegistryImpl();
+        assertTrue(registry.bases(new ResourceLocation("dummy.png")).isEmpty());
+    }
+
+    @Test
+    public void bases_LocationNotPresentInAnyMetadata_NoneFound() {
+        MetadataRegistryImpl registry = new MetadataRegistryImpl();
+        registry.set(ImmutableMap.of(
+                new ResourceLocation("textures/block.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(
+                                Triple.of(
+                                        "first1",
+                                        new ParsedMetadata() {
+                                            @Override
+                                            public Collection<Base> bases() {
+                                                return ImmutableList.of(
+                                                        new Base(new ResourceLocation("dummy.png"), Point.pack(0, 0))
+                                                );
+                                            }
+                                        },
+                                        (metadata, frames) -> new TextureComponent<>() {}
+                                ),
+                                Triple.of(
+                                        "first2",
+                                        new ParsedMetadata() {
+                                            @Override
+                                            public Collection<Base> bases() {
+                                                return ImmutableList.of(
+                                                        new Base(new ResourceLocation("dummy.png"), Point.pack(5, 20)),
+                                                        new Base(new ResourceLocation("dummy2.png"), Point.pack(7, 10))
+                                                );
+                                            }
+                                        },
+                                        (metadata, frames) -> new TextureComponent<>() {}
+                                )
+                        )
+                ),
+                new ResourceLocation("textures/block2.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "second",
+                                new ParsedMetadata() {},
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                ),
+                new ResourceLocation("textures/block3.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "third",
+                                new ParsedMetadata() {
+                                    @Override
+                                    public Collection<Base> bases() {
+                                        return ImmutableList.of(
+                                                new Base(new ResourceLocation("dummy2.png"), Point.pack(0, 0))
+                                        );
+                                    }
+                                },
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                )
+        ));
+        assertTrue(registry.bases(new ResourceLocation("dummy.png")).isEmpty());
+    }
+
+    @Test
+    public void bases_LocationPresentInMetadata_AllBasesFound() {
+        Base base1 = new Base(new ResourceLocation("dummy.png"), Point.pack(0, 0));
+        Base base2 = new Base(new ResourceLocation("dummy.png"), Point.pack(5, 20));
+        Base base3 = new Base(new ResourceLocation("dummy2.png"), Point.pack(7, 10));
+
+        MetadataRegistryImpl registry = new MetadataRegistryImpl();
+        registry.set(ImmutableMap.of(
+                new ResourceLocation("textures/block.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(
+                                Triple.of(
+                                        "first1",
+                                        new ParsedMetadata() {
+                                            @Override
+                                            public Collection<Base> bases() {
+                                                return ImmutableList.of(base1);
+                                            }
+                                        },
+                                        (metadata, frames) -> new TextureComponent<>() {}
+                                ),
+                                Triple.of(
+                                        "first2",
+                                        new ParsedMetadata() {
+                                            @Override
+                                            public Collection<Base> bases() {
+                                                return ImmutableList.of(base2, base3);
+                                            }
+                                        },
+                                        (metadata, frames) -> new TextureComponent<>() {}
+                                )
+                        )
+                ),
+                new ResourceLocation("textures/block2.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "second",
+                                new ParsedMetadata() {},
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                ),
+                new ResourceLocation("textures/block3.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "third",
+                                new ParsedMetadata() {
+                                    @Override
+                                    public Collection<Base> bases() {
+                                        return ImmutableList.of(
+                                                new Base(new ResourceLocation("dummy2.png"), Point.pack(0, 0))
+                                        );
+                                    }
+                                },
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                )
+        ));
+
+        Collection<Base> results = registry.bases(new ResourceLocation("textures/block.png"));
+        assertEquals(3, results.size());
+        assertTrue(results.contains(base1));
+        assertTrue(results.contains(base2));
+        assertTrue(results.contains(base3));
+    }
+
+    @Test
+    public void bases_LocationPresentInMetadataWithDuplicates_DuplicatesNotCombined() {
+        Base base1 = new Base(new ResourceLocation("dummy.png"), Point.pack(0, 0));
+        Base base2 = new Base(new ResourceLocation("dummy.png"), Point.pack(5, 20));
+        Base base3 = new Base(new ResourceLocation("dummy2.png"), Point.pack(7, 10));
+
+        MetadataRegistryImpl registry = new MetadataRegistryImpl();
+        registry.set(ImmutableMap.of(
+                new ResourceLocation("textures/block.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(
+                                Triple.of(
+                                        "first1",
+                                        new ParsedMetadata() {
+                                            @Override
+                                            public Collection<Base> bases() {
+                                                return ImmutableList.of(base1);
+                                            }
+                                        },
+                                        (metadata, frames) -> new TextureComponent<>() {}
+                                ),
+                                Triple.of(
+                                        "first2",
+                                        new ParsedMetadata() {
+                                            @Override
+                                            public Collection<Base> bases() {
+                                                return ImmutableList.of(base1, base2, base3);
+                                            }
+                                        },
+                                        (metadata, frames) -> new TextureComponent<>() {}
+                                )
+                        )
+                ),
+                new ResourceLocation("textures/block2.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "second",
+                                new ParsedMetadata() {},
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                ),
+                new ResourceLocation("textures/block3.png"),
+                new TextureData<>(
+                        new TextureData.FrameSize(30, 40),
+                        false, false,
+                        new MockCloseableImage(100, 100),
+                        List.of(Triple.of(
+                                "third",
+                                new ParsedMetadata() {
+                                    @Override
+                                    public Collection<Base> bases() {
+                                        return ImmutableList.of(
+                                                new Base(new ResourceLocation("dummy2.png"), Point.pack(0, 0))
+                                        );
+                                    }
+                                },
+                                (metadata, frames) -> new TextureComponent<>() {}
+                        ))
+                )
+        ));
+
+        Collection<Base> results = registry.bases(new ResourceLocation("textures/block.png"));
+        assertEquals(4, results.size());
+        assertTrue(results.contains(base1));
+        assertTrue(results.contains(base2));
+        assertTrue(results.contains(base3));
     }
 
     @Test

@@ -39,7 +39,6 @@ public interface ComponentProvider {
      *                      {@link ColorTransform}s to be applied
      * @return texture component for this texture
      */
-    TextureComponent<CurrentFrameView, UploadableFrameView>
-    assemble(ParsedMetadata metadata, FrameGroup<? extends MutableFrameView> frames);
+    TextureComponent<CurrentFrameView> assemble(ParsedMetadata metadata, FrameGroup<? extends MutableFrameView> frames);
 
 }

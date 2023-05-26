@@ -27,7 +27,7 @@ import io.github.moremcmeta.moremcmeta.forge.impl.client.reflection.AnnotatedCla
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.LazyTextureManager;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
@@ -185,7 +185,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     }
 
     @Override
-    protected void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
+    protected void startTicking(TextureManagerWrapper<EventDrivenTexture> texManager) {
         new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS, TickEvent.Phase.START, () -> true);
     }
 

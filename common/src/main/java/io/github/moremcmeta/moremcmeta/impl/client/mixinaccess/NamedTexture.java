@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2022 soir20
+ * Copyright (C) 2023 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,33 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.moremcmeta.moremcmeta.impl.client.texture;
+package io.github.moremcmeta.moremcmeta.impl.client.mixinaccess;
 
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Map;
-
 /**
- * Finishes items that need to be completed lazily.
- * @param <I> input type
- * @param <O> output type
+ * A texture that tracks its own name(s).
  * @author soir20
  */
-public interface Finisher<I, O> {
+public interface NamedTexture {
 
     /**
-     * Queues an item that needs to be finished. If an item at the
-     * same location is already queued, the original will be discarded
-     * and replaced.
-     * @param location      location identifying the item
-     * @param input         the unfinished item
+     * Adds a name to this texture.
+     * @param name      name to add to this texture
      */
-    void queue(ResourceLocation location, I input);
-
-    /**
-     * Finishes all currently-queued items.
-     * @return a map with all finished items by their locations
-     */
-    Map<ResourceLocation, O> finish();
+    void moremcmeta_addName(ResourceLocation name);
 
 }

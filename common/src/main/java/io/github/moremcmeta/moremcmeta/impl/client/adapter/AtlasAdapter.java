@@ -109,13 +109,13 @@ public class AtlasAdapter implements Atlas {
         }
 
         @Override
-        public void bind() {
-            SPRITE.atlas().bind();
+        public ResourceLocation name() {
+            return SPRITE.getName();
         }
 
         @Override
-        public ResourceLocation name() {
-            return SPRITE.getName();
+        public ResourceLocation atlas() {
+            return SPRITE.atlas().location();
         }
 
         @Override

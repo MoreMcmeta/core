@@ -17,17 +17,17 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.ClientPlugin;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
-import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
-import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.PackResourcesAdapter;
@@ -42,19 +42,17 @@ import io.github.moremcmeta.moremcmeta.impl.client.resource.SpriteFrameSizeFixPa
 import io.github.moremcmeta.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureCache;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureLoader;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.BaseCollection;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.LazyTextureManager;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.SpriteFinder;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureFinisher;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.UploadComponent;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
@@ -109,43 +107,18 @@ public abstract class MoreMcmeta {
      */
     public static final MetadataRegistryImpl METADATA_REGISTRY = new MetadataRegistryImpl();
 
-    private static SpriteFinder spriteFinder;
+    private static ImmutableMap<ResourceLocation, ImmutableSet<ResourceLocation>> dependencies = ImmutableMap.of();
 
     private final Set<String> DEFAULT_PLUGINS = Set.of();
 
     /**
-     * Finds all textures whose names match the provided location.
-     * @param texturePath       full path of the texture (with .png suffix)
-     * @return handles to all textures matching that location
+     * Gets all textures that have the given texture as a base.
+     * @param baseName      full path of the base texture
+     * @return all textures that have the given texture as a base
      */
-    public static Collection<TextureHandle> findTextures(ResourceLocation texturePath) {
-        requireNonNull(texturePath, "Texture path cannot be null");
-        ImmutableList.Builder<TextureHandle> handles = new ImmutableList.Builder<>();
-
-        if (spriteFinder == null) {
-            return handles.build();
-        }
-
-        Optional<Sprite> spriteOptional = spriteFinder.findSprite(texturePath);
-        if (spriteOptional.isPresent()) {
-            Sprite sprite = spriteOptional.get();
-            int minX = Point.x(sprite.uploadPoint());
-            int minY = Point.y(sprite.uploadPoint());
-            handles.add(new TextureHandle(sprite::bind, minX, minY, sprite.width(), sprite.height()));
-        }
-
-        AbstractTexture texture = Minecraft.getInstance().getTextureManager()
-                .getTexture(texturePath, MissingTextureAtlasSprite.getTexture());
-        if (texture != MissingTextureAtlasSprite.getTexture()) {
-
-            /* Currently, there is no way to retrieve the dimensions of a texture w/o Mixins.
-               The max integer value is used to reserve the interface w/ dimensions in case
-               the real dimensions are retrieved in the future. */
-            handles.add(new TextureHandle(texture::bind, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE));
-
-        }
-
-        return handles.build();
+    public static Set<ResourceLocation> dependencies(ResourceLocation baseName) {
+        requireNonNull(baseName, "Base name cannot be null");
+        return dependencies.getOrDefault(baseName, ImmutableSet.of());
     }
 
     /**
@@ -193,12 +166,11 @@ public abstract class MoreMcmeta {
         logPluginList(allPlugins, logger);
 
         // Texture manager
-        spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
-        TextureFinisher finisher = new TextureFinisher(spriteFinder, preparer());
-        LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager = new LazyTextureManager<>(
-                new TextureManagerAdapter(minecraft::getTextureManager, unregisterAction()),
-                finisher
-        );
+        SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
+        TextureManagerWrapper<EventDrivenTexture> manager =
+                new TextureManagerWrapper<>(
+                        new TextureManagerAdapter(minecraft::getTextureManager, unregisterAction())
+                );
 
         // Resource loaders
         TextureDataReader<NativeImageAdapter> reader = new TextureDataReader<>(
@@ -250,6 +222,8 @@ public abstract class MoreMcmeta {
                animate preloaded title screen textures. */
             rscManager.registerReloadListener(wrapListener(new TextureResourceReloadListener(
                     manager,
+                    preparer(),
+                    spriteFinder,
                     cache,
                     packIdGetter,
                     logger
@@ -320,10 +294,10 @@ public abstract class MoreMcmeta {
     protected abstract Optional<ReloadInstance> reloadInstance(LoadingOverlay overlay, Logger logger);
 
     /**
-     * Begins ticking the {@link LazyTextureManager} on a mod loader.
+     * Begins ticking the {@link TextureManagerWrapper} on a mod loader.
      * @param texManager        the manager to begin ticking
      */
-    protected abstract void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager);
+    protected abstract void startTicking(TextureManagerWrapper<EventDrivenTexture> texManager);
 
     /**
      * Divides the collection of all plugins into their separate subtypes.
@@ -566,17 +540,45 @@ public abstract class MoreMcmeta {
     /**
      * Adds a callback for any necessary post-reload work.
      * @param manager           texture manager with unfinished work
+     * @param preparer          prepares textures for OpenGL
+     * @param spriteFinder      finds sprites stitched to atlases
+     * @param textures          most recent textures that have been loaded
      * @param logger            logger to report warnings or errors
      */
-    private void addCompletedReloadCallback(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> manager,
+    private void addCompletedReloadCallback(TextureManagerWrapper<EventDrivenTexture> manager,
+                                            TexturePreparer preparer,
+                                            SpriteFinder spriteFinder,
+                                            Map<ResourceLocation, EventDrivenTexture.Builder> textures,
                                             Logger logger) {
         Optional<LoadingOverlay> overlay = loadingOverlay(logger);
         if (overlay.isEmpty()) {
             return;
         }
 
+        Map<ResourceLocation, ImmutableSet.Builder<ResourceLocation>> dependencies = new HashMap<>();
+
         Optional<ReloadInstance> reloadInstance = reloadInstance(overlay.get(), logger);
-        reloadInstance.ifPresent((instance) -> instance.done().thenRun(manager::finishQueued));
+        reloadInstance.ifPresent((instance) -> instance.done().thenRun(() -> {
+            textures.forEach((location, builder) -> {
+                Collection<Base> metadataBases = METADATA_REGISTRY.bases(location);
+                BaseCollection allBases = BaseCollection.find(spriteFinder, metadataBases, location);
+
+                allBases.baseNames().forEach((base) ->
+                        dependencies.computeIfAbsent(base, (loc) -> new ImmutableSet.Builder<>())
+                                .add(location)
+                );
+
+                UploadComponent uploadComponent = new UploadComponent(
+                        preparer,
+                        allBases
+                );
+                builder.add(uploadComponent);
+                manager.register(location, builder.build());
+
+            });
+
+            MoreMcmeta.dependencies = ImmutableMap.copyOf(Maps.transformValues(dependencies, ImmutableSet.Builder::build));
+        }));
     }
 
     /**
@@ -588,26 +590,35 @@ public abstract class MoreMcmeta {
     @MethodsReturnNonnullByDefault
     private class TextureResourceReloadListener
             implements StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> {
-        private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED = new HashMap<>();
+        private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED;
+        private final TextureManagerWrapper<EventDrivenTexture> TEX_MANAGER;
+        private final TexturePreparer PREPARER;
+        private final SpriteFinder SPRITE_FINDER;
         private final TextureCache<TextureData<NativeImageAdapter>, List<String>> CACHE;
         private final Supplier<List<String>> PACK_ID_GETTER;
-        private final LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> TEX_MANAGER;
         private final Logger LOGGER;
 
         /**
          * Creates a new resource reload listener.
          * @param texManager            texture manager that accepts queued textures
+         * @param preparer              prepares textures for OpenGL
+         * @param spriteFinder          finds sprites stitched to atlases
          * @param cache                 cache for texture data that should be loaded
          * @param packIdGetter          gets the IDs of the currently-selected packs
          * @param logger                a logger to write output
          */
         public TextureResourceReloadListener(
-                LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager,
+                TextureManagerWrapper<EventDrivenTexture> texManager,
+                TexturePreparer preparer,
+                SpriteFinder spriteFinder,
                 TextureCache<TextureData<NativeImageAdapter>, List<String>> cache,
                 Supplier<List<String>> packIdGetter,
                 Logger logger
         ) {
+            LAST_TEXTURES_ADDED = new HashMap<>();
             TEX_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
+            PREPARER = requireNonNull(preparer, "Preparer cannot be null");
+            SPRITE_FINDER = requireNonNull(spriteFinder, "Sprite finder cannot be null");
             CACHE = requireNonNull(cache, "Cache cannot be null");
             PACK_ID_GETTER = requireNonNull(packIdGetter, "Pack ID getter cannot be null");
             LOGGER = requireNonNull(logger, "Logger cannot be null");
@@ -675,14 +686,19 @@ public abstract class MoreMcmeta {
             requireNonNull(applyProfiler, "Profiler cannot be null");
             requireNonNull(applyExecutor, "Executor cannot be null");
 
-            addCompletedReloadCallback(TEX_MANAGER, LOGGER);
+            addCompletedReloadCallback(TEX_MANAGER, PREPARER, SPRITE_FINDER, LAST_TEXTURES_ADDED, LOGGER);
 
             return CompletableFuture.runAsync(() -> {
                 LAST_TEXTURES_ADDED.keySet().forEach(TEX_MANAGER::unregister);
                 LAST_TEXTURES_ADDED.clear();
                 LAST_TEXTURES_ADDED.putAll(data);
 
-                data.forEach(TEX_MANAGER::register);
+                /* Clear any existing texture immediately to prevent PreloadedTextures
+                   from re-adding themselves. The texture manager will reload before the
+                   EventDrivenTextures are added, causing a race condition with the
+                   registration CompletableFuture inside PreloadedTexture's reset method. */
+                LAST_TEXTURES_ADDED.keySet().forEach(TEX_MANAGER::unregister);
+
             }, applyExecutor);
         }
 

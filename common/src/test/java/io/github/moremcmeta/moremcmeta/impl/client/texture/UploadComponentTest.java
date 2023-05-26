@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2022 soir20
+ * Copyright (C) 2023 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,83 +17,88 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import com.google.common.collect.ImmutableList;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
+import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the {@link SpriteUploadComponent}.
+ * Tests the {@link UploadComponent}.
  * @author soir20
  */
-public class SpriteUploadComponentTest {
+public class UploadComponentTest {
+    private static final ResourceLocation DUMMY_LOCATION = new ResourceLocation("dummy.png");
     private static final TexturePreparer DUMMY_PREPARER =  (id, mipmap, width, height) -> {};
+    private static final BaseCollection DUMMY_BASE_COLLECTION = BaseCollection.find(
+            new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.of(
+                    new MockSprite(new ResourceLocation("dummy"), Point.pack(0, 0), 1)
+            )),
+            ImmutableList.of(new Base(DUMMY_LOCATION, Point.pack(2, 3))),
+            DUMMY_LOCATION
+    );
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void construct_NullSprite_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new SpriteUploadComponent(null, DUMMY_PREPARER);
-    }
-
-    @Test
     public void construct_NullPreparer_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new SpriteUploadComponent(new MockSprite(Point.pack(2, 3)), null);
+        new UploadComponent(null, DUMMY_BASE_COLLECTION);
     }
 
     @Test
-    public void upload_FirstUpload_FrameUploadedAtMipmappedPoints() {
+    public void construct_NullBaseCollection_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new UploadComponent(DUMMY_PREPARER, null);
+    }
+
+    @Test
+    public void upload_FirstUploadBeforePrepared_FrameNotUploadedAtMipmappedPoints() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new SpriteUploadComponent(new MockSprite(Point.pack(2, 3)), DUMMY_PREPARER));
+        builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        texture.upload();
+        texture.upload(DUMMY_LOCATION);
 
-        assertEquals(1, frame.uploadCount());
-        assertEquals((Long) Point.pack(2, 3), frame.mipmap(0).lastUploadPoint());
-        assertEquals((Long) Point.pack(1, 1), frame.mipmap(1).lastUploadPoint());
-        assertEquals((Long) Point.pack(0, 0), frame.mipmap(2).lastUploadPoint());
+        assertEquals(0, frame.uploadCount());
     }
 
     @Test
-    public void upload_SecondUpload_FrameUploadedAtMipmappedPointsOnce() {
+    public void upload_SecondUploadBeforePrepared_FrameNotUploadedAtMipmappedPointsOnce() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new SpriteUploadComponent(new MockSprite(Point.pack(2, 3)), DUMMY_PREPARER));
+        builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        texture.upload();
-        texture.upload();
+        texture.upload(DUMMY_LOCATION);
+        texture.upload(DUMMY_LOCATION);
 
-        assertEquals(1, frame.uploadCount());
-        assertEquals((Long) Point.pack(2, 3), frame.mipmap(0).lastUploadPoint());
-        assertEquals((Long) Point.pack(1, 1), frame.mipmap(1).lastUploadPoint());
-        assertEquals((Long) Point.pack(0, 0), frame.mipmap(2).lastUploadPoint());
+        assertEquals(0, frame.uploadCount());
     }
 
     @Test
-    public void tick_FirstTick_BoundAndUploaded() {
+    public void tick_FirstTick_NotBoundAndUploaded() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        MockSprite sprite = new MockSprite(Point.pack(2, 3));
-        builder.add(new SpriteUploadComponent(sprite, DUMMY_PREPARER));
+        builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
         builder.setPredefinedFrames(List.of(frame));
@@ -102,17 +107,12 @@ public class SpriteUploadComponentTest {
 
         texture.tick();
 
-        assertEquals(1, sprite.bindCount());
-        assertEquals(1, frame.uploadCount());
-        assertEquals((Long) Point.pack(2, 3), frame.mipmap(0).lastUploadPoint());
-        assertEquals((Long) Point.pack(1, 1), frame.mipmap(1).lastUploadPoint());
-        assertEquals((Long) Point.pack(0, 0), frame.mipmap(2).lastUploadPoint());
+        assertEquals(0, frame.uploadCount());
     }
 
     @Test
-    public void tick_SecondTick_BoundAndUploaded() {
+    public void tick_SecondTick_NotBoundAndUploaded() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        MockSprite sprite = new MockSprite(Point.pack(2, 3));
 
         AtomicInteger ticks = new AtomicInteger();
         builder.add(new TextureComponent<>() {
@@ -125,7 +125,7 @@ public class SpriteUploadComponentTest {
 
             }
         });
-        builder.add(new SpriteUploadComponent(sprite, DUMMY_PREPARER));
+        builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
         int layers = 2;
         MockCloseableImageFrame frame = new MockCloseableImageFrame(layers);
@@ -137,18 +137,13 @@ public class SpriteUploadComponentTest {
         texture.tick();
         texture.tick();
 
-        assertEquals(2, sprite.bindCount());
-        assertEquals(2, frame.uploadCount());
-        assertEquals((Long) Point.pack(2, 3), frame.mipmap(0).lastUploadPoint());
-        assertEquals((Long) Point.pack(1, 1), frame.mipmap(1).lastUploadPoint());
-        assertEquals((Long) Point.pack(0, 0), frame.mipmap(2).lastUploadPoint());
+        assertEquals(0, frame.uploadCount());
     }
 
     @Test
     public void register_AllImages_MipmapLoweredToSprite() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        MockSprite sprite = new MockSprite(1);
-        builder.add(new SpriteUploadComponent(sprite, DUMMY_PREPARER));
+        builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
         MockCloseableImageFrame frame1 = new MockCloseableImageFrame(1);
         MockCloseableImageFrame frame2 = new MockCloseableImageFrame(1);

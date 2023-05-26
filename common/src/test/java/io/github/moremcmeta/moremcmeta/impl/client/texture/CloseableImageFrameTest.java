@@ -425,7 +425,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.uploadAt(-1, 2);
+        frame.uploadAt(-1, 2, mipmaps.size() - 1);
     }
 
     @Test
@@ -445,7 +445,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.uploadAt(1, -2);
+        frame.uploadAt(1, -2, mipmaps.size() - 1);
     }
 
     @Test
@@ -465,11 +465,51 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.uploadAt(-1, -2);
+        frame.uploadAt(-1, -2, mipmaps.size() - 1);
     }
 
     @Test
-    public void upload_ZeroPoint_AllUploaded() {
+    public void upload_NegativeMipmap_IllegalArgException() {
+        ImmutableList<CloseableImage> mipmaps = ImmutableList.of(
+                new MockCloseableImage(128, 256),
+                new MockCloseableImage(64, 128),
+                new MockCloseableImage(32, 64),
+                new MockCloseableImage(16, 32),
+                new MockCloseableImage(8, 16)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(128, 256, 30, 40),
+                mipmaps,
+                1
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        frame.uploadAt(1, 2, -1);
+    }
+
+    @Test
+    public void upload_MipmapTooLarge_IllegalArgException() {
+        ImmutableList<CloseableImage> mipmaps = ImmutableList.of(
+                new MockCloseableImage(128, 256),
+                new MockCloseableImage(64, 128),
+                new MockCloseableImage(32, 64),
+                new MockCloseableImage(16, 32),
+                new MockCloseableImage(8, 16)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(128, 256, 30, 40),
+                mipmaps,
+                1
+        );
+
+        expectedException.expect(IllegalArgumentException.class);
+        frame.uploadAt(1, 2, mipmaps.size());
+    }
+
+    @Test
+    public void upload_ZeroPointOnlyBase_AllUploaded() {
         ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
                 new MockCloseableImage(128, 256),
                 new MockCloseableImage(64, 128),
@@ -484,7 +524,57 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(0, 0);
+        frame.uploadAt(0, 0, 0);
+
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(0).lastUploadPoint());
+        assertNull(mipmaps.get(1).lastUploadPoint());
+        assertNull(mipmaps.get(2).lastUploadPoint());
+        assertNull(mipmaps.get(3).lastUploadPoint());
+        assertNull(mipmaps.get(4).lastUploadPoint());
+    }
+
+    @Test
+    public void upload_ZeroPointSomeMipmaps_AllUploaded() {
+        ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
+                new MockCloseableImage(128, 256),
+                new MockCloseableImage(64, 128),
+                new MockCloseableImage(32, 64),
+                new MockCloseableImage(16, 32),
+                new MockCloseableImage(8, 16)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(128, 256, 30, 40),
+                mipmaps,
+                1
+        );
+
+        frame.uploadAt(0, 0, mipmaps.size() - 3);
+
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(0).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(1).lastUploadPoint());
+        assertEquals((Long) Point.pack(0, 0), mipmaps.get(2).lastUploadPoint());
+        assertNull(mipmaps.get(3).lastUploadPoint());
+        assertNull(mipmaps.get(4).lastUploadPoint());
+    }
+
+    @Test
+    public void upload_ZeroPointAllMipmaps_AllUploaded() {
+        ImmutableList<MockCloseableImage> mipmaps = ImmutableList.of(
+                new MockCloseableImage(128, 256),
+                new MockCloseableImage(64, 128),
+                new MockCloseableImage(32, 64),
+                new MockCloseableImage(16, 32),
+                new MockCloseableImage(8, 16)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(128, 256, 30, 40),
+                mipmaps,
+                1
+        );
+
+        frame.uploadAt(0, 0, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(0, 0), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(0, 0), mipmaps.get(1).lastUploadPoint());
@@ -509,7 +599,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(6, 4);
+        frame.uploadAt(6, 4, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(6, 4), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(3, 2), mipmaps.get(1).lastUploadPoint());
@@ -534,7 +624,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(55, 40);
+        frame.uploadAt(55, 40, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(55, 40), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(27, 20), mipmaps.get(1).lastUploadPoint());
@@ -559,7 +649,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(55, 40);
+        frame.uploadAt(55, 40, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(55, 40), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(27, 20), mipmaps.get(1).lastUploadPoint());
@@ -584,7 +674,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(4, 16);
+        frame.uploadAt(4, 16, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(4, 16), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(2, 8), mipmaps.get(1).lastUploadPoint());
@@ -609,7 +699,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(8, 8);
+        frame.uploadAt(8, 8, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(8, 8), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(4, 4), mipmaps.get(1).lastUploadPoint());
@@ -634,7 +724,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(8, 16);
+        frame.uploadAt(8, 16, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(8, 16), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(4, 8), mipmaps.get(1).lastUploadPoint());
@@ -659,7 +749,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(5, 5);
+        frame.uploadAt(5, 5, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(5, 5), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(2, 2), mipmaps.get(1).lastUploadPoint());
@@ -684,7 +774,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(5, 5);
+        frame.uploadAt(5, 5, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(5, 5), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(2, 2), mipmaps.get(1).lastUploadPoint());
@@ -709,7 +799,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(5, 5);
+        frame.uploadAt(5, 5, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(5, 5), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(2, 2), mipmaps.get(1).lastUploadPoint());
@@ -734,7 +824,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(500, 500);
+        frame.uploadAt(500, 500, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(500, 500), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(250, 250), mipmaps.get(1).lastUploadPoint());
@@ -759,7 +849,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        frame.uploadAt(5, 5);
+        frame.uploadAt(5, 5, mipmaps.size() - 1);
 
         assertEquals((Long) Point.pack(5, 5), mipmaps.get(0).lastUploadPoint());
         assertEquals((Long) Point.pack(2, 2), mipmaps.get(1).lastUploadPoint());
@@ -787,7 +877,7 @@ public class CloseableImageFrameTest {
         frame.close();
 
         expectedException.expect(IllegalStateException.class);
-        frame.uploadAt(55, 40);
+        frame.uploadAt(55, 40, mipmaps.size() - 1);
     }
 
     @Test

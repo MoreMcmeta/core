@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import net.minecraft.resources.ResourceLocation;
 import org.junit.Test;
 
 import java.util.List;
@@ -66,7 +67,7 @@ public class CoreTextureComponentTest {
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
-        builder.build().upload();
+        builder.build().upload(new ResourceLocation("dummy.png"));
     }
 
     @Test

@@ -25,7 +25,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
-import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CleanupComponent;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
@@ -200,15 +199,15 @@ public class TextureDataAssembler<I extends CloseableImage> {
      * @param layer         index of layer to apply transformations to
      * @return assembled component
      */
-    private TextureComponent<CurrentFrameView, UploadableFrameView> assembleComponent(
-            ComponentProvider provider, List<CloseableImageFrame> frames, ParsedMetadata metadata, int layer) {
-
+    private TextureComponent<CurrentFrameView> assembleComponent(ComponentProvider provider,
+                                                                 List<CloseableImageFrame> frames,
+                                                                 ParsedMetadata metadata, int layer) {
         FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(
                 frames,
                 (frame, index) -> new MutableFrameViewImpl(frame, index, layer)
         );
 
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 metadata,
                 mutableFrames
         );

@@ -22,13 +22,14 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Responds to events relevant to MoreMcmeta's internal implementation for a particular texture.
  * @author soir20
  */
 public interface CoreTextureComponent
-        extends TextureComponent<EventDrivenTexture.TextureAndFrameView, EventDrivenTexture.TextureAndFrameView> {
+        extends TextureComponent<EventDrivenTexture.TextureAndFrameView> {
 
     /**
      * Responds to the registration event of the associated texture. Note that the lifetime of the
@@ -40,5 +41,19 @@ public interface CoreTextureComponent
      */
     default void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
                                 FrameGroup<PersistentFrameView> predefinedFrames) {}
+
+    /**
+     * <p>Responds to the upload event of the associated texture. The upload event occurs when the texture is
+     * updated with respect to OpenGL. The upload event does not necessarily occur for every transform applied
+     * in other events. Note that the lifetime of the {@link UploadableFrameView} provided to this method is limited
+     * to the call of this method. Attempting to retain and use a {@link UploadableFrameView} at a later point will
+     * cause a {@link FrameView.IllegalFrameReference} exception to be thrown.</p>
+     *
+     * <p>Assume that the texture at the provided {@link ResourceLocation} is bound before this method is
+     * called.</p>
+     * @param currentFrame      view of the texture's current frame
+     * @param baseLocation      location of the base to which frames will be uploaded
+     */
+    default void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {}
 
 }

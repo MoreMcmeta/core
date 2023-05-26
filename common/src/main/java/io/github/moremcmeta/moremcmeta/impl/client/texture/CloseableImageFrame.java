@@ -123,27 +123,37 @@ public class CloseableImageFrame {
 
     /**
      * Uploads this frame at a given position in the active texture.
-     * @param x     x-coordinate of the point to upload the top-left corner of this frame at
-     * @param y     y-coordinate of the point to upload the top-left corner of this frame at
+     * @param x         x-coordinate of the point to upload the top-left corner of this frame at
+     * @param y         y-coordinate of the point to upload the top-left corner of this frame at
+     * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
      * @throws IllegalStateException if this frame has been closed
      */
-    public void uploadAt(int x, int y) {
+    public void uploadAt(int x, int y, int mipmap) {
         checkOpen();
 
         if (x < 0 || y < 0) {
             throw new IllegalArgumentException("Point coordinates must be greater than zero");
         }
 
-        for (int level = 0; level < mipmaps.size(); level++) {
+        if (mipmap < 0) {
+            throw new IllegalArgumentException("Mipmap cannot be negative, but was " + mipmap);
+        }
+
+        if (mipmap >= mipmaps.size()) {
+            throw new IllegalArgumentException("Provided mipmap level " + mipmap
+                    + " is greater than frame mipmap level " + (mipmaps.size() - 1));
+        }
+
+        for (int level = 0; level <= mipmap; level++) {
             int mipmappedX = x >> level;
             int mipmappedY = y >> level;
 
-            CloseableImage mipmap = mipmaps.get(level);
-            int mipmappedWidth = mipmap.width();
-            int mipmappedHeight = mipmap.height();
+            CloseableImage mipmapImage = mipmaps.get(level);
+            int mipmappedWidth = mipmapImage.width();
+            int mipmappedHeight = mipmapImage.height();
 
             if (mipmappedWidth > 0 && mipmappedHeight > 0) {
-                mipmap.upload(mipmappedX, mipmappedY);
+                mipmapImage.upload(mipmappedX, mipmappedY);
             }
         }
     }

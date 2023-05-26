@@ -29,7 +29,7 @@ import io.github.moremcmeta.moremcmeta.fabric.impl.client.mixin.TextureManagerAc
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.LazyTextureManager;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -129,7 +129,7 @@ public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer
     }
 
     @Override
-    protected void startTicking(LazyTextureManager<EventDrivenTexture.Builder, EventDrivenTexture> texManager) {
+    protected void startTicking(TextureManagerWrapper<EventDrivenTexture> texManager) {
         ClientTickEvents.START_CLIENT_TICK.register((client) -> texManager.tick());
     }
 

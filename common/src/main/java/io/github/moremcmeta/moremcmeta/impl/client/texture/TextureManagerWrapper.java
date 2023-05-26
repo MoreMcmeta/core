@@ -26,53 +26,31 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Finishes loaded textures lazily with upload components according to the provided {@link Finisher}.
- * @param <I> type of texture builders (input)
- * @param <O> type of textures (output)
+ * Wraps Minecraft's {@link net.minecraft.client.renderer.texture.TextureManager} to fix a bug with
+ * tracking {@link net.minecraft.client.renderer.texture.Tickable} textures.
+ * @param <T> texture type
  * @author soir20
  */
-public class LazyTextureManager<I, O extends AbstractTexture & CustomTickable> implements Manager<I> {
+public class TextureManagerWrapper<T extends AbstractTexture & CustomTickable> implements Manager<T> {
     private final Manager<? super AbstractTexture> DELEGATE;
     private final Map<ResourceLocation, CustomTickable> TICKABLE_TEXTURES;
-    private final Finisher<? super I, ? extends O> FINISHER;
 
     /**
      * Creates the TextureManagerWrapper.
      * @param delegate      Minecraft's the texture manager
-     * @param finisher      lazily finishes textures once resource loading is complete
      */
-    public LazyTextureManager(Manager<? super AbstractTexture> delegate,
-                              Finisher<? super I, ? extends O> finisher) {
+    public TextureManagerWrapper(Manager<? super AbstractTexture> delegate) {
         DELEGATE = requireNonNull(delegate, "Delegate manager cannot be null");
         TICKABLE_TEXTURES = new HashMap<>();
-        FINISHER = requireNonNull(finisher, "Finisher cannot be null");
     }
 
     @Override
-    public void register(ResourceLocation textureLocation, I builder) {
+    public void register(ResourceLocation textureLocation, T texture) {
         requireNonNull(textureLocation, "Texture location cannot be null");
-        requireNonNull(builder, "Texture builder cannot be null");
+        requireNonNull(texture, "Texture cannot be null");
 
-        /* Clear any existing texture immediately to prevent PreloadedTextures
-           from re-adding themselves. The texture manager will reload before the
-           EventDrivenTextures are added, causing a race condition with the
-           registration CompletableFuture inside PreloadedTexture's reset method. */
-        DELEGATE.unregister(textureLocation);
-
-        FINISHER.queue(textureLocation, builder);
-    }
-
-    /**
-     * Finishes all queued textures by adding them to Minecraft's texture manager
-     * according to the provided {@link Finisher}.
-     */
-    public void finishQueued() {
-        Map<ResourceLocation, ? extends O> textures = FINISHER.finish();
-
-        textures.forEach((location, texture) -> {
-            DELEGATE.register(location, texture);
-            TICKABLE_TEXTURES.put(location, texture);
-        });
+        TICKABLE_TEXTURES.put(textureLocation, texture);
+        DELEGATE.register(textureLocation, texture);
     }
 
     @Override

@@ -27,7 +27,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
-import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -1209,8 +1208,8 @@ public class TextureDataReaderTest {
         }
 
         @Override
-        public TextureComponent<CurrentFrameView, UploadableFrameView>
-        assemble(ParsedMetadata metadata, FrameGroup<? extends MutableFrameView> frames) {
+        public TextureComponent<CurrentFrameView> assemble(ParsedMetadata metadata,
+                                                           FrameGroup<? extends MutableFrameView> frames) {
             return new TextureComponent<>() {};
         }
 

@@ -25,7 +25,7 @@ package io.github.moremcmeta.moremcmeta.api.client.texture;
 public final class NegativeUploadPointException extends IllegalArgumentException {
 
     /**
-     * Creates a new exception to indicates that negative coordinates were used for an upload point.
+     * Creates a new exception to indicate that negative coordinates were used for an upload point.
      * @param x x-coordinate of the point accessed
      * @param y y-coordinate of the point accessed
      */

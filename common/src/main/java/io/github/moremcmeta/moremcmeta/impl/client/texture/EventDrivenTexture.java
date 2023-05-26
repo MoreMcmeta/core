@@ -18,7 +18,6 @@
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
@@ -26,10 +25,8 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
-import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
-import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
-import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
+import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -37,12 +34,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -56,11 +51,21 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
-    private static final Function<ResourceLocation, Collection<TextureHandle>> LOOKUP = MoreMcmeta::findTextures;
+
+    /**
+     * The coordinate at which textures should upload to themselves.
+     */
+    public static final long SELF_UPLOAD_POINT = Point.pack(0, 0);
+
+    /**
+     * The mipmap level of the texture uploading to themselves.
+     */
+    public static final int SELF_MIPMAP_LEVEL = 0;
+
     private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
+    private final ThreadLocal<Boolean> IS_BINDING = ThreadLocal.withInitial(() -> false);
     private boolean registered;
-    private boolean uploading;
 
     /**
      * Binds this texture or the texture it proxies to OpenGL. Fires upload listeners
@@ -68,18 +73,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     @Override
     public void bind() {
-
-        /* We need to get the ID from the superclass, so we don't get stuck in an infinite
-           loop if the texture isn't bound. */
-        if (!RenderSystem.isOnRenderThreadOrInit()) {
-            RenderSystem.recordRenderCall(() -> GlStateManager._bindTexture(super.getId()));
-        } else {
-            GlStateManager._bindTexture(super.getId());
-        }
-
-        if (!uploading) {
-            upload();
-        }
+        IS_BINDING.set(true);
+        super.bind();
+        IS_BINDING.set(false);
     }
 
     /**
@@ -95,25 +91,20 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
         runListeners((component, view) -> component.onRegistration(view, CURRENT_STATE.predefinedFrames()));
         registered = true;
-        bind();
     }
 
     /**
      * Fires upload listeners and marks the texture as not needing an upload.
+     * @param base      base texture that frames will be uploaded to
      */
-    public void upload() {
-        uploading = true;
+    public void upload(ResourceLocation base) {
+        requireNonNull(base, "Base cannot be null");
 
         if (CURRENT_STATE.hasUpdatedSinceUpload) {
             CURRENT_STATE.hasUpdatedSinceUpload = false;
 
-            runListeners(((textureComponent, textureAndFrameView) -> {
-                bind();
-                textureComponent.onUpload(textureAndFrameView, LOOKUP);
-            }));
+            runListeners((textureComponent, textureAndFrameView) -> textureComponent.onUpload(textureAndFrameView, base));
         }
-
-        uploading = false;
     }
 
     /**
@@ -144,7 +135,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
            probably being used in RenderSystem#setShaderTexture(). That RenderSystem method
            binds the ID directly instead of this texture, preventing the title screen
            textures from animating normally. */
-        if (!isCurrentlyBound() && registered) {
+        if (!isCurrentlyBound() && registered && !IS_BINDING.get()) {
             bind();
         }
 
@@ -167,8 +158,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Runs all listeners (a method for every component), each with its own temporary view.
      * @param method      executes the necessary method from the component
      */
-    private void runListeners(
-            BiConsumer<CoreTextureComponent, TextureAndFrameView> method) {
+    private void runListeners(BiConsumer<CoreTextureComponent, TextureAndFrameView> method) {
         for (int layer = 0; layer < COMPONENTS.size(); layer++) {
             TextureAndFrameView view = new TextureAndFrameView(CURRENT_STATE, layer);
             method.accept(COMPONENTS.get(layer), view);
@@ -258,18 +248,12 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param component     component to add to the texture
          * @return this builder for chaining
          */
-        public Builder add(TextureComponent<? super TextureAndFrameView, ? super TextureAndFrameView> component) {
+        public Builder add(TextureComponent<? super TextureAndFrameView> component) {
             requireNonNull(component, "Component cannot be null");
             add(new CoreTextureComponent() {
                 @Override
                 public void onTick(TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                     component.onTick(currentFrame, predefinedFrames);
-                }
-
-                @Override
-                public void onUpload(TextureAndFrameView currentFrame,
-                                     Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
-                    component.onUpload(currentFrame, textureLookup);
                 }
 
                 @Override
@@ -396,17 +380,18 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Uploads the current frame at the given point. This should only
          * be called when the correct texture (usually this texture) is
          * bound in OpenGL.
-         * @param x   x-coordinate of the point to upload the frame at
-         * @param y   y-coordinate of the point to upload the frame at
+         * @param x         x-coordinate of the point to upload the frame at
+         * @param y         y-coordinate of the point to upload the frame at
+         * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
          */
-        public void upload(int x, int y) {
+        public void upload(int x, int y, int mipmap) {
             checkValid();
 
             if (x < 0 || y < 0) {
                 throw new NegativeUploadPointException(x, y);
             }
 
-            STATE.uploadAt(x, y);
+            STATE.uploadAt(x, y, mipmap);
         }
 
         /**
@@ -560,14 +545,15 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Uploads the current frame at the given point. This should only
          * be called when the correct texture (usually this texture) is
          * bound in OpenGL.
-         * @param x   x-coordinate of the point to upload the frame at
-         * @param y   y-coordinate of the point to upload the frame at
+         * @param x         x-coordinate of the point to upload the frame at
+         * @param y         y-coordinate of the point to upload the frame at
+         * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
          */
-        public void uploadAt(int x, int y) {
+        public void uploadAt(int x, int y, int mipmap) {
             if (currentFrame() == GENERATED_FRAME) {
                 updateGeneratedFrame();
             }
-            currentFrame().uploadAt(x, y);
+            currentFrame().uploadAt(x, y, mipmap);
         }
 
         /**

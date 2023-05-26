@@ -27,15 +27,16 @@ import net.minecraft.resources.ResourceLocation;
 public interface Sprite {
 
     /**
-     * Binds the sprite (and thus its atlas) to OpenGL.
-     */
-    void bind();
-
-    /**
      * Gets the name of this sprite (without an extension).
      * @return the sprite's name
      */
     ResourceLocation name();
+
+    /**
+     * Gets the full path of the atlas that this sprite is stitched to.
+     * @return location of atlas this sprite is stitched to
+     */
+    ResourceLocation atlas();
 
     /**
      * Gets the position of the sprite's top-left corner on its atlas.

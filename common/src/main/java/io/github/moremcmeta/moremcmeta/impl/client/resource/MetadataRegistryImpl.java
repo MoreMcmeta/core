@@ -17,8 +17,10 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
@@ -27,6 +29,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Triple;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -80,6 +83,24 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     public Map<ResourceLocation, ParsedMetadata> metadataByPlugin(String pluginName) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         return metadata.getOrDefault(pluginName, ImmutableMap.of());
+    }
+
+    /**
+     * Retrieves all bases associated with the given texture from any plugin. Duplicates may appear.
+     * @param textureLocation       full path of the texture whose bases to search for
+     * @return all bases associated with the given texture as defined in metadata
+     */
+    public Collection<Base> bases(ResourceLocation textureLocation) {
+        requireNonNull(textureLocation, "Texture location cannot be null");
+
+        ImmutableList.Builder<Base> builder = new ImmutableList.Builder<>();
+        Collection<String> plugins = metadata.keySet();
+
+        for (String plugin : plugins) {
+            metadataFromPath(plugin, textureLocation).ifPresent((metadata) -> builder.addAll(metadata.bases()));
+        }
+
+        return builder.build();
     }
 
     /**

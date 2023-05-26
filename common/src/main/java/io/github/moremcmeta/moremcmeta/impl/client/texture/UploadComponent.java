@@ -20,12 +20,10 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
-import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
+import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,30 +31,20 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture that is not associated with an atlas sprite.
  * @author soir20
  */
-public class SingleUploadComponent implements CoreTextureComponent {
-    private static final int UPLOAD_X = 0;
-    private static final int UPLOAD_Y = 0;
+public class UploadComponent implements CoreTextureComponent {
     private final TexturePreparer PREPARER;
     private final AtomicBoolean IS_PREPARED;
-    private final int MIPMAP;
+    private final BaseCollection BASE_DATA;
 
     /**
      * Creates a new upload component for an independent texture.
      * @param preparer      prepares the texture for OpenGL on registration
+     * @param baseData      data about all bases for this texture
      */
-    public SingleUploadComponent(TexturePreparer preparer) {
-        this(preparer, 0);
-    }
-
-    /**
-     * Creates a new upload component for an independent texture.
-     * @param preparer      prepares the texture for OpenGL on registration
-     * @param mipmap        mipmap level of the texture
-     */
-    protected SingleUploadComponent(TexturePreparer preparer, int mipmap) {
+    public UploadComponent(TexturePreparer preparer, BaseCollection baseData) {
         PREPARER = requireNonNull(preparer, "Preparer cannot be null");
         IS_PREPARED = new AtomicBoolean();
-        MIPMAP = mipmap;
+        BASE_DATA = requireNonNull(baseData, "Base data cannot be null");
     }
 
     @Override
@@ -65,7 +53,11 @@ public class SingleUploadComponent implements CoreTextureComponent {
 
         /* Ensure the current frame is only accessed in this method, as the
            view may be invalidated if accessing them inside a render call. */
-        currentFrame.lowerMipmapLevel(MIPMAP);
+
+        // Remove unused mipmaps
+        currentFrame.lowerMipmapLevel(BASE_DATA.maxMipmap());
+
+
         EventDrivenTexture texture = currentFrame.texture();
         int frameWidth = currentFrame.width();
         int frameHeight = currentFrame.height();
@@ -82,11 +74,15 @@ public class SingleUploadComponent implements CoreTextureComponent {
     }
 
     @Override
-    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame,
-                         Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
-        if (IS_PREPARED.get()) {
-            currentFrame.upload(UPLOAD_X, UPLOAD_Y);
+    public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {
+        if (!IS_PREPARED.get()) {
+            return;
         }
+
+        BASE_DATA.baseData(baseLocation).forEach((base) -> {
+            long uploadPoint = base.uploadPoint();
+            currentFrame.upload(Point.x(uploadPoint), Point.y(uploadPoint), base.mipmap());
+        });
     }
 
     /**
@@ -96,7 +92,7 @@ public class SingleUploadComponent implements CoreTextureComponent {
      * @param frameHeight  height of a frame in the texture
      */
     private void prepareTexture(EventDrivenTexture texture, int frameWidth, int frameHeight) {
-        PREPARER.prepare(texture.getId(), MIPMAP, frameWidth, frameHeight);
+        PREPARER.prepare(texture.getId(), EventDrivenTexture.SELF_MIPMAP_LEVEL, frameWidth, frameHeight);
     }
 
 }
