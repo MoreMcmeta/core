@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
@@ -64,19 +63,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
     private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
-    private final ThreadLocal<Boolean> IS_BINDING = ThreadLocal.withInitial(() -> false);
-    private boolean registered;
-
-    /**
-     * Binds this texture or the texture it proxies to OpenGL. Fires upload listeners
-     * if the texture's image has changed.
-     */
-    @Override
-    public void bind() {
-        IS_BINDING.set(true);
-        super.bind();
-        IS_BINDING.set(false);
-    }
 
     /**
      * Fires registration listeners when this texture is put into the texture manager.
@@ -90,7 +76,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         CURRENT_STATE.replaceWith(0);
 
         runListeners((component, view) -> component.onRegistration(view, CURRENT_STATE.predefinedFrames()));
-        registered = true;
     }
 
     /**
@@ -121,37 +106,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     @Override
     public void close() {
         runListeners((component, view) -> component.onClose(view, CURRENT_STATE.predefinedFrames()));
-    }
-
-    /**
-     * Gets the OpenGL ID of this texture. Released IDs may be reused.
-     * @return the texture's OpenGL ID
-     */
-    @Override
-    public int getId() {
-        int id = super.getId();
-
-        /* Check if this texture is currently bound. If it isn't bound, the texture is
-           probably being used in RenderSystem#setShaderTexture(). That RenderSystem method
-           binds the ID directly instead of this texture, preventing the title screen
-           textures from animating normally. */
-        if (!isCurrentlyBound() && registered && !IS_BINDING.get()) {
-            bind();
-        }
-
-        return id;
-    }
-
-    /**
-     * Checks if this texture is currently bound to OpenGL.
-     * @return whether this texture is bound
-     */
-    private boolean isCurrentlyBound() {
-
-        // The GlStateManager adds this character when it returns the active texture
-        char offset = '蓀';
-
-        return GlStateManager._getTextureId(GlStateManager._getActiveTexture() - offset) == id;
     }
 
     /**
