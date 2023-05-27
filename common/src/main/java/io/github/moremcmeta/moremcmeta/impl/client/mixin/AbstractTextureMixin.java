@@ -31,7 +31,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -55,49 +54,12 @@ public abstract class AbstractTextureMixin implements NamedTexture {
     }
 
     /**
-     * Sets that this texture is being bound when {@link AbstractTexture#bind()} is called.
-     * @param callbackInfo      callback info from Mixin
-     */
-    @Inject(method = "bind()V", at = @At("HEAD"))
-    public void moremcmeta_onBindStart(CallbackInfo callbackInfo) {
-        onRenderThread(() -> {
-            //noinspection DataFlowIssue
-            lastBound = (AbstractTexture) (Object) this;
-        });
-    }
-
-    /**
      * Uploads all dependencies when this texture is bound.
      * @param callbackInfo      callback info from Mixin
      */
     @Inject(method = "bind()V", at = @At("RETURN"))
-    public void moremcmeta_onBindEnd(CallbackInfo callbackInfo) {
+    public void moremcmeta_onBind(CallbackInfo callbackInfo) {
         onRenderThread(this::uploadDependencies);
-    }
-
-    /**
-     * When getId() is called, the texture is might be being used in RenderSystem#setShaderTexture().
-     * That RenderSystem method binds the ID directly instead of this texture, preventing the title
-     * screen textures from animating normally. This handler binds the base texture normally and then
-     * restores the original texture that was bound.
-     * @param callbackInfo      callback info from Mixin
-     */
-    @Inject(method = "getId()I", at = @At("RETURN"))
-    public void moremcmeta_onGetId(CallbackInfoReturnable<Integer> callbackInfo) {
-        onRenderThread(() -> {
-            //noinspection EqualsBetweenInconvertibleTypes
-            if (this.equals(lastBound)) {
-                return;
-            }
-
-            AbstractTexture lastBoundBeforeCall = lastBound;
-            //noinspection DataFlowIssue
-            ((AbstractTexture) (Object) this).bind();
-
-            if (lastBoundBeforeCall != null) {
-                lastBoundBeforeCall.bind();
-            }
-        });
     }
 
     /**
