@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.NamedTexture;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
@@ -45,14 +46,12 @@ public abstract class AbstractTextureMixin implements NamedTexture {
     @Unique
     private static AbstractTexture lastBound;
     @Unique
-    private boolean isBinding = false;
-    @Unique
     private final Set<ResourceLocation> MOREMCMETA_NAMES = new HashSet<>();
 
     @Unique
     @Override
     public void moremcmeta_addName(ResourceLocation name) {
-        MOREMCMETA_NAMES.add(name);
+        onRenderThread(() -> MOREMCMETA_NAMES.add(name));
     }
 
     /**
@@ -61,7 +60,10 @@ public abstract class AbstractTextureMixin implements NamedTexture {
      */
     @Inject(method = "bind()V", at = @At("HEAD"))
     public void moremcmeta_onBindStart(CallbackInfo callbackInfo) {
-        isBinding = true;
+        onRenderThread(() -> {
+            //noinspection DataFlowIssue
+            lastBound = (AbstractTexture) (Object) this;
+        });
     }
 
     /**
@@ -70,10 +72,7 @@ public abstract class AbstractTextureMixin implements NamedTexture {
      */
     @Inject(method = "bind()V", at = @At("RETURN"))
     public void moremcmeta_onBindEnd(CallbackInfo callbackInfo) {
-        //noinspection DataFlowIssue
-        lastBound = (AbstractTexture) (Object) this;
-        moremcmeta_uploadDependencies();
-        isBinding = false;
+        onRenderThread(this::uploadDependencies);
     }
 
     /**
@@ -85,16 +84,33 @@ public abstract class AbstractTextureMixin implements NamedTexture {
      */
     @Inject(method = "getId()I", at = @At("RETURN"))
     public void moremcmeta_onGetId(CallbackInfoReturnable<Integer> callbackInfo) {
-        if (isBinding) {
-            return;
-        }
+        onRenderThread(() -> {
+            //noinspection EqualsBetweenInconvertibleTypes
+            if (this.equals(lastBound)) {
+                return;
+            }
 
-        AbstractTexture lastBoundBeforeCall = lastBound;
-        //noinspection DataFlowIssue
-        ((AbstractTexture) (Object) this).bind();
+            AbstractTexture lastBoundBeforeCall = lastBound;
+            //noinspection DataFlowIssue
+            ((AbstractTexture) (Object) this).bind();
 
-        if (lastBoundBeforeCall != null) {
-            lastBoundBeforeCall.bind();
+            if (lastBoundBeforeCall != null) {
+                lastBoundBeforeCall.bind();
+            }
+        });
+    }
+
+    /**
+     * Ensures that all work is done on the same thread. This is a defense against any subtle
+     * multithreading issues.
+     * @param action    action to perform on the render thread
+     */
+    @Unique
+    private void onRenderThread(Runnable action) {
+        if (!RenderSystem.isOnRenderThreadOrInit()) {
+            RenderSystem.recordRenderCall(action::run);
+        } else {
+            action.run();
         }
     }
 
@@ -102,7 +118,7 @@ public abstract class AbstractTextureMixin implements NamedTexture {
      * Uploads all of a base texture's dependencies, assuming it is already bound.
      */
     @Unique
-    private void moremcmeta_uploadDependencies() {
+    private void uploadDependencies() {
         TextureManager textureManager = Minecraft.getInstance().getTextureManager();
 
         MOREMCMETA_NAMES.forEach((base) -> {
