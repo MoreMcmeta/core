@@ -23,8 +23,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -33,7 +31,6 @@ import static java.util.Objects.requireNonNull;
  */
 public class UploadComponent implements CoreTextureComponent {
     private final TexturePreparer PREPARER;
-    private final AtomicBoolean IS_PREPARED;
     private final BaseCollection BASE_DATA;
 
     /**
@@ -43,7 +40,6 @@ public class UploadComponent implements CoreTextureComponent {
      */
     public UploadComponent(TexturePreparer preparer, BaseCollection baseData) {
         PREPARER = requireNonNull(preparer, "Preparer cannot be null");
-        IS_PREPARED = new AtomicBoolean();
         BASE_DATA = requireNonNull(baseData, "Base data cannot be null");
     }
 
@@ -63,22 +59,14 @@ public class UploadComponent implements CoreTextureComponent {
         int frameHeight = currentFrame.height();
 
         if (!RenderSystem.isOnRenderThreadOrInit()) {
-            RenderSystem.recordRenderCall(() -> {
-                prepareTexture(texture, frameWidth, frameHeight);
-                IS_PREPARED.set(true);
-            });
+            RenderSystem.recordRenderCall(() -> prepareTexture(texture, frameWidth, frameHeight));
         } else {
             prepareTexture(texture, frameWidth, frameHeight);
-            IS_PREPARED.set(true);
         }
     }
 
     @Override
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {
-        if (!IS_PREPARED.get()) {
-            return;
-        }
-
         BASE_DATA.baseData(baseLocation).forEach((base) -> {
             long uploadPoint = base.uploadPoint();
             currentFrame.upload(Point.x(uploadPoint), Point.y(uploadPoint), base.mipmap());
