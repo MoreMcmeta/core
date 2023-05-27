@@ -65,7 +65,7 @@ public class UploadComponentTest {
     }
 
     @Test
-    public void upload_FirstUploadBeforePrepared_FrameNotUploadedAtMipmappedPoints() {
+    public void upload_FirstUpload_FrameUploadedAtMipmappedPoints() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
@@ -76,11 +76,11 @@ public class UploadComponentTest {
 
         texture.upload(DUMMY_LOCATION);
 
-        assertEquals(0, frame.uploadCount());
+        assertEquals(2, frame.uploadCount());
     }
 
     @Test
-    public void upload_SecondUploadBeforePrepared_FrameNotUploadedAtMipmappedPointsOnce() {
+    public void upload_SecondUpload_FrameUploadedAtMipmappedPointsOnce() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
@@ -92,7 +92,7 @@ public class UploadComponentTest {
         texture.upload(DUMMY_LOCATION);
         texture.upload(DUMMY_LOCATION);
 
-        assertEquals(0, frame.uploadCount());
+        assertEquals(2, frame.uploadCount());
     }
 
     @Test
