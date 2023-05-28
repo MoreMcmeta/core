@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -139,6 +140,16 @@ public class CombinedMetadataView implements MetadataView {
     @Override
     public Optional<Boolean> booleanValue(int index) {
         return value(index, MetadataView::booleanValue, Optional.empty());
+    }
+
+    @Override
+    public Optional<InputStream> byteStreamValue(String key) {
+        return value(key, (view) -> view.byteStreamValue(key), Optional.empty());
+    }
+
+    @Override
+    public Optional<InputStream> byteStreamValue(int index) {
+        return value(index, MetadataView::byteStreamValue, Optional.empty());
     }
 
     @Override

@@ -26,6 +26,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +42,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class CombinedMetadataViewTest {
     private static final MockMetadataView MOCK_SUB_VIEW = new MockMetadataView(List.of("test"));
+    private static final InputStream MOCK_STREAM = new ByteArrayInputStream("eight".getBytes());
     private static final ImmutableList<MetadataView> MOCK_VIEWS = ImmutableList.of(
             new MockMetadataView(ImmutableMap.of("one", 1, "two", 2.0f)),
             new MockMetadataView(
@@ -48,7 +51,8 @@ public class CombinedMetadataViewTest {
                             "four", true,
                             "five", 5L,
                             "six", 6.0D,
-                            "seven", MOCK_SUB_VIEW
+                            "seven", MOCK_SUB_VIEW,
+                            "eight", MOCK_STREAM
                     )
             )
     );
@@ -123,13 +127,13 @@ public class CombinedMetadataViewTest {
     @Test
     public void size_MultipleViews_AllKeysCounted() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(7, view.size());
+        assertEquals(8, view.size());
     }
 
     @Test
     public void keys_MultipleViews_IterationInCorrectOrder() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(List.of("one", "two", "three", "four", "five", "six", "seven"), Lists.newArrayList(view.keys()));
+        assertEquals(List.of("one", "two", "three", "four", "five", "six", "seven", "eight"), Lists.newArrayList(view.keys()));
     }
 
     @Test
@@ -152,7 +156,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void hasKey_KeyNoView_DoesNotHaveKey() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertFalse(view.hasKey("eight"));
+        assertFalse(view.hasKey("nine"));
     }
 
     @Test
@@ -175,7 +179,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void hasKey_IndexInNoView_DoesNotHaveKey() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertFalse(view.hasKey(7));
+        assertFalse(view.hasKey(8));
     }
 
     @Test
@@ -200,7 +204,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void stringValue_KeyNotPresent_DoesNotHaveItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(Optional.empty(), view.stringValue("eight"));
+        assertEquals(Optional.empty(), view.stringValue("nine"));
     }
 
     @Test
@@ -243,7 +247,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void integerValue_KeyNotPresent_DoesNotHaveItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(Optional.empty(), view.integerValue("eight"));
+        assertEquals(Optional.empty(), view.integerValue("nine"));
     }
 
     @Test
@@ -286,7 +290,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void longValue_KeyNotPresent_DoesNotHaveItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(Optional.empty(), view.longValue("eight"));
+        assertEquals(Optional.empty(), view.longValue("nine"));
     }
 
     @Test
@@ -329,7 +333,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void floatValue_KeyNotPresent_DoesNotHaveItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(Optional.empty(), view.floatValue("eight"));
+        assertEquals(Optional.empty(), view.floatValue("nine"));
     }
 
     @Test
@@ -372,7 +376,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void doubleValue_KeyNotPresent_DoesNotHaveItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(Optional.empty(), view.doubleValue("eight"));
+        assertEquals(Optional.empty(), view.doubleValue("nine"));
     }
 
     @Test
@@ -415,7 +419,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void booleanValue_KeyNotPresent_DoesNotHaveItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(Optional.empty(), view.booleanValue("eight"));
+        assertEquals(Optional.empty(), view.booleanValue("nine"));
     }
 
     @Test
@@ -458,7 +462,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void subView_KeyNotPresent_DoesNotHaveItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(Optional.empty(), view.subView("eight"));
+        assertEquals(Optional.empty(), view.subView("nine"));
     }
 
     @Test
@@ -484,6 +488,49 @@ public class CombinedMetadataViewTest {
     public void subView_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
         assertEquals(MOCK_SUB_VIEW, view.subView(6).orElseThrow());
+    }
+
+    @Test
+    public void streamValue_ItemIsRightType_HasItem() {
+        CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
+        assertEquals(MOCK_STREAM, view.byteStreamValue("eight").orElseThrow());
+    }
+
+    @Test
+    public void streamValue_ItemIsDifferentType_DoesNotHaveItem() {
+        CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
+        assertEquals(Optional.empty(), view.byteStreamValue("five"));
+    }
+
+    @Test
+    public void streamValue_KeyNotPresent_DoesNotHaveItem() {
+        CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
+        assertEquals(Optional.empty(), view.byteStreamValue("nine"));
+    }
+
+    @Test
+    public void streamValue_NegativeIndex_NegativeIndexException() {
+        CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
+        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        view.byteStreamValue(-1);
+    }
+
+    @Test
+    public void streamValue_TooLargeIndex_DoesNotHaveItem() {
+        CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
+        assertEquals(Optional.empty(), view.byteStreamValue(10));
+    }
+
+    @Test
+    public void streamValue_WrongTypeAtIndex_DoesNotHaveItem() {
+        CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
+        assertEquals(Optional.empty(), view.byteStreamValue(1));
+    }
+
+    @Test
+    public void streamValue_RightTypeAtIndex_HasItem() {
+        CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
+        assertEquals(MOCK_STREAM, view.byteStreamValue(7).orElseThrow());
     }
 
 }

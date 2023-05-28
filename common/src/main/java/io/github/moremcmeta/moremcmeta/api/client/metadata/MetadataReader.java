@@ -21,9 +21,6 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Reads metadata from a file or throws a {@link InvalidMetadataException} if it is not valid.
@@ -39,12 +36,12 @@ public interface MetadataReader {
      * <p>This reader should *not* throw exceptions that are not {@link InvalidMetadataException}.</p>
      * @param metadataLocation      location of the metadata file
      * @param metadataStream        data in the metadata file
-     * @param resourceSearcher      searches for resources that exist in any currently-applied resource pack
+     * @param resourceRepository    searches for resources that exist in any currently-applied resource pack
      * @return an immutable view of the read metadata by texture path
      * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
     Map<ResourceLocation, MetadataView> read(ResourceLocation metadataLocation, InputStream metadataStream,
-                                             Function<Predicate<String>, Set<ResourceLocation>> resourceSearcher)
+                                             ResourceRepository resourceRepository)
             throws InvalidMetadataException;
 
 }

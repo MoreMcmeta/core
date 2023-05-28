@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.metadata;
 
+import java.io.InputStream;
 import java.util.Optional;
 
 /**
@@ -231,6 +232,31 @@ public interface MetadataView {
      * @throws NegativeKeyIndexException if the provided index is negative
      */
     Optional<Boolean> booleanValue(int index);
+
+    /**
+     * <p>Retrieves the value of a stream for the given key if any exists. If there is no such key or
+     * the key's associated value is not a valid stream, this method returns {@link Optional#empty()}.
+     * {@link #hasKey(String)} can be used to determine whether the key is present or the value is
+     * not a stream.</p>
+     * @param key       the key whose stream value to retrieve
+     * @return An {@link Optional} containing the stream value or {@link Optional#empty()} if there is
+     *         stream value associated with the key. The stream inside the {@link Optional} will never
+     *         be null.
+     */
+    Optional<InputStream> byteStreamValue(String key);
+
+    /**
+     * <p>Retrieves the value of a stream for the key at the given index if any exists. If there is no such
+     * key or the key's associated value is not a valid stream, this method returns {@link Optional#empty()}.
+     * {@link #hasKey(int)} can be used to determine whether the key is present or the value is
+     * not a stream.</p>
+     * @param index       the index of the key whose stream value to retrieve
+     * @return An {@link Optional} containing the stream value or {@link Optional#empty()} if there is
+     *         stream value associated with the key. The stream inside the {@link Optional} will never
+     *         be null.
+     * @throws NegativeKeyIndexException if the provided index is negative
+     */
+    Optional<InputStream> byteStreamValue(int index);
 
     /**
      * Retrieves the sub-view for the given key if any exists. If there is no such key or

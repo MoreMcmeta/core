@@ -19,6 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 
+import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,6 +128,17 @@ public class MockMetadataView implements MetadataView {
     public Optional<Boolean> booleanValue(int index) {
         checkNegativeIndex(index);
         return valueIfPresent(index, Boolean.class);
+    }
+
+    @Override
+    public Optional<InputStream> byteStreamValue(String key) {
+        return valueIfPresent(key, InputStream.class);
+    }
+
+    @Override
+    public Optional<InputStream> byteStreamValue(int index) {
+        checkNegativeIndex(index);
+        return valueIfPresent(index, InputStream.class);
     }
 
     @Override
