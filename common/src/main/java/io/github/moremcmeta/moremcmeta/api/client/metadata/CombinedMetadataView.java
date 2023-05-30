@@ -44,6 +44,7 @@ import static java.util.Objects.requireNonNull;
  * The resulting view would have keys (A, C, B, D, E, F), with the value of A from the first view and the
  * value of E from the second view.</p>
  * @author soir20
+ * @since 4.0.0
  */
 public final class CombinedMetadataView implements MetadataView {
     private final Map<String, MetadataView> KEY_TO_VIEW;
