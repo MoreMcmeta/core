@@ -26,6 +26,7 @@ import static java.util.Objects.requireNonNull;
  * without the "textures/" prefix and ".png" suffix) and texture paths (locations with
  * the full path and suffix).
  * @author soir20
+ * @since 4.0.0
  */
 public class SpriteName {
     private static final String TEX_PATH_PREFIX = "textures/";
