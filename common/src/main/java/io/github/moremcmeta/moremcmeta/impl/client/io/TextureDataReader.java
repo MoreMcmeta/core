@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -56,7 +55,6 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
     public TextureDataReader(Iterable<? extends MoreMcmetaTexturePlugin> plugins,
                              ImageReader<? extends I> imageReader,
                              BlurClampApplier<? super I, ? extends I> blurClampApplier) {
-
         requireNonNull(plugins, "Plugins cannot be null");
         SECTION_TO_PLUGIN = new HashMap<>();
         plugins.forEach((plugin) -> SECTION_TO_PLUGIN.put(plugin.sectionName(), plugin));
@@ -66,13 +64,11 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
     }
 
     @Override
-    public TextureData<I> read(InputStream textureStream, MetadataView metadata,
-                               Set<String> sectionsInSamePack)
+    public TextureData<I> read(InputStream textureStream, MetadataView metadata)
             throws IOException, InvalidMetadataException {
 
         requireNonNull(textureStream, "Texture stream cannot be null");
         requireNonNull(metadata, "Metadata cannot be null");
-        requireNonNull(sectionsInSamePack, "Set of sections in same pack cannot be null");
 
         I image = IMAGE_READER.read(textureStream);
         requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
@@ -85,8 +81,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
         for (String section : metadata.keys()) {
             MoreMcmetaTexturePlugin plugin = SECTION_TO_PLUGIN.get(section);
-            boolean texAndSectionInDiffPack = !sectionsInSamePack.contains(section);
-            if (plugin == null || (!plugin.allowTextureAndSectionInDifferentPacks() && texAndSectionInDiffPack)) {
+            if (plugin == null) {
                 continue;
             }
 

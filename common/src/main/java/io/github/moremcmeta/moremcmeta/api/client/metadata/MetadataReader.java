@@ -27,11 +27,11 @@ import java.util.Map;
  * @author soir20
  * @since 4.0.0
  */
-@FunctionalInterface
 public interface MetadataReader {
 
     /**
-     * <p>Reads metadata from a file, provided as an input stream.</p>
+     * <p>Reads metadata from a file, provided as an input stream. The order of keys in each {@link MetadataView}
+     * matters, as it determines in what order MoreMcmeta will apply plugins.</p>
      *
      * <p>This reader should *not* throw exceptions that are not {@link InvalidMetadataException}.</p>
      * @param metadataLocation      location of the metadata file
@@ -43,5 +43,25 @@ public interface MetadataReader {
     Map<ResourceLocation, MetadataView> read(ResourceLocation metadataLocation, InputStream metadataStream,
                                              ResourceRepository resourceRepository)
             throws InvalidMetadataException;
+
+    /**
+     * <p>Combines multiple {@link MetadataView}s for the same texture into one {@link MetadataView}. All
+     * views provided to this method are guaranteed to come from this reader's
+     * {@link MetadataReader#read(ResourceLocation, InputStream, ResourceRepository)} method.</p>
+     *
+     * <p>As with the {@link MetadataReader#read(ResourceLocation, InputStream, ResourceRepository)} method,
+     * the order of keys in the resultant {@link MetadataView} matters. The order determines in what order
+     * MoreMcmeta will apply plugins.</p>
+     *
+     * <p>This reader should *not* throw exceptions that are not {@link InvalidMetadataException}.</p>
+     * @param textureLocation               full path of the texture whose metadata should be combined
+     * @param metadataByLocation            metadata by metadata file location
+     * @return combined {@link MetadataView} with all metadata
+     * @throws InvalidMetadataException if the metadata is not valid for some reason
+     */
+    default MetadataView combine(ResourceLocation textureLocation, Map<ResourceLocation, MetadataView> metadataByLocation)
+            throws InvalidMetadataException {
+        throw new InvalidMetadataException("Format does not support metadata split among multiple files");
+    }
 
 }

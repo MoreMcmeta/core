@@ -22,7 +22,6 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
 
 /**
  * Reads a texture.
@@ -36,13 +35,10 @@ public interface TextureReader<T> {
      * Reads a texture from file data.
      * @param textureStream                 input stream of image data
      * @param metadata                      metadata associated with this texture
-     * @param sectionsInSamePack            set of metadata sections that are in the same pack
-     *                                      as the texture
      * @return texture read from the stream
      * @throws IOException failure reading from either input stream
      * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
-    T read(InputStream textureStream, MetadataView metadata, Set<String> sectionsInSamePack)
-            throws IOException, InvalidMetadataException;
+    T read(InputStream textureStream, MetadataView metadata) throws IOException, InvalidMetadataException;
 
 }

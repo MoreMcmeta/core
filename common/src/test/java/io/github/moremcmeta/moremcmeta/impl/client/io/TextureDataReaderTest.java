@@ -99,7 +99,7 @@ public class TextureDataReaderTest {
                 (image, blur, clamp) -> image
         );
         expectedException.expect(NullPointerException.class);
-        reader.read(null, new MockMetadataView(Collections.singletonList("texture")), Set.of("texture"));
+        reader.read(null, new MockMetadataView(Collections.singletonList("texture")));
     }
 
     @Test
@@ -110,18 +110,7 @@ public class TextureDataReaderTest {
                 (image, blur, clamp) -> image
         );
         expectedException.expect(NullPointerException.class);
-        reader.read(DEMO_TEXTURE_STREAM, null, Set.of("texture"));
-    }
-
-    @Test
-    public void read_NullSectionsInSamePack_NullPointerException() throws IOException, InvalidMetadataException {
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
-                (stream) -> new MockCloseableImage(),
-                (image, blur, clamp) -> image
-        );
-        expectedException.expect(NullPointerException.class);
-        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")), null);
+        reader.read(DEMO_TEXTURE_STREAM, null);
     }
 
     @Test
@@ -132,7 +121,7 @@ public class TextureDataReaderTest {
                 (image, blur, clamp) -> image
         );
         expectedException.expect(NullPointerException.class);
-        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")), Set.of("texture"));
+        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")));
     }
 
     @Test
@@ -143,7 +132,7 @@ public class TextureDataReaderTest {
                 (image, blur, clamp) -> null
         );
         expectedException.expect(NullPointerException.class);
-        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")), Set.of("texture"));
+        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")));
     }
 
     @Test
@@ -154,33 +143,7 @@ public class TextureDataReaderTest {
                 (image, blur, clamp) -> image
         );
         expectedException.expect(IOException.class);
-        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")), Set.of("texture"));
-    }
-
-    @Test
-    public void read_NoSections_NoMetadata() throws IOException, InvalidMetadataException {
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
-                (stream) -> new MockCloseableImage(),
-                (image, blur, clamp) -> image
-        );
-
-        TextureData<MockCloseableImage> data = reader.read(
-                DEMO_TEXTURE_STREAM,
-                new MockMetadataView(new ArrayList<>()),
-                Set.of()
-        );
-
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
-            );
-            numParsed++;
-        }
-
-        assertEquals(0, numParsed);
+        reader.read(DEMO_TEXTURE_STREAM, new MockMetadataView(Collections.singletonList("texture")));
     }
 
     @Test
@@ -197,8 +160,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -231,8 +193,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Collections.singletonList("texture")),
-                Set.of("texture")
+                new MockMetadataView(Collections.singletonList("texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -266,8 +227,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -287,8 +247,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -308,8 +267,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -329,8 +287,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -349,8 +306,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -383,8 +339,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -417,8 +372,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -451,8 +405,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -485,8 +438,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -520,8 +472,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -555,8 +506,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -590,8 +540,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -625,8 +574,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -660,8 +608,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -695,8 +642,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -730,83 +676,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
-        );
-
-        Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
-            assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
-            );
-            numParsed++;
-        }
-
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(3, numParsed);
-    }
-
-    @Test
-    public void read_SectionNotInSamePackAsRequired_SectionIgnored() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
-                new MockPlugin("animation", null, null, null, null, null),
-                new MockPlugin("other", null,null, null, null, null),
-                new MockPlugin("texture", null, null, null, null, null)
-        );
-
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                plugins,
-                (stream) -> new MockCloseableImage(),
-                (image, blur, clamp) -> image
-        );
-
-        TextureData<MockCloseableImage> data = reader.read(
-                DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "other")
-        );
-
-        Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
-            assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
-            );
-            numParsed++;
-        }
-
-        assertEquals(Set.of(plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(2, numParsed);
-    }
-
-    @Test
-    public void read_SectionNotInSamePackAsAllowed_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
-                new MockPlugin("animation", null, null, null, null, null) {
-                    @Override
-                    public boolean allowTextureAndSectionInDifferentPacks() {
-                        return true;
-                    }
-                },
-                new MockPlugin("other", null,null, null, null, null),
-                new MockPlugin("texture", null, null, null, null, null)
-        );
-
-        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                plugins,
-                (stream) -> new MockCloseableImage(),
-                (image, blur, clamp) -> image
-        );
-
-        TextureData<MockCloseableImage> data = reader.read(
-                DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
 
         Set<Integer> foundIds = new HashSet<>();
@@ -840,8 +710,7 @@ public class TextureDataReaderTest {
         expectedException.expect(NullPointerException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
     }
 
@@ -861,8 +730,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "other", "texture")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("animation", "other", "texture"))
         );
     }
 
@@ -895,8 +763,7 @@ public class TextureDataReaderTest {
 
         TextureData<MockCloseableImage> data = reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("texture", "animation", "other")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("texture", "animation", "other"))
         );
 
         // Make sure that the view was checked for correct priority ordering
@@ -939,8 +806,7 @@ public class TextureDataReaderTest {
 
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("texture", "animation", "other")),
-                Set.of("texture", "animation", "other")
+                new MockMetadataView(Arrays.asList("texture", "animation", "other"))
         );
 
         // Make sure that the view was checked for correct priority ordering
@@ -964,8 +830,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -985,8 +850,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -1006,8 +870,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -1027,8 +890,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -1048,8 +910,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
@@ -1069,8 +930,7 @@ public class TextureDataReaderTest {
         expectedException.expect(InvalidMetadataException.class);
         reader.read(
                 DEMO_TEXTURE_STREAM,
-                new MockMetadataView(Arrays.asList("animation", "texture")),
-                Set.of("texture", "animation")
+                new MockMetadataView(Arrays.asList("animation", "texture"))
         );
     }
 
