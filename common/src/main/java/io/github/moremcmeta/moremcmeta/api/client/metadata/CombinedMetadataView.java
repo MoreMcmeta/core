@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2022 soir20
+ * Copyright (C) 2023 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.moremcmeta.moremcmeta.impl.client.resource;
+package io.github.moremcmeta.moremcmeta.api.client.metadata;
 
 import com.mojang.datafixers.util.Pair;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
+import net.minecraft.resources.ResourceLocation;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,10 +33,19 @@ import java.util.function.Function;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A {@link MetadataView} that is the aggregate of several other views.
+ * <p>A {@link MetadataView} that is the aggregate of several other views. This class is useful when
+ * implementing {@link MetadataReader#combine(ResourceLocation, Map)}.</p>
+ *
+ * <p>This view's keys are in the same order as the views provided; they are not alphabetized or otherwise
+ * reordered. If a key is present in multiple views, the value of that key in the first view it appears in
+ * is used. The other values for that key are omitted.</p>
+ *
+ * <p>For example, say there are three views provided with the following keys: (A, C, B), (D, E), (E, F, A).
+ * The resulting view would have keys (A, C, B, D, E, F), with the value of A from the first view and the
+ * value of E from the second view.</p>
  * @author soir20
  */
-public class CombinedMetadataView implements MetadataView {
+public final class CombinedMetadataView implements MetadataView {
     private final Map<String, MetadataView> KEY_TO_VIEW;
     private final List<Pair<String, MetadataView>> INDEX_TO_VIEW;
 

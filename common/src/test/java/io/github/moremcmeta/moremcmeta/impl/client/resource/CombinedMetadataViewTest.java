@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.CombinedMetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.impl.client.io.MockMetadataView;
 import org.junit.Rule;
