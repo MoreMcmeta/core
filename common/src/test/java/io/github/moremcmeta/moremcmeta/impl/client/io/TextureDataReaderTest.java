@@ -19,9 +19,9 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
@@ -164,18 +164,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id()), foundIds);
-        assertEquals(1, numParsed);
+        assertEquals(1, numAnalyzed);
     }
 
     @Test
@@ -197,18 +197,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(1).id()), foundIds);
-        assertEquals(1, numParsed);
+        assertEquals(1, numAnalyzed);
     }
 
     @Test
@@ -310,18 +310,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
-        assertEquals(2, numParsed);
+        assertEquals(2, numAnalyzed);
     }
 
     @Test
@@ -343,18 +343,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
-        assertEquals(2, numParsed);
+        assertEquals(2, numAnalyzed);
     }
 
     @Test
@@ -376,18 +376,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
-        assertEquals(2, numParsed);
+        assertEquals(2, numAnalyzed);
     }
 
     @Test
@@ -409,18 +409,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
-        assertEquals(2, numParsed);
+        assertEquals(2, numAnalyzed);
     }
 
     @Test
@@ -442,18 +442,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
-        assertEquals(2, numParsed);
+        assertEquals(2, numAnalyzed);
     }
 
     @Test
@@ -476,18 +476,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(3, numParsed);
+        assertEquals(3, numAnalyzed);
     }
 
     @Test
@@ -510,18 +510,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(3, numParsed);
+        assertEquals(3, numAnalyzed);
     }
 
     @Test
@@ -544,18 +544,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(3, numParsed);
+        assertEquals(3, numAnalyzed);
     }
 
     @Test
@@ -578,18 +578,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(3, numParsed);
+        assertEquals(3, numAnalyzed);
     }
 
     @Test
@@ -612,18 +612,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(3, numParsed);
+        assertEquals(3, numAnalyzed);
     }
 
     @Test
@@ -646,18 +646,18 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(3, numParsed);
+        assertEquals(3, numAnalyzed);
     }
 
     @Test
@@ -680,22 +680,22 @@ public class TextureDataReaderTest {
         );
 
         Set<Integer> foundIds = new HashSet<>();
-        int numParsed = 0;
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
-            numParsed++;
+            numAnalyzed++;
         }
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
-        assertEquals(3, numParsed);
+        assertEquals(3, numAnalyzed);
     }
 
     @Test
-    public void read_ParsedMetadataNull_NullPointerException() throws IOException, InvalidMetadataException {
+    public void read_AnalyzedMetadataNull_NullPointerException() throws IOException, InvalidMetadataException {
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", null, null, null, null, null),
                 new MockPlugin("other", null, null, null, null, null, true, (view, imageWidth, imageHeight) -> {})
@@ -769,12 +769,12 @@ public class TextureDataReaderTest {
         // Make sure that the view was checked for correct priority ordering
         assertTrue(checked.get());
 
-        // Check the parsed metadata for priority ordering
+        // Check the analyzed metadata for priority ordering
         List<Integer> foundIds = new ArrayList<>();
-        for (Triple<String, ParsedMetadata, ComponentProvider> metadata : data.parsedMetadata()) {
-            foundIds.add(((MockParsedMetadata) metadata.getMiddle()).id());
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
-                    ((MockParsedMetadata) metadata.getMiddle()).id(),
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
                     ((MockComponentProvider) metadata.getRight()).id()
             );
         }
@@ -989,14 +989,14 @@ public class TextureDataReaderTest {
         }
 
         @Override
-        public MetadataParser parser() {
+        public MetadataAnalyzer analyzer() {
             return (view, imageWidth, imageHeight) -> {
                 if (INVALID_REASON != null) {
                     throw new InvalidMetadataException(INVALID_REASON);
                 }
 
                 VIEW_CHECK_FUNCTION.accept(view, imageWidth, imageHeight);
-                return NULL_METADATA ? null : new MockParsedMetadata(ID, FRAME_WIDTH, FRAME_HEIGHT, BLUR, CLAMP);
+                return NULL_METADATA ? null : new MockAnalyzedMetadata(ID, FRAME_WIDTH, FRAME_HEIGHT, BLUR, CLAMP);
             };
         }
 
@@ -1012,17 +1012,17 @@ public class TextureDataReaderTest {
     }
 
     /**
-     * Mock implementation of {@link ParsedMetadata} for easy creation in tests.
+     * Mock implementation of {@link AnalyzedMetadata} for easy creation in tests.
      * @author soir20
      */
-    private static final class MockParsedMetadata implements ParsedMetadata {
+    private static final class MockAnalyzedMetadata implements AnalyzedMetadata {
         private final int ID;
         private final Integer FRAME_WIDTH;
         private final Integer FRAME_HEIGHT;
         private final Boolean BLUR;
         private final Boolean CLAMP;
 
-        public MockParsedMetadata(int id, Integer width, Integer height, Boolean blur, Boolean clamp) {
+        public MockAnalyzedMetadata(int id, Integer width, Integer height, Boolean blur, Boolean clamp) {
             ID = id;
             FRAME_WIDTH = width;
             FRAME_HEIGHT = height;
@@ -1068,7 +1068,7 @@ public class TextureDataReaderTest {
         }
 
         @Override
-        public TextureComponent<CurrentFrameView> assemble(ParsedMetadata metadata,
+        public TextureComponent<CurrentFrameView> assemble(AnalyzedMetadata metadata,
                                                            FrameGroup<? extends MutableFrameView> frames) {
             return new TextureComponent<>() {};
         }

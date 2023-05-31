@@ -20,7 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.api.client.texture.SpriteName;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
@@ -38,7 +38,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class MetadataRegistryImpl implements MetadataRegistry {
-    private ImmutableMap<String, ImmutableMap<ResourceLocation, ParsedMetadata>> metadata;
+    private ImmutableMap<String, ImmutableMap<ResourceLocation, AnalyzedMetadata>> metadata;
 
     /**
      * Creates a new implementation of a {@link MetadataRegistry}.
@@ -48,7 +48,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     }
 
     @Override
-    public Optional<ParsedMetadata> metadataFromPath(String pluginName, ResourceLocation textureLocation) {
+    public Optional<AnalyzedMetadata> metadataFromPath(String pluginName, ResourceLocation textureLocation) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         requireNonNull(textureLocation, "Texture location cannot be null");
         return Optional.ofNullable(
@@ -58,7 +58,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     }
 
     @Override
-    public Optional<ParsedMetadata> metadataFromSpriteName(String pluginName, ResourceLocation spriteName) {
+    public Optional<AnalyzedMetadata> metadataFromSpriteName(String pluginName, ResourceLocation spriteName) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         requireNonNull(spriteName, "Sprite name cannot be null");
 
@@ -77,7 +77,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     }
 
     @Override
-    public Map<ResourceLocation, ParsedMetadata> metadataByPlugin(String pluginName) {
+    public Map<ResourceLocation, AnalyzedMetadata> metadataByPlugin(String pluginName) {
         requireNonNull(pluginName, "Plugin name cannot be null");
         return metadata.getOrDefault(pluginName, ImmutableMap.of());
     }
@@ -89,14 +89,14 @@ public class MetadataRegistryImpl implements MetadataRegistry {
     public void set(Map<? extends ResourceLocation, ? extends TextureData<?>> textureData) {
         requireNonNull(textureData, "Texture data cannot be null");
 
-        Map<String, ImmutableMap.Builder<ResourceLocation, ParsedMetadata>> builders = new HashMap<>();
+        Map<String, ImmutableMap.Builder<ResourceLocation, AnalyzedMetadata>> builders = new HashMap<>();
 
         for (Map.Entry<? extends ResourceLocation, ? extends TextureData<?>> entry : textureData.entrySet()) {
             ResourceLocation textureLocation = entry.getKey();
 
-            for (Triple<String, ParsedMetadata, ComponentProvider> pluginEntry : entry.getValue().parsedMetadata()) {
+            for (Triple<String, AnalyzedMetadata, ComponentProvider> pluginEntry : entry.getValue().analyzedMetadata()) {
                 String pluginName = pluginEntry.getLeft();
-                ParsedMetadata sectionData = pluginEntry.getMiddle();
+                AnalyzedMetadata sectionData = pluginEntry.getMiddle();
 
                 builders.computeIfAbsent(pluginName, (key) -> new ImmutableMap.Builder<>())
                         .put(textureLocation, sectionData);

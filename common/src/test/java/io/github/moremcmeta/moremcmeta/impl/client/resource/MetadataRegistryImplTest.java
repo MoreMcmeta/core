@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
@@ -54,7 +54,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -75,7 +75,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -96,7 +96,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -116,7 +116,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -127,7 +127,7 @@ public class MetadataRegistryImplTest {
 
     @Test
     public void getFromPath_SamePluginHasMetadata_MetadataFound() {
-        ParsedMetadata expected = new ParsedMetadata() {};
+        AnalyzedMetadata expected = new AnalyzedMetadata() {};
 
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
@@ -161,7 +161,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -182,7 +182,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -203,7 +203,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -223,7 +223,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -234,7 +234,7 @@ public class MetadataRegistryImplTest {
 
     @Test
     public void getFromSpriteName_SamePluginHasMetadata_MetadataFound() {
-        ParsedMetadata expected = new ParsedMetadata() {};
+        AnalyzedMetadata expected = new AnalyzedMetadata() {};
 
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
@@ -268,7 +268,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
@@ -289,13 +289,13 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
         ));
 
-        Map<ResourceLocation, ParsedMetadata> metadata = registry.metadataByPlugin("plugin2");
+        Map<ResourceLocation, AnalyzedMetadata> metadata = registry.metadataByPlugin("plugin2");
         assertTrue(metadata.isEmpty());
     }
 
@@ -310,7 +310,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 ),
@@ -321,13 +321,13 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 )
         ));
 
-        Map<ResourceLocation, ParsedMetadata> metadata = registry.metadataByPlugin("plugin");
+        Map<ResourceLocation, AnalyzedMetadata> metadata = registry.metadataByPlugin("plugin");
         assertTrue(metadata.containsKey(new ResourceLocation("textures/block.png")));
         assertTrue(metadata.containsKey(new ResourceLocation("textures/block2.png")));
         assertEquals(2, metadata.size());
@@ -343,7 +343,7 @@ public class MetadataRegistryImplTest {
 
     @Test
     public void set_SamePluginHasTwoMetadataObjects_IllegalArgException() {
-        ParsedMetadata expected = new ParsedMetadata() {};
+        AnalyzedMetadata expected = new AnalyzedMetadata() {};
 
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
 
@@ -356,7 +356,7 @@ public class MetadataRegistryImplTest {
                         new MockCloseableImage(100, 100),
                         List.of(Triple.of(
                                 "plugin",
-                                new ParsedMetadata() {},
+                                new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {
                                 }
                         ), Triple.of(

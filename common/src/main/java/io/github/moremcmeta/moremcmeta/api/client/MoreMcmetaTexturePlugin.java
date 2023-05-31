@@ -17,7 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.api.client;
 
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 
 /**
@@ -42,12 +42,12 @@ public interface MoreMcmetaTexturePlugin extends ClientPlugin {
     String sectionName();
 
     /**
-     * Gets the {@link MetadataParser} for this plugin. <b>This method may be called from multiple threads
+     * Gets the {@link MetadataAnalyzer} for this plugin. <b>This method may be called from multiple threads
      * concurrently. If there is any state shared between calls, it must be synchronized properly for
      * concurrent usage.</b>
-     * @return plugin's metadata parser
+     * @return plugin's metadata analyzer
      */
-    MetadataParser parser();
+    MetadataAnalyzer analyzer();
 
     /**
      * Gets the {@link ComponentProvider} for this plugin. <b>This method may be called from multiple

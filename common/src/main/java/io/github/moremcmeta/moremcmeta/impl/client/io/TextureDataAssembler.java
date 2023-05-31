@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
@@ -85,7 +85,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
         int maxMipmapY = Mth.log2(frameHeight);
 
         // Create frames
-        int layers = data.parsedMetadata().size() + EXTERNAL_DEFAULT_COMPONENTS + INTERNAL_DEFAULT_COMPONENTS;
+        int layers = data.analyzedMetadata().size() + EXTERNAL_DEFAULT_COMPONENTS + INTERNAL_DEFAULT_COMPONENTS;
         List<? extends I> mipmaps = MIPMAP_GENERATOR.apply(original, Math.min(maxMipmapX, maxMipmapY));
         ImmutableList<CloseableImageFrame> frames = readFrames(
                 mipmaps,
@@ -114,9 +114,9 @@ public class TextureDataAssembler<I extends CloseableImage> {
                 .setGeneratedFrame(generatedFrame)
                 .add(new CleanupComponent(closeMipmaps));
 
-        for (int index = 0; index < data.parsedMetadata().size(); index++) {
-            Triple<String, ParsedMetadata, ComponentProvider> metadata = data.parsedMetadata().get(index);
-            ParsedMetadata sectionData = metadata.getMiddle();
+        for (int index = 0; index < data.analyzedMetadata().size(); index++) {
+            Triple<String, AnalyzedMetadata, ComponentProvider> metadata = data.analyzedMetadata().get(index);
+            AnalyzedMetadata sectionData = metadata.getMiddle();
 
             builder.add(assembleComponent(
                     metadata.getRight(),
@@ -200,7 +200,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
      */
     private TextureComponent<CurrentFrameView> assembleComponent(ComponentProvider provider,
                                                                  List<CloseableImageFrame> frames,
-                                                                 ParsedMetadata metadata, int layer) {
+                                                                 AnalyzedMetadata metadata, int layer) {
         FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(
                 frames,
                 (frame, index) -> new MutableFrameViewImpl(frame, layer)

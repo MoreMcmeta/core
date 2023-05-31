@@ -17,7 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.api.client;
 
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 
 /**
  * <p>A user-provided plugin that reads custom metadata formats using the MoreMcmeta loader.</p>
@@ -28,7 +28,7 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
  * @author soir20
  * @since 4.0.0
  */
-public interface MoreMcmetaMetadataReaderPlugin extends ClientPlugin {
+public interface MoreMcmetaMetadataParserPlugin extends ClientPlugin {
 
     /**
      * Gets the file extension the plugin is tied to (without a period). If a metadata file has this extension,
@@ -41,11 +41,11 @@ public interface MoreMcmetaMetadataReaderPlugin extends ClientPlugin {
     String extension();
 
     /**
-     * Gets the {@link MetadataReader} for this plugin. <b>This method may be called from multiple threads
+     * Gets the {@link MetadataParser} for this plugin. <b>This method may be called from multiple threads
      * concurrently. If there is any state shared between calls, it must be synchronized properly for
      * concurrent usage.</b>
      * @return plugin's metadata reader
      */
-    MetadataReader metadataReader();
+    MetadataParser metadataParser();
 
 }

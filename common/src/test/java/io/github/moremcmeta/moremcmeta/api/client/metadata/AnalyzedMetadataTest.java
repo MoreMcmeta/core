@@ -24,31 +24,31 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertFalse;
 
 /**
- * Tests the default methods of the {@link ParsedMetadata} class and {@link .ParsedMetadata.FrameSize}.
+ * Tests the default methods of the {@link AnalyzedMetadata} class.
  * @author soir20
  */
-public class ParsedMetadataTest {
+public class AnalyzedMetadataTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void frameWidth_NotOverridden_Empty() {
-        assertFalse((new ParsedMetadata() {}).frameWidth().isPresent());
+        assertFalse((new AnalyzedMetadata() {}).frameWidth().isPresent());
     }
 
     @Test
     public void frameHeight_NotOverridden_Empty() {
-        assertFalse((new ParsedMetadata() {}).frameHeight().isPresent());
+        assertFalse((new AnalyzedMetadata() {}).frameHeight().isPresent());
     }
 
     @Test
     public void blur_NotOverridden_Empty() {
-        assertFalse((new ParsedMetadata() {}).blur().isPresent());
+        assertFalse((new AnalyzedMetadata() {}).blur().isPresent());
     }
 
     @Test
     public void clamp_NotOverridden_Empty() {
-        assertFalse((new ParsedMetadata() {}).clamp().isPresent());
+        assertFalse((new AnalyzedMetadata() {}).clamp().isPresent());
     }
 
 }

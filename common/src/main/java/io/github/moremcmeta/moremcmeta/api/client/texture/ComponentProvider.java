@@ -17,8 +17,8 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 
 /**
  * Creates {@link TextureComponent}s from initial texture and frame information. Applies initial
@@ -33,12 +33,12 @@ public interface ComponentProvider {
      * Assembles initial data about a texture into a {@link TextureComponent}. <b>This method may be
      * called from multiple threads concurrently. If there is any state shared between calls, it must
      * be synchronized properly for concurrent usage.</b>
-     * @param metadata      metadata parsed earlier by this plugin's
-     *                      {@link MetadataParser}.
+     * @param metadata      metadata analyzed earlier by this plugin's
+     *                      {@link MetadataAnalyzer}.
      * @param frames        all the predefined frames, which are mutable to allow for initial
      *                      {@link ColorTransform}s to be applied
      * @return texture component for this texture
      */
-    TextureComponent<CurrentFrameView> assemble(ParsedMetadata metadata, FrameGroup<? extends MutableFrameView> frames);
+    TextureComponent<CurrentFrameView> assemble(AnalyzedMetadata metadata, FrameGroup<? extends MutableFrameView> frames);
 
 }

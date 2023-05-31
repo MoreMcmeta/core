@@ -17,31 +17,51 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.metadata;
 
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import net.minecraft.resources.ResourceLocation;
+
+import java.io.InputStream;
+import java.util.Map;
 
 /**
- * Parses immutable texture metadata into data in a more usable form. The {@link ParsedMetadata} returned
- * by the parser will later be given to the same plugin's {@link ComponentProvider}.
+ * Reads metadata from a file or throws a {@link InvalidMetadataException} if it is not valid.
  * @author soir20
  * @since 4.0.0
  */
-@FunctionalInterface
 public interface MetadataParser {
 
     /**
-     * Converts the original metadata into a more usable form. <b>This method may be called from multiple
-     * threads concurrently. If there is any state shared between calls, it must be synchronized properly
-     * for concurrent usage.</b>
-     * @param metadata      the original, immutable metadata. This metadata contains all metadata for
-     *                      the texture, not just the metadata in this plugin's section name. The actual
-     *                      metadata attributes themselves are stored within their section names. That is,
-     *                      to access an attribute, a {@link MetadataView} for the section must be accessed
-     *                      first.
-     * @param imageWidth    width of the image associated with the metadata
-     * @param imageHeight   height of the image associated with the metadata
-     * @return an object with parsed data
-     * @throws InvalidMetadataException if the metadata is not valid
+     * <p>Reads metadata from a file, provided as an input stream. The order of keys in each {@link MetadataView}
+     * matters, as it determines in what order MoreMcmeta will apply plugins.</p>
+     *
+     * <p>This reader should *not* throw exceptions that are not {@link InvalidMetadataException}.</p>
+     * @param metadataLocation      location of the metadata file
+     * @param metadataStream        data in the metadata file
+     * @param resourceRepository    searches for resources that exist in any currently-applied resource pack
+     * @return an immutable view of the read metadata by texture path
+     * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
-    ParsedMetadata parse(MetadataView metadata, int imageWidth, int imageHeight) throws InvalidMetadataException;
+    Map<ResourceLocation, MetadataView> parse(ResourceLocation metadataLocation, InputStream metadataStream,
+                                              ResourceRepository resourceRepository)
+            throws InvalidMetadataException;
+
+    /**
+     * <p>Combines multiple {@link MetadataView}s for the same texture into one {@link MetadataView}. All
+     * views provided to this method are guaranteed to come from this reader's
+     * {@link MetadataParser#parse(ResourceLocation, InputStream, ResourceRepository)} method.</p>
+     *
+     * <p>As with the {@link MetadataParser#parse(ResourceLocation, InputStream, ResourceRepository)} method,
+     * the order of keys in the resultant {@link MetadataView} matters. The order determines in what order
+     * MoreMcmeta will apply plugins.</p>
+     *
+     * <p>This reader should *not* throw exceptions that are not {@link InvalidMetadataException}.</p>
+     * @param textureLocation               full path of the texture whose metadata should be combined
+     * @param metadataByLocation            metadata by metadata file location
+     * @return combined {@link MetadataView} with all metadata
+     * @throws InvalidMetadataException if the metadata is not valid for some reason
+     */
+    default MetadataView combine(ResourceLocation textureLocation, Map<ResourceLocation, MetadataView> metadataByLocation)
+            throws InvalidMetadataException {
+        throw new InvalidMetadataException("Format does not support metadata split among multiple files");
+    }
 
 }

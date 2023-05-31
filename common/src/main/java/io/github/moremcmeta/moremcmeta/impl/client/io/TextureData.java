@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
@@ -38,7 +38,7 @@ public class TextureData<I extends CloseableImage> {
     private final boolean BLUR;
     private final boolean CLAMP;
     private final I IMAGE;
-    private final List<Triple<String, ParsedMetadata, ComponentProvider>> PARSED_SECTIONS;
+    private final List<Triple<String, AnalyzedMetadata, ComponentProvider>> ANALYZED_SECTIONS;
 
     /**
      * Creates a new texture data container.
@@ -46,11 +46,11 @@ public class TextureData<I extends CloseableImage> {
      * @param blur              whether to blur the image
      * @param clamp             whether to clamp the image
      * @param image             texture image
-     * @param parsedSections    parsed metadata and component providers that will
+     * @param analyzedSections  analyzed metadata and component providers that will
      *                          process the metadata
      */
     public TextureData(FrameSize frameSize, boolean blur, boolean clamp, I image,
-                       List<Triple<String, ParsedMetadata, ComponentProvider>> parsedSections) {
+                       List<Triple<String, AnalyzedMetadata, ComponentProvider>> analyzedSections) {
         if (frameSize.width() > image.width()) {
             throw new IllegalArgumentException("Frame width cannot be larger than image width");
         }
@@ -63,7 +63,7 @@ public class TextureData<I extends CloseableImage> {
         BLUR = blur;
         CLAMP = clamp;
         IMAGE = requireNonNull(image, "Image cannot be null");
-        PARSED_SECTIONS = requireNonNull(ImmutableList.copyOf(parsedSections), "Parsed sections cannot be null");
+        ANALYZED_SECTIONS = requireNonNull(ImmutableList.copyOf(analyzedSections), "Analyzed sections cannot be null");
     }
 
     /**
@@ -99,12 +99,12 @@ public class TextureData<I extends CloseableImage> {
     }
 
     /**
-     * Gets parsed metadata and its associated plugin names and component providers that
+     * Gets analyzed metadata and its associated plugin names and component providers that
      * will process the metadata.
-     * @return parsed metadata sections and associated component providers
+     * @return analyzed metadata sections and associated component providers
      */
-    public List<Triple<String, ParsedMetadata, ComponentProvider>> parsedMetadata() {
-        return PARSED_SECTIONS;
+    public List<Triple<String, AnalyzedMetadata, ComponentProvider>> analyzedMetadata() {
+        return ANALYZED_SECTIONS;
     }
 
     /**

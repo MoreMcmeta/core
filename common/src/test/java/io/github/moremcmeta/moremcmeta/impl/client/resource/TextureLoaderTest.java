@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.CombinedMetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ResourceRepository;
 import io.github.moremcmeta.moremcmeta.impl.client.io.MockMetadataView;
@@ -63,21 +63,21 @@ import static org.junit.Assert.assertTrue;
  */
 public class TextureLoaderTest {
     private final Logger LOGGER = LogManager.getLogger();
-    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
+    private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace("2.moremcmeta", "").replace(".moremcmeta", "")
             ),
             new MockMetadataView(List.of("one", "two", "three"))
     );
-    private final MetadataReader MOCK_READER_2 = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
+    private final MetadataParser MOCK_READER_2 = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".other", "")
             ),
             new MockMetadataView(List.of("four", "five", "six"))
     );
-    private final ImmutableMap<String, MetadataReader> MOCK_READERS = ImmutableMap.of(
+    private final ImmutableMap<String, MetadataParser> MOCK_READERS = ImmutableMap.of(
             ".moremcmeta", MOCK_READER,
             ".other", MOCK_READER_2
     );
@@ -294,7 +294,7 @@ public class TextureLoaderTest {
                         );
                     }
 
-                    return MOCK_READER.read(metadataLocation, metadataStream, resourceRepository);
+                    return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
                 }),
                 LOGGER
         );
@@ -471,7 +471,7 @@ public class TextureLoaderTest {
                         throw new InvalidMetadataException("Dummy exception");
                     }
 
-                    return MOCK_READER.read(metadataLocation, metadataStream, resourceRepository);
+                    return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
                 }),
                 LOGGER
         );
@@ -885,13 +885,13 @@ public class TextureLoaderTest {
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadata) -> 1,
                 ImmutableMap.of(
-                        ".moremcmeta", new MetadataReader() {
+                        ".moremcmeta", new MetadataParser() {
                             @Override
-                            public Map<ResourceLocation, MetadataView> read(ResourceLocation metadataLocation,
-                                                                            InputStream metadataStream,
-                                                                            ResourceRepository resourceRepository)
+                            public Map<ResourceLocation, MetadataView> parse(ResourceLocation metadataLocation,
+                                                                             InputStream metadataStream,
+                                                                             ResourceRepository resourceRepository)
                                     throws InvalidMetadataException {
-                                return MOCK_READER.read(metadataLocation, metadataStream, resourceRepository);
+                                return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
                             }
 
                             @Override
@@ -931,13 +931,13 @@ public class TextureLoaderTest {
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadata) -> 1,
                 ImmutableMap.of(
-                        ".moremcmeta", new MetadataReader() {
+                        ".moremcmeta", new MetadataParser() {
                             @Override
-                            public Map<ResourceLocation, MetadataView> read(ResourceLocation metadataLocation,
-                                                                            InputStream metadataStream,
-                                                                            ResourceRepository resourceRepository)
+                            public Map<ResourceLocation, MetadataView> parse(ResourceLocation metadataLocation,
+                                                                             InputStream metadataStream,
+                                                                             ResourceRepository resourceRepository)
                                     throws InvalidMetadataException {
-                                return MOCK_READER.read(metadataLocation, metadataStream, resourceRepository);
+                                return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
                             }
 
                             @Override

@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * <p>A {@link MetadataView} that is the aggregate of several other views. This class is useful when
- * implementing {@link MetadataReader#combine(ResourceLocation, Map)}.</p>
+ * implementing {@link MetadataParser#combine(ResourceLocation, Map)}.</p>
  *
  * <p>This view's keys are in the same order as the views provided; they are not alphabetized or otherwise
  * reordered. If a key is present in multiple views, the value of that key in the first view it appears in

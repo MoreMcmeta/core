@@ -20,13 +20,13 @@ package io.github.moremcmeta.moremcmeta.api.client.metadata;
 import java.util.Optional;
 
 /**
- * Contains data parsed by the {@link MetadataParser}. <b>There may be multiple instances being used
+ * Contains data analyzed by the {@link MetadataAnalyzer}. <b>There may be multiple instances being used
  * by different threads concurrently. If there is any state shared between instances, it must be
  * synchronized properly for concurrent usage.</b>
  * @author soir20
  * @since 4.0.0
  */
-public interface ParsedMetadata {
+public interface AnalyzedMetadata {
 
     /**
      * Gets the frame width read from the metadata. {@link Optional#empty()} indicates "no opinion."

@@ -23,9 +23,9 @@ import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.ClientPlugin;
-import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
+import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataParserPlugin;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.NativeImageAdapter;
@@ -135,7 +135,7 @@ public abstract class MoreMcmeta {
         Logger logger = LogManager.getLogger();
 
         // Fetch and validate plugins
-        Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>> plugins = dividePlugins(
+        Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataParserPlugin>> plugins = dividePlugins(
                 fetchTexturePlugins(logger)
         );
 
@@ -149,17 +149,17 @@ public abstract class MoreMcmeta {
         );
         checkItemConflict(texturePlugins, MoreMcmetaTexturePlugin::sectionName, "section name");
 
-        Collection<MoreMcmetaMetadataReaderPlugin> readerPlugins = plugins.getSecond();
-        validateIndividualReaderPlugins(readerPlugins);
-        readerPlugins = removeOverriddenPlugins(
-                readerPlugins,
-                MoreMcmetaMetadataReaderPlugin::extension,
+        Collection<MoreMcmetaMetadataParserPlugin> parserPlugins = plugins.getSecond();
+        validateIndividualparserPlugins(parserPlugins);
+        parserPlugins = removeOverriddenPlugins(
+                parserPlugins,
+                MoreMcmetaMetadataParserPlugin::extension,
                 DEFAULT_PLUGINS,
                 logger
         );
-        checkItemConflict(readerPlugins, MoreMcmetaMetadataReaderPlugin::extension, "extension");
+        checkItemConflict(parserPlugins, MoreMcmetaMetadataParserPlugin::extension, "extension");
 
-        List<ClientPlugin> allPlugins = Stream.concat(texturePlugins.stream(), readerPlugins.stream()).toList();
+        List<ClientPlugin> allPlugins = Stream.concat(texturePlugins.stream(), parserPlugins.stream()).toList();
         checkItemConflict(allPlugins, ClientPlugin::displayName, "display name");
 
         logPluginList(allPlugins, logger);
@@ -183,7 +183,7 @@ public abstract class MoreMcmeta {
         );
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(
                 reader,
-                readersByExtension(readerPlugins),
+                parsersByExtension(parserPlugins),
                 logger
         );
 
@@ -303,11 +303,11 @@ public abstract class MoreMcmeta {
      * @param plugins       the plugins to divide
      * @return divided texture and metadata plugins
      */
-    private Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataReaderPlugin>> dividePlugins(
+    private Pair<Collection<MoreMcmetaTexturePlugin>, Collection<MoreMcmetaMetadataParserPlugin>> dividePlugins(
             Collection<ClientPlugin> plugins
     ) {
         Collection<MoreMcmetaTexturePlugin> texturePlugins = new ArrayList<>();
-        Collection<MoreMcmetaMetadataReaderPlugin> readerPlugins = new ArrayList<>();
+        Collection<MoreMcmetaMetadataParserPlugin> parserPlugins = new ArrayList<>();
         for (ClientPlugin plugin : plugins) {
             if (plugin instanceof MoreMcmetaTexturePlugin) {
                 texturePlugins.add((MoreMcmetaTexturePlugin) plugin);
@@ -315,13 +315,13 @@ public abstract class MoreMcmeta {
 
             /* If a plugin implements both interfaces, we will throw a conflicting name exception later
                instead of ignoring the other interface. */
-            if (plugin instanceof MoreMcmetaMetadataReaderPlugin) {
-                readerPlugins.add((MoreMcmetaMetadataReaderPlugin) plugin);
+            if (plugin instanceof MoreMcmetaMetadataParserPlugin) {
+                parserPlugins.add((MoreMcmetaMetadataParserPlugin) plugin);
             }
 
         }
 
-        return Pair.of(texturePlugins, readerPlugins);
+        return Pair.of(texturePlugins, parserPlugins);
     }
 
     /**
@@ -379,22 +379,22 @@ public abstract class MoreMcmeta {
         for (MoreMcmetaTexturePlugin plugin : plugins) {
             validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
             validatePluginItem(plugin.sectionName(), "section name", plugin.displayName());
-            validatePluginItem(plugin.parser(), "parser", plugin.displayName());
+            validatePluginItem(plugin.analyzer(), "analyzer", plugin.displayName());
             validatePluginItem(plugin.componentProvider(), "component provider", plugin.displayName());
         }
 
     }
 
     /**
-     * Checks all the reader registered plugins to make sure they are individually valid.
+     * Checks all the analyzer registered plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
      * @throws ClientPlugin.InvalidPluginException if a plugin is not valid
      */
-    private void validateIndividualReaderPlugins(Collection<MoreMcmetaMetadataReaderPlugin> plugins)
+    private void validateIndividualparserPlugins(Collection<MoreMcmetaMetadataParserPlugin> plugins)
             throws ClientPlugin.InvalidPluginException {
 
         // Validate individual plugins
-        for (MoreMcmetaMetadataReaderPlugin plugin : plugins) {
+        for (MoreMcmetaMetadataParserPlugin plugin : plugins) {
             validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
 
             String extension = plugin.extension();
@@ -407,7 +407,7 @@ public abstract class MoreMcmeta {
                 throw new ClientPlugin.InvalidPluginException("Extension cannot be empty");
             }
 
-            validatePluginItem(plugin.metadataReader(), "metadata reader", plugin.displayName());
+            validatePluginItem(plugin.metadataParser(), "metadata analyzer", plugin.displayName());
         }
 
     }
@@ -469,22 +469,22 @@ public abstract class MoreMcmeta {
     }
 
     /**
-     * Associates all registered {@link MetadataReader}s with their extensions.
-     * @param readerPlugins     all the metadata reader plugins
+     * Associates all registered {@link MetadataParser}s with their extensions.
+     * @param parserPlugins     all the metadata analyzer plugins
      * @return a map that is a valid input to a {@link TextureLoader}
      */
-    private ImmutableMap<String, MetadataReader> readersByExtension(
-            Iterable<MoreMcmetaMetadataReaderPlugin> readerPlugins) {
+    private ImmutableMap<String, MetadataParser> parsersByExtension(
+            Iterable<MoreMcmetaMetadataParserPlugin> parserPlugins) {
 
-        ImmutableMap.Builder<String, MetadataReader> readers = new ImmutableMap.Builder<>();
-        for (MoreMcmetaMetadataReaderPlugin plugin : readerPlugins) {
-            readers.put(
+        ImmutableMap.Builder<String, MetadataParser> analyzers = new ImmutableMap.Builder<>();
+        for (MoreMcmetaMetadataParserPlugin plugin : parserPlugins) {
+            analyzers.put(
                     "." + plugin.extension(),
-                    plugin.metadataReader()
+                    plugin.metadataParser()
             );
         }
 
-        return readers.build();
+        return analyzers.build();
     }
 
     /**

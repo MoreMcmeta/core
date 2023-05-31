@@ -17,7 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
@@ -237,8 +237,8 @@ public class TextureDataTest {
     }
 
     @Test
-    public void parsedMetadata_None_NoneReturned() {
-        List<Triple<String, ParsedMetadata, ComponentProvider>> expectedMetadata = List.of();
+    public void analyzedMetadata_None_NoneReturned() {
+        List<Triple<String, AnalyzedMetadata, ComponentProvider>> expectedMetadata = List.of();
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
         TextureData<MockCloseableImage> data = new TextureData<>(
@@ -249,16 +249,16 @@ public class TextureDataTest {
                 expectedMetadata
         );
 
-        assertEquals(0, data.parsedMetadata().size());
+        assertEquals(0, data.analyzedMetadata().size());
     }
 
     @Test
-    public void parsedMetadata_Some_SameMetadataReturned() {
-        List<Triple<String, ParsedMetadata, ComponentProvider>> expectedMetadata = List.of(
-                Triple.of("pluginOne", new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Triple.of("pluginTwo", new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Triple.of("pluginThree", new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Triple.of("pluginFour", new ParsedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {})
+    public void analyzedMetadata_Some_SameMetadataReturned() {
+        List<Triple<String, AnalyzedMetadata, ComponentProvider>> expectedMetadata = List.of(
+                Triple.of("pluginOne", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Triple.of("pluginTwo", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Triple.of("pluginThree", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
+                Triple.of("pluginFour", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {})
         );
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
@@ -270,36 +270,36 @@ public class TextureDataTest {
                 expectedMetadata
         );
 
-        assertEquals(expectedMetadata, data.parsedMetadata());
+        assertEquals(expectedMetadata, data.analyzedMetadata());
     }
 
     @Test
-    public void parsedMetadata_ListModifiedExternally_InternalListNotModified() {
-        List<Triple<String, ParsedMetadata, ComponentProvider>> expectedMetadata = new ArrayList<>();
+    public void analyzedMetadata_ListModifiedExternally_InternalListNotModified() {
+        List<Triple<String, AnalyzedMetadata, ComponentProvider>> expectedMetadata = new ArrayList<>();
         expectedMetadata.add(Triple.of(
                 "pluginOne",
-                new ParsedMetadata() {},
+                new AnalyzedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
         expectedMetadata.add(Triple.of(
                 "pluginTwo",
-                new ParsedMetadata() {},
+                new AnalyzedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
         expectedMetadata.add(Triple.of(
                 "pluginThree",
-                new ParsedMetadata() {},
+                new AnalyzedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
         expectedMetadata.add(Triple.of(
                 "pluginFour",
-                new ParsedMetadata() {},
+                new AnalyzedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
 
-        Triple<String, ParsedMetadata, ComponentProvider> extraSection = Triple.of(
+        Triple<String, AnalyzedMetadata, ComponentProvider> extraSection = Triple.of(
                 "pluginFive",
-                new ParsedMetadata() {},
+                new AnalyzedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
         );
 
@@ -314,7 +314,7 @@ public class TextureDataTest {
 
         expectedMetadata.add(extraSection);
 
-        List<Triple<String, ParsedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>(data.parsedMetadata());
+        List<Triple<String, AnalyzedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>(data.analyzedMetadata());
 
         // If the actual metadata already contains the extra section, the lists won't be equal
         actualMetadata.add(extraSection);

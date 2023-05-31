@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ResourceRepository;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureReader;
@@ -52,22 +52,22 @@ import static java.util.Objects.requireNonNull;
  */
 public class TextureLoader<R> {
     private final TextureReader<? extends R> TEXTURE_READER;
-    private final Map<String, ? extends MetadataReader> READERS;
+    private final Map<String, ? extends MetadataParser> PARSERS;
     private final Logger LOGGER;
 
     /**
      * Creates a TextureLoader.
      * @param textureReader         reads textures from a stream of file data
-     * @param metadataReaders       {@link MetadataReader}s by extension. All extensions must start with a
+     * @param metadataParsers       {@link MetadataParser}s by extension. All extensions must start with a
      *                              period (.) and contain at least one other character.
      * @param logger                logs listener-related messages to the game's output
      */
     public TextureLoader(TextureReader<? extends R> textureReader,
-                         ImmutableMap<String, ? extends MetadataReader> metadataReaders, Logger logger) {
+                         ImmutableMap<String, ? extends MetadataParser> metadataParsers, Logger logger) {
         TEXTURE_READER = requireNonNull(textureReader, "Texture reader cannot be null");
-        READERS = requireNonNull(metadataReaders, "Metadata readers cannot be null");
+        PARSERS = requireNonNull(metadataParsers, "Metadata parsers cannot be null");
 
-        if (READERS.keySet().stream().anyMatch((ext) -> ext.lastIndexOf('.') != 0 || ext.length() < 2)) {
+        if (PARSERS.keySet().stream().anyMatch((ext) -> ext.lastIndexOf('.') != 0 || ext.length() < 2)) {
             throw new IllegalArgumentException("File extensions must contain only one period (.) at the start and " +
                     "contain least one other character");
         }
@@ -95,7 +95,7 @@ public class TextureLoader<R> {
         Set<ResourceLocation> textureCandidates = searchResources(
                 repository,
                 paths,
-                (fileName) -> READERS.keySet().stream().anyMatch(fileName::endsWith)
+                (fileName) -> PARSERS.keySet().stream().anyMatch(fileName::endsWith)
         );
 
         return makeTextures(textureCandidates, repository, paths);
@@ -196,11 +196,11 @@ public class TextureLoader<R> {
             String metadataPath = metadataLocation.getPath();
             String extension = metadataPath.substring(metadataPath.lastIndexOf('.'));
 
-            // There must be a reader for this extension since we only retrieved files with readers' extensions
+            // There must be a parser for this extension since we only retrieved files with parsers' extensions
             InputStream metadataStream = metadataResources.collection().find(resourceType, metadataLocation);
-            Map<ResourceLocation, MetadataView> metadata = READERS
+            Map<ResourceLocation, MetadataView> metadata = PARSERS
                     .get(extension)
-                    .read(metadataLocation, metadataStream, wrapRepository(repository, paths));
+                    .parse(metadataLocation, metadataStream, wrapRepository(repository, paths));
             metadataStream.close();
 
             results.put(metadataLocation, new ReadMetadataFile(metadata, metadataResources.collectionIndex(), extension));
@@ -276,7 +276,7 @@ public class TextureLoader<R> {
             MetadataView combinedMetadata;
             if (allMetadata.size() > 1) {
                 try {
-                    combinedMetadata = READERS.get(extension)
+                    combinedMetadata = PARSERS.get(extension)
                             .combine(textureLocation, allMetadata.metadataByLocation());
                 } catch (InvalidMetadataException err) {
                     LOGGER.error(

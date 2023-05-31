@@ -18,10 +18,10 @@
 package io.github.moremcmeta.moremcmeta.forge.impl.client.reflection;
 
 import com.google.common.collect.ImmutableSet;
-import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
+import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataParserPlugin;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.forge.api.client.MoreMcmetaClientPlugin;
 import net.minecraftforge.forgespi.language.ModFileScanData;
@@ -228,7 +228,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public MetadataParser parser() {
+        public MetadataAnalyzer analyzer() {
             return null;
         }
 
@@ -255,7 +255,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public MetadataParser parser() {
+        public MetadataAnalyzer analyzer() {
             return null;
         }
 
@@ -269,7 +269,7 @@ public class AnnotatedClassLoaderTest {
      * A mock reader plugin.
      * @author soir20
      */
-    public static class MockPluginThree implements MoreMcmetaMetadataReaderPlugin {
+    public static class MockPluginThree implements MoreMcmetaMetadataParserPlugin {
 
         @Override
         public String displayName() {
@@ -282,7 +282,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public MetadataReader metadataReader() {
+        public MetadataParser metadataParser() {
             return null;
         }
     }
@@ -291,7 +291,7 @@ public class AnnotatedClassLoaderTest {
      * A mock reader plugin.
      * @author soir20
      */
-    public static class MockPluginFour implements MoreMcmetaMetadataReaderPlugin {
+    public static class MockPluginFour implements MoreMcmetaMetadataParserPlugin {
 
         @Override
         public String displayName() {
@@ -304,7 +304,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public MetadataReader metadataReader() {
+        public MetadataParser metadataParser() {
             return null;
         }
     }
@@ -331,7 +331,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public MetadataParser parser() {
+        public MetadataAnalyzer analyzer() {
             return null;
         }
 
@@ -362,7 +362,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public MetadataParser parser() {
+        public MetadataAnalyzer analyzer() {
             return null;
         }
 

@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.impl.client.io.MockMetadataView;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -41,14 +41,14 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 public class TextureCacheTest {
-    private final MetadataReader MOCK_READER = (metadataLocation, metadataStream, resourceSearcher) -> Map.of(
+    private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceSearcher) -> Map.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".moremcmeta", "")
             ),
             new MockMetadataView(Collections.emptyList())
     );
-    private final ImmutableMap<String, MetadataReader> MOCK_READERS = ImmutableMap.of(".moremcmeta", MOCK_READER);
+    private final ImmutableMap<String, MetadataParser> MOCK_READERS = ImmutableMap.of(".moremcmeta", MOCK_READER);
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

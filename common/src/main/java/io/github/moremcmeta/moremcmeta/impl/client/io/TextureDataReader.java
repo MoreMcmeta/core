@@ -20,7 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
 import org.apache.commons.lang3.tuple.Triple;
@@ -48,7 +48,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
     /**
      * Creates a new reader that is aware of the given plugins, if any.
-     * @param plugins           plugins that the reader should use to parse texture data
+     * @param plugins           plugins that the reader should use to analyze texture data
      * @param imageReader       reads the image from the {@link InputStream} of texture data
      * @param blurClampApplier  applies blur and clamp to an image
      */
@@ -73,7 +73,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         I image = IMAGE_READER.read(textureStream);
         requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
 
-        List<Triple<String, ParsedMetadata, ComponentProvider>> parsedSections = new ArrayList<>();
+        List<Triple<String, AnalyzedMetadata, ComponentProvider>> analyzedSections = new ArrayList<>();
         Optional<Integer> frameWidthOptional = Optional.empty();
         Optional<Integer> frameHeightOptional = Optional.empty();
         Optional<Boolean> blurOptional = Optional.empty();
@@ -85,17 +85,17 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                 continue;
             }
 
-            ParsedMetadata sectionData;
+            AnalyzedMetadata sectionData;
             try {
-                sectionData = plugin.parser().parse(metadata, image.width(), image.height());
+                sectionData = plugin.analyzer().analyze(metadata, image.width(), image.height());
             } catch (InvalidMetadataException err) {
                 throw new InvalidMetadataException(String.format("%s marked metadata as invalid: %s",
                         plugin.displayName(), err.getMessage()), err);
             }
 
             requireNonNull(sectionData, "Plugin " + plugin.displayName()
-                    + " returned null for parsed metadata");
-            parsedSections.add(Triple.of(plugin.displayName(), sectionData, plugin.componentProvider()));
+                    + " returned null for analyzed metadata");
+            analyzedSections.add(Triple.of(plugin.displayName(), sectionData, plugin.componentProvider()));
 
             frameWidthOptional = unwrapIfCompatible(frameWidthOptional, sectionData.frameWidth(), "frame width");
             frameHeightOptional = unwrapIfCompatible(frameHeightOptional, sectionData.frameHeight(), "frame width");
@@ -134,7 +134,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                 blur,
                 clamp,
                 image,
-                parsedSections
+                analyzedSections
         );
     }
 
