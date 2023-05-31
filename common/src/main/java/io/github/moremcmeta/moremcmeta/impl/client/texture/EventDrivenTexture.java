@@ -31,10 +31,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.BiConsumer;
 
 import static java.util.Objects.requireNonNull;
@@ -391,7 +389,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final List<? extends CloseableImageFrame> PREDEFINED_FRAMES;
         private final FrameGroup<PersistentFrameView> PREDEFINED_FRAME_GROUP;
         private final CloseableImageFrame GENERATED_FRAME;
-        private final Queue<QueuedTransform> TRANSFORMS;
         private Integer currentFrameIndex;
         private Integer indexToCopyToGenerated;
         private boolean hasUpdatedSinceUpload;
@@ -409,10 +406,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
             markNeedsUpload();
             currentFrameIndex = null;
-            TRANSFORMS.add(new QueuedTransform(transform, applyArea, layer));
 
             // We may wish to delay updates later if the transforms list is optimized, but update immediately for now
-            updateGeneratedFrame();
+            updateGeneratedFrame(transform, applyArea, layer);
 
         }
 
@@ -449,9 +445,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
          */
         public void uploadAt(int x, int y, int mipmap) {
-            if (currentFrame() == GENERATED_FRAME) {
-                updateGeneratedFrame();
-            }
             currentFrame().uploadAt(x, y, mipmap);
         }
 
@@ -490,7 +483,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             PREDEFINED_FRAMES = predefinedFrames;
             PREDEFINED_FRAME_GROUP = new FrameGroupImpl<>(predefinedFrames, (frame, index) -> new PredefinedFrameView(frame));
             GENERATED_FRAME = generatedFrame;
-            TRANSFORMS = new ArrayDeque<>();
             replaceWith(0);
         }
 
@@ -509,7 +501,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             markNeedsUpload();
             currentFrameIndex = index;
             indexToCopyToGenerated = index;
-            TRANSFORMS.clear();
         }
 
         /**
@@ -529,8 +520,11 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
 
         /**
          * Applies all transformations to the generated frame.
+         * @param transform     the transformation to apply to the current frame
+         * @param applyArea     area to apply the transformation to
+         * @param layer         layer to apply the transform to
          */
-        private void updateGeneratedFrame() {
+        private void updateGeneratedFrame(ColorTransform transform, Area applyArea, int layer) {
             if (indexToCopyToGenerated != null) {
                 CloseableImageFrame copyFrame = PREDEFINED_FRAMES.get(indexToCopyToGenerated);
                 GENERATED_FRAME.copyFrom(copyFrame);
@@ -538,37 +532,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 indexToCopyToGenerated = null;
             }
 
-            while (!TRANSFORMS.isEmpty()) {
-                QueuedTransform transform = TRANSFORMS.remove();
-                GENERATED_FRAME.applyTransform(
-                        transform.TRANSFORM,
-                        transform.APPLY_AREA,
-                        transform.LAYER
-                );
-            }
-        }
-
-    }
-
-    /**
-     * Wrapper class for queued transforms.
-     * @author soir20
-     */
-    private static class QueuedTransform {
-        private final ColorTransform TRANSFORM;
-        private final Area APPLY_AREA;
-        private final int LAYER;
-
-        /**
-         * Creates a new wrapper for a queued transform.
-         * @param transform         the transform
-         * @param applyArea         apply area of the transform
-         * @param layer             layer to apply the transform to
-         */
-        public QueuedTransform(ColorTransform transform, Area applyArea, int layer) {
-            TRANSFORM = transform;
-            APPLY_AREA = applyArea;
-            LAYER = layer;
+            GENERATED_FRAME.applyTransform(transform, applyArea, layer);
         }
 
     }
