@@ -19,7 +19,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
-import io.github.moremcmeta.moremcmeta.api.client.texture.NonDependencyRequestException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
@@ -1434,7 +1433,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform(null, Area.of(), Area.of(), 0);
+        frame.applyTransform(null, Area.of(), 0);
     }
 
     @Test
@@ -1450,7 +1449,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), null, Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), null, 0);
     }
 
     @Test
@@ -1466,7 +1465,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), -1);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), -1);
     }
 
     @Test
@@ -1482,7 +1481,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), 5);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), 5);
     }
 
     @Test
@@ -1498,7 +1497,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(IllegalArgumentException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(), 128);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), 128);
     }
 
     @Test
@@ -1514,7 +1513,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(100, 50)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(100, 50)), 0);
     }
 
     @Test
@@ -1530,7 +1529,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 200)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 200)), 0);
     }
 
     @Test
@@ -1546,7 +1545,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(-1, 50)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(-1, 50)), 0);
     }
 
     @Test
@@ -1562,23 +1561,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, -1)), Area.of(), 0);
-    }
-
-    @Test
-    public void applyTransform_NullDependenciesIterable_NullPointerException() {
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(
-                        new MockCloseableImage(100, 200),
-                        new MockCloseableImage(50, 100),
-                        new MockCloseableImage(25, 50)
-                ),
-                1
-        );
-
-        expectedException.expect(NullPointerException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), null, 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, -1)), 0);
     }
 
     @Test
@@ -1594,7 +1577,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(100, 50)), 0);
+        frame.applyTransform((x, y, depFunction) -> depFunction.color(100, 50), Area.of(Point.pack(50, 50)), 0);
     }
 
     @Test
@@ -1610,7 +1593,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 200)), 0);
+        frame.applyTransform((x, y, depFunction) -> depFunction.color(50, 200), Area.of(Point.pack(50, 50)), 0);
     }
 
     @Test
@@ -1626,7 +1609,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(-1, 50)), 0);
+        frame.applyTransform((x, y, depFunction) -> depFunction.color(-1, 50), Area.of(Point.pack(50, 50)), 0);
     }
 
     @Test
@@ -1642,49 +1625,7 @@ public class CloseableImageFrameTest {
         );
 
         expectedException.expect(PixelOutOfBoundsException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, -1)), 0);
-    }
-
-    @Test
-    public void applyTransform_DependencyPointNotRequested_NonDependencyException() {
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 0, 0),
-                ImmutableList.of(
-                        new MockCloseableImage(100, 200),
-                        new MockCloseableImage(50, 100),
-                        new MockCloseableImage(25, 50)
-                ),
-                1
-        );
-
-        expectedException.expect(NonDependencyRequestException.class);
-        frame.applyTransform((x, y, depFunction) -> {
-            depFunction.color(50, 50);
-            return Color.pack(100, 100, 100, 100);
-        }, Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 100)), 0);
-    }
-
-    @Test
-    public void applyTransform_DependencyPointRequested_DependencyRetrieved() {
-        ImmutableList<MockCloseableImage> images = ImmutableList.of(
-                new MockCloseableImage(100, 200),
-                new MockCloseableImage(50, 100),
-                new MockCloseableImage(25, 50)
-        );
-        images.get(0).setColor(50, 50, Color.pack(200, 200, 200, 200));
-
-        CloseableImageFrame frame = new CloseableImageFrame(
-                new FrameReader.FrameData(100, 200, 0, 0),
-                images,
-                1
-        );
-
-        frame.applyTransform(
-                (x, y, depFunction) -> depFunction.color(50, 50) / 2,
-                Area.of(Point.pack(50, 50)),
-                Area.of(Point.pack(50, 50)),
-                0
-        );
+        frame.applyTransform((x, y, depFunction) -> depFunction.color(50, -1), Area.of(Point.pack(50, 50)), 0);
     }
 
     @Test
@@ -1710,7 +1651,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
-                Area.of(),
                 0
         );
 
@@ -1755,7 +1695,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
-                Area.of(),
                 0
         );
 
@@ -1799,7 +1738,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
-                Area.of(),
                 0
         );
 
@@ -1857,7 +1795,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
-                Area.of(),
                 0
         );
 
@@ -1914,7 +1851,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
                 Area.of(pointToColor.keySet()),
-                Area.of(),
                 0
         );
 
@@ -1957,7 +1893,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 2
         );
 
@@ -1966,7 +1901,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 0
         );
 
@@ -1993,7 +1927,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 2
         );
 
@@ -2002,7 +1935,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 2
         );
 
@@ -2029,7 +1961,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 2
         );
 
@@ -2038,7 +1969,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 2
         );
 
@@ -2067,7 +1997,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 1
         );
 
@@ -2076,7 +2005,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 0
         );
 
@@ -2103,7 +2031,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 1
         );
 
@@ -2112,7 +2039,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 1
         );
 
@@ -2139,7 +2065,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 1
         );
 
@@ -2148,7 +2073,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 2
         );
 
@@ -2175,7 +2099,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 0
         );
 
@@ -2184,11 +2107,10 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 0
         );
 
-        assertEquals(796332458, images.get(0).color(48, 101));
+        assertEquals(450605672, images.get(0).color(48, 101));
     }
 
     @Test
@@ -2211,7 +2133,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 0
         );
 
@@ -2220,7 +2141,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 1
         );
 
@@ -2247,7 +2167,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 103)),
-                Area.of(),
                 0
         );
 
@@ -2256,7 +2175,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> depFunction.color(48, 103),
                 Area.of(Point.pack(48, 101)),
-                Area.of(Point.pack(48, 103)),
                 2
         );
 
@@ -2282,7 +2200,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 2
         );
 
@@ -2291,7 +2208,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 0
         );
 
@@ -2317,7 +2233,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 2
         );
 
@@ -2326,7 +2241,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 1
         );
 
@@ -2352,7 +2266,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 2
         );
 
@@ -2361,7 +2274,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 2
         );
 
@@ -2387,7 +2299,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 1
         );
 
@@ -2396,7 +2307,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 0
         );
 
@@ -2422,7 +2332,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 1
         );
 
@@ -2431,7 +2340,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 1
         );
 
@@ -2457,7 +2365,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 1
         );
 
@@ -2466,7 +2373,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 2
         );
 
@@ -2492,7 +2398,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 0
         );
 
@@ -2501,7 +2406,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 0
         );
 
@@ -2527,7 +2431,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 0
         );
 
@@ -2536,7 +2439,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 1
         );
 
@@ -2562,7 +2464,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 796332458,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 0
         );
 
@@ -2571,7 +2472,6 @@ public class CloseableImageFrameTest {
         frame.applyTransform(
                 (x, y, depFunction) -> 450605672,
                 Area.of(Point.pack(48, 101)),
-                Area.of(),
                 2
         );
 
@@ -2593,7 +2493,7 @@ public class CloseableImageFrameTest {
         frame.close();
 
         expectedException.expect(IllegalStateException.class);
-        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 100)), Area.of(), 0);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 100)), 0);
     }
 
     @Test

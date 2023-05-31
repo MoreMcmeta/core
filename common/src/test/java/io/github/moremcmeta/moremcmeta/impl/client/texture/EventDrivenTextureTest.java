@@ -22,7 +22,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointException;
-import io.github.moremcmeta.moremcmeta.api.client.texture.NonDependencyRequestException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
@@ -122,7 +121,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {
-                currentFrame.generateWith((x, y, depFunction) -> 0, Area.of(), Area.of());
+                currentFrame.generateWith((x, y, depFunction) -> 0, Area.of());
                 currentFrame.upload(0, 0, 0);
             }
         });
@@ -379,8 +378,7 @@ public class EventDrivenTextureTest {
                 currentFrame.generateWith(
                         (x, y, dependencies) -> predefinedFrames.frame(1)
                                 .color(x, y),
-                        Area.of(Point.pack(0, 0)),
-                        Area.of()
+                        Area.of(Point.pack(0, 0))
                 );
             }
 
@@ -478,7 +476,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith(null, Area.of(Point.pack(0, 0)), Area.of());
+                currentFrame.generateWith(null, Area.of(Point.pack(0, 0)));
             }
         });
 
@@ -496,7 +494,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), null, Area.of());
+                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), null);
             }
         });
 
@@ -514,7 +512,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(), Area.of());
+                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of());
             }
 
             @Override
@@ -555,31 +553,12 @@ public class EventDrivenTextureTest {
     }
 
     @Test
-    public void generate_NullDependencies_NullPointerException() {
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new CoreTextureComponent() {
-            @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), null);
-                currentFrame.upload(0, 0, 0);
-            }
-        });
-
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
-        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
-        EventDrivenTexture texture = builder.build();
-
-        expectedException.expect(NullPointerException.class);
-        texture.tick();
-    }
-
-    @Test
     public void generate_NegativeXDependencyPoint_ExceptionFromImage() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(-1, 50)));
+                currentFrame.generateWith((x, y, depFunction) -> depFunction.color(-1, 50), Area.of(Point.pack(50, 50)));
                 currentFrame.upload(0, 0, 0);
             }
         });
@@ -598,7 +577,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, -1)));
+                currentFrame.generateWith((x, y, depFunction) -> depFunction.color(50, -1), Area.of(Point.pack(50, 50)));
                 currentFrame.upload(0, 0, 0);
             }
         });
@@ -617,7 +596,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(100, 50)));
+                currentFrame.generateWith((x, y, depFunction) -> depFunction.color(100, 50), Area.of(Point.pack(50, 50)));
                 currentFrame.upload(0, 0, 0);
             }
         });
@@ -636,7 +615,7 @@ public class EventDrivenTextureTest {
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 100)));
+                currentFrame.generateWith((x, y, depFunction) -> depFunction.color(50, 100), Area.of(Point.pack(50, 50)));
                 currentFrame.upload(0, 0, 0);
             }
         });
@@ -650,37 +629,18 @@ public class EventDrivenTextureTest {
     }
 
     @Test
-    public void generate_NonRequestedDependencyPoint_NonDependencyRequestException() {
+    public void generate_ValidDependencyPoint_NoException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CoreTextureComponent() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> depFunction.color(25, 25), Area.of(Point.pack(50, 50)), Area.of(Point.pack(25, 50)));
-                currentFrame.upload(0, 0, 0);
-            }
-        });
-
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
-        builder.setGeneratedFrame(new MockCloseableImageFrame(1));
-        EventDrivenTexture texture = builder.build();
-
-        expectedException.expect(NonDependencyRequestException.class);
-        texture.tick();
-    }
-
-    @Test
-    public void generate_RequestedDependencyPoint_NoException() {
-        EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new CoreTextureComponent() {
-            @Override
-            public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
-                currentFrame.generateWith((x, y, depFunction) -> depFunction.color(25, 50), Area.of(Point.pack(50, 50)), Area.of(Point.pack(25, 50)));
+                currentFrame.generateWith((x, y, depFunction) -> depFunction.color(25, 50), Area.of(Point.pack(50, 50)));
                 currentFrame.upload(0, 0, 0);
             }
         });
 
         List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
-        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(25, 50)), Area.of(), 0);
+        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(25, 50)), 0);
 
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
@@ -698,8 +658,7 @@ public class EventDrivenTextureTest {
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y, depFunction) -> Color.pack(100, 100, 100, 100),
-                        Area.of(Point.pack(1, 0), Point.pack(1, 1)),
-                        Area.of()
+                        Area.of(Point.pack(1, 0), Point.pack(1, 1))
                 );
             }
 
@@ -748,8 +707,7 @@ public class EventDrivenTextureTest {
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y, depFunction) -> Color.pack(100, 100, 100, 100),
-                        Area.of(Point.pack(1, 0), Point.pack(1, 1)),
-                        Area.of()
+                        Area.of(Point.pack(1, 0), Point.pack(1, 1))
                 );
             }
 
@@ -793,8 +751,7 @@ public class EventDrivenTextureTest {
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y, depFunction) -> Color.pack(100, 100, 100, 100),
-                        Area.of(Point.pack(1, 0), Point.pack(1, 1)),
-                        Area.of()
+                        Area.of(Point.pack(1, 0), Point.pack(1, 1))
                 );
             }
 
@@ -808,8 +765,7 @@ public class EventDrivenTextureTest {
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
                 currentFrame.generateWith(
                         (x, y, depFunction) -> Color.pack(200, 200, 200, 200),
-                        Area.of(Point.pack(0, 0), Point.pack(1, 1)),
-                        Area.of()
+                        Area.of(Point.pack(0, 0), Point.pack(1, 1))
                 );
             }
         });
@@ -853,7 +809,7 @@ public class EventDrivenTextureTest {
 
             @Override
             public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {
-                view.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(0, 0)), Area.of());
+                view.generateWith((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(0, 0)));
                 currentFrame.upload(0, 0, 0);
             }
         });
@@ -884,7 +840,7 @@ public class EventDrivenTextureTest {
         });
 
         List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
-        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), Area.of(), 0);
+        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
@@ -930,7 +886,7 @@ public class EventDrivenTextureTest {
         });
 
         List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
-        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), Area.of(), 0);
+        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
@@ -977,7 +933,7 @@ public class EventDrivenTextureTest {
         });
 
         List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
-        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), Area.of(), 0);
+        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
@@ -1017,7 +973,7 @@ public class EventDrivenTextureTest {
     public void upload_NullBase_NullPointerException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
-        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), Area.of(), 0);
+        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
@@ -1037,7 +993,7 @@ public class EventDrivenTextureTest {
         });
 
         List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
-        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), Area.of(), 0);
+        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
@@ -1057,7 +1013,7 @@ public class EventDrivenTextureTest {
         });
 
         List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
-        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), Area.of(), 0);
+        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
@@ -1077,7 +1033,7 @@ public class EventDrivenTextureTest {
         });
 
         List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
-        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), Area.of(), 0);
+        frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();

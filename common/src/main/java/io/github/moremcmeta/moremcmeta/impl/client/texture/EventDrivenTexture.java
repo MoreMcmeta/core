@@ -287,9 +287,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private boolean valid;
 
         @Override
-        public void generateWith(ColorTransform transform, Area applyArea, Area dependencies) {
+        public void generateWith(ColorTransform transform, Area applyArea) {
             checkValid();
-            STATE.generateWith(transform, applyArea, dependencies, LAYER);
+            STATE.generateWith(transform, applyArea, LAYER);
         }
 
         @Override
@@ -401,17 +401,15 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * a new frame, which will become the current frame.
          * @param transform     the transformation to apply to the current frame
          * @param applyArea     area to apply the transformation to
-         * @param dependencies  the points whose current colors this transformation depends on
          * @param layer         layer to apply the transform to
          */
-        public void generateWith(ColorTransform transform, Area applyArea, Area dependencies, int layer) {
+        public void generateWith(ColorTransform transform, Area applyArea, int layer) {
             requireNonNull(transform, "Frame transform cannot be null");
             requireNonNull(applyArea, "Apply area cannot be null");
-            requireNonNull(dependencies, "Dependencies cannot be null");
 
             markNeedsUpload();
             currentFrameIndex = null;
-            TRANSFORMS.add(new QueuedTransform(transform, applyArea, dependencies, layer));
+            TRANSFORMS.add(new QueuedTransform(transform, applyArea, layer));
 
             // We may wish to delay updates later if the transforms list is optimized, but update immediately for now
             updateGeneratedFrame();
@@ -545,7 +543,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                 GENERATED_FRAME.applyTransform(
                         transform.TRANSFORM,
                         transform.APPLY_AREA,
-                        transform.DEPENDENCIES,
                         transform.LAYER
                 );
             }
@@ -560,20 +557,17 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     private static class QueuedTransform {
         private final ColorTransform TRANSFORM;
         private final Area APPLY_AREA;
-        private final Area DEPENDENCIES;
         private final int LAYER;
 
         /**
          * Creates a new wrapper for a queued transform.
          * @param transform         the transform
          * @param applyArea         apply area of the transform
-         * @param dependencies      dependencies of the transform
          * @param layer             layer to apply the transform to
          */
-        public QueuedTransform(ColorTransform transform, Area applyArea, Area dependencies, int layer) {
+        public QueuedTransform(ColorTransform transform, Area applyArea, int layer) {
             TRANSFORM = transform;
             APPLY_AREA = applyArea;
-            DEPENDENCIES = dependencies;
             LAYER = layer;
         }
 

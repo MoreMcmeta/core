@@ -25,7 +25,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameIndexOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
-import io.github.moremcmeta.moremcmeta.api.client.texture.NonDependencyRequestException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
@@ -451,7 +450,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform(null, Area.of(Point.pack(0, 0)), Area.of());
+                    frames.frame(0).transform(null, Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -477,33 +476,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, null, Area.of());
-                    return new TextureComponent<>() {};
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_NullDependencyList_NullPointerException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        expectedException.expect(NullPointerException.class);
-        assembler.assemble(new TextureData<>(
-                new TextureData.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(), null);
+                    frames.frame(0).transform((x, y, depFunction) -> 100, null);
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -529,7 +502,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(-1, 0)), Area.of());
+                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(-1, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -555,7 +528,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, -1)), Area.of());
+                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, -1)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -581,7 +554,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(30, 0)), Area.of());
+                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(30, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -607,7 +580,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 40)), Area.of());
+                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 40)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -632,7 +605,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0), Point.pack(20, 25)), Area.of());
+                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0), Point.pack(20, 25)));
                     return new TextureComponent<>() {};
                 }))
         ))).build();
@@ -665,7 +638,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0)), Area.of(Point.pack(-1, 0)));
+                    frames.frame(0).transform((x, y, depFunction) -> depFunction.color(-1, 0), Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -691,7 +664,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0)), Area.of(Point.pack(0, -1)));
+                    frames.frame(0).transform((x, y, depFunction) -> depFunction.color(0, -1), Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -717,7 +690,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0)), Area.of(Point.pack(30, 0)));
+                    frames.frame(0).transform((x, y, depFunction) -> depFunction.color(30, 0), Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -743,33 +716,7 @@ public class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0)), Area.of(Point.pack(0, 40)));
-                    return new TextureComponent<>() {};
-                }))
-        )).build();
-    }
-
-    @Test
-    public void assemble_NonDependencyPointRequested_NonDependencyRequestException() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        expectedException.expect(NonDependencyRequestException.class);
-        assembler.assemble(new TextureData<>(
-                new TextureData.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
-                    frames.frame(0).transform((x, y, depFunction) -> depFunction.color(25, 0), Area.of(Point.pack(0, 0)), Area.of(Point.pack(0, 25)));
+                    frames.frame(0).transform((x, y, depFunction) -> depFunction.color(0, 40), Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
         )).build();
@@ -797,8 +744,7 @@ public class TextureDataAssemblerTest {
                 List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform(
                             (x, y, depFunction) -> depFunction.color(25, 30),
-                            Area.of(Point.pack(0, 0), Point.pack(20, 25)), 
-                            Area.of(Point.pack(25, 30))
+                            Area.of(Point.pack(0, 0), Point.pack(20, 25))
                     );
                     return new TextureComponent<>() {};
                 }))
@@ -839,7 +785,7 @@ public class TextureDataAssemblerTest {
         ))).build();
 
         expectedException.expect(IllegalFrameReferenceException.class);
-        frameView[0].transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0)), Area.of());
+        frameView[0].transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0)));
     }
 
     @Test

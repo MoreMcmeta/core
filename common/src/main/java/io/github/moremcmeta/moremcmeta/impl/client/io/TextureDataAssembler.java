@@ -250,9 +250,9 @@ public class TextureDataAssembler<I extends CloseableImage> {
         }
 
         @Override
-        public void transform(ColorTransform transform, Area applyArea, Area dependencies) {
+        public void transform(ColorTransform transform, Area applyArea) {
             checkValid();
-            FRAME.applyTransform(transform, applyArea, dependencies, LAYER);
+            FRAME.applyTransform(transform, applyArea, LAYER);
         }
 
         /**

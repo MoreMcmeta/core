@@ -122,8 +122,7 @@ public class UploadComponentTest {
                 currentFrame.generateWith(
                         (x, y, dependencies) -> predefinedFrames.frame(ticks.incrementAndGet() % predefinedFrames.frames())
                                 .color(x, y),
-                        Area.of(Point.pack(0, 0)),
-                        Area.of()
+                        Area.of(Point.pack(0, 0))
                 );
 
             }

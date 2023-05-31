@@ -32,30 +32,29 @@ public interface ColorTransform {
      * provided.
      * @param overwriteX            x-coordinate of the location of the pixel whose color will be replaced
      * @param overwriteY            y-coordinate of the location of the pixel whose color will be replaced
-     * @param dependencyFunction    function to retrieve the color of a dependency. If a point
-     *                              not given as a dependency when this transform was applied is
-     *                              requested, it will throw a {@link NonDependencyRequestException}.
-     *                              The colors returned will be those before the associated transformation
-     *                              was applied to any points.
+     * @param layerBelow            retrieves the color of pixels in the layer below this plugin's layer.
+     *                              Use this to write plugins that compute colors as a function of the
+     *                              previous layers (say, grayscale filter that respects animations below).
+     *                              If this plugin is the first one to be applied, then the layer below is
+     *                              the original image.
      * @return the new color of the pixel at (x, y) in the format
      */
-    int transform(int overwriteX, int overwriteY, DependencyFunction dependencyFunction);
+    int transform(int overwriteX, int overwriteY, LayerBelow layerBelow);
 
     /**
-     * Function that retrieves a color at the given point,
+     * In a frame, the layer below this plugin's layer.
+     * @author soir20
+     * @since 4.0.0
      */
-    interface DependencyFunction {
+    interface LayerBelow {
 
         /**
-         * Retrieves the color of the pixel at the given point, assuming that point was requested
-         * as a dependency.
+         * Retrieves the color of the pixel at the given point.
          * @param x     x-coordinate of the pixel to retrieve the color of
          * @param y     y-coordinate of the pixel to retrieve the color of
          * @return the color at the given point
-         * @throws NonDependencyRequestException if a point not given as a dependency when this transform
-         *                                       was applied
          */
-        int color(int x, int y) throws NonDependencyRequestException;
+        int color(int x, int y);
 
     }
 

@@ -31,16 +31,13 @@ public interface CurrentFrameView extends FrameView {
     /**
      * Generates a frame from the current frame by applying the given {@link ColorTransform} over
      * the given area. The current frame may be a predefined frame or a generated frame. Predefined
-     * frames are never modified. There is no ordering guaranteed for how the transform will be applied.
-     * To calculate new point colors based on the current colors, specify those points as
-     * dependencies.
+     * frames are never modified. There is no ordering guaranteed for how the transform will be applied
+     * over the provided points.
      * @param transform     the transformation to apply to the given points
      * @param applyArea     the points to apply the transformation to
-     * @param dependencies  the points whose current colors this transformation depends on
-     * @throws PixelOutOfBoundsException if a pixel
-     *         in `applyArea` or `dependencies` is out of the frame's bounds
+     * @throws PixelOutOfBoundsException if a pixel in `applyArea` is out of the frame's bounds
      * @throws IllegalFrameReferenceException if this view is no longer valid
      */
-    void generateWith(ColorTransform transform, Area applyArea, Area dependencies);
+    void generateWith(ColorTransform transform, Area applyArea);
 
 }

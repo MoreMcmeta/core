@@ -19,14 +19,11 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
-import io.github.moremcmeta.moremcmeta.api.client.texture.NonDependencyRequestException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.adt.SparseIntMatrix;
 import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
-import it.unimi.dsi.fastutil.longs.Long2IntMap;
-import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
 import it.unimi.dsi.fastutil.longs.LongPriorityQueue;
 
@@ -98,9 +95,8 @@ public class CloseableImageFrame {
             TOP_LAYER.setBottomLayer(bottomLayer);
 
             Layer lastLayer = bottomLayer;
-            layerBuilder.add(lastLayer);
 
-            for (byte layerIndex = 1; layerIndex < layers - 1; layerIndex++) {
+            for (byte layerIndex = 0; layerIndex < layers - 1; layerIndex++) {
                 lastLayer = new MiddleLayer(TOP_LAYER, lastLayer, WIDTH, HEIGHT, layerIndex);
                 layerBuilder.add(lastLayer);
             }
@@ -247,18 +243,14 @@ public class CloseableImageFrame {
      * bounds.
      * @param transform     transform to apply
      * @param applyArea     area to apply the transformation to
-     * @param dependencies  points whose colors the given transform is dependent on
      * @param layer         the index of the layer to apply the transformation to
      * @throws IllegalStateException if this frame has been closed
-     * @throws NonDependencyRequestException if the previous color of a point that
-     *                                                     is not a dependency is requested
      */
-    public void applyTransform(ColorTransform transform, Area applyArea, Area dependencies, int layer) {
+    public void applyTransform(ColorTransform transform, Area applyArea, int layer) {
         checkOpen();
 
         requireNonNull(transform, "Transform cannot be null");
         requireNonNull(applyArea, "Apply area cannot be null");
-        requireNonNull(dependencies, "Dependencies cannot be null");
 
         if (layer < 0) {
             throw new IllegalArgumentException(String.format("Layer index cannot be negative: %s", layer));
@@ -272,14 +264,6 @@ public class CloseableImageFrame {
         }
 
         Layer layerBelow = layerBelow(layer);
-        Long2IntMap previousColors = new Long2IntOpenHashMap();
-        dependencies.forEach((point) -> {
-            int x = Point.x(point);
-            int y = Point.y(point);
-            checkPointInBounds(x, y);
-
-            previousColors.put(point, layerBelow.read(x, y));
-        });
 
         // Apply transformation to the original image
         Layer thisLayer = layer == TOP_LAYER_INDEX ? TOP_LAYER : LOWER_LAYERS.get(layer);
@@ -288,12 +272,10 @@ public class CloseableImageFrame {
             int y = Point.y(point);
             checkPointInBounds(x, y);
 
-            int newColor = transform.transform(
-                    x,
-                    y,
-                    (depX, depY) -> colorIfDependency(Point.pack(depX, depY), previousColors)
-            );
-
+            int newColor = transform.transform(x, y, (depX, depY) -> {
+                checkPointInBounds(depX, depY);
+                return layerBelow.read(depX, depY);
+            });
             thisLayer.write(x, y, newColor);
         });
 
@@ -374,7 +356,7 @@ public class CloseableImageFrame {
         }
 
         if (layer == 0) {
-            return LOWER_LAYERS.get(0);
+            return TOP_LAYER.bottomLayer;
         }
 
         return LOWER_LAYERS.get(layer - 1);
@@ -390,23 +372,6 @@ public class CloseableImageFrame {
         if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
             throw new PixelOutOfBoundsException(x, y);
         }
-    }
-
-    /**
-     * Retrieves the current color of a point that a transform depends on, or throws an
-     * exception if the transform did not request the point as a dependency.
-     * @param requestedPoint        point the transform requested
-     * @param dependencies          all the transform's dependencies and their current colors
-     * @return the color of the requested point
-     * @throws NonDependencyRequestException if the point is not a dependency
-     *                                                     of the transform
-     */
-    private int colorIfDependency(long requestedPoint, Long2IntMap dependencies) {
-        if (!dependencies.containsKey(requestedPoint)) {
-            throw new NonDependencyRequestException();
-        }
-
-        return dependencies.get(requestedPoint);
     }
 
     /**
@@ -610,9 +575,8 @@ public class CloseableImageFrame {
                   illusion that nothing has changed in the lower layers.
 
                3. The top layer is written to after the bottom layer has been written to (at the
-                  particular point). Either the bottom layer is storing the original color (case 2),
-                  or the original color has been overwritten at the bottom layer and is therefore
-                  irrelevant. Hence, we don't need to write the original color to the bottom layer. */
+                  particular point). Then the bottom layer is storing the original color (case 2).
+                  Hence, we don't need to write the original color to the bottom layer. */
             if (bottomLayer != null) {
                 bottomLayer.tryWrite(x, y, read(x, y));
             }
