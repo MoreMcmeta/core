@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the default methods of the {@link ParsedMetadata} class and {@link .ParsedMetadata.FrameSize}.
@@ -50,11 +49,6 @@ public class ParsedMetadataTest {
     @Test
     public void clamp_NotOverridden_Empty() {
         assertFalse((new ParsedMetadata() {}).clamp().isPresent());
-    }
-
-    @Test
-    public void bases_NotOverridden_Empty() {
-        assertTrue((new ParsedMetadata() {}).bases().isEmpty());
     }
 
 }

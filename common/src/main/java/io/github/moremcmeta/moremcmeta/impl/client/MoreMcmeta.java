@@ -25,7 +25,6 @@ import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.ClientPlugin;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataReaderPlugin;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataReader;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.AtlasAdapter;
@@ -560,8 +559,7 @@ public abstract class MoreMcmeta {
         Optional<ReloadInstance> reloadInstance = reloadInstance(overlay.get(), logger);
         reloadInstance.ifPresent((instance) -> instance.done().thenRun(() -> {
             textures.forEach((location, builder) -> {
-                Collection<Base> metadataBases = METADATA_REGISTRY.bases(location);
-                BaseCollection allBases = BaseCollection.find(spriteFinder, metadataBases, location);
+                BaseCollection allBases = BaseCollection.find(spriteFinder, location);
 
                 allBases.baseNames().forEach((base) ->
                         dependencies.computeIfAbsent(base, (loc) -> new ImmutableSet.Builder<>())

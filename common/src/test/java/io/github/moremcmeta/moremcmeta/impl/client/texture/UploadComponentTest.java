@@ -17,8 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
-import com.google.common.collect.ImmutableList;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
@@ -45,7 +43,6 @@ public class UploadComponentTest {
             new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.of(
                     new MockSprite(new ResourceLocation("dummy"), Point.pack(0, 0), 1)
             )),
-            ImmutableList.of(new Base(DUMMY_LOCATION, Point.pack(2, 3))),
             DUMMY_LOCATION
     );
 
@@ -76,7 +73,7 @@ public class UploadComponentTest {
 
         texture.upload(DUMMY_LOCATION);
 
-        assertEquals(2, frame.uploadCount());
+        assertEquals(1, frame.uploadCount());
     }
 
     @Test
@@ -92,7 +89,7 @@ public class UploadComponentTest {
         texture.upload(DUMMY_LOCATION);
         texture.upload(DUMMY_LOCATION);
 
-        assertEquals(2, frame.uploadCount());
+        assertEquals(1, frame.uploadCount());
     }
 
     @Test

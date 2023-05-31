@@ -21,11 +21,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,29 +45,22 @@ public class BaseCollection {
      * Finds all bases associated with the given texture. Duplicates (where both the base
      * and the mipmap level are the same) are combined.
      * @param spriteFinder      checks if a texture is a sprite stitched onto an atlas
-     * @param knownBases        all already-known bases as defined in metadata
      * @param textureLocation   location of the texture whose bases to retrieve
      * @return all bases associated with the texture at the given location
      */
-    public static BaseCollection find(SpriteFinder spriteFinder, Collection<Base> knownBases,
-                                      ResourceLocation textureLocation) {
+    public static BaseCollection find(SpriteFinder spriteFinder, ResourceLocation textureLocation) {
         requireNonNull(spriteFinder, "Sprite finder cannot be null");
-        requireNonNull(knownBases, "Known bases cannot be null");
         requireNonNull(textureLocation, "Texture location cannot be null");
 
         Map<ResourceLocation, Collection<MipmappedBase>> newBases = new HashMap<>();
 
-        // Always add the provided texture as its own base
-        knownBases = new ArrayList<>(knownBases);
-        knownBases.add(new Base(textureLocation, EventDrivenTexture.SELF_UPLOAD_POINT));
+        baseSet(newBases, textureLocation).add(
+                new MipmappedBase(EventDrivenTexture.SELF_UPLOAD_POINT, EventDrivenTexture.SELF_MIPMAP_LEVEL)
+        );
 
-        for (Base base : knownBases) {
-            baseSet(newBases, base.baseLocation()).add(makeNonSpriteBase(base));
-
-            findSpriteBase(spriteFinder, base).ifPresent(
-                    (pair) -> baseSet(newBases, pair.getFirst().atlas()).add(pair.getSecond())
-            );
-        }
+        findSpriteBase(spriteFinder, textureLocation, EventDrivenTexture.SELF_UPLOAD_POINT).ifPresent(
+                (pair) -> baseSet(newBases, pair.getFirst().atlas()).add(pair.getSecond())
+        );
 
         return new BaseCollection(newBases);
     }
@@ -89,29 +80,15 @@ public class BaseCollection {
     }
 
     /**
-     * Creates a base for a non-sprite texture.
-     * @param base      base to convert to a base with mipmap
-     * @return base with mipmap for a non-sprite texture
-     */
-    private static MipmappedBase makeNonSpriteBase(Base base) {
-        return new MipmappedBase(
-                base.uploadPoint(),
-
-                // No way to determine mipmap level for an arbitrary texture, so assume it is the default mipmap level
-                EventDrivenTexture.SELF_MIPMAP_LEVEL
-
-        );
-    }
-
-    /**
-     * Finds a {@link MipmappedBase} if the given {@link Base} is associated with a sprite.
+     * Finds a {@link MipmappedBase} if the given base is associated with a sprite.
      * @param spriteFinder      finds sprites stitched to atlases
-     * @param base              base to find
+     * @param baseLocation      location of the base to find
+     * @param uploadPoint       upload point of the base
      * @return if the base is associated with a sprite, the sprite and the {@link MipmappedBase}
      */
-    private static Optional<Pair<Sprite, MipmappedBase>> findSpriteBase(SpriteFinder spriteFinder, Base base) {
-        ResourceLocation baseLocation = base.baseLocation();
-
+    private static Optional<Pair<Sprite, MipmappedBase>> findSpriteBase(
+            SpriteFinder spriteFinder, ResourceLocation baseLocation,
+            @SuppressWarnings("SameParameterValue") long uploadPoint) {
         Optional<Sprite> spriteOptional = spriteFinder.findSprite(baseLocation);
         if (spriteOptional.isEmpty()) {
             return Optional.empty();
@@ -119,8 +96,8 @@ public class BaseCollection {
 
         Sprite sprite = spriteOptional.get();
         long uploadPointInSprite = Point.pack(
-                Point.x(base.uploadPoint()) + Point.x(sprite.uploadPoint()),
-                Point.y(base.uploadPoint()) + Point.y(sprite.uploadPoint())
+                Point.x(uploadPoint) + Point.x(sprite.uploadPoint()),
+                Point.y(uploadPoint) + Point.y(sprite.uploadPoint())
         );
 
         return Optional.of(

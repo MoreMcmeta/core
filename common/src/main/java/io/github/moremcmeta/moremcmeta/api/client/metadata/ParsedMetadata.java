@@ -17,9 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.metadata;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -73,14 +70,6 @@ public interface ParsedMetadata {
      */
     default Optional<Boolean> clamp() {
         return Optional.empty();
-    }
-
-    /**
-     * Gets all {@link Base}s read from the metadata.
-     * @return all {@link Base}s read from the metadata
-     */
-    default Collection<Base> bases() {
-        return ImmutableList.of();
     }
 
 }
