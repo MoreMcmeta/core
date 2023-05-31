@@ -17,7 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -76,7 +76,7 @@ public class MockCloseableImage implements CloseableImage {
         y += Y_OFFSET;
 
         if (x >= width() || x < 0 || y >= height() || y < 0) {
-            throw new FrameView.PixelOutOfBoundsException(x, y);
+            throw new PixelOutOfBoundsException(x, y);
         }
 
         return PIXELS[x][y];
@@ -92,7 +92,7 @@ public class MockCloseableImage implements CloseableImage {
         y += Y_OFFSET;
 
         if (x >= width() || x < 0 || y >= height() || y < 0) {
-            throw new FrameView.PixelOutOfBoundsException(x, y);
+            throw new PixelOutOfBoundsException(x, y);
         }
 
         PIXELS[x][y] = color;

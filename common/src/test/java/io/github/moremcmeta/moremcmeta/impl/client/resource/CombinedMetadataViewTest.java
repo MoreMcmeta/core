@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.CombinedMetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.NegativeKeyIndexException;
 import io.github.moremcmeta.moremcmeta.impl.client.io.MockMetadataView;
 import org.junit.Rule;
 import org.junit.Test;
@@ -186,7 +187,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void hasKey_IndexNegative_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         assertFalse(view.hasKey(-1));
     }
 
@@ -211,7 +212,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void stringValue_NegativeIndex_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         view.stringValue(-1);
     }
 
@@ -254,7 +255,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void integerValue_NegativeIndex_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         view.integerValue(-1);
     }
 
@@ -297,7 +298,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void longValue_NegativeIndex_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         view.longValue(-1);
     }
 
@@ -340,7 +341,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void floatValue_NegativeIndex_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         view.floatValue(-1);
     }
 
@@ -383,7 +384,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void doubleValue_NegativeIndex_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         view.doubleValue(-1);
     }
 
@@ -426,7 +427,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void booleanValue_NegativeIndex_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         view.booleanValue(-1);
     }
 
@@ -469,7 +470,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void subView_NegativeIndex_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         view.subView(-1);
     }
 
@@ -512,7 +513,7 @@ public class CombinedMetadataViewTest {
     @Test
     public void streamValue_NegativeIndex_NegativeIndexException() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         view.byteStreamValue(-1);
     }
 

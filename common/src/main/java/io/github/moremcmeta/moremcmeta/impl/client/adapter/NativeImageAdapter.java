@@ -19,7 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -251,7 +251,7 @@ public class NativeImageAdapter implements CloseableImage {
      */
     private void checkInBounds(int x, int y) {
         if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
-            throw new FrameView.PixelOutOfBoundsException(x, y);
+            throw new PixelOutOfBoundsException(x, y);
         }
     }
 

@@ -19,8 +19,8 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.NonDependencyRequestException;
+import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
@@ -246,7 +246,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.color(100, 45);
     }
 
@@ -258,7 +258,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.color(-10, 45);
     }
 
@@ -270,7 +270,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.color(45, 200);
     }
 
@@ -282,7 +282,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.color(45, -10);
     }
 
@@ -1513,7 +1513,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(100, 50)), Area.of(), 0);
     }
 
@@ -1529,7 +1529,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 200)), Area.of(), 0);
     }
 
@@ -1545,7 +1545,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(-1, 50)), Area.of(), 0);
     }
 
@@ -1561,7 +1561,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, -1)), Area.of(), 0);
     }
 
@@ -1593,7 +1593,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(100, 50)), 0);
     }
 
@@ -1609,7 +1609,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, 200)), 0);
     }
 
@@ -1625,7 +1625,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(-1, 50)), 0);
     }
 
@@ -1641,7 +1641,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(50, 50)), Area.of(Point.pack(50, -1)), 0);
     }
 
@@ -1657,7 +1657,7 @@ public class CloseableImageFrameTest {
                 1
         );
 
-        expectedException.expect(ColorTransform.NonDependencyRequestException.class);
+        expectedException.expect(NonDependencyRequestException.class);
         frame.applyTransform((x, y, depFunction) -> {
             depFunction.color(50, 50);
             return Color.pack(100, 100, 100, 100);

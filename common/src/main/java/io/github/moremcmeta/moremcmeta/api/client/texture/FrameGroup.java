@@ -29,7 +29,7 @@ public interface FrameGroup<F extends FrameView> extends Iterable<F> {
      * Gets a frame in this group by its index.
      * @param index     index of the frame to retrieve
      * @return the frame at this index in the group
-     * @throws FrameView.FrameIndexOutOfBoundsException if the provided index is outside
+     * @throws FrameIndexOutOfBoundsException if the provided index is outside
      *                                                  the range of legal frame indices
      */
     F frame(int index);

@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.FrameIndexOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,7 +78,7 @@ public class FrameGroupImplTest {
         FrameGroup<PredefinedFrameView> frames =
                 new FrameGroupImpl<>(List.of(new MockCloseableImageFrame(1)), (frame, index) -> new PredefinedFrameView(frame));
 
-        expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
+        expectedException.expect(FrameIndexOutOfBoundsException.class);
         frames.frame(-1);
     }
 
@@ -87,7 +87,7 @@ public class FrameGroupImplTest {
         FrameGroup<PredefinedFrameView> frames =
                 new FrameGroupImpl<>(List.of(new MockCloseableImageFrame(1)), (frame, index) -> new PredefinedFrameView(frame));
 
-        expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
+        expectedException.expect(FrameIndexOutOfBoundsException.class);
         frames.frame(1);
     }
 

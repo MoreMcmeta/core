@@ -42,13 +42,13 @@ public class ColorTest {
 
     @Test
     public void constructSeparate_TooHighRed_IllegalRGBAComponentException() {
-        expectedException.expect(Color.IllegalRGBAComponentException.class);
+        expectedException.expect(IllegalRGBAComponentException.class);
         Color.pack(256, 200, 50, 100);
     }
 
     @Test
     public void constructSeparate_NegativeRed_CorrectComponents() {
-        expectedException.expect(Color.IllegalRGBAComponentException.class);
+        expectedException.expect(IllegalRGBAComponentException.class);
         Color.pack(-1, 200, 50, 100);
     }
 
@@ -63,13 +63,13 @@ public class ColorTest {
 
     @Test
     public void constructSeparate_TooHighGreen_IllegalRGBAComponentException() {
-        expectedException.expect(Color.IllegalRGBAComponentException.class);
+        expectedException.expect(IllegalRGBAComponentException.class);
         Color.pack(75, 256, 50, 100);
     }
 
     @Test
     public void constructSeparate_NegativeGreen_CorrectComponents() {
-        expectedException.expect(Color.IllegalRGBAComponentException.class);
+        expectedException.expect(IllegalRGBAComponentException.class);
         Color.pack(75, -1, 50, 100);
     }
 
@@ -84,13 +84,13 @@ public class ColorTest {
 
     @Test
     public void constructSeparate_TooHighBlue_IllegalRGBAComponentException() {
-        expectedException.expect(Color.IllegalRGBAComponentException.class);
+        expectedException.expect(IllegalRGBAComponentException.class);
         Color.pack(75, 200, 256, 100);
     }
 
     @Test
     public void constructSeparate_NegativeBlue_CorrectComponents() {
-        expectedException.expect(Color.IllegalRGBAComponentException.class);
+        expectedException.expect(IllegalRGBAComponentException.class);
         Color.pack(75, 200, -1, 100);
     }
 
@@ -105,13 +105,13 @@ public class ColorTest {
 
     @Test
     public void constructSeparate_TooHighAlpha_IllegalRGBAComponentException() {
-        expectedException.expect(Color.IllegalRGBAComponentException.class);
+        expectedException.expect(IllegalRGBAComponentException.class);
         Color.pack(75, 200, 50, 256);
     }
 
     @Test
     public void constructSeparate_NegativeAlpha_CorrectComponents() {
-        expectedException.expect(Color.IllegalRGBAComponentException.class);
+        expectedException.expect(IllegalRGBAComponentException.class);
         Color.pack(75, 200, 50, -1);
     }
 

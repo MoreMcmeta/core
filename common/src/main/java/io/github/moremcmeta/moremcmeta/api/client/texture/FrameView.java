@@ -20,7 +20,7 @@ package io.github.moremcmeta.moremcmeta.api.client.texture;
 /**
  * <p>A view of information about a texture frame without any underlying implementation detail. This interface
  * specifies an immutable view of a frame, but sub-interfaces may specify additional methods that make the
- * view mutable. A view may have a limited lifetime, after which {@link IllegalFrameReference} exceptions
+ * view mutable. A view may have a limited lifetime, after which {@link IllegalFrameReferenceException} exceptions
  * are thrown when the view's methods are called, specified by its implementation.</p>
  *
  * <p>Note about coordinate points: The top-left corner of the frame is considered to be at (0, 0), and
@@ -34,64 +34,15 @@ public interface FrameView {
     /**
      * Gets the width of the frame.
      * @return width of the frame
-     * @throws IllegalFrameReference if this view is no longer valid
+     * @throws IllegalFrameReferenceException if this view is no longer valid
      */
     int width();
 
     /**
      * Gets the height of the frame.
      * @return height of the frame
-     * @throws IllegalFrameReference if this view is no longer valid
+     * @throws IllegalFrameReferenceException if this view is no longer valid
      */
     int height();
-
-    /**
-     * Indicates that an illegal predefined frame index was accessed.
-     * @author soir20
-     * @since 4.0.0
-     */
-    final class FrameIndexOutOfBoundsException extends IndexOutOfBoundsException {
-
-        /**
-         * Creates an exception to indicate that a frame with a certain index does not
-         * exist.
-         * @param index     the illegal index accessed
-         */
-        public FrameIndexOutOfBoundsException(int index) {
-            super("Frame index out of range: " + index);
-        }
-    }
-
-    /**
-     * Indicates that a point outside a frame's bounds was accessed.
-     * @author soir20
-     * @since 4.0.0
-     */
-    final class PixelOutOfBoundsException extends RuntimeException {
-
-        /**
-         * Creates a new exception to indicate that a point outside a frame's bounds was accessed.
-         * @param x     x-coordinate of the point accessed
-         * @param y     y-coordinate of the point accessed
-         */
-        public PixelOutOfBoundsException(int x, int y) {
-            super("Point (" + x + ", " + y + ") is outside the frame");
-        }
-    }
-
-    /**
-     * Indicates that a {@link FrameView} was used after it became invalid.
-     * @author soir20
-     * @since 4.0.0
-     */
-    final class IllegalFrameReference extends IllegalStateException {
-
-        /**
-         * Creates a new exception to indicate that a reference to a frame view is invalid.
-         */
-        public IllegalFrameReference() {
-            super("Cannot use frame view beyond intended point");
-        }
-    }
 
 }

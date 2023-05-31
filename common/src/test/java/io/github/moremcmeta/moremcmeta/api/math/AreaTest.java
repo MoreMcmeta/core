@@ -60,25 +60,25 @@ public class AreaTest {
 
     @Test
     public void construct_OverflowWidth_RectangleOverflowException() {
-        expectedException.expect(Area.RectangleOverflowException.class);
+        expectedException.expect(RectangleOverflowException.class);
         new Area(Integer.MAX_VALUE - 10, 0, 11, 10);
     }
 
     @Test
     public void construct_OverflowHeight_RectangleOverflowException() {
-        expectedException.expect(Area.RectangleOverflowException.class);
+        expectedException.expect(RectangleOverflowException.class);
         new Area(0, Integer.MAX_VALUE - 10, 10, 11);
     }
 
     @Test
     public void construct_OverflowWidthMaxValue_RectangleOverflowException() {
-        expectedException.expect(Area.RectangleOverflowException.class);
+        expectedException.expect(RectangleOverflowException.class);
         new Area(1, 0, Integer.MAX_VALUE, 10);
     }
 
     @Test
     public void construct_OverflowHeightMaxValue_RectangleOverflowException() {
-        expectedException.expect(Area.RectangleOverflowException.class);
+        expectedException.expect(RectangleOverflowException.class);
         new Area(0, 1, 10, Integer.MAX_VALUE);
     }
 

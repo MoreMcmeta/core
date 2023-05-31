@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2022 soir20
+ * Copyright (C) 2023 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,23 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.moremcmeta.moremcmeta.api.client.texture;
+package io.github.moremcmeta.moremcmeta.api.client;
 
 /**
- * A frame view that never becomes invalid and never throws an {@link IllegalFrameReferenceException}.
+ * Signals that one of the provided plugins is not valid for some reason.
  * @author soir20
  * @since 4.0.0
  */
-public interface PersistentFrameView extends FrameView {
+public final class InvalidPluginException extends PluginException {
 
     /**
-     * Gets the color at a specific pixel in this frame.
-     * @param x     x-coordinate of the pixel
-     * @param y     y-coordinate of the pixel
-     * @return the color of the pixel
-     * @throws PixelOutOfBoundsException if the requested pixel is outside
-     *                                             the frame's bounds
+     * Creates a new exception with a detail message.
+     * @param reason the reason the plugin is invalid
      */
-    int color(int x, int y);
+    public InvalidPluginException(String reason) {
+        super(reason);
+    }
 
 }

@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Tests the {@link MetadataView.NegativeKeyIndexException} since there are no non-test implementations of
+ * Tests the {@link NegativeKeyIndexException} since there are no non-test implementations of
  * {@link MetadataView}.
  * @author soir20
  */
@@ -32,9 +32,9 @@ public class NegativeKeyIndexExceptionTest {
 
     @Test
     public void throw_IndexProvided_MessageHasIndex() {
-        expectedException.expect(MetadataView.NegativeKeyIndexException.class);
+        expectedException.expect(NegativeKeyIndexException.class);
         expectedException.expectMessage("Key index is negative: -5");
-        throw new MetadataView.NegativeKeyIndexException(-5);
+        throw new NegativeKeyIndexException(-5);
     }
 
 }

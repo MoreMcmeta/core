@@ -19,7 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +35,7 @@ public interface CoreTextureComponent
      * Responds to the registration event of the associated texture. Note that the lifetime of the
      * {@link CurrentFrameView} provided to this method is limited to the call of this method. Attempting
      * to retain and use a {@link CurrentFrameView} at a later point will cause a
-     * {@link FrameView.IllegalFrameReference} exception to be thrown.
+     * {@link IllegalFrameReferenceException} exception to be thrown.
      * @param currentFrame      view of the texture's current frame
      * @param predefinedFrames  persistent views of predefined frames
      */
@@ -47,7 +47,7 @@ public interface CoreTextureComponent
      * updated with respect to OpenGL. The upload event does not necessarily occur for every transform applied
      * in other events. Note that the lifetime of the {@link UploadableFrameView} provided to this method is limited
      * to the call of this method. Attempting to retain and use a {@link UploadableFrameView} at a later point will
-     * cause a {@link FrameView.IllegalFrameReference} exception to be thrown.</p>
+     * cause a {@link IllegalFrameReferenceException} exception to be thrown.</p>
      *
      * <p>Assume that the texture at the provided {@link ResourceLocation} is bound before this method is
      * called.</p>

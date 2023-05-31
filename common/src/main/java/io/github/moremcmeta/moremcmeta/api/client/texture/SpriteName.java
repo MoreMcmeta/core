@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  * @since 4.0.0
  */
-public class SpriteName {
+public final class SpriteName {
     private static final String TEX_PATH_PREFIX = "textures/";
     private static final int TEX_PATH_PREFIX_LENGTH = TEX_PATH_PREFIX.length();
     private static final String TEX_PATH_SUFFIX = ".png";

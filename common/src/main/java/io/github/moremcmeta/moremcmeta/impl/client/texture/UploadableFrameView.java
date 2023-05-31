@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointException;
 
 /**
@@ -32,7 +33,7 @@ public interface UploadableFrameView extends FrameView {
      * @param x         x-coordinate of the point to upload to
      * @param y         y-coordinate of the point to upload to
      * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
-     * @throws IllegalFrameReference if this view is no longer valid
+     * @throws IllegalFrameReferenceException if this view is no longer valid
      * @throws NegativeUploadPointException if the provided upload point is negative. The upload point may
      *                                      still be positive and out of bounds even if no exception is
      *                                      thrown.

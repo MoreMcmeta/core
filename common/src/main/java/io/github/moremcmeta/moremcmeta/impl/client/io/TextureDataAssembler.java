@@ -23,6 +23,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
+import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
@@ -256,7 +257,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
 
         /**
          * Makes this frame view invalid for further use. After this method is called, all future
-         * calls to other methods will throw an {@link IllegalFrameReference} exception. However,
+         * calls to other methods will throw an {@link IllegalFrameReferenceException} exception. However,
          * this method is idempotent.
          */
         public void invalidate() {
@@ -265,11 +266,11 @@ public class TextureDataAssembler<I extends CloseableImage> {
 
         /**
          * Checks that this frame view is currently valid and throws an exception if not.
-         * @throws IllegalFrameReference if this view is no longer valid
+         * @throws IllegalFrameReferenceException if this view is no longer valid
          */
-        private void checkValid() throws IllegalFrameReference {
+        private void checkValid() throws IllegalFrameReferenceException {
             if (!valid) {
-                throw new IllegalFrameReference();
+                throw new IllegalFrameReferenceException();
             }
         }
 

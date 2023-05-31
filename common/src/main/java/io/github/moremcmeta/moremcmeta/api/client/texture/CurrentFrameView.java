@@ -39,7 +39,7 @@ public interface CurrentFrameView extends FrameView {
      * @param dependencies  the points whose current colors this transformation depends on
      * @throws PixelOutOfBoundsException if a pixel
      *         in `applyArea` or `dependencies` is out of the frame's bounds
-     * @throws IllegalFrameReference if this view is no longer valid
+     * @throws IllegalFrameReferenceException if this view is no longer valid
      */
     void generateWith(ColorTransform transform, Area applyArea, Area dependencies);
 

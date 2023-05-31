@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -54,7 +54,7 @@ public class PredefinedFrameViewTest {
     @Test
     public void color_ColorOutOfBounds_PixelOutOfBoundsException() {
         PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(100, 200, 1));
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         view.color(100, 30);
     }
 

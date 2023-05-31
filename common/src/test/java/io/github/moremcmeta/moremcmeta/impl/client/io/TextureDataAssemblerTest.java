@@ -21,10 +21,12 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.FrameIndexOutOfBoundsException;
+import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.NonDependencyRequestException;
+import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
@@ -370,7 +372,7 @@ public class TextureDataAssemblerTest {
                 }))
         ))).build();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         frameView[0].width();
     }
 
@@ -425,7 +427,7 @@ public class TextureDataAssemblerTest {
                 }))
         ))).build();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         frameView[0].height();
     }
 
@@ -521,7 +523,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -547,7 +549,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -573,7 +575,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -599,7 +601,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -657,7 +659,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -683,7 +685,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -709,7 +711,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -735,7 +737,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -761,7 +763,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(ColorTransform.NonDependencyRequestException.class);
+        expectedException.expect(NonDependencyRequestException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -836,7 +838,7 @@ public class TextureDataAssemblerTest {
                 }))
         ))).build();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         frameView[0].transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0)), Area.of());
     }
 
@@ -854,7 +856,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
+        expectedException.expect(FrameIndexOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
@@ -880,7 +882,7 @@ public class TextureDataAssemblerTest {
                 )
         );
 
-        expectedException.expect(FrameView.FrameIndexOutOfBoundsException.class);
+        expectedException.expect(FrameIndexOutOfBoundsException.class);
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,

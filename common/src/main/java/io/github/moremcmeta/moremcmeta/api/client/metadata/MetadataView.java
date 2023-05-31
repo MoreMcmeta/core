@@ -283,21 +283,4 @@ public interface MetadataView {
      */
     Optional<MetadataView> subView(int index);
 
-    /**
-     * Indicates that an illegal index was used to access a key in a {@link MetadataView}.
-     * @author soir20
-     * @since 4.0.0
-     */
-    final class NegativeKeyIndexException extends IndexOutOfBoundsException {
-
-        /**
-         * Creates a new exception to indicate that an illegal index was used to access a key.
-         * @param index     the illegal index used
-         */
-        public NegativeKeyIndexException(int index) {
-            super("Key index is negative: " + index);
-        }
-
-    }
-
 }

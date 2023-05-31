@@ -23,6 +23,8 @@ import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.ClientPlugin;
+import io.github.moremcmeta.moremcmeta.api.client.ConflictingPluginsException;
+import io.github.moremcmeta.moremcmeta.api.client.InvalidPluginException;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataParserPlugin;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
@@ -123,13 +125,13 @@ public abstract class MoreMcmeta {
     /**
      * Begins the startup process, creating necessary objects and registering the
      * resource reload listener.
-     * @throws ClientPlugin.InvalidPluginException if one of the plugins did not provide
+     * @throws InvalidPluginException if one of the plugins did not provide
      *         all required objects
-     * @throws ClientPlugin.ConflictingPluginsException if two plugins are not compatible for
+     * @throws ConflictingPluginsException if two plugins are not compatible for
      *         any reason
      */
-    public void start() throws ClientPlugin.InvalidPluginException,
-            ClientPlugin.ConflictingPluginsException {
+    public void start() throws InvalidPluginException,
+            ConflictingPluginsException {
 
         Minecraft minecraft = Minecraft.getInstance();
         Logger logger = LogManager.getLogger();
@@ -370,10 +372,10 @@ public abstract class MoreMcmeta {
     /**
      * Checks all the registered texture plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
-     * @throws ClientPlugin.InvalidPluginException if a plugin is not valid
+     * @throws InvalidPluginException if a plugin is not valid
      */
     private void validateIndividualTexturePlugins(Collection<MoreMcmetaTexturePlugin> plugins)
-            throws ClientPlugin.InvalidPluginException {
+            throws InvalidPluginException {
 
         // Validate individual plugins
         for (MoreMcmetaTexturePlugin plugin : plugins) {
@@ -388,10 +390,10 @@ public abstract class MoreMcmeta {
     /**
      * Checks all the analyzer registered plugins to make sure they are individually valid.
      * @param plugins   plugins to validate
-     * @throws ClientPlugin.InvalidPluginException if a plugin is not valid
+     * @throws InvalidPluginException if a plugin is not valid
      */
     private void validateIndividualparserPlugins(Collection<MoreMcmetaMetadataParserPlugin> plugins)
-            throws ClientPlugin.InvalidPluginException {
+            throws InvalidPluginException {
 
         // Validate individual plugins
         for (MoreMcmetaMetadataParserPlugin plugin : plugins) {
@@ -400,11 +402,11 @@ public abstract class MoreMcmeta {
             String extension = plugin.extension();
             validatePluginItem(extension, "extension", plugin.displayName());
             if (extension.contains(".")) {
-                throw new ClientPlugin.InvalidPluginException("Extension cannot contain a period (.)");
+                throw new InvalidPluginException("Extension cannot contain a period (.)");
             }
 
             if (extension.length() == 0) {
-                throw new ClientPlugin.InvalidPluginException("Extension cannot be empty");
+                throw new InvalidPluginException("Extension cannot be empty");
             }
 
             validatePluginItem(plugin.metadataParser(), "metadata analyzer", plugin.displayName());
@@ -417,32 +419,32 @@ public abstract class MoreMcmeta {
      * @param item          item to validate
      * @param itemName      display name of the item
      * @param pluginName    display name of the plugin
-     * @throws ClientPlugin.InvalidPluginException if the item is not present
+     * @throws InvalidPluginException if the item is not present
      */
     private void validatePluginItem(Object item, String itemName, String pluginName)
-            throws ClientPlugin.InvalidPluginException {
+            throws InvalidPluginException {
 
         if (item == null) {
-            throw new ClientPlugin.InvalidPluginException("Plugin " + pluginName + " is missing " + itemName);
+            throw new InvalidPluginException("Plugin " + pluginName + " is missing " + itemName);
         }
     }
 
     /**
-     * Checks the provided plugins and throws a {@link ClientPlugin.ConflictingPluginsException}
+     * Checks the provided plugins and throws a {@link ConflictingPluginsException}
      * if any two have a duplicate value for the property being checked.
      * @param plugins               the plugins to check
      * @param propertyAccessor      the function to use to access the property
      * @param propertyName          display name of the property
      * @param <P> type of plugin
      * @param <T> type of the property values
-     * @throws ClientPlugin.ConflictingPluginsException if two plugins have the same value returned
+     * @throws ConflictingPluginsException if two plugins have the same value returned
      *                                                            by the propertyAccessor
      */
     private <P extends ClientPlugin, T> void checkItemConflict(
             Collection<P> plugins,
             Function<P, T> propertyAccessor,
             String propertyName)
-            throws ClientPlugin.ConflictingPluginsException {
+            throws ConflictingPluginsException {
 
         Map<T, List<P>> pluginsByProperty = plugins
                 .stream()
@@ -464,7 +466,7 @@ public abstract class MoreMcmeta {
                 .map(ClientPlugin::displayName)
                 .toList();
 
-        throw new ClientPlugin.ConflictingPluginsException("Plugins " + conflictingPluginNames
+        throw new ConflictingPluginsException("Plugins " + conflictingPluginNames
                 + " have conflicting " + propertyName + ": " + conflictingProperty);
     }
 

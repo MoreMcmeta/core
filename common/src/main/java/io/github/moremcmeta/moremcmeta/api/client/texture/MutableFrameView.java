@@ -34,9 +34,9 @@ public interface MutableFrameView extends FrameView {
      * @param transform     the transformation to apply to the given points
      * @param applyArea     the points to apply the transformation to
      * @param dependencies  the points whose current colors this transformation depends on
-     * @throws FrameView.PixelOutOfBoundsException if a pixel in `applyArea` or `dependencies`
+     * @throws PixelOutOfBoundsException if a pixel in `applyArea` or `dependencies`
      *                                             is out of the frame's bounds
-     * @throws IllegalFrameReference if this view is no longer valid
+     * @throws IllegalFrameReferenceException if this view is no longer valid
      */
     void transform(ColorTransform transform, Area applyArea, Area dependencies);
 

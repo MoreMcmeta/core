@@ -59,20 +59,4 @@ public interface ColorTransform {
 
     }
 
-    /**
-     * Indicates that a transform requested the current color of a point that is not its dependency.
-     * @author soir20
-     * @since 4.0.0
-     */
-    class NonDependencyRequestException extends RuntimeException {
-
-        /**
-         * Creates a new exception to indicate a transform requested a non-dependency.
-         */
-        public NonDependencyRequestException() {
-            super("A transform tried to retrieve the color of a point that is not its dependency");
-        }
-
-    }
-
 }

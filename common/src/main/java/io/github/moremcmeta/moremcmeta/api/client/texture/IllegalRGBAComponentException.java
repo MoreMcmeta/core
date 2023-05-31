@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2022 soir20
+ * Copyright (C) 2023 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,20 +18,20 @@
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 /**
- * A frame view that never becomes invalid and never throws an {@link IllegalFrameReferenceException}.
+ * Indicates that a provided color component is outside the required [0, 255] range.
  * @author soir20
  * @since 4.0.0
  */
-public interface PersistentFrameView extends FrameView {
+public final class IllegalRGBAComponentException extends IllegalArgumentException {
 
     /**
-     * Gets the color at a specific pixel in this frame.
-     * @param x     x-coordinate of the pixel
-     * @param y     y-coordinate of the pixel
-     * @return the color of the pixel
-     * @throws PixelOutOfBoundsException if the requested pixel is outside
-     *                                             the frame's bounds
+     * Creates a new exception to indicate that a provided color component is outside
+     * the required [0, 255] range.
+     *
+     * @param component the value of the component outside the required range
      */
-    int color(int x, int y);
+    public IllegalRGBAComponentException(int component) {
+        super("RGBA component " + component + " is outside [0, 255]");
+    }
 
 }

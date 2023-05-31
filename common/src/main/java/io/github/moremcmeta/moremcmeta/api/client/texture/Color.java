@@ -108,22 +108,4 @@ public final class Color {
         }
     }
 
-    /**
-     * Indicates that a provided color component is outside the required [0, 255] range.
-     * @author soir20
-     * @since 4.0.0
-     */
-    public static final class IllegalRGBAComponentException extends IllegalArgumentException {
-
-        /**
-         * Creates a new exception to indicate that a provided color component is outside
-         * the required [0, 255] range.
-         * @param component     the value of the component outside the required range
-         */
-        public IllegalRGBAComponentException(int component) {
-            super("RGBA component " + component + " is outside [0, 255]");
-        }
-
-    }
-
 }

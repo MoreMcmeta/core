@@ -22,8 +22,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Tests the messages inside the {@link ClientPlugin.InvalidPluginException} and
- * {@link ClientPlugin.ConflictingPluginsException}.
+ * Tests the messages inside the {@link InvalidPluginException} and
+ * {@link ConflictingPluginsException}.
  * @author soir20
  */
 public class PluginExceptionTest {
@@ -32,16 +32,16 @@ public class PluginExceptionTest {
 
     @Test
     public void incompletePluginException_Thrown_MessageSameAsReason() {
-        expectedException.expect(ClientPlugin.InvalidPluginException.class);
+        expectedException.expect(InvalidPluginException.class);
         expectedException.expectMessage("Dummy message");
-        throw new ClientPlugin.InvalidPluginException("Dummy message");
+        throw new InvalidPluginException("Dummy message");
     }
 
     @Test
     public void conflictingPluginsException_Thrown_MessageSameAsReason() {
-        expectedException.expect(ClientPlugin.ConflictingPluginsException.class);
+        expectedException.expect(ConflictingPluginsException.class);
         expectedException.expectMessage("Dummy message");
-        throw new ClientPlugin.ConflictingPluginsException("Dummy message");
+        throw new ConflictingPluginsException("Dummy message");
     }
 
 }

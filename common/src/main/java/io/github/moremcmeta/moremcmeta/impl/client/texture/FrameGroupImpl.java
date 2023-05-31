@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
+import io.github.moremcmeta.moremcmeta.api.client.texture.FrameIndexOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,7 +73,7 @@ public class FrameGroupImpl<F extends FrameView> implements FrameGroup<F> {
     @Override
     public F frame(int index) {
         if (index < 0 || index >= FRAMES.size()) {
-            throw new FrameView.FrameIndexOutOfBoundsException(index);
+            throw new FrameIndexOutOfBoundsException(index);
         }
 
         return FRAMES.get(index);

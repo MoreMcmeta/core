@@ -179,29 +179,6 @@ public final class Area implements LongIterable {
     }
 
     /**
-     * Indicates that a rectangle was created that contains points that cannot be represented with
-     * two 32-bit integers.
-     * @author soir20
-     * @since 4.0.0
-     */
-    public static final class RectangleOverflowException extends IllegalArgumentException {
-
-        /**
-         * Creates a new exception to indicate that a rectangle was created that contains points
-         * that cannot be represented with two 32-bit integers.
-         * @param x         x-coordinate of the top-left corner of the rectangle
-         * @param y         y-coordinate of the top-right corner of the rectangle
-         * @param width     width of the rectangle
-         * @param height    height of the rectangle
-         */
-        public RectangleOverflowException(int x, int y, int width, int height) {
-            super("Points in the " + width + "x" + height + " rectangle starting at ("
-                    + x + ", " + y + ") cannot be represented by 32-bit coordinates");
-        }
-
-    }
-
-    /**
      * Creates a new area.
      * @param rows  all the horizontal strips in this image
      */

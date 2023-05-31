@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2022 soir20
+ * Copyright (C) 2023 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,20 +18,17 @@
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 /**
- * A frame view that never becomes invalid and never throws an {@link IllegalFrameReferenceException}.
+ * Indicates that a transform requested the current color of a point that is not its dependency.
  * @author soir20
  * @since 4.0.0
  */
-public interface PersistentFrameView extends FrameView {
+public class NonDependencyRequestException extends RuntimeException {
 
     /**
-     * Gets the color at a specific pixel in this frame.
-     * @param x     x-coordinate of the pixel
-     * @param y     y-coordinate of the pixel
-     * @return the color of the pixel
-     * @throws PixelOutOfBoundsException if the requested pixel is outside
-     *                                             the frame's bounds
+     * Creates a new exception to indicate a transform requested a non-dependency.
      */
-    int color(int x, int y);
+    public NonDependencyRequestException() {
+        super("A transform tried to retrieve the color of a point that is not its dependency");
+    }
 
 }

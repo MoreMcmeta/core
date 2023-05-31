@@ -19,7 +19,8 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.NonDependencyRequestException;
+import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.adt.SparseIntMatrix;
@@ -249,7 +250,7 @@ public class CloseableImageFrame {
      * @param dependencies  points whose colors the given transform is dependent on
      * @param layer         the index of the layer to apply the transformation to
      * @throws IllegalStateException if this frame has been closed
-     * @throws ColorTransform.NonDependencyRequestException if the previous color of a point that
+     * @throws NonDependencyRequestException if the previous color of a point that
      *                                                     is not a dependency is requested
      */
     public void applyTransform(ColorTransform transform, Area applyArea, Area dependencies, int layer) {
@@ -383,11 +384,11 @@ public class CloseableImageFrame {
      * Checks if a point is inside this layer's boundaries.
      * @param x     x-coordinate of the point to check
      * @param y     y-coordinate of the point to check
-     * @throws FrameView.PixelOutOfBoundsException if the point is out of bounds
+     * @throws PixelOutOfBoundsException if the point is out of bounds
      */
-    private void checkPointInBounds(int x, int y) throws FrameView.PixelOutOfBoundsException {
+    private void checkPointInBounds(int x, int y) throws PixelOutOfBoundsException {
         if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
-            throw new FrameView.PixelOutOfBoundsException(x, y);
+            throw new PixelOutOfBoundsException(x, y);
         }
     }
 
@@ -397,12 +398,12 @@ public class CloseableImageFrame {
      * @param requestedPoint        point the transform requested
      * @param dependencies          all the transform's dependencies and their current colors
      * @return the color of the requested point
-     * @throws ColorTransform.NonDependencyRequestException if the point is not a dependency
+     * @throws NonDependencyRequestException if the point is not a dependency
      *                                                     of the transform
      */
     private int colorIfDependency(long requestedPoint, Long2IntMap dependencies) {
         if (!dependencies.containsKey(requestedPoint)) {
-            throw new ColorTransform.NonDependencyRequestException();
+            throw new NonDependencyRequestException();
         }
 
         return dependencies.get(requestedPoint);

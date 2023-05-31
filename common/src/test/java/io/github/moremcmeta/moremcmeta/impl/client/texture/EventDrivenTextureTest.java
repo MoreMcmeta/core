@@ -19,11 +19,12 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointException;
+import io.github.moremcmeta.moremcmeta.api.client.texture.NonDependencyRequestException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
+import io.github.moremcmeta.moremcmeta.api.client.texture.PixelOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
@@ -587,7 +588,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         texture.tick();
     }
 
@@ -606,7 +607,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         texture.tick();
     }
 
@@ -625,7 +626,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         texture.tick();
     }
 
@@ -644,7 +645,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(FrameView.PixelOutOfBoundsException.class);
+        expectedException.expect(PixelOutOfBoundsException.class);
         texture.tick();
     }
 
@@ -663,7 +664,7 @@ public class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
-        expectedException.expect(ColorTransform.NonDependencyRequestException.class);
+        expectedException.expect(NonDependencyRequestException.class);
         texture.tick();
     }
 
@@ -868,7 +869,7 @@ public class EventDrivenTextureTest {
 
         texture.tick();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         texture.upload(DUMMY_BASE_LOCATION);
     }
 
@@ -914,7 +915,7 @@ public class EventDrivenTextureTest {
 
         texture.tick();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         texture.upload(DUMMY_BASE_LOCATION);
     }
 
@@ -960,7 +961,7 @@ public class EventDrivenTextureTest {
 
         texture.tick();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         texture.upload(DUMMY_BASE_LOCATION);
     }
 
@@ -1008,7 +1009,7 @@ public class EventDrivenTextureTest {
 
         texture.tick();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         texture.upload(DUMMY_BASE_LOCATION);
     }
 
@@ -1109,7 +1110,7 @@ public class EventDrivenTextureTest {
 
         texture.tick();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         texture.upload(DUMMY_BASE_LOCATION);
     }
 
@@ -1212,7 +1213,7 @@ public class EventDrivenTextureTest {
 
         texture.tick();
 
-        expectedException.expect(FrameView.IllegalFrameReference.class);
+        expectedException.expect(IllegalFrameReferenceException.class);
         texture.upload(DUMMY_BASE_LOCATION);
     }
 

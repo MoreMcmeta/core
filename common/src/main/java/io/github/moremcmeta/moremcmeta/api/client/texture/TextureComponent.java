@@ -28,7 +28,7 @@ public interface TextureComponent<V> {
     /**
      * Responds to the tick event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
      * provided to this method is limited to the call of this method. Attempting to retain and use a
-     * {@link CurrentFrameView} at a later point will cause a {@link FrameView.IllegalFrameReference} exception
+     * {@link CurrentFrameView} at a later point will cause a {@link IllegalFrameReferenceException} exception
      * to be thrown.
      * @param currentFrame      view of the texture's current frame
      * @param predefinedFrames  persistent views of all predefined frames
@@ -38,7 +38,7 @@ public interface TextureComponent<V> {
     /**
      * Responds to the close event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
      * provided to this method is limited to the call of this method. Attempting to retain and use a
-     * {@link CurrentFrameView} at a later point will cause a {@link FrameView.IllegalFrameReference} exception
+     * {@link CurrentFrameView} at a later point will cause a {@link IllegalFrameReferenceException} exception
      * to be thrown.
      * @param currentFrame      view of the texture's current frame
      * @param predefinedFrames  persistent views of all predefined frames

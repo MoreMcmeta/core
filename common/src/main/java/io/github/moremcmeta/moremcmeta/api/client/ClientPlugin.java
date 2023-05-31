@@ -38,40 +38,6 @@ public interface ClientPlugin {
      */
     String displayName();
 
-    /**
-     * Signals that one of the provided plugins is not valid for some reason.
-     * @author soir20
-     * @since 4.0.0
-     */
-    final class InvalidPluginException extends PluginException {
-
-        /**
-         * Creates a new exception with a detail message.
-         * @param reason    the reason the plugin is invalid
-         */
-        public InvalidPluginException(String reason) {
-            super(reason);
-        }
-
-    }
-
-    /**
-     * Signals that at least two of the provided plugins conflict with each other.
-     * @author soir20
-     * @since 4.0.0
-     */
-    final class ConflictingPluginsException extends PluginException {
-
-        /**
-         * Creates a new exception with a detail message.
-         * @param reason    the reason the plugins are conflicting
-         */
-        public ConflictingPluginsException(String reason) {
-            super(reason);
-        }
-
-    }
-
 }
 
 /**
