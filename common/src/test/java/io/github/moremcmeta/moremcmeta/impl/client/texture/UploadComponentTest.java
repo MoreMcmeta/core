@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
+import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
@@ -118,7 +119,12 @@ public class UploadComponentTest {
                                FrameGroup<PersistentFrameView> predefinedFrames) {
 
                 // Modify the current frame to ensure it is uploaded
-                currentFrame.replaceWith(ticks.incrementAndGet() % predefinedFrames.frames());
+                currentFrame.generateWith(
+                        (x, y, dependencies) -> predefinedFrames.frame(ticks.incrementAndGet() % predefinedFrames.frames())
+                                .color(x, y),
+                        Area.of(Point.pack(0, 0)),
+                        Area.of()
+                );
 
             }
         });

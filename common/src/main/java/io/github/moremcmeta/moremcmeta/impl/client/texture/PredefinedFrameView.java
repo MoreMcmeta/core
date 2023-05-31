@@ -19,8 +19,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 
-import java.util.Optional;
-
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -30,21 +28,13 @@ import static java.util.Objects.requireNonNull;
  */
 public class PredefinedFrameView implements PersistentFrameView {
     private final CloseableImageFrame FRAME;
-    private final int INDEX;
 
     /**
      * Creates a new predefined frame view.
      * @param frame                 the predefined frame
-     * @param index                 the index of the predefined frame among all predefined frames
      */
-    public PredefinedFrameView(CloseableImageFrame frame, int index) {
+    public PredefinedFrameView(CloseableImageFrame frame) {
         FRAME = requireNonNull(frame, "Frame cannot be null");
-
-        if (index < 0) {
-            throw new IllegalArgumentException("Predefined frame index cannot be negative");
-        }
-
-        INDEX = index;
     }
 
     @Override
@@ -55,11 +45,6 @@ public class PredefinedFrameView implements PersistentFrameView {
     @Override
     public int height() {
         return FRAME.height();
-    }
-
-    @Override
-    public Optional<Integer> index() {
-        return Optional.of(INDEX);
     }
 
     @Override

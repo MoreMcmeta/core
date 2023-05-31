@@ -20,7 +20,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
@@ -34,7 +33,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiConsumer;
 
@@ -71,10 +69,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      */
     @Override
     public void load(@Nullable ResourceManager resourceManager) {
-
-        // Set the first frame as current by default, unless overwritten by the registration listeners
-        CURRENT_STATE.replaceWith(0);
-
         runListeners((component, view) -> component.onRegistration(view, CURRENT_STATE.predefinedFrames()));
     }
 
@@ -298,12 +292,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         }
 
         @Override
-        public void replaceWith(int index) {
-            checkValid();
-            STATE.replaceWith(index);
-        }
-
-        @Override
         public int width() {
             checkValid();
             return STATE.width();
@@ -313,12 +301,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         public int height() {
             checkValid();
             return STATE.height();
-        }
-
-        @Override
-        public Optional<Integer> index() {
-            checkValid();
-            return STATE.index();
         }
 
         /**
@@ -429,37 +411,10 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             markNeedsUpload();
             currentFrameIndex = null;
             TRANSFORMS.add(new QueuedTransform(transform, applyArea, dependencies, layer));
-        }
 
-        /**
-         * Replace the current frame with one of the predefined frames.
-         * @param index     the index of the predefined frame to make
-         *                  the current frame
-         */
-        public void replaceWith(int index) {
-            if (index < 0 || index >= PREDEFINED_FRAMES.size()) {
-                throw new FrameView.FrameIndexOutOfBoundsException(index);
-            }
+            // We may wish to delay updates later if the transforms list is optimized, but update immediately for now
+            updateGeneratedFrame();
 
-            // If we are setting the current frame to itself, we don't need to upload again
-            if (currentFrameIndex != null && index == currentFrameIndex) {
-                return;
-            }
-
-            markNeedsUpload();
-            currentFrameIndex = index;
-            indexToCopyToGenerated = index;
-            TRANSFORMS.clear();
-        }
-
-        /**
-         * Gets the color of the given pixel in the current frame.
-         * @param x     x-coordinate of the pixel (from the top left)
-         * @param y     y-coordinate of the pixel (from the top left)
-         * @return the color of the pixel at the given coordinate
-         */
-        public int color(int x, int y) {
-            return currentFrame().color(x, y);
         }
 
         /**
@@ -476,15 +431,6 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          */
         public int height() {
             return PREDEFINED_FRAMES.get(0).height();
-        }
-
-        /**
-         * Gets the index of the current frame if it is a predefined frame.
-         * Otherwise, the frame is a generated frame, so empty is returned.
-         * @return the index of the predefined frame or empty if generated
-         */
-        public Optional<Integer> index() {
-            return Optional.ofNullable(currentFrameIndex);
         }
 
         /**
@@ -543,10 +489,28 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
                              CloseableImageFrame generatedFrame) {
             TEXTURE = texture;
             PREDEFINED_FRAMES = predefinedFrames;
-            PREDEFINED_FRAME_GROUP = new FrameGroupImpl<>(predefinedFrames, PredefinedFrameView::new);
+            PREDEFINED_FRAME_GROUP = new FrameGroupImpl<>(predefinedFrames, (frame, index) -> new PredefinedFrameView(frame));
             GENERATED_FRAME = generatedFrame;
             TRANSFORMS = new ArrayDeque<>();
             replaceWith(0);
+        }
+
+        /**
+         * Replace the current frame with one of the predefined frames.
+         * @param index     the index of the predefined frame to make
+         *                  the current frame
+         */
+        private void replaceWith(@SuppressWarnings("SameParameterValue") int index) {
+
+            // If we are setting the current frame to itself, we don't need to upload again
+            if (currentFrameIndex != null && index == currentFrameIndex) {
+                return;
+            }
+
+            markNeedsUpload();
+            currentFrameIndex = index;
+            indexToCopyToGenerated = index;
+            TRANSFORMS.clear();
         }
 
         /**

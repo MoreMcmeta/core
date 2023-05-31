@@ -430,31 +430,6 @@ public class TextureDataAssemblerTest {
     }
 
     @Test
-    public void assemble_IndexWhileValid_CorrectIndex() {
-        MockCloseableImage originalImage = new MockCloseableImage(100, 100);
-
-        TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
-                (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
-                        original,
-                        new MockCloseableImage(original.width() >> 1, original.height() >> 1),
-                        new MockCloseableImage(original.width() >> 2, original.height() >> 2),
-                        new MockCloseableImage(original.width() >> 3, original.height() >> 3)
-                )
-        );
-
-        addExtraDefaultComponents(assembler.assemble(new TextureData<>(
-                new TextureData.FrameSize(30, 40),
-                false, true,
-                originalImage,
-                List.of(Triple.of("plugin", new ParsedMetadata() {}, (metadata, frames) -> {
-                    assertEquals(1, (int) frames.frame(1).index().orElseThrow());
-                    return new TextureComponent<>() {};
-                }))
-        ))).build();
-    }
-
-    @Test
     public void assemble_NullTransform_NullPointerException() {
         MockCloseableImage originalImage = new MockCloseableImage(100, 100);
 

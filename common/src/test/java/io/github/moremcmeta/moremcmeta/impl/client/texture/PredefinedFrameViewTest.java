@@ -36,42 +36,24 @@ public class PredefinedFrameViewTest {
     @Test
     public void construct_NulLFrame_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new PredefinedFrameView(null, 0);
-    }
-
-    @Test
-    public void construct_NegativeIndex_IllegalArgException() {
-        expectedException.expect(IllegalArgumentException.class);
-        new PredefinedFrameView(new MockCloseableImageFrame(1), -1);
-    }
-
-    @Test
-    public void index_ZeroIndex_GetsIndex() {
-        PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(1), 0);
-        assertEquals(0, (int) view.index().orElseThrow());
-    }
-
-    @Test
-    public void index_PositiveIndex_GetsIndex() {
-        PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(1), 1);
-        assertEquals(1, (int) view.index().orElseThrow());
+        new PredefinedFrameView(null);
     }
 
     @Test
     public void width_HasWidth_GetsWidth() {
-        PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(100, 200, 1), 1);
+        PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(100, 200, 1));
         assertEquals(100, view.width());
     }
 
     @Test
     public void height_HasHeight_GetsHeight() {
-        PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(100, 200, 1), 1);
+        PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(100, 200, 1));
         assertEquals(200, view.height());
     }
 
     @Test
     public void color_ColorOutOfBounds_PixelOutOfBoundsException() {
-        PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(100, 200, 1), 1);
+        PredefinedFrameView view = new PredefinedFrameView(new MockCloseableImageFrame(100, 200, 1));
         expectedException.expect(FrameView.PixelOutOfBoundsException.class);
         view.color(100, 30);
     }
@@ -81,7 +63,7 @@ public class PredefinedFrameViewTest {
         MockCloseableImageFrame frame = new MockCloseableImageFrame(100, 200, 1);
         frame.mipmap(0).setColor(25, 30, Color.pack(100, 100, 100, 100));
 
-        PredefinedFrameView view = new PredefinedFrameView(frame, 1);
+        PredefinedFrameView view = new PredefinedFrameView(frame);
         assertEquals(Color.pack(100, 100, 100, 100), view.color(25, 30));
     }
 

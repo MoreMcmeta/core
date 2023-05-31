@@ -17,8 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
-import java.util.Optional;
-
 /**
  * <p>A view of information about a texture frame without any underlying implementation detail. This interface
  * specifies an immutable view of a frame, but sub-interfaces may specify additional methods that make the
@@ -46,13 +44,6 @@ public interface FrameView {
      * @throws IllegalFrameReference if this view is no longer valid
      */
     int height();
-
-    /**
-     * Gets the index of the frame if it is a predefined frame.
-     * @return the index of the predefined frame or {@link Optional#empty()} if it is not a predefined frame
-     * @throws IllegalFrameReference if this view is no longer valid
-     */
-    Optional<Integer> index();
 
     /**
      * Indicates that an illegal predefined frame index was accessed.

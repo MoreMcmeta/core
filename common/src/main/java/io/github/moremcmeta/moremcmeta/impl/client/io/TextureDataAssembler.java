@@ -35,7 +35,6 @@ import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
@@ -204,7 +203,7 @@ public class TextureDataAssembler<I extends CloseableImage> {
                                                                  ParsedMetadata metadata, int layer) {
         FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(
                 frames,
-                (frame, index) -> new MutableFrameViewImpl(frame, index, layer)
+                (frame, index) -> new MutableFrameViewImpl(frame, layer)
         );
 
         TextureComponent<CurrentFrameView> component = provider.assemble(
@@ -223,20 +222,16 @@ public class TextureDataAssembler<I extends CloseableImage> {
      */
     private static class MutableFrameViewImpl implements MutableFrameView {
         private final CloseableImageFrame FRAME;
-        private final int INDEX;
         private final int LAYER;
-
         private boolean valid;
 
         /**
          * Creates a new view for a mutable predefined frame.
          * @param frame         the original frame
-         * @param index         index of the frame among all frames
          * @param layer         layer in the original frame to apply transformations to
          */
-        public MutableFrameViewImpl(CloseableImageFrame frame, int index, int layer) {
+        public MutableFrameViewImpl(CloseableImageFrame frame, int layer) {
             FRAME = frame;
-            INDEX = index;
             LAYER = layer;
             valid = true;
         }
@@ -251,12 +246,6 @@ public class TextureDataAssembler<I extends CloseableImage> {
         public int height() {
             checkValid();
             return FRAME.height();
-        }
-
-        @Override
-        public Optional<Integer> index() {
-            checkValid();
-            return Optional.of(INDEX);
         }
 
         @Override

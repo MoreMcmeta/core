@@ -43,15 +43,4 @@ public interface CurrentFrameView extends FrameView {
      */
     void generateWith(ColorTransform transform, Area applyArea, Area dependencies);
 
-    /**
-     * Makes the predefined frame with the given index the current frame. The next call to
-     * {@link #generateWith(ColorTransform, Area, Area)} by any plugin will generate a frame based
-     * on this predefined frame, unless another predefined frame is made the current frame.
-     * @param index     the index of the predefined frame to make current
-     * @throws FrameIndexOutOfBoundsException if the
-     *         provided index is outside the range of legal frame indices
-     * @throws IllegalFrameReference if this view is no longer valid
-     */
-    void replaceWith(int index);
-
 }
