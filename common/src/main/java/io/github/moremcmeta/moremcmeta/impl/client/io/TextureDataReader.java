@@ -90,12 +90,11 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                 sectionData = plugin.analyzer().analyze(metadata, image.width(), image.height());
             } catch (InvalidMetadataException err) {
                 throw new InvalidMetadataException(String.format("%s marked metadata as invalid: %s",
-                        plugin.displayName(), err.getMessage()), err);
+                        plugin.id(), err.getMessage()), err);
             }
 
-            requireNonNull(sectionData, "Plugin " + plugin.displayName()
-                    + " returned null for analyzed metadata");
-            analyzedSections.add(Triple.of(plugin.displayName(), sectionData, plugin.componentProvider()));
+            requireNonNull(sectionData, "Plugin " + plugin.id() + " returned null for analyzed metadata");
+            analyzedSections.add(Triple.of(plugin.id(), sectionData, plugin.componentProvider()));
 
             frameWidthOptional = unwrapIfCompatible(frameWidthOptional, sectionData.frameWidth(), "frame width");
             frameHeightOptional = unwrapIfCompatible(frameHeightOptional, sectionData.frameHeight(), "frame width");

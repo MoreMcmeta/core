@@ -152,7 +152,7 @@ public abstract class MoreMcmeta {
         checkItemConflict(texturePlugins, MoreMcmetaTexturePlugin::sectionName, "section name");
 
         Collection<MoreMcmetaMetadataParserPlugin> parserPlugins = plugins.getSecond();
-        validateIndividualparserPlugins(parserPlugins);
+        validateIndividualParserPlugins(parserPlugins);
         parserPlugins = removeOverriddenPlugins(
                 parserPlugins,
                 MoreMcmetaMetadataParserPlugin::extension,
@@ -162,7 +162,7 @@ public abstract class MoreMcmeta {
         checkItemConflict(parserPlugins, MoreMcmetaMetadataParserPlugin::extension, "extension");
 
         List<ClientPlugin> allPlugins = Stream.concat(texturePlugins.stream(), parserPlugins.stream()).toList();
-        checkItemConflict(allPlugins, ClientPlugin::displayName, "display name");
+        checkItemConflict(allPlugins, ClientPlugin::id, "id");
 
         logPluginList(allPlugins, logger);
 
@@ -330,7 +330,7 @@ public abstract class MoreMcmeta {
      * Removes default plugins that are overridden by other plugins if they share an item.
      * @param plugins               main collection of plugins (with user-provided plugins)
      * @param itemRetriever         retrieves the item that will be used to override plugins
-     * @param defaultPluginNames    unique names of default plugins
+     * @param defaultPluginIds      unique IDs of default plugins
      * @param logger                logger to report warnings and errors
      * @return the new collection of plugins with overridden plugins removed
      * @param <P>   plugin type
@@ -339,7 +339,7 @@ public abstract class MoreMcmeta {
     private <P extends ClientPlugin, T> Collection<P> removeOverriddenPlugins(
             Collection<P> plugins,
             Function<P, T> itemRetriever,
-            Set<String> defaultPluginNames,
+            Set<String> defaultPluginIds,
             Logger logger) {
 
         Map<T, Long> countBySection = plugins.stream()
@@ -352,14 +352,13 @@ public abstract class MoreMcmeta {
 
         plugins.forEach((plugin) -> {
             T item = itemRetriever.apply(plugin);
-            String displayName = plugin.displayName();
+            String displayName = plugin.id();
 
             /* Disable default plugin if there is a user-provided plugin with the same item.
-               It has already been validated that no two plugins have the same display name, so only
+               It has already been validated that no two plugins have the same ID, so only
                default plugins will be disabled. */
-            if (countBySection.get(item) > 1 && defaultPluginNames.contains(displayName)) {
-                logger.info("Disabled default plugin " + plugin.displayName()
-                        + " as a replacement plugin was provided");
+            if (countBySection.get(item) > 1 && defaultPluginIds.contains(displayName)) {
+                logger.info("Disabled default plugin {} as a replacement plugin was provided", plugin.id());
             } else {
                 results.add(plugin);
             }
@@ -379,10 +378,11 @@ public abstract class MoreMcmeta {
 
         // Validate individual plugins
         for (MoreMcmetaTexturePlugin plugin : plugins) {
-            validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
-            validatePluginItem(plugin.sectionName(), "section name", plugin.displayName());
-            validatePluginItem(plugin.analyzer(), "analyzer", plugin.displayName());
-            validatePluginItem(plugin.componentProvider(), "component provider", plugin.displayName());
+            requirePluginItem(plugin.id(), "id", plugin.id());
+            validateId(plugin.id());
+            requirePluginItem(plugin.sectionName(), "section name", plugin.id());
+            requirePluginItem(plugin.analyzer(), "analyzer", plugin.id());
+            requirePluginItem(plugin.componentProvider(), "component provider", plugin.id());
         }
 
     }
@@ -392,15 +392,16 @@ public abstract class MoreMcmeta {
      * @param plugins   plugins to validate
      * @throws InvalidPluginException if a plugin is not valid
      */
-    private void validateIndividualparserPlugins(Collection<MoreMcmetaMetadataParserPlugin> plugins)
+    private void validateIndividualParserPlugins(Collection<MoreMcmetaMetadataParserPlugin> plugins)
             throws InvalidPluginException {
 
         // Validate individual plugins
         for (MoreMcmetaMetadataParserPlugin plugin : plugins) {
-            validatePluginItem(plugin.displayName(), "display name", plugin.displayName());
+            requirePluginItem(plugin.id(), "id", plugin.id());
+            validateId(plugin.id());
 
             String extension = plugin.extension();
-            validatePluginItem(extension, "extension", plugin.displayName());
+            requirePluginItem(extension, "extension", plugin.id());
             if (extension.contains(".")) {
                 throw new InvalidPluginException("Extension cannot contain a period (.)");
             }
@@ -409,7 +410,7 @@ public abstract class MoreMcmeta {
                 throw new InvalidPluginException("Extension cannot be empty");
             }
 
-            validatePluginItem(plugin.metadataParser(), "metadata analyzer", plugin.displayName());
+            requirePluginItem(plugin.metadataParser(), "metadata analyzer", plugin.id());
         }
 
     }
@@ -418,14 +419,24 @@ public abstract class MoreMcmeta {
      * Validates that an individual item in a plugin is present (non-null).
      * @param item          item to validate
      * @param itemName      display name of the item
-     * @param pluginName    display name of the plugin
+     * @param pluginId      ID of the plugin
      * @throws InvalidPluginException if the item is not present
      */
-    private void validatePluginItem(Object item, String itemName, String pluginName)
-            throws InvalidPluginException {
-
+    private void requirePluginItem(Object item, String itemName, String pluginId) throws InvalidPluginException {
         if (item == null) {
-            throw new InvalidPluginException("Plugin " + pluginName + " is missing " + itemName);
+            throw new InvalidPluginException("Plugin " + pluginId + " is missing " + itemName);
+        }
+    }
+
+    /**
+     * Validates that an individual item in a plugin is present (non-null).
+     * @param id            unique ID of the plugin
+     * @throws InvalidPluginException if the item is not present
+     */
+    private void validateId(String id) throws InvalidPluginException {
+        String regex = "[a-z0-9_.-]+";
+        if (!id.matches(regex)) {
+            throw new InvalidPluginException("Plugin ID must match " + regex + ", but was: " + id);
         }
     }
 
@@ -459,15 +470,15 @@ public abstract class MoreMcmeta {
             return;
         }
 
-        // Report section name and plugin display names to help diagnose the issue
+        // Report section name and plugin IDs to help diagnose the issue
         T conflictingProperty = conflictingPlugins.get().getKey();
-        List<String> conflictingPluginNames = conflictingPlugins.get().getValue()
+        List<String> conflictingIds = conflictingPlugins.get().getValue()
                 .stream()
-                .map(ClientPlugin::displayName)
+                .map(ClientPlugin::id)
                 .toList();
 
-        throw new ConflictingPluginsException("Plugins " + conflictingPluginNames
-                + " have conflicting " + propertyName + ": " + conflictingProperty);
+        throw new ConflictingPluginsException("Plugins " + conflictingIds + " have conflicting " + propertyName
+                + ": " + conflictingProperty);
     }
 
     /**
@@ -496,7 +507,7 @@ public abstract class MoreMcmeta {
      */
     private void logPluginList(Collection<ClientPlugin> plugins, Logger logger) {
         String pluginList = plugins.stream()
-                .map((plugin) -> "\n\t- " + plugin.displayName())
+                .map((plugin) -> "\n\t- " + plugin.id())
                 .collect(Collectors.joining());
 
         logger.info(String.format("Loading %s MoreMcmeta plugins:", plugins.size()) + pluginList);
