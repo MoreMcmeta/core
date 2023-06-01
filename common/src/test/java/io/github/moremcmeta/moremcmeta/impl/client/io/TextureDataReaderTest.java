@@ -17,6 +17,8 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
@@ -208,6 +210,42 @@ public class TextureDataReaderTest {
         }
 
         assertEquals(Set.of(plugins.get(1).id()), foundIds);
+        assertEquals(1, numAnalyzed);
+    }
+
+    @Test
+    public void read_SectionNotASubView_MetadataForPresentPlugins() throws IOException, InvalidMetadataException {
+        List<MockPlugin> plugins = List.of(
+                new MockPlugin("animation", null, null, null, null, null),
+                new MockPlugin("texture", null, null, null, null, null)
+        );
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage(),
+                (image, blur, clamp) -> image
+        );
+
+        TextureData<MockCloseableImage> data = reader.read(
+                DEMO_TEXTURE_STREAM,
+                new MockMetadataView(ImmutableMap.of(
+                        "animation", new MockMetadataView(ImmutableList.of("dummy")),
+                        "texture", 1
+                ))
+        );
+
+        Set<String> foundIds = new HashSet<>();
+        int numAnalyzed = 0;
+        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+            foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
+            assertEquals(
+                    ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
+                    ((MockComponentProvider) metadata.getRight()).id()
+            );
+            numAnalyzed++;
+        }
+
+        assertEquals(Set.of(plugins.get(0).id()), foundIds);
         assertEquals(1, numAnalyzed);
     }
 
@@ -736,22 +774,9 @@ public class TextureDataReaderTest {
 
     @Test
     public void read_OrderInView_MetadataOrderedByViewOrder() throws IOException, InvalidMetadataException {
-        AtomicBoolean checked = new AtomicBoolean(false);
-
-        TriConsumer<MetadataView, Integer, Integer> viewCheckFunction = (view, imageWidth, imageHeight) -> {
-            checked.set(true);
-
-            List<String> sectionNames = new ArrayList<>();
-            for (String key : view.keys()) {
-                sectionNames.add(key);
-            }
-
-            assertEquals(List.of("texture", "animation", "other"), sectionNames);
-        };
-
         List<MockPlugin> plugins = List.of(
                 new MockPlugin("animation", 100, 100, true, null, null),
-                new MockPlugin("other", null, null, true, null, null, false, viewCheckFunction),
+                new MockPlugin("other", null, null, true, null, null),
                 new MockPlugin("texture", null, null, true, null, null)
         );
 
@@ -766,9 +791,6 @@ public class TextureDataReaderTest {
                 new MockMetadataView(Arrays.asList("texture", "animation", "other"))
         );
 
-        // Make sure that the view was checked for correct priority ordering
-        assertTrue(checked.get());
-
         // Check the analyzed metadata for priority ordering
         List<String> foundIds = new ArrayList<>();
         for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
@@ -778,8 +800,8 @@ public class TextureDataReaderTest {
                     ((MockComponentProvider) metadata.getRight()).id()
             );
         }
-        assertEquals(List.of(plugins.get(2).id(), plugins.get(0).id(), plugins.get(1).id()), foundIds);
 
+        assertEquals(List.of(plugins.get(2).id(), plugins.get(0).id(), plugins.get(1).id()), foundIds);
     }
 
     @Test

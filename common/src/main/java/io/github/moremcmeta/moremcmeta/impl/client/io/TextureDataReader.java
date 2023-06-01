@@ -81,13 +81,14 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
 
         for (String section : metadata.keys()) {
             MoreMcmetaTexturePlugin plugin = SECTION_TO_PLUGIN.get(section);
-            if (plugin == null) {
+            Optional<MetadataView> sectionView = metadata.subView(section);
+            if (plugin == null || sectionView.isEmpty()) {
                 continue;
             }
 
             AnalyzedMetadata sectionData;
             try {
-                sectionData = plugin.analyzer().analyze(metadata, image.width(), image.height());
+                sectionData = plugin.analyzer().analyze(sectionView.get(), image.width(), image.height());
             } catch (InvalidMetadataException err) {
                 throw new InvalidMetadataException(String.format("%s marked metadata as invalid: %s",
                         plugin.id(), err.getMessage()), err);

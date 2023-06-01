@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.NegativeKeyIndexException;
 
@@ -36,7 +37,7 @@ public class MockMetadataView implements MetadataView {
     public MockMetadataView(List<String> sections) {
         SECTION_TO_VALUE = new LinkedHashMap<>();
         for (String section : sections) {
-            SECTION_TO_VALUE.put(section, 1);
+            SECTION_TO_VALUE.put(section, new MockMetadataView(ImmutableMap.of("dummy", 1)));
         }
     }
 
