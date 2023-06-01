@@ -110,7 +110,7 @@ public class AnnotatedClassLoaderTest {
 
         Set<String> pluginNames = new HashSet<>();
         for (MoreMcmetaTexturePlugin plugin : plugins) {
-            pluginNames.add(plugin.displayName());
+            pluginNames.add(plugin.id());
         }
         assertEquals(ImmutableSet.of("one", "two"), pluginNames);
     }
@@ -135,7 +135,7 @@ public class AnnotatedClassLoaderTest {
 
         Set<String> pluginNames = new HashSet<>();
         for (MoreMcmetaTexturePlugin plugin : plugins) {
-            pluginNames.add(plugin.displayName());
+            pluginNames.add(plugin.id());
         }
         assertEquals(ImmutableSet.of("one", "two"), pluginNames);
     }
@@ -156,7 +156,7 @@ public class AnnotatedClassLoaderTest {
 
         Set<String> pluginNames = new HashSet<>();
         for (MoreMcmetaTexturePlugin plugin : plugins) {
-            pluginNames.add(plugin.displayName());
+            pluginNames.add(plugin.id());
         }
         assertEquals(ImmutableSet.of(), pluginNames);
     }
@@ -181,7 +181,7 @@ public class AnnotatedClassLoaderTest {
 
         Set<String> pluginNames = new HashSet<>();
         for (MoreMcmetaTexturePlugin plugin : plugins) {
-            pluginNames.add(plugin.displayName());
+            pluginNames.add(plugin.id());
         }
         assertEquals(ImmutableSet.of("one", "two"), pluginNames);
     }
@@ -206,7 +206,7 @@ public class AnnotatedClassLoaderTest {
 
         Set<String> pluginNames = new HashSet<>();
         for (MoreMcmetaTexturePlugin plugin : plugins) {
-            pluginNames.add(plugin.displayName());
+            pluginNames.add(plugin.id());
         }
         assertEquals(ImmutableSet.of("one", "two"), pluginNames);
     }
@@ -218,7 +218,7 @@ public class AnnotatedClassLoaderTest {
     public static class MockPluginOne implements MoreMcmetaTexturePlugin {
 
         @Override
-        public String displayName() {
+        public String id() {
             return "one";
         }
 
@@ -245,7 +245,7 @@ public class AnnotatedClassLoaderTest {
     public static class MockPluginTwo implements MoreMcmetaTexturePlugin {
 
         @Override
-        public String displayName() {
+        public String id() {
             return "two";
         }
 
@@ -272,7 +272,7 @@ public class AnnotatedClassLoaderTest {
     public static class MockPluginThree implements MoreMcmetaMetadataParserPlugin {
 
         @Override
-        public String displayName() {
+        public String id() {
             return "three";
         }
 
@@ -294,7 +294,7 @@ public class AnnotatedClassLoaderTest {
     public static class MockPluginFour implements MoreMcmetaMetadataParserPlugin {
 
         @Override
-        public String displayName() {
+        public String id() {
             return "four";
         }
 
@@ -321,7 +321,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public String displayName() {
+        public String id() {
             return NAME;
         }
 
@@ -352,7 +352,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public String displayName() {
+        public String id() {
             return "bad_plugin";
         }
 
