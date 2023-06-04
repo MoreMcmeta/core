@@ -17,11 +17,11 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.metadata;
 
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 
 /**
  * Analyzes immutable texture metadata and converts it into data in a more usable form. The {@link AnalyzedMetadata}
- * returned by the analyzer will later be given to the same plugin's {@link ComponentProvider}.
+ * returned by the analyzer will later be given to the same plugin's {@link ComponentBuilder}.
  * @author soir20
  * @since 4.0.0
  */

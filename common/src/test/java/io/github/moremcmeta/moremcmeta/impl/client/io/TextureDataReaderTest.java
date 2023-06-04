@@ -24,7 +24,7 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataExcept
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
@@ -167,11 +167,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -200,11 +200,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -236,11 +236,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -349,11 +349,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -382,11 +382,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -415,11 +415,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -448,11 +448,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -481,11 +481,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -515,11 +515,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -549,11 +549,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -583,11 +583,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -617,11 +617,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -651,11 +651,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -685,11 +685,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -719,11 +719,11 @@ public class TextureDataReaderTest {
 
         Set<String> foundIds = new HashSet<>();
         int numAnalyzed = 0;
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
             numAnalyzed++;
         }
@@ -793,11 +793,11 @@ public class TextureDataReaderTest {
 
         // Check the analyzed metadata for priority ordering
         List<String> foundIds = new ArrayList<>();
-        for (Triple<String, AnalyzedMetadata, ComponentProvider> metadata : data.analyzedMetadata()) {
+        for (Triple<String, AnalyzedMetadata, ComponentBuilder> metadata : data.analyzedMetadata()) {
             foundIds.add(((MockAnalyzedMetadata) metadata.getMiddle()).id());
             assertEquals(
                     ((MockAnalyzedMetadata) metadata.getMiddle()).id(),
-                    ((MockComponentProvider) metadata.getRight()).id()
+                    ((MockComponentBuilder) metadata.getRight()).id()
             );
         }
 
@@ -1018,8 +1018,8 @@ public class TextureDataReaderTest {
         }
 
         @Override
-        public ComponentProvider componentProvider() {
-            return new MockComponentProvider(ID);
+        public ComponentBuilder componentBuilder() {
+            return new MockComponentBuilder(ID);
         }
 
         @Override
@@ -1075,19 +1075,19 @@ public class TextureDataReaderTest {
     }
 
     /**
-     * Mock implementation of {@link ComponentProvider} for easy creation in tests.
+     * Mock implementation of {@link ComponentBuilder} for easy creation in tests.
      * @author soir20
      */
-    private static final class MockComponentProvider implements ComponentProvider {
+    private static final class MockComponentBuilder implements ComponentBuilder {
         private final String ID;
 
-        public MockComponentProvider(String id) {
+        public MockComponentBuilder(String id) {
             ID = id;
         }
 
         @Override
-        public TextureComponent<CurrentFrameView> assemble(AnalyzedMetadata metadata,
-                                                           FrameGroup<? extends MutableFrameView> frames) {
+        public TextureComponent<CurrentFrameView> build(AnalyzedMetadata metadata,
+                                                        FrameGroup<? extends MutableFrameView> frames) {
             return new TextureComponent<>() {};
         }
 

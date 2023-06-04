@@ -27,7 +27,7 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
  * @since 4.0.0
  */
 @FunctionalInterface
-public interface ComponentProvider {
+public interface ComponentBuilder {
 
     /**
      * Assembles initial data about a texture into a {@link TextureComponent}. <b>This method may be
@@ -39,6 +39,6 @@ public interface ComponentProvider {
      *                      {@link ColorTransform}s to be applied
      * @return texture component for this texture
      */
-    TextureComponent<CurrentFrameView> assemble(AnalyzedMetadata metadata, FrameGroup<? extends MutableFrameView> frames);
+    TextureComponent<CurrentFrameView> build(AnalyzedMetadata metadata, FrameGroup<? extends MutableFrameView> frames);
 
 }

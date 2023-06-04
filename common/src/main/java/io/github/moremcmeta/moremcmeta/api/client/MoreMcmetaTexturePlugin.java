@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.api.client;
 
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 
 /**
  * <p>A user-provided plugin that provides texture features using the MoreMcmeta loader.</p>
@@ -50,11 +50,11 @@ public interface MoreMcmetaTexturePlugin extends ClientPlugin {
     MetadataAnalyzer analyzer();
 
     /**
-     * Gets the {@link ComponentProvider} for this plugin. <b>This method may be called from multiple
+     * Gets the {@link ComponentBuilder} for this plugin. <b>This method may be called from multiple
      * threads concurrently. If there is any state shared between calls, it must be synchronized properly
      * for concurrent usage.</b>
-     * @return plugin's component provider
+     * @return plugin's component builder
      */
-    ComponentProvider componentProvider();
+    ComponentBuilder componentBuilder();
 
 }

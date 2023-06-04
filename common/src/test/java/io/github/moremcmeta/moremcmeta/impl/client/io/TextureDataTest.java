@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
@@ -238,7 +238,7 @@ public class TextureDataTest {
 
     @Test
     public void analyzedMetadata_None_NoneReturned() {
-        List<Triple<String, AnalyzedMetadata, ComponentProvider>> expectedMetadata = List.of();
+        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> expectedMetadata = List.of();
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
         TextureData<MockCloseableImage> data = new TextureData<>(
@@ -254,7 +254,7 @@ public class TextureDataTest {
 
     @Test
     public void analyzedMetadata_Some_SameMetadataReturned() {
-        List<Triple<String, AnalyzedMetadata, ComponentProvider>> expectedMetadata = List.of(
+        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> expectedMetadata = List.of(
                 Triple.of("pluginOne", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
                 Triple.of("pluginTwo", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
                 Triple.of("pluginThree", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
@@ -275,7 +275,7 @@ public class TextureDataTest {
 
     @Test
     public void analyzedMetadata_ListModifiedExternally_InternalListNotModified() {
-        List<Triple<String, AnalyzedMetadata, ComponentProvider>> expectedMetadata = new ArrayList<>();
+        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> expectedMetadata = new ArrayList<>();
         expectedMetadata.add(Triple.of(
                 "pluginOne",
                 new AnalyzedMetadata() {},
@@ -297,7 +297,7 @@ public class TextureDataTest {
                 (metadata, frames) -> new TextureComponent<>() {}
         ));
 
-        Triple<String, AnalyzedMetadata, ComponentProvider> extraSection = Triple.of(
+        Triple<String, AnalyzedMetadata, ComponentBuilder> extraSection = Triple.of(
                 "pluginFive",
                 new AnalyzedMetadata() {},
                 (metadata, frames) -> new TextureComponent<>() {}
@@ -314,7 +314,7 @@ public class TextureDataTest {
 
         expectedMetadata.add(extraSection);
 
-        List<Triple<String, AnalyzedMetadata, ComponentProvider>> actualMetadata = new ArrayList<>(data.analyzedMetadata());
+        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> actualMetadata = new ArrayList<>(data.analyzedMetadata());
 
         // If the actual metadata already contains the extra section, the lists won't be equal
         actualMetadata.add(extraSection);

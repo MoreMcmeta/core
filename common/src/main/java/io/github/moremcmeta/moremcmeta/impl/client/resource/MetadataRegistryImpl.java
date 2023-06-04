@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.api.client.texture.SpriteName;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import net.minecraft.resources.ResourceLocation;
@@ -94,7 +94,7 @@ public class MetadataRegistryImpl implements MetadataRegistry {
         for (Map.Entry<? extends ResourceLocation, ? extends TextureData<?>> entry : textureData.entrySet()) {
             ResourceLocation textureLocation = entry.getKey();
 
-            for (Triple<String, AnalyzedMetadata, ComponentProvider> pluginEntry : entry.getValue().analyzedMetadata()) {
+            for (Triple<String, AnalyzedMetadata, ComponentBuilder> pluginEntry : entry.getValue().analyzedMetadata()) {
                 String pluginName = pluginEntry.getLeft();
                 AnalyzedMetadata sectionData = pluginEntry.getMiddle();
 

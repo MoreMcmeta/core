@@ -20,7 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
@@ -116,10 +116,10 @@ public class TextureDataAssembler<I extends CloseableImage> {
                 .add(new CleanupComponent(closeMipmaps));
 
         for (int index = 0; index < data.analyzedMetadata().size(); index++) {
-            Triple<String, AnalyzedMetadata, ComponentProvider> metadata = data.analyzedMetadata().get(index);
+            Triple<String, AnalyzedMetadata, ComponentBuilder> metadata = data.analyzedMetadata().get(index);
             AnalyzedMetadata sectionData = metadata.getMiddle();
 
-            builder.add(assembleComponent(
+            builder.add(builder(
                     metadata.getRight(),
                     frames,
                     sectionData,
@@ -192,22 +192,22 @@ public class TextureDataAssembler<I extends CloseableImage> {
     }
 
     /**
-     * Creates a texture component based on the given frames and provider.
-     * @param provider      component provider
+     * Creates a texture component based on the given frames and builder.
+     * @param builder       component builder
      * @param frames        predefined frames
      * @param metadata      metadata associated with the transform
      * @param layer         index of layer to apply transformations to
      * @return assembled component
      */
-    private TextureComponent<CurrentFrameView> assembleComponent(ComponentProvider provider,
-                                                                 List<CloseableImageFrame> frames,
-                                                                 AnalyzedMetadata metadata, int layer) {
+    private TextureComponent<CurrentFrameView> builder(ComponentBuilder builder,
+                                                       List<CloseableImageFrame> frames,
+                                                       AnalyzedMetadata metadata, int layer) {
         FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(
                 frames,
                 (frame, index) -> new MutableFrameViewImpl(frame, layer)
         );
 
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = builder.build(
                 metadata,
                 mutableFrames
         );

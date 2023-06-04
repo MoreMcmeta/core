@@ -22,7 +22,7 @@ import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaMetadataParserPlugin
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.forge.api.client.MoreMcmetaClientPlugin;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import org.apache.logging.log4j.LogManager;
@@ -233,7 +233,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public ComponentProvider componentProvider() {
+        public ComponentBuilder componentBuilder() {
             return null;
         }
     }
@@ -260,7 +260,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public ComponentProvider componentProvider() {
+        public ComponentBuilder componentBuilder() {
             return null;
         }
     }
@@ -336,7 +336,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public ComponentProvider componentProvider() {
+        public ComponentBuilder componentBuilder() {
             return null;
         }
     }
@@ -367,7 +367,7 @@ public class AnnotatedClassLoaderTest {
         }
 
         @Override
-        public ComponentProvider componentProvider() {
+        public ComponentBuilder componentBuilder() {
             return null;
         }
     }

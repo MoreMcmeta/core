@@ -382,7 +382,7 @@ public abstract class MoreMcmeta {
             validateId(plugin.id());
             requirePluginItem(plugin.sectionName(), "section name", plugin.id());
             requirePluginItem(plugin.analyzer(), "analyzer", plugin.id());
-            requirePluginItem(plugin.componentProvider(), "component provider", plugin.id());
+            requirePluginItem(plugin.componentBuilder(), "component builder", plugin.id());
         }
 
     }

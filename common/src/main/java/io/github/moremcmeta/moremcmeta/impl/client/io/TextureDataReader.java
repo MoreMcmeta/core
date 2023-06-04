@@ -21,7 +21,7 @@ import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -73,7 +73,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
         I image = IMAGE_READER.read(textureStream);
         requireNonNull(image, "Image read cannot be null. Throw an IOException instead.");
 
-        List<Triple<String, AnalyzedMetadata, ComponentProvider>> analyzedSections = new ArrayList<>();
+        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> analyzedSections = new ArrayList<>();
         Optional<Integer> frameWidthOptional = Optional.empty();
         Optional<Integer> frameHeightOptional = Optional.empty();
         Optional<Boolean> blurOptional = Optional.empty();
@@ -95,7 +95,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
             }
 
             requireNonNull(sectionData, "Plugin " + plugin.id() + " returned null for analyzed metadata");
-            analyzedSections.add(Triple.of(plugin.id(), sectionData, plugin.componentProvider()));
+            analyzedSections.add(Triple.of(plugin.id(), sectionData, plugin.componentBuilder()));
 
             frameWidthOptional = unwrapIfCompatible(frameWidthOptional, sectionData.frameWidth(), "frame width");
             frameHeightOptional = unwrapIfCompatible(frameHeightOptional, sectionData.frameHeight(), "frame width");

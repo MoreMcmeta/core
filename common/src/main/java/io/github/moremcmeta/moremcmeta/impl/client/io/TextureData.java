@@ -19,7 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
 import org.apache.commons.lang3.tuple.Triple;
@@ -38,7 +38,7 @@ public class TextureData<I extends CloseableImage> {
     private final boolean BLUR;
     private final boolean CLAMP;
     private final I IMAGE;
-    private final List<Triple<String, AnalyzedMetadata, ComponentProvider>> ANALYZED_SECTIONS;
+    private final List<Triple<String, AnalyzedMetadata, ComponentBuilder>> ANALYZED_SECTIONS;
 
     /**
      * Creates a new texture data container.
@@ -46,11 +46,11 @@ public class TextureData<I extends CloseableImage> {
      * @param blur              whether to blur the image
      * @param clamp             whether to clamp the image
      * @param image             texture image
-     * @param analyzedSections  analyzed metadata and component providers that will
+     * @param analyzedSections  analyzed metadata and component builders that will
      *                          process the metadata
      */
     public TextureData(FrameSize frameSize, boolean blur, boolean clamp, I image,
-                       List<Triple<String, AnalyzedMetadata, ComponentProvider>> analyzedSections) {
+                       List<Triple<String, AnalyzedMetadata, ComponentBuilder>> analyzedSections) {
         if (frameSize.width() > image.width()) {
             throw new IllegalArgumentException("Frame width cannot be larger than image width");
         }
@@ -99,11 +99,11 @@ public class TextureData<I extends CloseableImage> {
     }
 
     /**
-     * Gets analyzed metadata and its associated plugin names and component providers that
+     * Gets analyzed metadata and its associated plugin names and component builders that
      * will process the metadata.
-     * @return analyzed metadata sections and associated component providers
+     * @return analyzed metadata sections and associated component builder
      */
-    public List<Triple<String, AnalyzedMetadata, ComponentProvider>> analyzedMetadata() {
+    public List<Triple<String, AnalyzedMetadata, ComponentBuilder>> analyzedMetadata() {
         return ANALYZED_SECTIONS;
     }
 
