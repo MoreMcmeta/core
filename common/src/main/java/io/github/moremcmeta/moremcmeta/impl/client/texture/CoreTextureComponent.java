@@ -40,7 +40,7 @@ public interface CoreTextureComponent
      * @param predefinedFrames  persistent views of predefined frames
      */
     default void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
-                                FrameGroup<PersistentFrameView> predefinedFrames) {}
+                                FrameGroup<? extends PersistentFrameView> predefinedFrames) {}
 
     /**
      * <p>Responds to the upload event of the associated texture. The upload event occurs when the texture is

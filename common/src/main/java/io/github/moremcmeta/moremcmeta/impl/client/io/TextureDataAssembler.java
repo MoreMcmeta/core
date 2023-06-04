@@ -119,12 +119,14 @@ public class TextureDataAssembler<I extends CloseableImage> {
             Triple<String, AnalyzedMetadata, ComponentBuilder> metadata = data.analyzedMetadata().get(index);
             AnalyzedMetadata sectionData = metadata.getMiddle();
 
-            builder.add(builder(
-                    metadata.getRight(),
-                    frames,
-                    sectionData,
-                    index
-            ));
+            builder.add(
+                    buildComponent(
+                            metadata.getRight(),
+                            frames,
+                            sectionData,
+                            index
+                    )
+            );
         }
 
         return builder;
@@ -199,15 +201,15 @@ public class TextureDataAssembler<I extends CloseableImage> {
      * @param layer         index of layer to apply transformations to
      * @return assembled component
      */
-    private TextureComponent<CurrentFrameView> builder(ComponentBuilder builder,
-                                                       List<CloseableImageFrame> frames,
-                                                       AnalyzedMetadata metadata, int layer) {
+    private TextureComponent<? super CurrentFrameView> buildComponent(ComponentBuilder builder,
+                                                                      List<CloseableImageFrame> frames,
+                                                                      AnalyzedMetadata metadata, int layer) {
         FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(
                 frames,
                 (frame, index) -> new MutableFrameViewImpl(frame, layer)
         );
 
-        TextureComponent<CurrentFrameView> component = builder.build(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 metadata,
                 mutableFrames
         );

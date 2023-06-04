@@ -33,7 +33,7 @@ public interface TextureComponent<V> {
      * @param currentFrame      view of the texture's current frame
      * @param predefinedFrames  persistent views of all predefined frames
      */
-    default void onTick(V currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {}
+    default void onTick(V currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {}
 
     /**
      * Responds to the close event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
@@ -43,6 +43,6 @@ public interface TextureComponent<V> {
      * @param currentFrame      view of the texture's current frame
      * @param predefinedFrames  persistent views of all predefined frames
      */
-    default void onClose(V currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {}
+    default void onClose(V currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {}
 
 }

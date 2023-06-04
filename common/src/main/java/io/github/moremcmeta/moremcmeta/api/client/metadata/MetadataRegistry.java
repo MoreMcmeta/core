@@ -58,6 +58,6 @@ public interface MetadataRegistry {
      * @param pluginName            name of the plugin that provided the metadata
      * @return all metadata associated with a given plugin, by texture location, as an immutable map
      */
-    Map<ResourceLocation, AnalyzedMetadata> metadataByPlugin(String pluginName);
+    Map<? extends ResourceLocation, ? extends AnalyzedMetadata> metadataByPlugin(String pluginName);
 
 }

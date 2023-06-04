@@ -361,7 +361,7 @@ public class TextureLoaderTest {
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadata) -> 1,
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
-                    Set<ResourceLocation> locations = resourceRepository.list(
+                    Set<? extends ResourceLocation> locations = resourceRepository.list(
                             (fileName) -> fileName.endsWith("_abcd.png")
                     );
 
@@ -392,7 +392,7 @@ public class TextureLoaderTest {
         TextureLoader<Integer> loader = new TextureLoader<>(
                 (texStream, metadata) -> 1,
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
-                    Set<ResourceLocation> locations = resourceRepository.list(
+                    Set<? extends ResourceLocation> locations = resourceRepository.list(
                             (fileName) -> fileName.endsWith("_abcd.png")
                     );
 
@@ -887,16 +887,16 @@ public class TextureLoaderTest {
                 ImmutableMap.of(
                         ".moremcmeta", new MetadataParser() {
                             @Override
-                            public Map<ResourceLocation, MetadataView> parse(ResourceLocation metadataLocation,
-                                                                             InputStream metadataStream,
-                                                                             ResourceRepository resourceRepository)
+                            public Map<? extends ResourceLocation, ? extends MetadataView> parse(ResourceLocation metadataLocation,
+                                                                                                 InputStream metadataStream,
+                                                                                                 ResourceRepository resourceRepository)
                                     throws InvalidMetadataException {
                                 return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
                             }
 
                             @Override
                             public MetadataView combine(ResourceLocation textureLocation,
-                                                        Map<ResourceLocation, MetadataView> metadataByLocation) {
+                                                        Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
                                 assertEquals(new ResourceLocation("textures/zombie.png"), textureLocation);
                                 assertEquals(
                                         Set.of(
@@ -933,16 +933,16 @@ public class TextureLoaderTest {
                 ImmutableMap.of(
                         ".moremcmeta", new MetadataParser() {
                             @Override
-                            public Map<ResourceLocation, MetadataView> parse(ResourceLocation metadataLocation,
-                                                                             InputStream metadataStream,
-                                                                             ResourceRepository resourceRepository)
+                            public Map<? extends ResourceLocation, ? extends MetadataView> parse(ResourceLocation metadataLocation,
+                                                                                                 InputStream metadataStream,
+                                                                                                 ResourceRepository resourceRepository)
                                     throws InvalidMetadataException {
                                 return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
                             }
 
                             @Override
                             public MetadataView combine(ResourceLocation textureLocation,
-                                                        Map<ResourceLocation, MetadataView> metadataByLocation) {
+                                                        Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
                                 assertEquals(new ResourceLocation("textures/creeper.png"), textureLocation);
                                 assertEquals(
                                         Set.of(

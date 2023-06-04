@@ -198,7 +198,7 @@ public class TextureLoader<R> {
 
             // There must be a parser for this extension since we only retrieved files with parsers' extensions
             InputStream metadataStream = metadataResources.collection().find(resourceType, metadataLocation);
-            Map<ResourceLocation, MetadataView> metadata = PARSERS
+            Map<? extends ResourceLocation, ? extends MetadataView> metadata = PARSERS
                     .get(extension)
                     .parse(metadataLocation, metadataStream, wrapRepository(repository, paths));
             metadataStream.close();
@@ -357,7 +357,7 @@ public class TextureLoader<R> {
      * @author soir20
      */
     private static class ReadMetadataFile {
-        public final Map<ResourceLocation, MetadataView> METADATA_BY_TEXTURE;
+        public final Map<? extends ResourceLocation, ? extends MetadataView> METADATA_BY_TEXTURE;
         public final int COLLECTION_INDEX;
         public final String EXTENSION;
 
@@ -367,7 +367,8 @@ public class TextureLoader<R> {
          * @param collection                index of the collection that the metadata views came from
          * @param extension                 extension of the metadata files
          */
-        public ReadMetadataFile(Map<ResourceLocation, MetadataView> metadataByTexture, int collection, String extension) {
+        public ReadMetadataFile(Map<? extends ResourceLocation, ? extends MetadataView> metadataByTexture,
+                                int collection, String extension) {
             METADATA_BY_TEXTURE = metadataByTexture;
             COLLECTION_INDEX = collection;
             EXTENSION = extension;

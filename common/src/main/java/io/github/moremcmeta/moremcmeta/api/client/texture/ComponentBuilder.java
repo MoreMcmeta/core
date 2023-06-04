@@ -39,6 +39,7 @@ public interface ComponentBuilder {
      *                      {@link ColorTransform}s to be applied
      * @return texture component for this texture
      */
-    TextureComponent<CurrentFrameView> build(AnalyzedMetadata metadata, FrameGroup<? extends MutableFrameView> frames);
+    TextureComponent<? super CurrentFrameView> build(AnalyzedMetadata metadata,
+                                                     FrameGroup<? extends MutableFrameView> frames);
 
 }

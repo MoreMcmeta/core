@@ -39,7 +39,7 @@ public class CleanupComponent implements CoreTextureComponent {
 
     @Override
     public void onClose(EventDrivenTexture.TextureAndFrameView currentFrame,
-                        FrameGroup<PersistentFrameView> predefinedFrames) {
+                        FrameGroup<? extends PersistentFrameView> predefinedFrames) {
         CLOSE_ACTION.run();
     }
 

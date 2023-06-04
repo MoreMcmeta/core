@@ -40,8 +40,9 @@ public interface MetadataParser {
      * @return an immutable view of the read metadata by texture path
      * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
-    Map<ResourceLocation, MetadataView> parse(ResourceLocation metadataLocation, InputStream metadataStream,
-                                              ResourceRepository resourceRepository)
+    Map<? extends ResourceLocation, ? extends MetadataView> parse(ResourceLocation metadataLocation,
+                                                                  InputStream metadataStream,
+                                                                  ResourceRepository resourceRepository)
             throws InvalidMetadataException;
 
     /**
@@ -59,7 +60,8 @@ public interface MetadataParser {
      * @return combined {@link MetadataView} with all metadata
      * @throws InvalidMetadataException if the metadata is not valid for some reason
      */
-    default MetadataView combine(ResourceLocation textureLocation, Map<ResourceLocation, MetadataView> metadataByLocation)
+    default MetadataView combine(ResourceLocation textureLocation,
+                                 Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation)
             throws InvalidMetadataException {
         throw new InvalidMetadataException("Format does not support metadata split among multiple files");
     }

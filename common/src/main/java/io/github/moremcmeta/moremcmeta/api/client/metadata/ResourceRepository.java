@@ -48,7 +48,7 @@ public interface ResourceRepository {
      * @param fileFilter    returns true for resource location paths that should be included in the results
      * @return all resources that match the provided filter
      */
-    Set<ResourceLocation> list(Predicate<String> fileFilter);
+    Set<? extends ResourceLocation> list(Predicate<String> fileFilter);
 
     /**
      * A pack that contains resources as streams of bytes.

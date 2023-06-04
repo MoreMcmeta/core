@@ -116,7 +116,7 @@ public class UploadComponentTest {
         builder.add(new TextureComponent<>() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame,
-                               FrameGroup<PersistentFrameView> predefinedFrames) {
+                               FrameGroup<? extends PersistentFrameView> predefinedFrames) {
 
                 // Modify the current frame to ensure it is uploaded
                 currentFrame.generateWith(

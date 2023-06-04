@@ -199,12 +199,14 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             requireNonNull(component, "Component cannot be null");
             add(new CoreTextureComponent() {
                 @Override
-                public void onTick(TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+                public void onTick(TextureAndFrameView currentFrame,
+                                   FrameGroup<? extends PersistentFrameView> predefinedFrames) {
                     component.onTick(currentFrame, predefinedFrames);
                 }
 
                 @Override
-                public void onClose(TextureAndFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+                public void onClose(TextureAndFrameView currentFrame,
+                                    FrameGroup<? extends PersistentFrameView> predefinedFrames) {
                     component.onClose(currentFrame, predefinedFrames);
                 }
             });

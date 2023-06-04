@@ -45,7 +45,7 @@ public class UploadComponent implements CoreTextureComponent {
 
     @Override
     public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame,
-                               FrameGroup<PersistentFrameView> predefinedFrames) {
+                               FrameGroup<? extends PersistentFrameView> predefinedFrames) {
 
         /* Ensure the current frame is only accessed in this method, as the
            view may be invalidated if accessing them inside a render call. */
