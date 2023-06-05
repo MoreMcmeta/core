@@ -32,7 +32,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import static java.util.Objects.requireNonNull;
@@ -78,8 +80,8 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
     public void upload(ResourceLocation base) {
         requireNonNull(base, "Base cannot be null");
 
-        if (CURRENT_STATE.hasUpdatedSinceUpload) {
-            CURRENT_STATE.hasUpdatedSinceUpload = false;
+        if (!CURRENT_STATE.BASES_UPLOADED_SINCE_UPDATE.contains(base)) {
+            CURRENT_STATE.BASES_UPLOADED_SINCE_UPDATE.add(base);
 
             runListeners((textureComponent, textureAndFrameView) -> textureComponent.onUpload(textureAndFrameView, base));
         }
@@ -391,9 +393,9 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
         private final List<? extends CloseableImageFrame> PREDEFINED_FRAMES;
         private final FrameGroup<PersistentFrameView> PREDEFINED_FRAME_GROUP;
         private final CloseableImageFrame GENERATED_FRAME;
+        private final Set<ResourceLocation> BASES_UPLOADED_SINCE_UPDATE;
         private Integer currentFrameIndex;
         private Integer indexToCopyToGenerated;
-        private boolean hasUpdatedSinceUpload;
 
         /**
          * Applies the provided transformation to the current frame to generate
@@ -485,6 +487,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
             PREDEFINED_FRAMES = predefinedFrames;
             PREDEFINED_FRAME_GROUP = new FrameGroupImpl<>(predefinedFrames, (frame, index) -> new PredefinedFrameView(frame));
             GENERATED_FRAME = generatedFrame;
+            BASES_UPLOADED_SINCE_UPDATE = new HashSet<>();
             replaceWith(0);
         }
 
@@ -509,7 +512,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
          * Flags the texture as needing an upload.
          */
         private void markNeedsUpload() {
-            hasUpdatedSinceUpload = true;
+            BASES_UPLOADED_SINCE_UPDATE.clear();
         }
 
         /**
