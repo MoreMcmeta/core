@@ -145,7 +145,7 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
      * items according to {@link Object#equals(Object)}.</p>
      *
      * <p>If the two values are not compatible, an exception is thrown.
-     * Otherwise, the new value is returned.</p>
+     * Otherwise, the new value is returned if it is present.</p>
      * @param currentVal    current value
      * @param newVal        new value that may be returned
      * @param propName      property name describing what is contained in the values
@@ -161,7 +161,11 @@ public class TextureDataReader<I extends CloseableImage> implements TextureReade
                     propName, currentVal.get(), newVal.get()));
         }
 
-        return newVal;
+        if (newVal.isPresent()) {
+            return newVal;
+        }
+
+        return currentVal;
     }
 
 }

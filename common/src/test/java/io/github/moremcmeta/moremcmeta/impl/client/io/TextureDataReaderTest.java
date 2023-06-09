@@ -360,6 +360,9 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
+
+        assertEquals(100, data.frameSize().width());
+        assertEquals(100, data.frameSize().height());
     }
 
     @Test
@@ -393,6 +396,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
+
+        assertTrue(data.blur());
     }
 
     @Test
@@ -426,6 +431,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
+
+        assertFalse(data.blur());
     }
 
     @Test
@@ -459,6 +466,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
+
+        assertTrue(data.clamp());
     }
 
     @Test
@@ -492,6 +501,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
+
+        assertFalse(data.clamp());
     }
 
     @Test
@@ -526,6 +537,9 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
+
+        assertEquals(100, data.frameSize().width());
+        assertEquals(100, data.frameSize().height());
     }
 
     @Test
@@ -560,6 +574,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
+
+        assertTrue(data.blur());
     }
 
     @Test
@@ -594,6 +610,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
+
+        assertFalse(data.blur());
     }
 
     @Test
@@ -628,6 +646,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
+
+        assertTrue(data.clamp());
     }
 
     @Test
@@ -662,6 +682,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
+
+        assertFalse(data.clamp());
     }
 
     @Test
@@ -696,6 +718,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
+
+        assertFalse(data.blur());
     }
 
     @Test
@@ -730,6 +754,8 @@ public class TextureDataReaderTest {
 
         assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
+
+        assertFalse(data.clamp());
     }
 
     @Test
