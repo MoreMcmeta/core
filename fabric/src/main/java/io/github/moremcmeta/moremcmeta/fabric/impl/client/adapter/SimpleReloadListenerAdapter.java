@@ -38,7 +38,7 @@ import static java.util.Objects.requireNonNull;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListener<T>,
+public final class SimpleReloadListenerAdapter<T> implements SimpleResourceReloadListener<T>,
         StagedResourceReloadListener<T> {
 
     private final StagedResourceReloadListener<T> DELEGATE;

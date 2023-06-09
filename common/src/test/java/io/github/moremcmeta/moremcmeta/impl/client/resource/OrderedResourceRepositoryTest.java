@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  * Tests the {@link OrderedResourceRepository}.
  * @author soir20
  */
-public class OrderedResourceRepositoryTest {
+public final class OrderedResourceRepositoryTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

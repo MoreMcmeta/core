@@ -28,7 +28,7 @@ import org.junit.rules.ExpectedException;
  * uses the render system and will throw errors in test code.
  * @author soir20
  */
-public class NativeImageAdapterTest {
+public final class NativeImageAdapterTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

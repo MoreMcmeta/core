@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link CloseableImageFrame}.
  * @author soir20
  */
-public class CloseableImageFrameTest {
+public final class CloseableImageFrameTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

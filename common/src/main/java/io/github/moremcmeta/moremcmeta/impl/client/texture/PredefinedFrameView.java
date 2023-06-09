@@ -26,7 +26,7 @@ import static java.util.Objects.requireNonNull;
  * frame provided is not changed externally once this object is created.
  * @author soir20
  */
-public class PredefinedFrameView implements PersistentFrameView {
+public final class PredefinedFrameView implements PersistentFrameView {
     private final CloseableImageFrame FRAME;
 
     /**

@@ -33,7 +33,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-public class ClientTicker {
+public final class ClientTicker {
     private final ImmutableCollection<? extends CustomTickable> TICKABLES;
     private final IEventBus EVENT_BUS;
     private final TickEvent.Phase PHASE;

@@ -50,7 +50,7 @@ import static java.util.Objects.requireNonNull;
  * @param <R> resource type
  * @author soir20
  */
-public class TextureLoader<R> {
+public final class TextureLoader<R> {
     private final TextureReader<? extends R> TEXTURE_READER;
     private final Map<String, ? extends MetadataParser> PARSERS;
     private final Logger LOGGER;

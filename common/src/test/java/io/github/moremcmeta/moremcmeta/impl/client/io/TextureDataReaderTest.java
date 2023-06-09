@@ -57,7 +57,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link TextureDataReader}.
  * @author soir20
  */
-public class TextureDataReaderTest {
+public final class TextureDataReaderTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
     

@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
  * Retrieves all classes with a particular annotation.
  * @author soir20
  */
-public class AnnotatedClassLoader {
+public final class AnnotatedClassLoader {
     private final Supplier<Iterable<ModFileScanData.AnnotationData>> ANNOTATION_DATA_SUPPLIER;
     private final Logger LOGGER;
 

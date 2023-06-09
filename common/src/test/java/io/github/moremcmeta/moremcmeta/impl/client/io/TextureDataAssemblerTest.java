@@ -52,7 +52,7 @@ import static org.junit.Assert.assertTrue;
  * other things that are tested. Therefore, the tests for it are less thorough.
  * @author soir20
  */
-public class TextureDataAssemblerTest {
+public final class TextureDataAssemblerTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

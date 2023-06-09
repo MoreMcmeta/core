@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  * Tests default methods of the {@link CloseableImage}.
  * @author soir20
  */
-public class CloseableImageTest {
+public final class CloseableImageTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
     

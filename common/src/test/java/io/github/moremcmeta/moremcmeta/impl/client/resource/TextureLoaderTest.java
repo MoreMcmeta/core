@@ -61,7 +61,7 @@ import static org.junit.Assert.assertTrue;
  * (standards definition of try-with-resources).</p>
  * @author soir20
  */
-public class TextureLoaderTest {
+public final class TextureLoaderTest {
     private final Logger LOGGER = LogManager.getLogger();
     private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
             new ResourceLocation(

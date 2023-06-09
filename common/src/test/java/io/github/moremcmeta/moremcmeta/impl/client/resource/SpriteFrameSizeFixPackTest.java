@@ -49,7 +49,7 @@ import static org.junit.Assert.*;
  * @author soir20
  */
 @SuppressWarnings("resource")
-public class SpriteFrameSizeFixPackTest {
+public final class SpriteFrameSizeFixPackTest {
     private final OrderedResourceRepository DUMMY_REPO = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
             ImmutableList.of(
             new MockResourceCollection(

@@ -26,7 +26,7 @@ import org.junit.rules.ExpectedException;
  * {@link ConflictingPluginsException}.
  * @author soir20
  */
-public class PluginExceptionTest {
+public final class PluginExceptionTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

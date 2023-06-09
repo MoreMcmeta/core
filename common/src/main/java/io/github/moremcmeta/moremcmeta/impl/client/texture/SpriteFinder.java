@@ -29,7 +29,7 @@ import static java.util.Objects.requireNonNull;
  * Searches atlas textures for sprites.
  * @author soir20
  */
-public class SpriteFinder {
+public final class SpriteFinder {
     private static final ImmutableSet<ResourceLocation> ATLAS_LOCATIONS = ImmutableSet.of(
             new ResourceLocation("textures/atlas/blocks.png"),
             new ResourceLocation("textures/atlas/signs.png"),

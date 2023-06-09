@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the link {@link TextureData} container.
  * @author soir20
  */
-public class TextureDataTest {
+public final class TextureDataTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

@@ -45,7 +45,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("unused")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MockResourceManager implements ResourceManager {
+public final class MockResourceManager implements ResourceManager {
     public static final String DEFAULT_PACK_NAME = "test";
     private static final InputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
 
@@ -128,7 +128,7 @@ public class MockResourceManager implements ResourceManager {
      * in the future.
      * @author soir20
      */
-    public static class MockSimpleResource extends SimpleResource {
+    public static final class MockSimpleResource extends SimpleResource {
         public MockSimpleResource(ResourceLocation locationIn, String packName) {
             super(packName, locationIn, EMPTY_STREAM, null);
         }

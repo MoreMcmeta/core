@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link MetadataRegistryImpl}.
  * @author soir20
  */
-public class MetadataRegistryImplTest {
+public final class MetadataRegistryImplTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

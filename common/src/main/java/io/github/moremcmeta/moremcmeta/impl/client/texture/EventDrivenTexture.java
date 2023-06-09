@@ -48,7 +48,7 @@ import static java.util.Objects.requireNonNull;
  * render thread.</p>
  * @author soir20
  */
-public class EventDrivenTexture extends AbstractTexture implements CustomTickable {
+public final class EventDrivenTexture extends AbstractTexture implements CustomTickable {
 
     /**
      * The coordinate at which textures should upload to themselves.
@@ -134,7 +134,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Builds an event-driven texture from components.
      * @author soir20
      */
-    public static class Builder {
+    public static final class Builder {
         private final List<CoreTextureComponent> COMPONENTS;
         private List<? extends CloseableImageFrame> predefinedFrames;
         private CloseableImageFrame generatedFrame;
@@ -283,7 +283,7 @@ public class EventDrivenTexture extends AbstractTexture implements CustomTickabl
      * Provides a view of the current state of the texture and the current frame.
      * @author soir20
      */
-    public static class TextureAndFrameView implements CurrentFrameView, UploadableFrameView {
+    public static final class TextureAndFrameView implements CurrentFrameView, UploadableFrameView {
         private final TextureState STATE;
         private final int LAYER;
         private boolean valid;

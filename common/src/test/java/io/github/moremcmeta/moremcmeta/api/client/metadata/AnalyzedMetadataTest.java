@@ -27,7 +27,7 @@ import static org.junit.Assert.assertFalse;
  * Tests the default methods of the {@link AnalyzedMetadata} class.
  * @author soir20
  */
-public class AnalyzedMetadataTest {
+public final class AnalyzedMetadataTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

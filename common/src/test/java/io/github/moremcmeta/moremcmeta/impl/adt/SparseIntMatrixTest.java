@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  * Tests the {@link SparseIntMatrix}.
  * @author soir20
  */
-public class SparseIntMatrixTest {
+public final class SparseIntMatrixTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

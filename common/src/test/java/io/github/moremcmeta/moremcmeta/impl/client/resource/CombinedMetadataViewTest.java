@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link CombinedMetadataView}.
  * @author soir20
  */
-public class CombinedMetadataViewTest {
+public final class CombinedMetadataViewTest {
     private static final MockMetadataView MOCK_SUB_VIEW = new MockMetadataView(List.of("test"));
     private static final InputStream MOCK_STREAM = new ByteArrayInputStream("eight".getBytes());
     private static final ImmutableList<MetadataView> MOCK_VIEWS = ImmutableList.of(

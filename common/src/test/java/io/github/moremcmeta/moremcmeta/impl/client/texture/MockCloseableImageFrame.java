@@ -25,7 +25,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
  * A fake {@link CloseableImageFrame}.
  * @author soir20
  */
-public class MockCloseableImageFrame extends CloseableImageFrame {
+public final class MockCloseableImageFrame extends CloseableImageFrame {
     private final ImmutableList<MockCloseableImage> MIPMAPS;
     private int uploads;
     private long lastUploadPoint;

@@ -31,7 +31,7 @@ import java.util.Optional;
  * Mock implementation of {@link MetadataView} that contains no data.
  * @author soir20
  */
-public class MockMetadataView implements MetadataView {
+public final class MockMetadataView implements MetadataView {
     private final Map<String, Object> SECTION_TO_VALUE;
 
     public MockMetadataView(List<String> sections) {

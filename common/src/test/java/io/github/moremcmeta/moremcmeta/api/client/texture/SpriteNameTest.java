@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  * Tests the {@link SpriteName} utility functions.
  * @author soir20
  */
-public class SpriteNameTest {
+public final class SpriteNameTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

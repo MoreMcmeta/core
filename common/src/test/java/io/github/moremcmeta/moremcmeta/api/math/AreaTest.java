@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link Area} as a rectangle and as a free-form area.
  * @author soir20
  */
-public class AreaTest {
+public final class AreaTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

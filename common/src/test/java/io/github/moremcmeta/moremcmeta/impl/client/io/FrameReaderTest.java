@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link FrameReader} with predefined and not-defined frames.
  * @author soir20
  */
-public class FrameReaderTest {
+public final class FrameReaderTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

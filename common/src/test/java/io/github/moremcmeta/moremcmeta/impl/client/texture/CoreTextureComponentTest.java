@@ -26,7 +26,7 @@ import java.util.List;
  * Tests the default methods of the {@link CoreTextureComponent}.
  * @author soir20
  */
-public class CoreTextureComponentTest {
+public final class CoreTextureComponentTest {
 
     @Test
     public void onRegistration_NullState_NoException() {

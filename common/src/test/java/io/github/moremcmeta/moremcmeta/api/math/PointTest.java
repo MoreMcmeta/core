@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  * Tests the {@link Point}.
  * @author soir20
  */
-public class PointTest {
+public final class PointTest {
 
     @Test
     public void x_SomePoint_CorrectCoordinate() {

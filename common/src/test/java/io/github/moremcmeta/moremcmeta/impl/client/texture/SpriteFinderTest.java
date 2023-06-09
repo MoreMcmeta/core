@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
  * Tests the {@link SpriteFinder}.
  * @author soir20
  */
-public class SpriteFinderTest {
+public final class SpriteFinderTest {
     private static final ResourceLocation TEST_LOCATION = new ResourceLocation("textures/bat.png");
 
     @Rule

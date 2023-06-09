@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  * Tests the {@link ModRepositorySource}.
  * @author soir20
  */
-public class ModRepositorySourceTest {
+public final class ModRepositorySourceTest {
     private static final Pack.PackConstructor MOCK_CONSTRUCTOR =
             (id, title, required, packSupplier, packMetadataSection, position, packSource) ->
                     new Pack(id, title, required, packSupplier, packMetadataSection, PackType.CLIENT_RESOURCES,

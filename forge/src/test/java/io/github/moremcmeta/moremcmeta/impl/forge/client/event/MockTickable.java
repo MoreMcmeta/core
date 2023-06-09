@@ -23,7 +23,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.CustomTickable;
  * A tick counter that represents a tickable item.
  * @author soir20
  */
-public class MockTickable implements CustomTickable {
+public final class MockTickable implements CustomTickable {
     private int ticks;
 
     @Override

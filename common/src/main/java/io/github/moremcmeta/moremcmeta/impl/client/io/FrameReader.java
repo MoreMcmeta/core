@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * @param <F>   tickable texture type
  * @author soir20
  */
-public class FrameReader<F> {
+public final class FrameReader<F> {
     private final Function<FrameData, ? extends F> FRAME_FACTORY;
 
     /**
@@ -92,7 +92,7 @@ public class FrameReader<F> {
      * Holds data about a single frame.
      * @author soir20
      */
-    public static class FrameData {
+    public static final class FrameData {
         private final int WIDTH;
         private final int HEIGHT;
         private final int X_OFFSET;

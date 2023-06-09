@@ -58,7 +58,7 @@ import java.util.function.ToIntFunction;
  * @author soir20
  */
 @SuppressWarnings("unused")
-public class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer {
+public final class MoreMcmetaFabric extends MoreMcmeta implements ClientModInitializer {
     private static final String PLUGIN_ENTRYPOINT = MODID + "-client";
 
     @Override

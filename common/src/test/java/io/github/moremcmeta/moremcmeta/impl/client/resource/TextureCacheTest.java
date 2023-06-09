@@ -40,7 +40,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link TextureCache}.
  * @author soir20
  */
-public class TextureCacheTest {
+public final class TextureCacheTest {
     private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceSearcher) -> Map.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),

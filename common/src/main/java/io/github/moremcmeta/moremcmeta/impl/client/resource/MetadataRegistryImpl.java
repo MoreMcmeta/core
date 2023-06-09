@@ -37,7 +37,7 @@ import static java.util.Objects.requireNonNull;
  * Implementation of {@link MetadataRegistry} that can be updated.
  * @author soir20
  */
-public class MetadataRegistryImpl implements MetadataRegistry {
+public final class MetadataRegistryImpl implements MetadataRegistry {
     private ImmutableMap<String, ImmutableMap<ResourceLocation, AnalyzedMetadata>> metadata;
 
     /**

@@ -33,7 +33,7 @@ import java.util.BitSet;
  * maximum power is unnecessarily large or too large to work correctly with the provided dimensions.</p>
  * @author soir20
  */
-public class SparseIntMatrix {
+public final class SparseIntMatrix {
     private final BitSet IS_PRESENT;
     private final int WIDTH;
     private final int HEIGHT;

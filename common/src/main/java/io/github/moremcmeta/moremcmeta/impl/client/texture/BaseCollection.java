@@ -37,7 +37,7 @@ import static java.util.Objects.requireNonNull;
  * A collection of bases for a particular texture.
  * @author soir20
  */
-public class BaseCollection {
+public final class BaseCollection {
     private final Map<ResourceLocation, Collection<MipmappedBase>> BASES;
     private final int MAX_MIPMAP;
 

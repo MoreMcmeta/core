@@ -33,7 +33,7 @@ import static java.util.Objects.requireNonNull;
  * @param <I> texture image type
  * @author soir20
  */
-public class TextureData<I extends CloseableImage> {
+public final class TextureData<I extends CloseableImage> {
     private final FrameSize FRAME_SIZE;
     private final boolean BLUR;
     private final boolean CLAMP;

@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
  * @param <F> type of {@link FrameView} available from this group
  * @author soir20
  */
-public class FrameGroupImpl<F extends FrameView> implements FrameGroup<F> {
+public final class FrameGroupImpl<F extends FrameView> implements FrameGroup<F> {
     private final List<F> FRAMES;
 
     /**

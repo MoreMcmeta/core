@@ -41,7 +41,7 @@ import static java.util.Objects.requireNonNull;
  * @param <I> image type
  * @author soir20
  */
-public class TextureDataReader<I extends CloseableImage> implements TextureReader<TextureData<I>> {
+public final class TextureDataReader<I extends CloseableImage> implements TextureReader<TextureData<I>> {
     private final Map<String, MoreMcmetaTexturePlugin> SECTION_TO_PLUGIN;
     private final ImageReader<? extends I> IMAGE_READER;
     private final BlurClampApplier<? super I, ? extends I> BLUR_CLAMP_APPLIER;

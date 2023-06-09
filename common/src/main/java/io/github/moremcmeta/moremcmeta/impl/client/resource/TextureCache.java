@@ -39,7 +39,7 @@ import static java.util.Objects.requireNonNull;
  * @param <R> type of resource to cache
  * @param <S> type of state
  */
-public class TextureCache<R, S> {
+public final class TextureCache<R, S> {
     private final Lock LOCK;
     private final Condition IS_CURRENT;
     private final TextureLoader<R> LOADER;

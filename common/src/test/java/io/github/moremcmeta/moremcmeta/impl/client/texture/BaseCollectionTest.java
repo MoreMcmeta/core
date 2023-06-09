@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link BaseCollection}.
  * @author soir20
  */
-public class BaseCollectionTest {
+public final class BaseCollectionTest {
     private static final ResourceLocation NO_SPRITE_LOCATION_1 = new ResourceLocation("no_sprite1.png");
     private static final ResourceLocation SPRITE_LOCATION_1 = new ResourceLocation("sprite1.png");
     private static final ResourceLocation SPRITE_ATLAS_1 = new ResourceLocation("textures/atlas/blocks.png");

@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * if it is used too early (and the manager is null).
  * @author soir20
  */
-public class TextureManagerAdapter implements Manager<AbstractTexture> {
+public final class TextureManagerAdapter implements Manager<AbstractTexture> {
     private final Supplier<? extends TextureManager> MANAGER_GETTER;
     private final BiConsumer<TextureManager, ResourceLocation> UNREGISTER_ACTION;
 

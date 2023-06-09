@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
  * Tests the {@link AnnotatedClassLoader} with dummy annotation data.
  * @author soir20
  */
-public class AnnotatedClassLoaderTest {
+public final class AnnotatedClassLoaderTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
@@ -215,7 +215,7 @@ public class AnnotatedClassLoaderTest {
      * A mock texture plugin.
      * @author soir20
      */
-    public static class MockPluginOne implements MoreMcmetaTexturePlugin {
+    public static final class MockPluginOne implements MoreMcmetaTexturePlugin {
 
         @Override
         public String id() {
@@ -242,7 +242,7 @@ public class AnnotatedClassLoaderTest {
      * A mock texture plugin.
      * @author soir20
      */
-    public static class MockPluginTwo implements MoreMcmetaTexturePlugin {
+    public static final class MockPluginTwo implements MoreMcmetaTexturePlugin {
 
         @Override
         public String id() {
@@ -269,7 +269,7 @@ public class AnnotatedClassLoaderTest {
      * A mock reader plugin.
      * @author soir20
      */
-    public static class MockPluginThree implements MoreMcmetaMetadataParserPlugin {
+    public static final class MockPluginThree implements MoreMcmetaMetadataParserPlugin {
 
         @Override
         public String id() {
@@ -291,7 +291,7 @@ public class AnnotatedClassLoaderTest {
      * A mock reader plugin.
      * @author soir20
      */
-    public static class MockPluginFour implements MoreMcmetaMetadataParserPlugin {
+    public static final class MockPluginFour implements MoreMcmetaMetadataParserPlugin {
 
         @Override
         public String id() {
@@ -313,7 +313,7 @@ public class AnnotatedClassLoaderTest {
      * A mock plugin with no default constructor.
      * @author soir20
      */
-    public static class PluginWithoutDefaultConstructor implements MoreMcmetaTexturePlugin {
+    public static final class PluginWithoutDefaultConstructor implements MoreMcmetaTexturePlugin {
         private final String NAME;
 
         public PluginWithoutDefaultConstructor(String name) {
@@ -345,7 +345,7 @@ public class AnnotatedClassLoaderTest {
      * A mock plugin that throws a {@link LinkageError} when constructed.
      * @author soir20
      */
-    public static class LinkageErrorPlugin implements MoreMcmetaTexturePlugin {
+    public static final class LinkageErrorPlugin implements MoreMcmetaTexturePlugin {
 
         public LinkageErrorPlugin() {
             throw new LinkageError("dummy exception");

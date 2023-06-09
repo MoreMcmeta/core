@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * Tests that the {@link ColorBlender} performs calculations close to Minecraft's {@link MipmapGenerator}.
  * @author soir20
  */
-public class ColorBlenderTest {
+public final class ColorBlenderTest {
     private static final MethodHandle EXPECTED_HANDLE;
     static {
         try {

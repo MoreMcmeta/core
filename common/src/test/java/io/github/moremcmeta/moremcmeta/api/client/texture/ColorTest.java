@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  * Tests the {@link Color}.
  * @author soir20
  */
-public class ColorTest {
+public final class ColorTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Mocks an {@link CloseableImage}. Keeps track of set pixel colors.
  * @author soir20
  */
-public class MockCloseableImage implements CloseableImage {
+public final class MockCloseableImage implements CloseableImage {
     public static final int DEFAULT_DIMENSION = 100;
 
     private final int[][] PIXELS;
@@ -163,7 +163,7 @@ public class MockCloseableImage implements CloseableImage {
      * Mock exception thrown when a sub-image that extends beyond the original is created.
      * @author soir20
      */
-    public static class MockSubImageOutsideOriginalException extends RuntimeException {
+    public static final class MockSubImageOutsideOriginalException extends RuntimeException {
 
         public MockSubImageOutsideOriginalException() {
             super("Sub-image extends beyond original");

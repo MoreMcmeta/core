@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> texture type
  * @author soir20
  */
-public class TextureManagerWrapper<T extends AbstractTexture & CustomTickable> implements Manager<T> {
+public final class TextureManagerWrapper<T extends AbstractTexture & CustomTickable> implements Manager<T> {
     private final Manager<? super AbstractTexture> DELEGATE;
     private final Map<ResourceLocation, CustomTickable> TICKABLE_TEXTURES;
 

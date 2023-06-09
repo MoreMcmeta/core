@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
  */
 @SuppressWarnings("unused")
 @Mixin(RenderSystem.class)
-public class RenderSystemMixin {
+public final class RenderSystemMixin {
 
     /**
      * Binds a texture when it is set as a shader texture. This method is usually called by GUI

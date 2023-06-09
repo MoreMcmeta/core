@@ -26,7 +26,7 @@ import org.junit.rules.ExpectedException;
  * Tests the {@link AtlasAdapter}.
  * @author soir20
  */
-public class AtlasAdapterTest {
+public final class AtlasAdapterTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

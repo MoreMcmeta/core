@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  * Tests the {@link PredefinedFrameView}.
  * @author soir20
  */
-public class PredefinedFrameViewTest {
+public final class PredefinedFrameViewTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

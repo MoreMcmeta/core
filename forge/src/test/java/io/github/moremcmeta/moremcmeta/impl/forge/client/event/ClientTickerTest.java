@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
  * Tests using and stopping the client-side ticker.
  * @author soir20
  */
-public class ClientTickerTest {
+public final class ClientTickerTest {
     private final MockEventBus EVENT_BUS = new MockEventBus();
 
     @Rule

@@ -32,7 +32,7 @@ import java.util.function.Consumer;
  * methods are implemented; the rest simply fulfill {@link IEventBus}.
  * @author soir20
  */
-public class MockEventBus implements IEventBus {
+public final class MockEventBus implements IEventBus {
     private final ArrayList<Object> LISTENERS;
 
     public MockEventBus() {

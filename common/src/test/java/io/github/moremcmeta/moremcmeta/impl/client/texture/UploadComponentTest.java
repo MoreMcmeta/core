@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link UploadComponent}.
  * @author soir20
  */
-public class UploadComponentTest {
+public final class UploadComponentTest {
     private static final ResourceLocation DUMMY_LOCATION = new ResourceLocation("dummy.png");
     private static final TexturePreparer DUMMY_PREPARER =  (id, mipmap, width, height) -> {};
     private static final BaseCollection DUMMY_BASE_COLLECTION = BaseCollection.find(

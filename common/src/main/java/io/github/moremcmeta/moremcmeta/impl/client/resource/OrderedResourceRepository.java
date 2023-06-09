@@ -118,7 +118,7 @@ public class OrderedResourceRepository {
      * Contains the result of a {@link ResourceCollection} search.
      * @author soir20
      */
-    public static class ResourceCollectionResult {
+    public final static class ResourceCollectionResult {
         private final ResourceCollection COLLECTION;
         private final int INDEX;
 

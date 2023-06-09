@@ -30,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  * Wraps a {@link NativeImage} so it is compatible with the {@link CloseableImage} interface.
  * @author soir20
  */
-public class NativeImageAdapter implements CloseableImage {
+public final class NativeImageAdapter implements CloseableImage {
     private final NativeImage IMAGE;
     private final int X_OFFSET;
     private final int Y_OFFSET;

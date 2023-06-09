@@ -37,7 +37,7 @@ import static java.util.Objects.requireNonNull;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ModRepositorySource implements RepositorySource {
+public final class ModRepositorySource implements RepositorySource {
 
     /**
      * The unique identifier for the mod's resource pack.

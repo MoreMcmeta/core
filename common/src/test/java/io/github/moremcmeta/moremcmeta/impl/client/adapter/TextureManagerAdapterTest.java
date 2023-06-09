@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  * @author soir20
  */
 @SuppressWarnings("resource")
-public class TextureManagerAdapterTest {
+public final class TextureManagerAdapterTest {
     private static final ResourceManager MOCK_RESOURCE_MANAGER =
             new MockResourceManager(ImmutableList.of(), ImmutableList.of(), false);
 

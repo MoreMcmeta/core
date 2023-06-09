@@ -47,7 +47,7 @@ import static org.junit.Assert.*;
  * Tests the {@link PackResourcesAdapter}.
  * @author soir20
  */
-public class PackResourcesAdapterTest {
+public final class PackResourcesAdapterTest {
     private static final Logger LOGGER = LogManager.getLogger();
     
     @Rule

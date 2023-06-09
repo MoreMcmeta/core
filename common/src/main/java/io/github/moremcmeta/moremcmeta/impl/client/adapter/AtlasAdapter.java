@@ -37,7 +37,7 @@ import static java.util.Objects.requireNonNull;
  * Adapts a {@link TextureAtlas} to be a {@link Atlas}.
  * @author soir20
  */
-public class AtlasAdapter implements Atlas {
+public final class AtlasAdapter implements Atlas {
     private final TextureAtlas ATLAS;
     private final ToIntFunction<TextureAtlasSprite> MIPMAP_LEVEL_GETTER;
 

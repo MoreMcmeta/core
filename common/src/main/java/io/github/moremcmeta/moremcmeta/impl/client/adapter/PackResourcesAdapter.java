@@ -37,7 +37,7 @@ import static java.util.Objects.requireNonNull;
  * Allows Minecraft's {@link PackResources} to implement {@link ResourceCollection}.
  * @author soir20
  */
-public class PackResourcesAdapter implements ResourceCollection {
+public final class PackResourcesAdapter implements ResourceCollection {
     private final PackResources ORIGINAL;
     private final Logger LOGGER;
 

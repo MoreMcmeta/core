@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  * Tests the {@link FrameGroupImpl}.
  * @author soir20
  */
-public class FrameGroupImplTest {
+public final class FrameGroupImplTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

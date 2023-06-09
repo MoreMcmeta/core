@@ -26,7 +26,7 @@ import org.junit.rules.ExpectedException;
  * {@link MetadataView}.
  * @author soir20
  */
-public class NegativeKeyIndexExceptionTest {
+public final class NegativeKeyIndexExceptionTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

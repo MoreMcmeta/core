@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link EventDrivenTexture}.
  * @author soir20
  */
-public class EventDrivenTextureTest {
+public final class EventDrivenTextureTest {
     private static final ResourceLocation DUMMY_BASE_LOCATION = new ResourceLocation("dummy.png");
 
     @Rule

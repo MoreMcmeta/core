@@ -24,7 +24,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
  * @author soir20
  * @see <a href="https://learnopengl.com/Advanced-Lighting/Gamma-Correction">OpenGL Reference</a>
  */
-public class ColorBlender {
+public final class ColorBlender {
     private static final double GAMMA = 2.2F;
     private static final double INVERSE_GAMMA = 1 / GAMMA;
 
@@ -103,5 +103,10 @@ public class ColorBlender {
 
         return (int) (Math.pow(average, INVERSE_GAMMA) * COMPONENT_MAX);
     }
+
+    /**
+     * Prevents the blender from being constructed.
+     */
+    private ColorBlender() {}
 
 }

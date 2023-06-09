@@ -29,7 +29,7 @@ import static java.util.Objects.requireNonNull;
  * Manages uploading a texture that is not associated with an atlas sprite.
  * @author soir20
  */
-public class UploadComponent implements CoreTextureComponent {
+public final class UploadComponent implements CoreTextureComponent {
     private final TexturePreparer PREPARER;
     private final BaseCollection BASE_DATA;
 

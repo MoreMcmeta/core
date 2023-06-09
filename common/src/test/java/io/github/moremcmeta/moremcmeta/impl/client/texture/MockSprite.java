@@ -24,7 +24,7 @@ import net.minecraft.resources.ResourceLocation;
  * A fake {@link Sprite}.
  * @author soir20
  */
-public class MockSprite implements Sprite {
+public final class MockSprite implements Sprite {
     private final ResourceLocation NAME;
     private final long UPLOAD_POINT;
     private final int MIPMAP_LEVEL;

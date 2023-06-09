@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  * Tests the {@link TextureManagerWrapper}.
  * @author soir20
  */
-public class TextureManagerWrapperTest {
+public final class TextureManagerWrapperTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

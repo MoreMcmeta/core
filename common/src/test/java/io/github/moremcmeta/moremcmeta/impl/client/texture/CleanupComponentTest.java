@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * Tests the {@link CleanupComponent}.
  * @author soir20
  */
-public class CleanupComponentTest {
+public final class CleanupComponentTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

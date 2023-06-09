@@ -46,7 +46,7 @@ import static java.util.Objects.requireNonNull;
  * @param <I> image type
  * @author soir20
  */
-public class TextureDataAssembler<I extends CloseableImage> {
+public final class TextureDataAssembler<I extends CloseableImage> {
 
     /** An upload component is added later, so an additional layer is needed. */
     public final static int EXTERNAL_DEFAULT_COMPONENTS = 1;

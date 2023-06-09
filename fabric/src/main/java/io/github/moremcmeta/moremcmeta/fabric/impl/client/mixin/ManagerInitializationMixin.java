@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(Minecraft.class)
 @SuppressWarnings("unused")
-public class ManagerInitializationMixin {
+public final class ManagerInitializationMixin {
 
     /**
      * Injects a callback after the resource manager is initialized on Fabric.
