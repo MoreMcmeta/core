@@ -37,17 +37,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.forgespi.language.ModFileScanData;
-import net.minecraftforge.network.NetworkConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,14 +54,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
-import static io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta.MODID;
-
 /**
- * The main mod class and entrypoint for Forge.
+ * The main mod class and clientside entrypoint for Forge.
  * @author soir20
  */
-@SuppressWarnings("unused")
-@Mod(MODID)
 public final class MoreMcmetaForge extends MoreMcmeta {
     private final AnnotatedClassLoader CLASS_LOADER;
 
@@ -85,18 +75,6 @@ public final class MoreMcmetaForge extends MoreMcmeta {
                 },
                 LogManager.getLogger()
         );
-
-        /* Make sure the mod being absent on the other network side does not
-           cause the client to display the server as incompatible. */
-        ModLoadingContext.get().registerExtensionPoint(
-                IExtensionPoint.DisplayTest.class,
-                ()-> new IExtensionPoint.DisplayTest(
-                        () -> NetworkConstants.IGNORESERVERONLY,
-                        (remoteVersion, isServer)-> true
-                )
-        );
-
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> this::start);
     }
 
     @Override
