@@ -111,6 +111,7 @@ public abstract class MoreMcmeta {
     private static ImmutableMap<ResourceLocation, ImmutableSet<ResourceLocation>> dependencies = ImmutableMap.of();
 
     private final Set<String> DEFAULT_PLUGINS = Set.of(
+            "moremcmeta_texture_plugin",
             "moremcmeta_animation_plugin",
             "moremcmeta_properties_parser_plugin",
             "moremcmeta_json_parser_plugin"
