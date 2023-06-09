@@ -1,6 +1,6 @@
 /*
  * MoreMcmeta is a Minecraft mod expanding texture animation capabilities.
- * Copyright (C) 2022 soir20
+ * Copyright (C) 2023 soir20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
