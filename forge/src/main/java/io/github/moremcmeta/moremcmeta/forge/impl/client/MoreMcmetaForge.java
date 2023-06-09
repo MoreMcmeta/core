@@ -66,6 +66,7 @@ import static io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta.MODID;
  * The main mod class and entrypoint for Forge.
  * @author soir20
  */
+@SuppressWarnings("unused")
 @Mod(MODID)
 public final class MoreMcmetaForge extends MoreMcmeta {
     private final AnnotatedClassLoader CLASS_LOADER;
