@@ -357,12 +357,12 @@ public abstract class MoreMcmeta {
 
         plugins.forEach((plugin) -> {
             T item = itemRetriever.apply(plugin);
-            String displayName = plugin.id();
+            String id = plugin.id();
 
             /* Disable default plugin if there is a user-provided plugin with the same item.
                It has already been validated that no two plugins have the same ID, so only
                default plugins will be disabled. */
-            if (countBySection.get(item) > 1 && defaultPluginIds.contains(displayName)) {
+            if (countBySection.get(item) > 1 && defaultPluginIds.contains(id)) {
                 logger.info("Disabled default plugin {} as a replacement plugin was provided", plugin.id());
             } else {
                 results.add(plugin);
