@@ -1,5 +1,5 @@
 # MoreMcmeta
-![MoreMcmeta logo](./info/img/moremcmeta-logo-black.png)
+![MoreMcmeta logo](./info/img/moremcmeta-logo-gradient.png)
 
 Animate almost any texture with more options.
 
