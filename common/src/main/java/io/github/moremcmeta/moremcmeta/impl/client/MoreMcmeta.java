@@ -114,7 +114,8 @@ public abstract class MoreMcmeta {
             "moremcmeta_texture_plugin",
             "moremcmeta_animation_plugin",
             "moremcmeta_properties_parser_plugin",
-            "moremcmeta_json_parser_plugin"
+            "moremcmeta_moremcmeta_parser_plugin",
+            "moremcmeta_mcmeta_parser_plugin"
     );
 
     /**
