@@ -82,8 +82,8 @@ public final class TextureDataAssembler<I extends CloseableImage> {
         boolean blur = data.blur();
         boolean clamp = data.clamp();
 
-        int maxMipmapX = Mth.log2(frameWidth);
-        int maxMipmapY = Mth.log2(frameHeight);
+        int maxMipmapX = Mth.log2(Integer.lowestOneBit(frameWidth));
+        int maxMipmapY = Mth.log2(Integer.lowestOneBit(frameHeight));
 
         // Create frames
         int layers = data.analyzedMetadata().size() + EXTERNAL_DEFAULT_COMPONENTS + INTERNAL_DEFAULT_COMPONENTS;
