@@ -112,8 +112,7 @@ public final class TextureDataAssembler<I extends CloseableImage> {
         // Add components
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setPredefinedFrames(frames)
-                .setGeneratedFrame(generatedFrame)
-                .add(new CleanupComponent(closeMipmaps));
+                .setGeneratedFrame(generatedFrame);
 
         for (int index = 0; index < data.analyzedMetadata().size(); index++) {
             Triple<String, AnalyzedMetadata, ComponentBuilder> metadata = data.analyzedMetadata().get(index);
@@ -129,6 +128,7 @@ public final class TextureDataAssembler<I extends CloseableImage> {
             );
         }
 
+        builder.add(new CleanupComponent(closeMipmaps));
         return builder;
     }
 
