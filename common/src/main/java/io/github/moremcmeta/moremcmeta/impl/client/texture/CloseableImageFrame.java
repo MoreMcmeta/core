@@ -214,28 +214,6 @@ public class CloseableImageFrame {
     }
 
     /**
-     * Copies pixels from another frame onto this frame. The other frame cannot
-     * have a lower mipmap level than this frame. The size of the copied area
-     * will be the smaller of the two frame widths and the smaller of the two
-     * frame heights.
-     * @param source     the source frame to copy from
-     * @throws IllegalStateException if this frame has been closed
-     */
-    public void copyFrom(CloseableImageFrame source) {
-        checkOpen();
-
-        requireNonNull(source, "Source cannot be null");
-
-        if (source.mipmapLevel() < mipmapLevel()) {
-            throw new IllegalArgumentException("Other frame cannot have lower mipmap level");
-        }
-
-        for (int level = 0; level <= mipmapLevel(); level++) {
-            mipmaps.get(level).copyFrom(source.mipmaps.get(level));
-        }
-    }
-
-    /**
      * Applies the given transformation to this frame. The transform is applied
      * directly to the topmost mipmap only. An equivalent transformation for all
      * mipmaps will be computed. A {@link IllegalArgumentException} will be thrown

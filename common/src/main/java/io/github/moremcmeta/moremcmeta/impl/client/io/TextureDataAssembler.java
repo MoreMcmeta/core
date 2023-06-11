@@ -122,6 +122,7 @@ public final class TextureDataAssembler<I extends CloseableImage> {
                     buildComponent(
                             metadata.getRight(),
                             frames,
+                            generatedFrame,
                             sectionData,
                             index
                     )
@@ -195,18 +196,26 @@ public final class TextureDataAssembler<I extends CloseableImage> {
 
     /**
      * Creates a texture component based on the given frames and builder.
-     * @param builder       component builder
-     * @param frames        predefined frames
-     * @param metadata      metadata associated with the transform
-     * @param layer         index of layer to apply transformations to
+     * @param builder           component builder
+     * @param frames            predefined frames
+     * @param generatedFrame    frame that should be identical to the first predefined frame after this method exits
+     * @param metadata          metadata associated with the transform
+     * @param layer             index of layer to apply transformations to
      * @return assembled component
      */
     private TextureComponent<? super CurrentFrameView> buildComponent(ComponentBuilder builder,
                                                                       List<CloseableImageFrame> frames,
+                                                                      CloseableImageFrame generatedFrame,
                                                                       AnalyzedMetadata metadata, int layer) {
         FrameGroup<MutableFrameViewImpl> mutableFrames = new FrameGroupImpl<>(
                 frames,
-                (frame, index) -> new MutableFrameViewImpl(frame, layer)
+                (frame, index) -> {
+                    if (index == 0) {
+                        return new MutableFrameViewImpl(layer, frame, generatedFrame);
+                    }
+
+                    return new MutableFrameViewImpl(layer, frame);
+                }
         );
 
         TextureComponent<? super CurrentFrameView> component = builder.build(
@@ -225,17 +234,20 @@ public final class TextureDataAssembler<I extends CloseableImage> {
      */
     private static class MutableFrameViewImpl implements MutableFrameView {
         private final CloseableImageFrame FRAME;
+        private final CloseableImageFrame[] OTHER_FRAMES;
         private final int LAYER;
         private boolean valid;
 
         /**
          * Creates a new view for a mutable predefined frame.
-         * @param frame         the original frame
          * @param layer         layer in the original frame to apply transformations to
+         * @param frame         the original frame
+         * @param otherFrames   other frames to apply the transformations to
          */
-        public MutableFrameViewImpl(CloseableImageFrame frame, int layer) {
-            FRAME = frame;
+        public MutableFrameViewImpl(int layer, CloseableImageFrame frame, CloseableImageFrame... otherFrames) {
             LAYER = layer;
+            FRAME = frame;
+            OTHER_FRAMES = otherFrames;
             valid = true;
         }
 
@@ -255,6 +267,9 @@ public final class TextureDataAssembler<I extends CloseableImage> {
         public void transform(ColorTransform transform, Area applyArea) {
             checkValid();
             FRAME.applyTransform(transform, applyArea, LAYER);
+            for (CloseableImageFrame frame : OTHER_FRAMES) {
+                frame.applyTransform(transform, applyArea, LAYER);
+            }
         }
 
         /**

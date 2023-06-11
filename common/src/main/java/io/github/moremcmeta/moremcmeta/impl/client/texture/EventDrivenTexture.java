@@ -395,7 +395,6 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
         private final CloseableImageFrame GENERATED_FRAME;
         private final Set<ResourceLocation> BASES_UPLOADED_SINCE_UPDATE;
         private Integer currentFrameIndex;
-        private Integer indexToCopyToGenerated;
 
         /**
          * Applies the provided transformation to the current frame to generate
@@ -412,7 +411,7 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
             currentFrameIndex = null;
 
             // We may wish to delay updates later if the transforms list is optimized, but update immediately for now
-            updateGeneratedFrame(transform, applyArea, layer);
+            GENERATED_FRAME.applyTransform(transform, applyArea, layer);
 
         }
 
@@ -505,7 +504,6 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
 
             markNeedsUpload();
             currentFrameIndex = index;
-            indexToCopyToGenerated = index;
         }
 
         /**
@@ -521,23 +519,6 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
          */
         private CloseableImageFrame currentFrame() {
             return currentFrameIndex == null ? GENERATED_FRAME : PREDEFINED_FRAMES.get(currentFrameIndex);
-        }
-
-        /**
-         * Applies all transformations to the generated frame.
-         * @param transform     the transformation to apply to the current frame
-         * @param applyArea     area to apply the transformation to
-         * @param layer         layer to apply the transform to
-         */
-        private void updateGeneratedFrame(ColorTransform transform, Area applyArea, int layer) {
-            if (indexToCopyToGenerated != null) {
-                CloseableImageFrame copyFrame = PREDEFINED_FRAMES.get(indexToCopyToGenerated);
-                GENERATED_FRAME.copyFrom(copyFrame);
-
-                indexToCopyToGenerated = null;
-            }
-
-            GENERATED_FRAME.applyTransform(transform, applyArea, layer);
         }
 
     }
