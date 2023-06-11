@@ -3,14 +3,14 @@
   "id": "moremcmeta",
   "version": "${modVersion}",
   "name": "MoreMcmeta",
-  "description": "Animate almost any Minecraft texture with more options.",
+  "description": "Animate almost any Minecraft texture with more options. Texture configuration API.",
   "authors": [
     "soir20"
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/moremcmeta",
-    "sources": "https://github.com/soir20/MoreMcmeta",
-    "issues": "https://github.com/soir20/MoreMcmeta/issues"
+    "sources": "https://github.com/MoreMcmeta/core",
+    "issues": "https://github.com/MoreMcmeta/core/issues"
   },
   "license": "LGPL-3.0",
   "icon": "tricolor-zombie.png",

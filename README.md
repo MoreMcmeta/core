@@ -5,7 +5,7 @@ Animate almost any texture with more options.
 
 This means:
 * more possibilities for resource packs
-* [a familiar animation format](https://github.com/soir20/MoreMcmeta/wiki/User-Docs:-Animation-Format)
+* [a familiar animation format](https://github.com/MoreMcmeta/core/wiki/User-Docs:-Animation-Format)
 * not invasive—better compatibility with other mods
 
 ![Mob, GUI, shadow, moon, and enchantment glint examples](./info/img/demo.gif)
@@ -58,4 +58,4 @@ If you've set up a modded Minecraft environment before, MoreMcmeta is not much d
 After you import the Gradle project, the Architectury plugin should automatically generate run configurations for the client and server on Forge and Fabric. MoreMcmeta is a client-sided mod, but the server tasks are important to verify that it does not crash a dedicated server.
 
 ### Release
-View built releases at the [Releases](https://github.com/soir20/MoreMcmeta/releases}) page. Generally, this page has exactly the same versions as CurseForge. Stable development builds may be there in the future.
+View built releases at the [Releases](https://github.com/MoreMcmeta/core/releases}) page. Generally, this page has exactly the same versions as CurseForge. Stable development builds may be there in the future.
