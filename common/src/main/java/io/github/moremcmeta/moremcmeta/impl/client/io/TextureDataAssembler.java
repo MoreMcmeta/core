@@ -95,7 +95,7 @@ public final class TextureDataAssembler<I extends CloseableImage> {
                 layers
         );
         CloseableImageFrame generatedFrame = createGeneratedFrame(
-                mipmaps.size() - 1,
+                mipmaps,
                 frameWidth,
                 frameHeight,
                 blur,
@@ -166,7 +166,7 @@ public final class TextureDataAssembler<I extends CloseableImage> {
 
     /**
      * Creates a frame that will hold generated frames.
-     * @param maxMipmap             maximum mipmap level of the original image
+     * @param mipmaps               mipmaps of the full texture image (with all frames)
      * @param frameWidth            the width of a single frame
      * @param frameHeight           the height of a single frame
      * @param blur                  whether the images are blurred
@@ -174,16 +174,17 @@ public final class TextureDataAssembler<I extends CloseableImage> {
      * @param layers                number of layers in the image
      * @return the adapters for the interpolation images
      */
-    private CloseableImageFrame createGeneratedFrame(int maxMipmap, int frameWidth,
+    private CloseableImageFrame createGeneratedFrame(List<? extends I> mipmaps, int frameWidth,
                                                      int frameHeight, boolean blur, boolean clamp,
                                                      int layers) {
         ImmutableList.Builder<CloseableImage> images = new ImmutableList.Builder<>();
 
-        for (int level = 0; level <= maxMipmap; level++) {
+        for (int level = 0; level < mipmaps.size(); level++) {
             int mipmappedWidth = frameWidth >> level;
             int mipmappedHeight = frameHeight >> level;
 
             CloseableImage image = ALLOCATOR.allocate(mipmappedWidth, mipmappedHeight, level, blur, clamp);
+            image.copyFrom(mipmaps.get(level));
             images.add(image);
         }
 
