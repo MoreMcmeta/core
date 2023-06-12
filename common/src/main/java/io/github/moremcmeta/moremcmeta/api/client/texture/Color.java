@@ -17,6 +17,8 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
+import io.github.moremcmeta.moremcmeta.impl.client.texture.ColorBlender;
+
 /**
  * Represents an RGBA color.
  * @author soir20
@@ -79,6 +81,17 @@ public final class Color {
      */
     public static int alpha(int color) {
         return (color >> ALPHA_OFFSET) & COMPONENT_MASK;
+    }
+
+    /**
+     * Performs alpha blending/compositing between two partially-transparent colors, where one color
+     * is on top of another color.
+     * @param topColor          color above the other color
+     * @param bottomColor       color below the other color
+     * @return alpha-blended color when the topColor is above the bottomColor in the same pixel
+     */
+    public static int alphaBlend(int topColor, int bottomColor) {
+        return ColorBlender.alphaBlend(topColor, bottomColor);
     }
 
     /**

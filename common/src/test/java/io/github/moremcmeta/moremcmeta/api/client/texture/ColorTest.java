@@ -203,4 +203,12 @@ public final class ColorTest {
         assertNotEquals(second, first);
     }
 
+    @Test
+    public void alphaBlend_RandomColors_Correct() {
+
+        // Most tests are in ColorBlenderTest since Color's method calls that method
+        assertEquals(2036033069, Color.alphaBlend(1767640594, 475725420));
+
+    }
+
 }

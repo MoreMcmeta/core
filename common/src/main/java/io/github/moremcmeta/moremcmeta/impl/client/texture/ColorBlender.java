@@ -17,6 +17,8 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
+
 /**
  * Utility class to blend colors with gamma correction. Based off
  * {@link net.minecraft.client.renderer.texture.MipmapGenerator} implementation.
@@ -38,6 +40,33 @@ public final class ColorBlender {
             );
         }
     }
+    private static final int ALPHA_OFFSET = 24;
+    private static final int RED_OFFSET = 16;
+    private static final int GREEN_OFFSET = 8;
+    private static final int BLUE_OFFSET = 0;
+
+    /**
+     * Applies alpha blending/compositing to two colors, one of which overlays the other.
+     * @param topColor      color above the other color
+     * @param bottomColor   color below the other color
+     * @return alpha-blended color
+     */
+    public static int alphaBlend(int topColor, int bottomColor) {
+        float alphaTop = (float) Color.alpha(topColor) / COMPONENT_MAX;
+        float alphaTopComplement = 1 - alphaTop;
+        float alphaBottom = (float) Color.alpha(bottomColor) / COMPONENT_MAX;
+        float alphaOutput = alphaTop + alphaBottom * alphaTopComplement;
+
+        int alpha = (int) (COMPONENT_MAX * alphaOutput);
+        int red = alphaBlendComponent(topColor, bottomColor, RED_OFFSET, alphaTop, alphaTopComplement,
+                alphaBottom, alphaOutput);
+        int green = alphaBlendComponent(topColor, bottomColor, GREEN_OFFSET, alphaTop, alphaTopComplement,
+                alphaBottom, alphaOutput);
+        int blue = alphaBlendComponent(topColor, bottomColor, BLUE_OFFSET, alphaTop, alphaTopComplement,
+                alphaBottom, alphaOutput);
+
+        return packResult(alpha, red, green, blue);
+    }
 
     /**
      * Averages four colors with gamma correction.
@@ -53,12 +82,13 @@ public final class ColorBlender {
         color3 = zeroIfInvisible(color3);
         color4 = zeroIfInvisible(color4);
 
-        int blendedAlpha = blendComponent(color1, color2, color3, color4, 24);
-        int blendedRed = blendComponent(color1, color2, color3, color4, 16);
-        int blendedGreen = blendComponent(color1, color2, color3, color4, 8);
-        int blendedBlue = blendComponent(color1, color2, color3, color4, 0);
+        // MC's MipmapGenerator applies gamma correction to the alpha component, so this method does, too
+        int blendedAlpha = blendComponent(color1, color2, color3, color4, ALPHA_OFFSET);
+        int blendedRed = blendComponent(color1, color2, color3, color4, RED_OFFSET);
+        int blendedGreen = blendComponent(color1, color2, color3, color4, GREEN_OFFSET);
+        int blendedBlue = blendComponent(color1, color2, color3, color4, BLUE_OFFSET);
 
-        return blendedAlpha << 24 | blendedRed << 16 | blendedGreen << 8 | blendedBlue;
+        return packResult(blendedAlpha, blendedRed, blendedGreen, blendedBlue);
     }
 
     /**
@@ -102,6 +132,39 @@ public final class ColorBlender {
         float average = (gammaAdjusted1 + gammaAdjusted2 + gammaAdjusted3 + gammaAdjusted4) / 4;
 
         return (int) (Math.pow(average, INVERSE_GAMMA) * COMPONENT_MAX);
+    }
+
+    /**
+     * Applies alpha blending/compositing to a component in two colors.
+     * @param topColor              color above the other color
+     * @param bottomColor           color below the other color
+     * @param offset                offset of the component in each color
+     * @param alphaTop              alpha proportion (between 0 and 1) of the top color
+     * @param alphaTopComplement    1 - alphaTop
+     * @param alphaBottom           alpha proportion (between 0 and 1) of the bottom color
+     * @param alphaOutput           alpha proportion (between 0 and 1) of the output color
+     * @return alpha-blended component
+     */
+    private static int alphaBlendComponent(int topColor, int bottomColor, int offset, float alphaTop,
+                                           float alphaTopComplement, float alphaBottom, float alphaOutput) {
+        float gammaAdjustedTop = adjustGamma(topColor, offset);
+        float gammaAdjustedBottom = adjustGamma(bottomColor, offset);
+
+        float noGammaOutput = (gammaAdjustedTop * alphaTop + gammaAdjustedBottom * alphaBottom * alphaTopComplement)
+                / alphaOutput;
+        return (int) (Math.pow(noGammaOutput, INVERSE_GAMMA) * COMPONENT_MAX);
+    }
+
+    /**
+     * Packs individual components into a resultant color.
+     * @param alpha     alpha component
+     * @param red       red component
+     * @param green     green component
+     * @param blue      blue component
+     * @return components packed as a single color
+     */
+    private static int packResult(int alpha, int red, int green, int blue) {
+        return alpha << ALPHA_OFFSET | red << RED_OFFSET | green << GREEN_OFFSET | blue << BLUE_OFFSET;
     }
 
     /**
