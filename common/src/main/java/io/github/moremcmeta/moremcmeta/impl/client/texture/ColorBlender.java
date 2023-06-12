@@ -41,9 +41,9 @@ public final class ColorBlender {
         }
     }
     private static final int ALPHA_OFFSET = 24;
-    private static final int RED_OFFSET = 16;
+    private static final int RED_OFFSET = 0;
     private static final int GREEN_OFFSET = 8;
-    private static final int BLUE_OFFSET = 0;
+    private static final int BLUE_OFFSET = 16;
 
     /**
      * Applies alpha blending/compositing to two colors, one of which overlays the other.
@@ -98,7 +98,7 @@ public final class ColorBlender {
      * @return 0 if the color is invisible or the color
      */
     private static int zeroIfInvisible(int color) {
-        return color >> 24 == 0 ? 0 : color;
+        return Color.alpha(color) == 0 ? 0 : color;
     }
 
     /**

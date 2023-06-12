@@ -26,9 +26,9 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.ColorBlender;
  */
 public final class Color {
     private final static int COMPONENT_MASK = 0xff;
-    private final static int RED_OFFSET = 16;
+    private final static int RED_OFFSET = 0;
     private final static int GREEN_OFFSET = 8;
-    private final static int BLUE_OFFSET = 0;
+    private final static int BLUE_OFFSET = 16;
     private final static int ALPHA_OFFSET = 24;
 
     /**

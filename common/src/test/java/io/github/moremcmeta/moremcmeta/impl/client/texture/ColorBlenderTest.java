@@ -26,7 +26,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests that the {@link ColorBlender} performs calculations close to Minecraft's {@link MipmapGenerator}.
@@ -390,7 +390,7 @@ public final class ColorBlenderTest {
     }
 
     @Test
-    public void blend_Red0Color1_Match() throws Throwable {
+    public void blend_Blue0Color1_Match() throws Throwable {
         int expected = blendExpected(
                 0b00101000000000000111010110011101,
                 RAND_GROUP_2[0],
@@ -409,7 +409,7 @@ public final class ColorBlenderTest {
     }
 
     @Test
-    public void blend_Red0Color2_Match() throws Throwable {
+    public void blend_Blue0Color2_Match() throws Throwable {
         int expected = blendExpected(
                 RAND_GROUP_1[0],
                 0b00101000000000000111010110011101,
@@ -428,7 +428,7 @@ public final class ColorBlenderTest {
     }
 
     @Test
-    public void blend_Red0Color3_Match() throws Throwable {
+    public void blend_Blue0Color3_Match() throws Throwable {
         int expected = blendExpected(
                 RAND_GROUP_1[0],
                 RAND_GROUP_2[0],
@@ -447,7 +447,7 @@ public final class ColorBlenderTest {
     }
 
     @Test
-    public void blend_Red0Color4_Match() throws Throwable {
+    public void blend_Blue0Color4_Match() throws Throwable {
         int expected = blendExpected(
                 RAND_GROUP_1[0],
                 RAND_GROUP_2[0],
@@ -536,6 +536,82 @@ public final class ColorBlenderTest {
                 RAND_GROUP_2[0],
                 RAND_GROUP_3[0],
                 0b00101000011101010000000010011101
+        );
+
+        assertColorsEqual(expected, actual);
+    }
+
+    @Test
+    public void blend_Red0Color1_Match() throws Throwable {
+        int expected = blendExpected(
+                0b00101000011101010111010100000000,
+                RAND_GROUP_2[0],
+                RAND_GROUP_3[0],
+                RAND_GROUP_4[0]
+        );
+
+        int actual = blendActual(
+                0b00101000011101010111010100000000,
+                RAND_GROUP_2[0],
+                RAND_GROUP_3[0],
+                RAND_GROUP_4[0]
+        );
+
+        assertColorsEqual(expected, actual);
+    }
+
+    @Test
+    public void blend_Red0Color2_Match() throws Throwable {
+        int expected = blendExpected(
+                RAND_GROUP_1[0],
+                0b00101000011101010111010100000000,
+                RAND_GROUP_3[0],
+                RAND_GROUP_4[0]
+        );
+
+        int actual = blendActual(
+                RAND_GROUP_1[0],
+                0b00101000011101010111010100000000,
+                RAND_GROUP_3[0],
+                RAND_GROUP_4[0]
+        );
+
+        assertColorsEqual(expected, actual);
+    }
+
+    @Test
+    public void blend_Red0Color3_Match() throws Throwable {
+        int expected = blendExpected(
+                RAND_GROUP_1[0],
+                RAND_GROUP_2[0],
+                0b00101000011101010111010100000000,
+                RAND_GROUP_4[0]
+        );
+
+        int actual = blendActual(
+                RAND_GROUP_1[0],
+                RAND_GROUP_2[0],
+                0b00101000011101010111010100000000,
+                RAND_GROUP_4[0]
+        );
+
+        assertColorsEqual(expected, actual);
+    }
+
+    @Test
+    public void blend_Red0Color4_Match() throws Throwable {
+        int expected = blendExpected(
+                RAND_GROUP_1[0],
+                RAND_GROUP_2[0],
+                RAND_GROUP_3[0],
+                0b00101000011101010111010100000000
+        );
+
+        int actual = blendActual(
+                RAND_GROUP_1[0],
+                RAND_GROUP_2[0],
+                RAND_GROUP_3[0],
+                0b00101000011101010111010100000000
         );
 
         assertColorsEqual(expected, actual);
@@ -815,7 +891,7 @@ public final class ColorBlenderTest {
     }
 
     @Test
-    public void alphaBlend_Red0Color1_Match() {
+    public void alphaBlend_Blue0Color1_Match() {
         int expected = 1060746893;
 
         int actual = ColorBlender.alphaBlend(
@@ -827,7 +903,7 @@ public final class ColorBlenderTest {
     }
 
     @Test
-    public void alphaBlend_Red0Color2_Match() {
+    public void alphaBlend_Blue0Color2_Match() {
         int expected = -2142030007;
 
         int actual = ColorBlender.alphaBlend(
@@ -857,6 +933,30 @@ public final class ColorBlenderTest {
         int actual = ColorBlender.alphaBlend(
                 RAND_GROUP_1[0],
                 0b00101000011101010000000010011101
+        );
+
+        assertColorsEqual(expected, actual);
+    }
+
+    @Test
+    public void alphaBlend_Red0Color1_Match() {
+        int expected = 1064023620;
+
+        int actual = ColorBlender.alphaBlend(
+                        0b00101000011101010111010100000000,
+                RAND_GROUP_2[0]
+        );
+
+        assertColorsEqual(expected, actual);
+    }
+
+    @Test
+    public void alphaBlend_Red0Color2_Match() {
+        int expected = -2141112560;
+
+        int actual = ColorBlender.alphaBlend(
+                RAND_GROUP_1[0],
+                           0b00101000011101010111010100000000
         );
 
         assertColorsEqual(expected, actual);
