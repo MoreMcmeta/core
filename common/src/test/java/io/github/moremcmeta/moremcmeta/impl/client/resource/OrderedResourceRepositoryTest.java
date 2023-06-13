@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import org.junit.Rule;
@@ -43,7 +44,7 @@ public final class OrderedResourceRepositoryTest {
     public void construct_NullPackType_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new OrderedResourceRepository(null,
-                List.of(new MockResourceCollection(Set.of(new ResourceLocation("one.png")))));
+                ImmutableList.of(new MockResourceCollection(Set.of(new ResourceLocation("one.png")))));
     }
 
     @Test

@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
+import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
@@ -50,7 +51,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
     }
 
@@ -62,7 +63,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
     }
 
@@ -74,7 +75,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
     }
 
@@ -85,7 +86,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
     }
 
@@ -96,7 +97,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
     }
 
@@ -106,7 +107,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 100),
                 false,
                 false,
-                new MockCloseableImage(100, 100), List.of()
+                new MockCloseableImage(100, 100), ImmutableList.of()
         );
     }
 
@@ -118,7 +119,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
     }
 
@@ -130,7 +131,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
     }
 
@@ -143,7 +144,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 null,
-                List.of()
+                ImmutableList.of()
         );
     }
 
@@ -154,7 +155,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
 
         assertFalse(data.blur());
@@ -167,7 +168,7 @@ public final class TextureDataTest {
                 true,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
 
         assertTrue(data.blur());
@@ -180,7 +181,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
 
         assertFalse(data.clamp());
@@ -193,7 +194,7 @@ public final class TextureDataTest {
                 false,
                 true,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
 
         assertTrue(data.clamp());
@@ -206,7 +207,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
         assertEquals(10, data.frameSize().width());
     }
@@ -218,7 +219,7 @@ public final class TextureDataTest {
                 false,
                 false,
                 new MockCloseableImage(100, 100),
-                List.of()
+                ImmutableList.of()
         );
         assertEquals(20, data.frameSize().height());
     }
@@ -231,14 +232,14 @@ public final class TextureDataTest {
                 false,
                 false,
                 image,
-                List.of()
+                ImmutableList.of()
         );
         assertEquals(image, data.image());
     }
 
     @Test
     public void analyzedMetadata_None_NoneReturned() {
-        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> expectedMetadata = List.of();
+        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> expectedMetadata = ImmutableList.of();
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
         TextureData<MockCloseableImage> data = new TextureData<>(
@@ -254,7 +255,7 @@ public final class TextureDataTest {
 
     @Test
     public void analyzedMetadata_Some_SameMetadataReturned() {
-        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> expectedMetadata = List.of(
+        List<Triple<String, AnalyzedMetadata, ComponentBuilder>> expectedMetadata = ImmutableList.of(
                 Triple.of("pluginOne", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
                 Triple.of("pluginTwo", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
                 Triple.of("pluginThree", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),

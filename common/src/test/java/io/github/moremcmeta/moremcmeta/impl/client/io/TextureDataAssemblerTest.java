@@ -107,7 +107,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, false,
                 new MockCloseableImage(100, 100),
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     checkFunction.accept(frames);
                     return new TextureComponent<>() {};
                 }))
@@ -128,14 +128,14 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> { checkFunction.accept(original); return List.of(original); }
+                (original, mipmap) -> { checkFunction.accept(original); return ImmutableList.of(original); }
         );
 
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, false,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                     new TextureComponent<>() {}
                 ))
         ));
@@ -160,7 +160,7 @@ public final class TextureDataAssemblerTest {
                     checkFunction.accept(Triple.of(width, height, mipmap));
                     return new MockCloseableImage(width, height);
                 },
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -172,7 +172,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, false,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<>() {}
                 ))
         ));
@@ -196,7 +196,7 @@ public final class TextureDataAssemblerTest {
                     checkFunction.accept(Pair.of(blur, clamp));
                     return new MockCloseableImage(width, height);
                 },
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -208,7 +208,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 true, false,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<>() {}
                 ))
         ));
@@ -232,7 +232,7 @@ public final class TextureDataAssemblerTest {
                     checkFunction.accept(Pair.of(blur, clamp));
                     return new MockCloseableImage(width, height);
                 },
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -244,7 +244,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<>() {}
                 ))
         ));
@@ -258,7 +258,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(20, 20),
                         new MockCloseableImage(20, 20),
@@ -271,7 +271,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, false,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<>() {}
                 ))
         ));
@@ -291,7 +291,7 @@ public final class TextureDataAssemblerTest {
                     return image;
                 },
                 (original, mipmap) -> {
-                    List<MockCloseableImage> mipmaps = List.of(
+                    List<MockCloseableImage> mipmaps = ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -310,7 +310,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<>() {}
                 ))
         ))).build();
@@ -326,7 +326,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -338,7 +338,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(30, frames.frame(0).width());
                     return new TextureComponent<>() {};
                 }))
@@ -351,7 +351,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -365,7 +365,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
                     return new TextureComponent<>() {};
                 }))
@@ -381,7 +381,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -393,7 +393,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(40, frames.frame(0).height());
                     return new TextureComponent<>() {};
                 }))
@@ -406,7 +406,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -420,7 +420,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
                     return new TextureComponent<>() {};
                 }))
@@ -436,7 +436,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -449,7 +449,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform(null, Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
@@ -462,7 +462,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -475,7 +475,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, null);
                     return new TextureComponent<>() {};
                 }))
@@ -488,7 +488,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -501,7 +501,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(-1, 0)));
                     return new TextureComponent<>() {};
                 }))
@@ -514,7 +514,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -527,7 +527,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, -1)));
                     return new TextureComponent<>() {};
                 }))
@@ -540,7 +540,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -553,7 +553,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(30, 0)));
                     return new TextureComponent<>() {};
                 }))
@@ -566,7 +566,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -579,7 +579,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 40)));
                     return new TextureComponent<>() {};
                 }))
@@ -592,7 +592,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -604,7 +604,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0), Point.pack(20, 25)));
                     return new TextureComponent<>() {};
                 }))
@@ -624,7 +624,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -637,7 +637,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(-1, 0), Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
@@ -650,7 +650,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -663,7 +663,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(0, -1), Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
@@ -676,7 +676,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -689,7 +689,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(30, 0), Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
@@ -702,7 +702,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -715,7 +715,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(0, 40), Area.of(Point.pack(0, 0)));
                     return new TextureComponent<>() {};
                 }))
@@ -729,7 +729,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -741,7 +741,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform(
                             (x, y, depFunction) -> depFunction.color(25, 30),
                             Area.of(Point.pack(0, 0), Point.pack(20, 25))
@@ -764,7 +764,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -778,7 +778,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
                     return new TextureComponent<>() {};
                 }))
@@ -794,7 +794,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -807,7 +807,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(-1);
                     return new TextureComponent<>() {};
                 }))
@@ -820,7 +820,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -833,7 +833,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(6);
                     return new TextureComponent<>() {};
                 }))
@@ -846,7 +846,7 @@ public final class TextureDataAssemblerTest {
 
         TextureDataAssembler<MockCloseableImage> assembler = new TextureDataAssembler<>(
                 (width, height, mipmap, blur, clamp) -> new MockCloseableImage(width, height),
-                (original, mipmap) -> List.of(
+                (original, mipmap) -> ImmutableList.of(
                         original,
                         new MockCloseableImage(original.width() >> 1, original.height() >> 1),
                         new MockCloseableImage(original.width() >> 2, original.height() >> 2),
@@ -858,7 +858,7 @@ public final class TextureDataAssemblerTest {
                 new TextureData.FrameSize(30, 40),
                 false, true,
                 originalImage,
-                List.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
+                ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(6, frames.frames());
                     return new TextureComponent<>() {};
                 }))

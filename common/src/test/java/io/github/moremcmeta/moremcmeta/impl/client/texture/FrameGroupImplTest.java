@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameIndexOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
@@ -70,13 +71,13 @@ public final class FrameGroupImplTest {
     @Test
     public void constructFrameList_NullViewConstructor_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new FrameGroupImpl<>(List.of(new MockCloseableImageFrame(1)), null);
+        new FrameGroupImpl<>(ImmutableList.of(new MockCloseableImageFrame(1)), null);
     }
 
     @Test
     public void frame_NegativeFrameIndex_FrameIndexOutOfBoundsException() {
         FrameGroup<PredefinedFrameView> frames =
-                new FrameGroupImpl<>(List.of(new MockCloseableImageFrame(1)), (frame, index) -> new PredefinedFrameView(frame));
+                new FrameGroupImpl<>(ImmutableList.of(new MockCloseableImageFrame(1)), (frame, index) -> new PredefinedFrameView(frame));
 
         expectedException.expect(FrameIndexOutOfBoundsException.class);
         frames.frame(-1);
@@ -85,7 +86,7 @@ public final class FrameGroupImplTest {
     @Test
     public void frame_TooLargeFrameIndex_FrameIndexOutOfBoundsException() {
         FrameGroup<PredefinedFrameView> frames =
-                new FrameGroupImpl<>(List.of(new MockCloseableImageFrame(1)), (frame, index) -> new PredefinedFrameView(frame));
+                new FrameGroupImpl<>(ImmutableList.of(new MockCloseableImageFrame(1)), (frame, index) -> new PredefinedFrameView(frame));
 
         expectedException.expect(FrameIndexOutOfBoundsException.class);
         frames.frame(1);
@@ -94,7 +95,7 @@ public final class FrameGroupImplTest {
     @Test
     public void frame_NonZeroValidFrameIndex_FrameRetrieved() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
+                ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
                 (frame, index) -> new PredefinedFrameView(frame)
         );
 
@@ -104,7 +105,7 @@ public final class FrameGroupImplTest {
     @Test
     public void frame_ZeroValidFrameIndex_FrameRetrieved() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
+                ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
                 (frame, index) -> new PredefinedFrameView(frame)
         );
 
@@ -114,7 +115,7 @@ public final class FrameGroupImplTest {
     @Test
     public void frames_ZeroFrames_CountReturned() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(),
+                ImmutableList.of(),
                 (CloseableImageFrame frame, Integer index) -> new PredefinedFrameView(frame)
         );
 
@@ -124,7 +125,7 @@ public final class FrameGroupImplTest {
     @Test
     public void frames_MultipleFrames_CountReturned() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
+                ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
                 (frame, index) -> new PredefinedFrameView(frame)
         );
 
@@ -134,27 +135,27 @@ public final class FrameGroupImplTest {
     @Test
     public void iterator_ZeroFrames_FramesIteratedInOrder() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(),
+                ImmutableList.of(),
                 (CloseableImageFrame frame1, Integer index) -> new PredefinedFrameView(frame1)
         );
 
         List<Integer> indices = new ArrayList<>();
         frames.forEach((frame) -> indices.add(frame.width()));
 
-        assertEquals(List.of(), indices);
+        assertEquals(ImmutableList.of(), indices);
     }
 
     @Test
     public void iterator_MultipleFrames_FramesIteratedInOrder() {
         FrameGroup<PredefinedFrameView> frames = new FrameGroupImpl<>(
-                List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
+                ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)),
                 (frame1, index) -> new PredefinedFrameView(frame1)
         );
 
         List<Integer> indices = new ArrayList<>();
         frames.forEach((frame) -> indices.add(frame.width()));
 
-        assertEquals(List.of(100, 100), indices);
+        assertEquals(ImmutableList.of(100, 100), indices);
     }
 
 }

@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
@@ -131,7 +132,7 @@ public final class UploadComponentTest {
 
         int layers = 2;
         MockCloseableImageFrame frame = new MockCloseableImageFrame(layers);
-        List<MockCloseableImageFrame> predefinedFrames = List.of(frame, frame);
+        List<MockCloseableImageFrame> predefinedFrames = ImmutableList.of(frame, frame);
         builder.setPredefinedFrames(predefinedFrames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(layers));
         EventDrivenTexture texture = builder.build();

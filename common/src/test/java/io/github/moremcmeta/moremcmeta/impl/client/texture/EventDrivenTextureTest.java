@@ -55,7 +55,7 @@ public final class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
 
         expectedException.expect(IllegalArgumentException.class);
-        builder.setPredefinedFrames(List.of());
+        builder.setPredefinedFrames(ImmutableList.of());
     }
 
     @Test
@@ -80,8 +80,8 @@ public final class EventDrivenTextureTest {
     public void build_SetPredefinedFramesTwice_HasLastList() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(new CoreTextureComponent() {
             @Override
             public void onRegistration(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
@@ -103,7 +103,7 @@ public final class EventDrivenTextureTest {
     public void build_NoGeneratedFrame_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new TextureComponent<>() {});
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
 
         expectedException.expect(IllegalStateException.class);
         builder.build();
@@ -117,7 +117,7 @@ public final class EventDrivenTextureTest {
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         builder.setGeneratedFrame(generatedFrame);
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
         builder.add(new CoreTextureComponent() {
             @Override
             public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {
@@ -135,7 +135,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_NullComponent_NullPointerException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
 
         expectedException.expect(NullPointerException.class);
@@ -145,7 +145,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_NoListeners_NoException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         builder.build();
     }
@@ -160,7 +160,7 @@ public final class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
 
         expectedException.expect(IllegalArgumentException.class);
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), lowerMipmapFrame));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), lowerMipmapFrame));
     }
 
     @Test
@@ -168,7 +168,7 @@ public final class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
 
         expectedException.expect(IllegalArgumentException.class);
-        builder.setPredefinedFrames(List.of(
+        builder.setPredefinedFrames(ImmutableList.of(
                 new MockCloseableImageFrame(100, 200, 1),
                 new MockCloseableImageFrame(50, 200, 1)
         ));
@@ -179,7 +179,7 @@ public final class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
 
         expectedException.expect(IllegalArgumentException.class);
-        builder.setPredefinedFrames(List.of(
+        builder.setPredefinedFrames(ImmutableList.of(
                 new MockCloseableImageFrame(50, 200, 1),
                 new MockCloseableImageFrame(50, 100, 1)
         ));
@@ -190,7 +190,7 @@ public final class EventDrivenTextureTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
 
         expectedException.expect(IllegalArgumentException.class);
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(2)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(2)));
     }
 
     @Test
@@ -201,7 +201,7 @@ public final class EventDrivenTextureTest {
         );
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(lowerMipmapFrame));
+        builder.setPredefinedFrames(ImmutableList.of(lowerMipmapFrame));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
 
         expectedException.expect(IllegalStateException.class);
@@ -216,7 +216,7 @@ public final class EventDrivenTextureTest {
         );
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(lowerMipmapFrame);
 
         expectedException.expect(IllegalStateException.class);
@@ -226,7 +226,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_PredefinedFrameHasLargerWidthThanGenerated_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(100, 200, 1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(100, 200, 1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(50, 200, 1));
 
         expectedException.expect(IllegalStateException.class);
@@ -236,7 +236,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_PredefinedFrameHasSmallerWidthThanGenerated_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 200, 1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(50, 200, 1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(100, 200, 1));
 
         expectedException.expect(IllegalStateException.class);
@@ -246,7 +246,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_PredefinedFrameHasLargerHeightThanGenerated_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 100, 1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(50, 100, 1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(50, 200, 1));
 
         expectedException.expect(IllegalStateException.class);
@@ -256,7 +256,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_PredefinedFrameHasSmallerHeightThanGenerated_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 200, 1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(50, 200, 1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(50, 100, 1));
 
         expectedException.expect(IllegalStateException.class);
@@ -266,7 +266,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_PredefinedFramesHaveLessLayersThanComponents_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 100, 1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(50, 100, 1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(50, 100, 3));
         builder.add(new CoreTextureComponent() {});
         builder.add(new CoreTextureComponent() {});
@@ -279,7 +279,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_PredefinedFramesHaveMoreLayersThanComponents_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 100, 4)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(50, 100, 4)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(50, 100, 3));
         builder.add(new CoreTextureComponent() {});
         builder.add(new CoreTextureComponent() {});
@@ -292,7 +292,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_GeneratedFramesHaveLessLayersThanComponents_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 100, 3)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(50, 100, 3)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(50, 100, 1));
         builder.add(new CoreTextureComponent() {});
         builder.add(new CoreTextureComponent() {});
@@ -305,7 +305,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_GeneratedFramesHaveMoreLayersThanComponents_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(50, 100, 3)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(50, 100, 3)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(50, 100, 4));
         builder.add(new CoreTextureComponent() {});
         builder.add(new CoreTextureComponent() {});
@@ -329,7 +329,7 @@ public final class EventDrivenTextureTest {
                 assertEquals(textureGetter[0], currentFrame.texture());
             }
         });
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
         textureGetter[0] = texture;
@@ -354,7 +354,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -388,7 +388,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -480,7 +480,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -498,7 +498,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -521,7 +521,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4, 1), new MockCloseableImageFrame(4, 4, 1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(4, 4, 1), new MockCloseableImageFrame(4, 4, 1));
         builder.setPredefinedFrames(frames);
 
         MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4, 1);
@@ -563,7 +563,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -582,7 +582,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -601,7 +601,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -620,7 +620,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -639,7 +639,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(25, 50)), 0);
 
         builder.setPredefinedFrames(frames);
@@ -668,7 +668,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(2, 2, 1), new MockCloseableImageFrame(2, 2, 1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(2, 2, 1), new MockCloseableImageFrame(2, 2, 1));
         builder.setPredefinedFrames(frames);
 
         MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(2, 2, 1);
@@ -717,7 +717,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4, 1), new MockCloseableImageFrame(4, 4, 1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(4, 4, 1), new MockCloseableImageFrame(4, 4, 1));
         builder.setPredefinedFrames(frames);
 
         MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4, 1);
@@ -770,7 +770,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4, 2), new MockCloseableImageFrame(4, 4, 2));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(4, 4, 2), new MockCloseableImageFrame(4, 4, 2));
         builder.setPredefinedFrames(frames);
 
         MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4, 2);
@@ -815,7 +815,7 @@ public final class EventDrivenTextureTest {
         });
 
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(4, 4, 1), new MockCloseableImageFrame(4, 4, 1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(4, 4, 1), new MockCloseableImageFrame(4, 4, 1));
         builder.setPredefinedFrames(frames);
 
         MockCloseableImageFrame generatedFrame = new MockCloseableImageFrame(4, 4, 1);
@@ -839,7 +839,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
@@ -865,7 +865,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -885,7 +885,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
@@ -911,7 +911,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -932,7 +932,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
@@ -959,7 +959,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -972,7 +972,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void upload_NullBase_NullPointerException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
@@ -992,7 +992,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
@@ -1012,7 +1012,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
@@ -1032,7 +1032,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         frames.get(0).applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), Area.of(Point.pack(20, 20)), 0);
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
@@ -1060,7 +1060,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -1080,7 +1080,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -1098,7 +1098,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -1116,7 +1116,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
@@ -1136,7 +1136,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        List<MockCloseableImageFrame> frames = List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
+        List<MockCloseableImageFrame> frames = ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1));
         builder.setPredefinedFrames(frames);
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
@@ -1163,7 +1163,7 @@ public final class EventDrivenTextureTest {
             }
         });
 
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -1176,7 +1176,7 @@ public final class EventDrivenTextureTest {
     private void testExpectedOrder(Consumer<EventDrivenTexture> action, boolean flagForUpload,
                                    Integer[] expected) {
         EventDrivenTexture.Builder texture = new EventDrivenTexture.Builder();
-        texture.setPredefinedFrames(List.of(new MockCloseableImageFrame(3)));
+        texture.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(3)));
         texture.setGeneratedFrame(new MockCloseableImageFrame(3));
 
         final int REG_ID_BASE = 1;

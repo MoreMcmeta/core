@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
+import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ResourceCollection;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -83,7 +83,7 @@ public final class PackResourcesAdapter implements ResourceCollection {
         } catch (ResourceLocationException error) {
             LOGGER.error("Found texture with invalid name in pack {}; cannot return any resources " +
                             "from this pack: {}", ORIGINAL.getName(), error.toString());
-            return List.of();
+            return ImmutableList.of();
         }
 
     }

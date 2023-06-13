@@ -77,7 +77,7 @@ public final class TextureDataReaderTest {
     public void test_NullImageReader_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new TextureDataReader<>(
-                List.of(new MockPlugin()),
+                ImmutableList.of(new MockPlugin()),
                 null,
                 (image, blur, clamp) -> image
         );
@@ -87,7 +87,7 @@ public final class TextureDataReaderTest {
     public void test_NullBlurClampApplier_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new TextureDataReader<>(
-                List.of(new MockPlugin()),
+                ImmutableList.of(new MockPlugin()),
                 (stream) -> new MockCloseableImage(),
                 null
         );
@@ -96,7 +96,7 @@ public final class TextureDataReaderTest {
     @Test
     public void read_NullTextureStream_NullPointerException() throws IOException, InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
+                ImmutableList.of(new MockPlugin()),
                 (stream) -> new MockCloseableImage(),
                 (image, blur, clamp) -> image
         );
@@ -107,7 +107,7 @@ public final class TextureDataReaderTest {
     @Test
     public void read_NullMetadataStream_NullPointerException() throws IOException, InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
+                ImmutableList.of(new MockPlugin()),
                 (stream) -> new MockCloseableImage(),
                 (image, blur, clamp) -> image
         );
@@ -118,7 +118,7 @@ public final class TextureDataReaderTest {
     @Test
     public void read_NullImageRead_NullPointerException() throws IOException, InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
+                ImmutableList.of(new MockPlugin()),
                 (stream) -> null,
                 (image, blur, clamp) -> image
         );
@@ -129,7 +129,7 @@ public final class TextureDataReaderTest {
     @Test
     public void read_NullImageBlurredClamped_NullPointerException() throws IOException, InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
+                ImmutableList.of(new MockPlugin()),
                 (stream) -> new MockCloseableImage(),
                 (image, blur, clamp) -> null
         );
@@ -140,7 +140,7 @@ public final class TextureDataReaderTest {
     @Test
     public void read_ReaderIOException_IOException() throws IOException, InvalidMetadataException {
         TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
-                List.of(new MockPlugin()),
+                ImmutableList.of(new MockPlugin()),
                 (stream) -> { throw new IOException("dummy"); },
                 (image, blur, clamp) -> image
         );
@@ -150,7 +150,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_NoPluginForSection_MetadataForPresentPlugins() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("texture", null, null, null, null, null)
         );
 
@@ -182,7 +182,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_NoSectionForPlugin_MetadataForPresentSections() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, null, null),
                 new MockPlugin("texture", null, null, null, null, null)
         );
@@ -215,7 +215,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_SectionNotASubView_MetadataForPresentPlugins() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, null, null),
                 new MockPlugin("texture", null, null, null, null, null)
         );
@@ -251,7 +251,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_ConflictingFrameWidth_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, 100, null, null, null),
                 new MockPlugin("texture", 50, 100, null, null, null)
         );
@@ -271,7 +271,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_ConflictingFrameHeight_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, 100, null, null, null),
                 new MockPlugin("texture", 100, 50, null, null, null)
         );
@@ -291,7 +291,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_ConflictingBlur_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, true, null, null),
                 new MockPlugin("texture", null, null, false, null, null)
         );
@@ -311,7 +311,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_ConflictingClamp_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, false, null),
                 new MockPlugin("texture", null, null, null, true, null)
         );
@@ -331,7 +331,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_AllPluginsProvideSameFrameSize_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, 100, null, null, null),
                 new MockPlugin("texture", 100, 100, null, null, null)
         );
@@ -367,7 +367,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_AllPluginsProvideTrueBlur_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, true, null, null),
                 new MockPlugin("texture", null, null, true, null, null)
         );
@@ -402,7 +402,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_AllPluginsProvideFalseBlur_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, false, null, null),
                 new MockPlugin("texture", null, null, false, null, null)
         );
@@ -437,7 +437,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_AllPluginsProvideTrueClamp_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, true, null),
                 new MockPlugin("texture", null, null, null, true, null)
         );
@@ -472,7 +472,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_AllPluginsProvideFalseClamp_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, false, null),
                 new MockPlugin("texture", null, null, null, false, null)
         );
@@ -507,7 +507,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_SomePluginsProvideSameFrameSize_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, 100, null, null, null),
                 new MockPlugin("other", 100, 100, null, null, null),
                 new MockPlugin("texture", null, null, null, null, null)
@@ -544,7 +544,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_SomePluginsProvideTrueBlur_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, true, null, null),
                 new MockPlugin("other", null, null, true, null, null),
                 new MockPlugin("texture", null, null, null, null, null)
@@ -580,7 +580,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_SomePluginsProvideFalseBlur_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, false, null, null),
                 new MockPlugin("other", null, null, false, null, null),
                 new MockPlugin("texture", null, null, null, null, null)
@@ -616,7 +616,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_SomePluginsProvideTrueClamp_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, true, null),
                 new MockPlugin("other", null, null, null, true, null),
                 new MockPlugin("texture", null, null, null, null, null)
@@ -652,7 +652,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_SomePluginsProvideFalseClamp_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, false, null),
                 new MockPlugin("other", null, null, null, false, null),
                 new MockPlugin("texture", null, null, null, null, null)
@@ -688,7 +688,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_NoPluginsProvideMinParams_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, null, null),
                 new MockPlugin("other", null,null, null, null, null),
                 new MockPlugin("texture", null, null, null, null, null)
@@ -724,7 +724,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_NoPluginsProvideClamp_NoConflict() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, 100, true, null, null),
                 new MockPlugin("other", null, null, true, null, null),
                 new MockPlugin("texture", null, null, true, null, null)
@@ -760,7 +760,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_AnalyzedMetadataNull_NullPointerException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, null, null),
                 new MockPlugin("other", null, null, null, null, null, true, (view, imageWidth, imageHeight) -> {})
         );
@@ -780,7 +780,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_InvalidReasonProvided_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, null, null, null),
                 new MockPlugin("other", null, null, null, null, "dummy")
         );
@@ -800,7 +800,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_OrderInView_MetadataOrderedByViewOrder() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, 100, true, null, null),
                 new MockPlugin("other", null, null, true, null, null),
                 new MockPlugin("texture", null, null, true, null, null)
@@ -827,7 +827,7 @@ public final class TextureDataReaderTest {
             );
         }
 
-        assertEquals(List.of(plugins.get(2).id(), plugins.get(0).id(), plugins.get(1).id()), foundIds);
+        assertEquals(ImmutableList.of(plugins.get(2).id(), plugins.get(0).id(), plugins.get(1).id()), foundIds);
     }
 
     @Test
@@ -840,7 +840,7 @@ public final class TextureDataReaderTest {
             assertEquals(131, (int) imageHeight);
         };
 
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", null, null, true, null, null),
                 new MockPlugin("other", null, null, true, null, null, false, viewCheckFunction),
                 new MockPlugin("texture", null, null, true, null, null)
@@ -864,7 +864,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_FrameWidthLargerThanImage_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 1000, 100, null, null, null),
                 new MockPlugin("texture", 1000, 100, null, null, null)
         );
@@ -884,7 +884,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_FrameWidthZero_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 0, 100, null, null, null),
                 new MockPlugin("texture", 0, 100, null, null, null)
         );
@@ -904,7 +904,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_FrameWidthNegative_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", -100, 100, null, null, null),
                 new MockPlugin("texture", -100, 100, null, null, null)
         );
@@ -924,7 +924,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_FrameHeightLargerThanImage_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, 1000, null, null, null),
                 new MockPlugin("texture", 100, 1000, null, null, null)
         );
@@ -944,7 +944,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_FrameHeightZero_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, 0, null, null, null),
                 new MockPlugin("texture", 100, 0, null, null, null)
         );
@@ -964,7 +964,7 @@ public final class TextureDataReaderTest {
 
     @Test
     public void read_FrameHeightNegative_InvalidMetadataException() throws IOException, InvalidMetadataException {
-        List<MockPlugin> plugins = List.of(
+        List<MockPlugin> plugins = ImmutableList.of(
                 new MockPlugin("animation", 100, -100, null, null, null),
                 new MockPlugin("texture", 100, -100, null, null, null)
         );

@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
@@ -28,7 +29,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +52,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -73,7 +73,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -94,7 +94,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -114,7 +114,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -136,7 +136,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 expected,
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -159,7 +159,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -180,7 +180,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -201,7 +201,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -221,7 +221,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -243,7 +243,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 expected,
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -266,7 +266,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -287,7 +287,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -308,7 +308,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -319,7 +319,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {}
@@ -354,7 +354,7 @@ public final class MetadataRegistryImplTest {
                         new TextureData.FrameSize(30, 40),
                         false, false,
                         new MockCloseableImage(100, 100),
-                        List.of(Triple.of(
+                        ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
                                 (metadata, frames) -> new TextureComponent<>() {
