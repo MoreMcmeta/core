@@ -77,7 +77,7 @@ public class OrderedResourceRepository {
                 .filter((index) -> COLLECTIONS.get(index).contains(RESOURCE_TYPE, location))
                 .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index)).findFirst();
 
-        if (collectionWithResource.isEmpty()) {
+        if (!collectionWithResource.isPresent()) {
             throw new IOException("Resource not found in any collection: " + location);
         }
 

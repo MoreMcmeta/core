@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
-import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,17 +26,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Tests the {@link ModRepositorySource}.
  * @author soir20
  */
 public final class ModRepositorySourceTest {
-    private static final Pack.PackConstructor MOCK_CONSTRUCTOR =
-            (id, title, required, packSupplier, packMetadataSection, position, packSource) ->
-                    new Pack(id, title, required, packSupplier, packMetadataSection, PackType.CLIENT_RESOURCES,
-                            position, packSource);
+    private static final Pack.PackConstructor MOCK_CONSTRUCTOR = Pack::new;
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

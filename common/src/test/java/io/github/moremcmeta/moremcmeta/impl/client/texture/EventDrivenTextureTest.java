@@ -69,7 +69,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_NoPredefinedFrames_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new TextureComponent<>() {});
+        builder.add(new TextureComponent<EventDrivenTexture.TextureAndFrameView>() {});
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
 
         expectedException.expect(IllegalStateException.class);
@@ -102,7 +102,7 @@ public final class EventDrivenTextureTest {
     @Test
     public void build_NoGeneratedFrame_IllegalStateException() {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new TextureComponent<>() {});
+        builder.add(new TextureComponent<EventDrivenTexture.TextureAndFrameView>() {});
         builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
 
         expectedException.expect(IllegalStateException.class);
@@ -323,7 +323,7 @@ public final class EventDrivenTextureTest {
         final Object[] textureGetter = new Object[1];
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
-        builder.add(new TextureComponent<>() {
+        builder.add(new TextureComponent<EventDrivenTexture.TextureAndFrameView>() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
                 assertEquals(textureGetter[0], currentFrame.texture());

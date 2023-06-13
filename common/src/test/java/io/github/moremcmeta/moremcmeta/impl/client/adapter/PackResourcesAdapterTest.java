@@ -18,13 +18,14 @@
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MockPackResources;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,7 @@ import org.junit.rules.ExpectedException;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,7 +87,7 @@ public final class PackResourcesAdapterTest {
         ResourceLocation location = new ResourceLocation("textures/block/sea/rock/gravel.png");
         InputStream resource = adapter.find(PackType.CLIENT_RESOURCES, location);
 
-        assertEquals(location.getPath(), new String(resource.readAllBytes()));
+        assertEquals(location.getPath(), IOUtils.toString(resource, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -94,7 +96,7 @@ public final class PackResourcesAdapterTest {
         ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
         InputStream resource = adapter.find(PackType.SERVER_DATA, location);
 
-        assertEquals(location.getPath(), new String(resource.readAllBytes()));
+        assertEquals(location.getPath(), IOUtils.toString(resource, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -273,15 +275,15 @@ public final class PackResourcesAdapterTest {
     public void getResources_OriginalThrowsResourceLocationException_NoneFound() {
         PackResourcesAdapter adapter = new PackResourcesAdapter(
                 new MockPackResources(
-                        Set.of("image.png", "info.txt", "readme.md"),
+                        ImmutableSet.of("image.png", "info.txt", "readme.md"),
                         ImmutableMap.of(
                                 PackType.CLIENT_RESOURCES,
-                                Set.of(new ResourceLocation("textures/hello.png"),
+                                ImmutableSet.of(new ResourceLocation("textures/hello.png"),
                                         new ResourceLocation("textures/block/sea/rock/gravel.png"),
                                         new ResourceLocation("sea", "textures/block/coral.png"),
                                         new ResourceLocation("lang/en/us/words.txt")),
                                 PackType.SERVER_DATA,
-                                Set.of(new ResourceLocation("settings/server/network/config.json"),
+                                ImmutableSet.of(new ResourceLocation("settings/server/network/config.json"),
                                         new ResourceLocation("lang/en/us/words.txt"),
                                         new ResourceLocation("sea", "textures/block/coral.png"),
                                         new ResourceLocation("textures/block/sea/rock/gravel.png")
@@ -359,24 +361,24 @@ public final class PackResourcesAdapterTest {
     @Test
     public void getNamespaces_ClientType_ClientNamespaces() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        assertEquals(Set.of("minecraft", "sea", "moremcmeta"), adapter.namespaces(PackType.CLIENT_RESOURCES));
+        assertEquals(ImmutableSet.of("minecraft", "sea", "moremcmeta"), adapter.namespaces(PackType.CLIENT_RESOURCES));
     }
 
     @Test
     public void getNamespaces_ServerType_ServerNamespaces() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        assertEquals(Set.of("minecraft", "sea"), adapter.namespaces(PackType.SERVER_DATA));
+        assertEquals(ImmutableSet.of("minecraft", "sea"), adapter.namespaces(PackType.SERVER_DATA));
     }
 
     private PackResourcesAdapter makeAdapterWithResources() {
-        Set<String> rootResources = Set.of("image.png", "info.txt", "readme.md");
+        Set<String> rootResources = ImmutableSet.of("image.png", "info.txt", "readme.md");
         Map<PackType, Set<ResourceLocation>> regularResources = new HashMap<>();
-        regularResources.put(PackType.CLIENT_RESOURCES, Set.of(new ResourceLocation("textures/hello.png"),
+        regularResources.put(PackType.CLIENT_RESOURCES, ImmutableSet.of(new ResourceLocation("textures/hello.png"),
                 new ResourceLocation("textures/block/sea/rock/gravel.png"),
                 new ResourceLocation("sea", "textures/block/coral.png"),
                 new ResourceLocation("lang/en/us/words.txt"),
                 new ResourceLocation("moremcmeta", "config/textures/settings.json")));
-        regularResources.put(PackType.SERVER_DATA, Set.of(new ResourceLocation("settings/server/network/config.json"),
+        regularResources.put(PackType.SERVER_DATA, ImmutableSet.of(new ResourceLocation("settings/server/network/config.json"),
                 new ResourceLocation("lang/en/us/words.txt"),
                 new ResourceLocation("sea", "textures/block/coral.png"),
                 new ResourceLocation("textures/block/sea/rock/gravel.png")));
@@ -391,7 +393,6 @@ public final class PackResourcesAdapterTest {
      * @author soir20
      */
     @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     private static class ExceptionPackResources implements PackResources {
 
         @Override

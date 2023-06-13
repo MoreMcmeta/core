@@ -242,7 +242,7 @@ public final class TextureLoader<R> {
         Map<ResourceLocation, MetadataView> textureToCombinedMetadata = new HashMap<>();
         textureToAllMetadata.forEach((textureLocation, allMetadata) -> {
             Optional<Integer> textureIndexOptional = findCollectionIndex(repository, textureLocation);
-            if (textureIndexOptional.isEmpty()) {
+            if (!textureIndexOptional.isPresent()) {
                 LOGGER.error(
                         "Unable to find texture {} (referenced by {})",
                         textureLocation,

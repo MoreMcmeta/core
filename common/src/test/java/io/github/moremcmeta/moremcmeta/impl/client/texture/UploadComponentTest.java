@@ -69,7 +69,7 @@ public final class UploadComponentTest {
         builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
-        builder.setPredefinedFrames(List.of(frame));
+        builder.setPredefinedFrames(ImmutableList.of(frame));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -84,7 +84,7 @@ public final class UploadComponentTest {
         builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
-        builder.setPredefinedFrames(List.of(frame));
+        builder.setPredefinedFrames(ImmutableList.of(frame));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -100,7 +100,7 @@ public final class UploadComponentTest {
         builder.add(new UploadComponent(DUMMY_PREPARER, DUMMY_BASE_COLLECTION));
 
         MockCloseableImageFrame frame = new MockCloseableImageFrame(1);
-        builder.setPredefinedFrames(List.of(frame));
+        builder.setPredefinedFrames(ImmutableList.of(frame));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -114,7 +114,7 @@ public final class UploadComponentTest {
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
 
         AtomicInteger ticks = new AtomicInteger();
-        builder.add(new TextureComponent<>() {
+        builder.add(new TextureComponent<EventDrivenTexture.TextureAndFrameView>() {
             @Override
             public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame,
                                FrameGroup<? extends PersistentFrameView> predefinedFrames) {
@@ -152,7 +152,7 @@ public final class UploadComponentTest {
         MockCloseableImageFrame frame2 = new MockCloseableImageFrame(1);
         MockCloseableImageFrame frame3 = new MockCloseableImageFrame(1);
 
-        builder.setPredefinedFrames(List.of(frame1, frame2));
+        builder.setPredefinedFrames(ImmutableList.of(frame1, frame2));
         builder.setGeneratedFrame(frame3);
         EventDrivenTexture texture = builder.build();
 

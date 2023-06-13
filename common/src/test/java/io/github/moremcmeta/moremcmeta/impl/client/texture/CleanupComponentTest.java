@@ -17,11 +17,11 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
@@ -46,7 +46,7 @@ public final class CleanupComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CleanupComponent(timesRan::incrementAndGet));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 
@@ -61,7 +61,7 @@ public final class CleanupComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.add(new CleanupComponent(timesRan::incrementAndGet));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
         EventDrivenTexture texture = builder.build();
 

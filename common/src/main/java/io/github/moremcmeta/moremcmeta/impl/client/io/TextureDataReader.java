@@ -82,7 +82,7 @@ public final class TextureDataReader<I extends CloseableImage> implements Textur
         for (String section : metadata.keys()) {
             MoreMcmetaTexturePlugin plugin = SECTION_TO_PLUGIN.get(section);
             Optional<MetadataView> sectionView = metadata.subView(section);
-            if (plugin == null || sectionView.isEmpty()) {
+            if (plugin == null || !sectionView.isPresent()) {
                 continue;
             }
 

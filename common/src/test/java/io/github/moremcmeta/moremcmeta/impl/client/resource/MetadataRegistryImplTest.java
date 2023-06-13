@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
@@ -39,6 +40,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link MetadataRegistryImpl}.
  * @author soir20
  */
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public final class MetadataRegistryImplTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -55,7 +57,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -76,7 +78,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -97,7 +99,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -117,7 +119,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -139,14 +141,14 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 expected,
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
 
         assertEquals(
                 expected,
-                registry.metadataFromPath("plugin", new ResourceLocation("textures/block.png")).orElseThrow()
+                registry.metadataFromPath("plugin", new ResourceLocation("textures/block.png")).get()
         );
     }
 
@@ -162,7 +164,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -183,7 +185,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -204,7 +206,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -224,7 +226,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -246,14 +248,14 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 expected,
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
 
         assertEquals(
                 expected,
-                registry.metadataFromSpriteName("plugin", new ResourceLocation("block")).orElseThrow()
+                registry.metadataFromSpriteName("plugin", new ResourceLocation("block")).get()
         );
     }
 
@@ -269,7 +271,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -290,7 +292,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -311,7 +313,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 ),
                 new ResourceLocation("textures/block2.png"),
@@ -322,7 +324,7 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));
@@ -357,12 +359,12 @@ public final class MetadataRegistryImplTest {
                         ImmutableList.of(Triple.of(
                                 "plugin",
                                 new AnalyzedMetadata() {},
-                                (metadata, frames) -> new TextureComponent<>() {
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {
                                 }
                         ), Triple.of(
                                 "plugin",
                                 expected,
-                                (metadata, frames) -> new TextureComponent<>() {}
+                                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
                         ))
                 )
         ));

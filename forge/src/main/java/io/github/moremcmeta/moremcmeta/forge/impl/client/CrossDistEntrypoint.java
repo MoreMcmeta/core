@@ -19,10 +19,11 @@ package io.github.moremcmeta.moremcmeta.forge.impl.client;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.IExtensionPoint;
+import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.NetworkConstants;
+import net.minecraftforge.fml.network.FMLNetworkConstants;
+import org.apache.commons.lang3.tuple.Pair;
 
 import static io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta.MODID;
 
@@ -42,10 +43,10 @@ public class CrossDistEntrypoint {
         /* Make sure the mod being absent on the other network side does not
            cause the client to display the server as incompatible. */
         ModLoadingContext.get().registerExtensionPoint(
-                IExtensionPoint.DisplayTest.class,
-                ()-> new IExtensionPoint.DisplayTest(
-                        () -> NetworkConstants.IGNORESERVERONLY,
-                        (remoteVersion, isServer)-> true
+                ExtensionPoint.DISPLAYTEST,
+                () -> Pair.of(
+                        () -> FMLNetworkConstants.IGNORESERVERONLY,
+                        (a, b) -> true
                 )
         );
 

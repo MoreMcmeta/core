@@ -66,8 +66,8 @@ public final class AnnotatedClassLoader {
         Set<String> classNames = new HashSet<>();
 
         for (ModFileScanData.AnnotationData annotation : ANNOTATION_DATA_SUPPLIER.get()) {
-            String className = annotation.memberName();
-            if (annotation.annotationType().equals(annotationType) && !classNames.contains(className)) {
+            String className = annotation.getMemberName();
+            if (annotation.getAnnotationType().equals(annotationType) && !classNames.contains(className)) {
                 classNames.add(className);
                 tryLoadClass(className, superClass).ifPresent(instances::add);
             }

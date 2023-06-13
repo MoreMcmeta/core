@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
+import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
@@ -256,10 +257,10 @@ public final class TextureDataTest {
     @Test
     public void analyzedMetadata_Some_SameMetadataReturned() {
         List<Triple<String, AnalyzedMetadata, ComponentBuilder>> expectedMetadata = ImmutableList.of(
-                Triple.of("pluginOne", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Triple.of("pluginTwo", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Triple.of("pluginThree", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {}),
-                Triple.of("pluginFour", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<>() {})
+                Triple.of("pluginOne", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}),
+                Triple.of("pluginTwo", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}),
+                Triple.of("pluginThree", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}),
+                Triple.of("pluginFour", new AnalyzedMetadata() {}, (metadata, frames) -> new TextureComponent<CurrentFrameView>() {})
         );
 
         MockCloseableImage image = new MockCloseableImage(100, 100);
@@ -280,28 +281,28 @@ public final class TextureDataTest {
         expectedMetadata.add(Triple.of(
                 "pluginOne",
                 new AnalyzedMetadata() {},
-                (metadata, frames) -> new TextureComponent<>() {}
+                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
         ));
         expectedMetadata.add(Triple.of(
                 "pluginTwo",
                 new AnalyzedMetadata() {},
-                (metadata, frames) -> new TextureComponent<>() {}
+                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
         ));
         expectedMetadata.add(Triple.of(
                 "pluginThree",
                 new AnalyzedMetadata() {},
-                (metadata, frames) -> new TextureComponent<>() {}
+                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
         ));
         expectedMetadata.add(Triple.of(
                 "pluginFour",
                 new AnalyzedMetadata() {},
-                (metadata, frames) -> new TextureComponent<>() {}
+                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
         ));
 
         Triple<String, AnalyzedMetadata, ComponentBuilder> extraSection = Triple.of(
                 "pluginFive",
                 new AnalyzedMetadata() {},
-                (metadata, frames) -> new TextureComponent<>() {}
+                (metadata, frames) -> new TextureComponent<CurrentFrameView>() {}
         );
 
         MockCloseableImage image = new MockCloseableImage(100, 100);

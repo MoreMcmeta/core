@@ -90,7 +90,7 @@ public final class BaseCollection {
             SpriteFinder spriteFinder, ResourceLocation baseLocation,
             @SuppressWarnings("SameParameterValue") long uploadPoint) {
         Optional<Sprite> spriteOptional = spriteFinder.findSprite(baseLocation);
-        if (spriteOptional.isEmpty()) {
+        if (!spriteOptional.isPresent()) {
             return Optional.empty();
         }
 
@@ -185,9 +185,11 @@ public final class BaseCollection {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof MipmappedBase otherBase)) {
+            if (!(other instanceof MipmappedBase)) {
                 return false;
             }
+
+            MipmappedBase otherBase = (MipmappedBase) other;
 
             return UPLOAD_POINT == otherBase.UPLOAD_POINT && MIPMAP == otherBase.MIPMAP;
         }

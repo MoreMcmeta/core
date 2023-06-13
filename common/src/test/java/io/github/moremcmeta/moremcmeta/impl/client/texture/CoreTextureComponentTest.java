@@ -17,10 +17,9 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * Tests the default methods of the {@link CoreTextureComponent}.
@@ -31,19 +30,19 @@ public final class CoreTextureComponentTest {
     @Test
     public void onRegistration_NullState_NoException() {
         CoreTextureComponent component = new CoreTextureComponent() {};
-        component.onRegistration(null, new FrameGroupImpl<>(List.of()));
+        component.onRegistration(null, new FrameGroupImpl<>(ImmutableList.of()));
     }
 
     @Test
     public void onTick_NullState_NoException() {
         CoreTextureComponent component = new CoreTextureComponent() {};
-        component.onTick(null, new FrameGroupImpl<>(List.of()));
+        component.onTick(null, new FrameGroupImpl<>(ImmutableList.of()));
     }
 
     @Test
     public void onClose_NullState_NoException() {
         CoreTextureComponent component = new CoreTextureComponent() {};
-        component.onClose(null, new FrameGroupImpl<>(List.of()));
+        component.onClose(null, new FrameGroupImpl<>(ImmutableList.of()));
     }
 
     @Test
@@ -52,8 +51,8 @@ public final class CoreTextureComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
         builder.build().load(null);
     }
@@ -64,8 +63,8 @@ public final class CoreTextureComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
         builder.build().upload(new ResourceLocation("dummy.png"));
     }
@@ -76,8 +75,8 @@ public final class CoreTextureComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
         builder.build().tick();
     }
@@ -88,8 +87,8 @@ public final class CoreTextureComponentTest {
 
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setGeneratedFrame(new MockCloseableImageFrame(1));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
-        builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1)));
+        builder.setPredefinedFrames(ImmutableList.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
         builder.build().close();
     }

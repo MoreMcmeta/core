@@ -40,7 +40,7 @@ import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -93,7 +93,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
         return (sprite) -> {
             try {
                 NativeImage[] mipmaps = ObfuscationReflectionHelper.getPrivateValue(TextureAtlasSprite.class,
-                        sprite, "f_118342_");
+                        sprite, "field_195670_c");
 
                 if (mipmaps != null) {
                     return mipmaps.length - 1;

@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 
@@ -40,7 +41,7 @@ public class MockResourceCollection implements ResourceCollection {
 
     public MockResourceCollection(Set<ResourceLocation> clientResources) {
         CLIENT_RESOURCES = clientResources;
-        SERVER_RESOURCES = Set.of();
+        SERVER_RESOURCES = ImmutableSet.of();
     }
 
     public MockResourceCollection(Set<ResourceLocation> clientResources,

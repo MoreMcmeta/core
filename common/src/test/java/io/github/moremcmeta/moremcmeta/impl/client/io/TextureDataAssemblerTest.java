@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
+import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameIndexOutOfBoundsException;
 import io.github.moremcmeta.moremcmeta.api.client.texture.IllegalFrameReferenceException;
@@ -109,7 +110,7 @@ public final class TextureDataAssemblerTest {
                 new MockCloseableImage(100, 100),
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     checkFunction.accept(frames);
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ));
 
@@ -136,7 +137,7 @@ public final class TextureDataAssemblerTest {
                 false, false,
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
-                    new TextureComponent<>() {}
+                    new TextureComponent<CurrentFrameView>() {}
                 ))
         ));
 
@@ -173,7 +174,7 @@ public final class TextureDataAssemblerTest {
                 false, false,
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
-                        new TextureComponent<>() {}
+                        new TextureComponent<CurrentFrameView>() {}
                 ))
         ));
 
@@ -209,7 +210,7 @@ public final class TextureDataAssemblerTest {
                 true, false,
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
-                        new TextureComponent<>() {}
+                        new TextureComponent<CurrentFrameView>() {}
                 ))
         ));
 
@@ -245,7 +246,7 @@ public final class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
-                        new TextureComponent<>() {}
+                        new TextureComponent<CurrentFrameView>() {}
                 ))
         ));
 
@@ -272,7 +273,7 @@ public final class TextureDataAssemblerTest {
                 false, false,
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
-                        new TextureComponent<>() {}
+                        new TextureComponent<CurrentFrameView>() {}
                 ))
         ));
     }
@@ -311,7 +312,7 @@ public final class TextureDataAssemblerTest {
                 false, true,
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
-                        new TextureComponent<>() {}
+                        new TextureComponent<CurrentFrameView>() {}
                 ))
         ))).build();
 
@@ -340,7 +341,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(30, frames.frame(0).width());
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ))).build();
     }
@@ -367,7 +368,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ))).build();
 
@@ -395,7 +396,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(40, frames.frame(0).height());
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ))).build();
     }
@@ -422,7 +423,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ))).build();
 
@@ -451,7 +452,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform(null, Area.of(Point.pack(0, 0)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -477,7 +478,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, null);
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -503,7 +504,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(-1, 0)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -529,7 +530,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, -1)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -555,7 +556,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(30, 0)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -581,7 +582,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 40)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -606,7 +607,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0), Point.pack(20, 25)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ))).build();
 
@@ -639,7 +640,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(-1, 0), Area.of(Point.pack(0, 0)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -665,7 +666,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(0, -1), Area.of(Point.pack(0, 0)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -691,7 +692,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(30, 0), Area.of(Point.pack(0, 0)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -717,7 +718,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(0, 40), Area.of(Point.pack(0, 0)));
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -746,7 +747,7 @@ public final class TextureDataAssemblerTest {
                             (x, y, depFunction) -> depFunction.color(25, 30),
                             Area.of(Point.pack(0, 0), Point.pack(20, 25))
                     );
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ))).build();
 
@@ -780,7 +781,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ))).build();
 
@@ -809,7 +810,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(-1);
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -835,7 +836,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(6);
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         )).build();
     }
@@ -860,7 +861,7 @@ public final class TextureDataAssemblerTest {
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(6, frames.frames());
-                    return new TextureComponent<>() {};
+                    return new TextureComponent<CurrentFrameView>() {};
                 }))
         ))).build();
     }

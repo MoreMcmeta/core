@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.repository.Pack;
@@ -36,7 +35,6 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public final class ModRepositorySource implements RepositorySource {
 
     /**

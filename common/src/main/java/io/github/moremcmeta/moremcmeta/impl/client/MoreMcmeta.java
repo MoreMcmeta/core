@@ -49,7 +49,6 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.SpriteFinder;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.UploadComponent;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
@@ -110,7 +109,7 @@ public abstract class MoreMcmeta {
 
     private static ImmutableMap<ResourceLocation, ImmutableSet<ResourceLocation>> dependencies = ImmutableMap.of();
 
-    private final Set<String> DEFAULT_PLUGINS = Set.of(
+    private final Set<String> DEFAULT_PLUGINS = ImmutableSet.of(
             "moremcmeta_texture_plugin",
             "moremcmeta_animation_plugin",
             "moremcmeta_properties_parser_plugin",
@@ -167,7 +166,8 @@ public abstract class MoreMcmeta {
         );
         checkItemConflict(parserPlugins, MoreMcmetaMetadataParserPlugin::extension, "extension");
 
-        List<ClientPlugin> allPlugins = Stream.concat(texturePlugins.stream(), parserPlugins.stream()).toList();
+        List<ClientPlugin> allPlugins = Stream.concat(texturePlugins.stream(), parserPlugins.stream())
+                .collect(Collectors.toList());
         checkItemConflict(allPlugins, ClientPlugin::id, "id");
 
         logPluginList(allPlugins, logger);
@@ -200,15 +200,17 @@ public abstract class MoreMcmeta {
 
         // Listener registration and add resource pack
         onResourceManagerInitialized((client) -> {
-            if (!(client.getResourceManager() instanceof ReloadableResourceManager rscManager)) {
+            if (!(client.getResourceManager() instanceof ReloadableResourceManager)) {
                 logger.error("Reload listener was not added because resource manager is not reloadable");
                 return;
             }
 
+            ReloadableResourceManager rscManager = (ReloadableResourceManager) client.getResourceManager();
+
             PackRepository packRepository = client.getResourcePackRepository();
             Supplier<List<String>> packIdGetter = () -> packRepository.getSelectedPacks().stream()
                     .map(Pack::getId)
-                    .toList();
+                    .collect(Collectors.toList());
 
             ModRepositorySource source = new ModRepositorySource(() -> {
                 OrderedResourceRepository repository = makeResourceRepository(packRepository, logger);
@@ -472,7 +474,7 @@ public abstract class MoreMcmeta {
                 .filter((entry) -> entry.getValue().size() > 1)
                 .findFirst();
 
-        if (conflictingPlugins.isEmpty()) {
+        if (!conflictingPlugins.isPresent()) {
             return;
         }
 
@@ -481,7 +483,7 @@ public abstract class MoreMcmeta {
         List<String> conflictingIds = conflictingPlugins.get().getValue()
                 .stream()
                 .map(ClientPlugin::id)
-                .toList();
+                .collect(Collectors.toList());
 
         throw new ConflictingPluginsException("Plugins " + conflictingIds + " have conflicting " + propertyName
                 + ": " + conflictingProperty);
@@ -526,12 +528,12 @@ public abstract class MoreMcmeta {
      * @return the repository with all resources
      */
     private OrderedResourceRepository makeResourceRepository(PackRepository packRepository, Logger logger) {
-        List<PackResourcesAdapter> otherPacks = new ArrayList<>(packRepository.getSelectedPacks()
+        List<PackResourcesAdapter> otherPacks = packRepository.getSelectedPacks()
                 .stream()
                 .filter((pack) -> !pack.getId().equals(ModRepositorySource.PACK_ID))
                 .map(Pack::open)
                 .map((pack) -> new PackResourcesAdapter(pack, logger))
-                .toList());
+                .collect(Collectors.toList());
 
         Collections.reverse(otherPacks);
 
@@ -569,7 +571,7 @@ public abstract class MoreMcmeta {
                                             Map<ResourceLocation, EventDrivenTexture.Builder> textures,
                                             Logger logger) {
         Optional<LoadingOverlay> overlay = loadingOverlay(logger);
-        if (overlay.isEmpty()) {
+        if (!overlay.isPresent()) {
             return;
         }
 
@@ -604,7 +606,6 @@ public abstract class MoreMcmeta {
      * @author soir20
      */
     @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     private class TextureResourceReloadListener
             implements StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> {
         private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED;

@@ -18,8 +18,8 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -48,7 +48,6 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public final class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
@@ -199,7 +198,7 @@ public final class SpriteFrameSizeFixPack implements PackResources {
     public Set<String> getNamespaces(PackType packType) {
         requireNonNull(packType, "Pack type cannot be null");
         return packType == PackType.CLIENT_RESOURCES ?
-                TEXTURES.keySet().stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet()) : Set.of();
+                TEXTURES.keySet().stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet()) : ImmutableSet.of();
     }
 
     /**

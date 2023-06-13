@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents an unordered collection of points.
@@ -154,7 +155,7 @@ public final class Area implements LongIterable {
             Set<Row> rows = new HashSet<>();
 
             for (Map.Entry<Integer, Set<Integer>> entry : ROWS.entrySet()) {
-                List<Integer> xPoints = entry.getValue().stream().sorted().toList();
+                List<Integer> xPoints = entry.getValue().stream().sorted().collect(Collectors.toList());
                 int numPoints = xPoints.size();
 
                 int startIndex = 0;
@@ -214,9 +215,11 @@ public final class Area implements LongIterable {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof Row otherRow)) {
+            if (!(other instanceof Row)) {
                 return false;
             }
+
+            Row otherRow = (Row) other;
 
             return X == otherRow.X && Y == otherRow.Y && WIDTH == ((Row) other).WIDTH;
         }

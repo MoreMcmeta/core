@@ -20,7 +20,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.Resource;
@@ -44,7 +43,6 @@ import java.util.stream.Stream;
  */
 @SuppressWarnings("unused")
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public final class MockResourceManager implements ResourceManager {
     public static final String DEFAULT_PACK_NAME = "test";
     private static final InputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});

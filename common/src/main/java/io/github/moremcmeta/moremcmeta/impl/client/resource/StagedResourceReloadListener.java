@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -35,7 +34,6 @@ import java.util.concurrent.Executor;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public interface StagedResourceReloadListener<T> extends PreparableReloadListener {
 
     /**

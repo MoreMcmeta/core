@@ -7,7 +7,6 @@
   ],
   "client": [
     "AbstractTextureMixin",
-    "RenderSystemMixin",
     "TextureManagerMixin"
   ],
   "injectors": {

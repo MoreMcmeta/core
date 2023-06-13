@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -42,7 +41,6 @@ import java.util.stream.Collectors;
  * @author soir20
  */
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MockPackResources implements PackResources {
     private final Set<String> ROOT_RESOURCES;
     private final Map<PackType, Set<ResourceLocation>> REGULAR_RESOURCES;

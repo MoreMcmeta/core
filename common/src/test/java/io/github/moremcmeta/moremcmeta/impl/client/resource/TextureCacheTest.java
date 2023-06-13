@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.impl.client.io.MockMetadataView;
 import net.minecraft.resources.ResourceLocation;
@@ -28,8 +29,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -41,7 +40,7 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 public final class TextureCacheTest {
-    private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceSearcher) -> Map.of(
+    private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceSearcher) -> ImmutableMap.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".moremcmeta", "")
@@ -85,7 +84,7 @@ public final class TextureCacheTest {
                 }, MOCK_READERS, LOGGER)
         );
 
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png",
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
 
         expectedException.expect(NullPointerException.class);
@@ -102,7 +101,7 @@ public final class TextureCacheTest {
                 }, MOCK_READERS, LOGGER)
         );
 
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png",
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
 
         expectedException.expect(NullPointerException.class);
@@ -119,7 +118,7 @@ public final class TextureCacheTest {
                 }, MOCK_READERS, LOGGER)
         );
 
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png",
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
 
         expectedException.expect(NullPointerException.class);
@@ -136,9 +135,9 @@ public final class TextureCacheTest {
                 }, MOCK_READERS, LOGGER)
         );
 
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png",
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
-        OrderedResourceRepository repository2 = makeMockRepository(Set.of("textures/cat.png",
+        OrderedResourceRepository repository2 = makeMockRepository(ImmutableSet.of("textures/cat.png",
                 "textures/cat.png.moremcmeta", "test/zombie.png", "test/zombie.png.moremcmeta"));
 
         cache.load(repository, 2, "textures", "test");
@@ -153,7 +152,7 @@ public final class TextureCacheTest {
                 new TextureLoader<>((texStream, metadata) -> 1, MOCK_READERS, LOGGER)
         );
 
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png",
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
 
         cache.load(repository, 1, "textures", "test");
@@ -173,7 +172,7 @@ public final class TextureCacheTest {
                 new TextureLoader<>((texStream, metadata) -> 1, MOCK_READERS, LOGGER)
         );
 
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png",
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
 
         AtomicReference<ImmutableMap<ResourceLocation, Integer>> actual = new AtomicReference<>();
@@ -201,9 +200,9 @@ public final class TextureCacheTest {
                 new TextureLoader<>((texStream, metadata) -> 1, MOCK_READERS, LOGGER)
         );
 
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png",
                 "textures/bat.png.moremcmeta", "test/creeper.png", "test/creeper.png.moremcmeta"));
-        OrderedResourceRepository repository2 = makeMockRepository(Set.of("textures/cat.png",
+        OrderedResourceRepository repository2 = makeMockRepository(ImmutableSet.of("textures/cat.png",
                 "textures/cat.png.moremcmeta", "test/zombie.png", "test/zombie.png.moremcmeta"));
 
         cache.load(repository, 1, "textures", "test");

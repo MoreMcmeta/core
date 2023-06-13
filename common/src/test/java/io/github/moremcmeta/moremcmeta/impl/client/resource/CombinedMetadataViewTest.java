@@ -42,20 +42,21 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link CombinedMetadataView}.
  * @author soir20
  */
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public final class CombinedMetadataViewTest {
-    private static final MockMetadataView MOCK_SUB_VIEW = new MockMetadataView(List.of("test"));
+    private static final MockMetadataView MOCK_SUB_VIEW = new MockMetadataView(ImmutableList.of("test"));
     private static final InputStream MOCK_STREAM = new ByteArrayInputStream("eight".getBytes());
     private static final ImmutableList<MetadataView> MOCK_VIEWS = ImmutableList.of(
             new MockMetadataView(ImmutableMap.of("one", 1, "two", 2.0f)),
             new MockMetadataView(
-                    ImmutableMap.of(
-                            "three", "3",
-                            "four", true,
-                            "five", 5L,
-                            "six", 6.0D,
-                            "seven", MOCK_SUB_VIEW,
-                            "eight", MOCK_STREAM
-                    )
+                    new ImmutableMap.Builder<String, Object>()
+                            .put("three", "3")
+                            .put("four", true)
+                            .put("five", 5L)
+                            .put("six", 6.0D)
+                            .put("seven", MOCK_SUB_VIEW)
+                            .put("eight", MOCK_STREAM)
+                            .build()
             )
     );
 
@@ -71,7 +72,7 @@ public final class CombinedMetadataViewTest {
     @Test
     public void construct_NullView_NullPointerException() {
         List<MetadataView> views = new ArrayList<>();
-        views.add(new MockMetadataView(List.of("one", "two")));
+        views.add(new MockMetadataView(ImmutableList.of("one", "two")));
         views.add(null);
 
         expectedException.expect(NullPointerException.class);
@@ -80,7 +81,7 @@ public final class CombinedMetadataViewTest {
 
     @Test
     public void construct_ConflictingKeys_KeyMethodsUseFirstViewWithKey() {
-        CombinedMetadataView view = new CombinedMetadataView(List.of(
+        CombinedMetadataView view = new CombinedMetadataView(ImmutableList.of(
                 new MockMetadataView(ImmutableMap.of("one", 1, "two", 2.0f)),
                 new MockMetadataView(ImmutableMap.of("three", "3", "one", true)),
                 new MockMetadataView(ImmutableMap.of("three", 5L, "four", 6.0D)),
@@ -91,17 +92,17 @@ public final class CombinedMetadataViewTest {
         assertTrue(view.hasKey("two"));
         assertTrue(view.hasKey("three"));
 
-        assertEquals(1, (int) view.integerValue("one").orElseThrow());
-        assertTrue(view.booleanValue("one").isEmpty());
+        assertEquals(1, (int) view.integerValue("one").get());
+        assertFalse(view.booleanValue("one").isPresent());
 
-        assertEquals("3", view.stringValue("three").orElseThrow());
-        assertTrue(view.longValue("three").isEmpty());
-        assertTrue(view.subView("three").isEmpty());
+        assertEquals("3", view.stringValue("three").get());
+        assertFalse(view.longValue("three").isPresent());
+        assertFalse(view.subView("three").isPresent());
     }
 
     @Test
     public void construct_ConflictingKeys_IndexMethodsUseFirstViewWithKey() {
-        CombinedMetadataView view = new CombinedMetadataView(List.of(
+        CombinedMetadataView view = new CombinedMetadataView(ImmutableList.of(
                 new MockMetadataView(ImmutableMap.of("one", 1, "two", 2.0f)),
                 new MockMetadataView(ImmutableMap.of("three", "3", "one", true)),
                 new MockMetadataView(ImmutableMap.of("three", 5L, "four", 6.0D)),
@@ -112,17 +113,17 @@ public final class CombinedMetadataViewTest {
         assertTrue(view.hasKey("two"));
         assertTrue(view.hasKey("three"));
 
-        assertEquals(1, (int) view.integerValue(0).orElseThrow());
-        assertTrue(view.booleanValue(0).isEmpty());
+        assertEquals(1, (int) view.integerValue(0).get());
+        assertFalse(view.booleanValue(0).isPresent());
 
-        assertEquals("3", view.stringValue(2).orElseThrow());
-        assertTrue(view.longValue(2).isEmpty());
-        assertTrue(view.subView(2).isEmpty());
+        assertEquals("3", view.stringValue(2).get());
+        assertFalse(view.longValue(2).isPresent());
+        assertFalse(view.subView(2).isPresent());
     }
 
     @Test
     public void construct_NoViews_NoException() {
-        CombinedMetadataView view = new CombinedMetadataView(List.of());
+        CombinedMetadataView view = new CombinedMetadataView(ImmutableList.of());
         assertEquals(0, view.size());
     }
 
@@ -135,7 +136,7 @@ public final class CombinedMetadataViewTest {
     @Test
     public void keys_MultipleViews_IterationInCorrectOrder() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(List.of("one", "two", "three", "four", "five", "six", "seven", "eight"), Lists.newArrayList(view.keys()));
+        assertEquals(ImmutableList.of("one", "two", "three", "four", "five", "six", "seven", "eight"), Lists.newArrayList(view.keys()));
     }
 
     @Test
@@ -194,7 +195,7 @@ public final class CombinedMetadataViewTest {
     @Test
     public void stringValue_ItemIsRightType_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals("3", view.stringValue("three").orElseThrow());
+        assertEquals("3", view.stringValue("three").get());
     }
 
     @Test
@@ -231,13 +232,13 @@ public final class CombinedMetadataViewTest {
     @Test
     public void stringValue_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals("3", view.stringValue(2).orElseThrow());
+        assertEquals("3", view.stringValue(2).get());
     }
 
     @Test
     public void integerValue_ItemIsRightType_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(1, (int) view.integerValue("one").orElseThrow());
+        assertEquals(1, (int) view.integerValue("one").get());
     }
 
     @Test
@@ -274,13 +275,13 @@ public final class CombinedMetadataViewTest {
     @Test
     public void integerValue_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(1, (int) view.integerValue(0).orElseThrow());
+        assertEquals(1, (int) view.integerValue(0).get());
     }
 
     @Test
     public void longValue_ItemIsRightType_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(5L, (long) view.longValue("five").orElseThrow());
+        assertEquals(5L, (long) view.longValue("five").get());
     }
 
     @Test
@@ -317,13 +318,13 @@ public final class CombinedMetadataViewTest {
     @Test
     public void longValue_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(5L, (long) view.longValue(4).orElseThrow());
+        assertEquals(5L, (long) view.longValue(4).get());
     }
 
     @Test
     public void floatValue_ItemIsRightType_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(2.0f, view.floatValue("two").orElseThrow(), 0);
+        assertEquals(2.0f, view.floatValue("two").get(), 0);
     }
 
     @Test
@@ -360,13 +361,13 @@ public final class CombinedMetadataViewTest {
     @Test
     public void floatValue_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(2.0f, view.floatValue(1).orElseThrow(), 0);
+        assertEquals(2.0f, view.floatValue(1).get(), 0);
     }
 
     @Test
     public void doubleValue_ItemIsRightType_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(6.0D, view.doubleValue("six").orElseThrow(), 0);
+        assertEquals(6.0D, view.doubleValue("six").get(), 0);
     }
 
     @Test
@@ -403,13 +404,13 @@ public final class CombinedMetadataViewTest {
     @Test
     public void doubleValue_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(6.0D, view.doubleValue(5).orElseThrow(), 0);
+        assertEquals(6.0D, view.doubleValue(5).get(), 0);
     }
 
     @Test
     public void booleanValue_ItemIsRightType_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(true, view.booleanValue("four").orElseThrow());
+        assertEquals(true, view.booleanValue("four").get());
     }
 
     @Test
@@ -446,13 +447,13 @@ public final class CombinedMetadataViewTest {
     @Test
     public void booleanValue_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(true, view.booleanValue(3).orElseThrow());
+        assertEquals(true, view.booleanValue(3).get());
     }
 
     @Test
     public void subView_ItemIsRightType_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(MOCK_SUB_VIEW, view.subView("seven").orElseThrow());
+        assertEquals(MOCK_SUB_VIEW, view.subView("seven").get());
     }
 
     @Test
@@ -489,13 +490,13 @@ public final class CombinedMetadataViewTest {
     @Test
     public void subView_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(MOCK_SUB_VIEW, view.subView(6).orElseThrow());
+        assertEquals(MOCK_SUB_VIEW, view.subView(6).get());
     }
 
     @Test
     public void streamValue_ItemIsRightType_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(MOCK_STREAM, view.byteStreamValue("eight").orElseThrow());
+        assertEquals(MOCK_STREAM, view.byteStreamValue("eight").get());
     }
 
     @Test
@@ -532,7 +533,7 @@ public final class CombinedMetadataViewTest {
     @Test
     public void streamValue_RightTypeAtIndex_HasItem() {
         CombinedMetadataView view = new CombinedMetadataView(MOCK_VIEWS);
-        assertEquals(MOCK_STREAM, view.byteStreamValue(7).orElseThrow());
+        assertEquals(MOCK_STREAM, view.byteStreamValue(7).get());
     }
 
 }

@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.CombinedMetadataView;
@@ -36,7 +37,6 @@ import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -63,19 +63,19 @@ import static org.junit.Assert.assertTrue;
  */
 public final class TextureLoaderTest {
     private final Logger LOGGER = LogManager.getLogger();
-    private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
+    private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceRepository) -> ImmutableMap.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace("2.moremcmeta", "").replace(".moremcmeta", "")
             ),
-            new MockMetadataView(List.of("one", "two", "three"))
+            new MockMetadataView(ImmutableList.of("one", "two", "three"))
     );
-    private final MetadataParser MOCK_READER_2 = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
+    private final MetadataParser MOCK_READER_2 = (metadataLocation, metadataStream, resourceRepository) -> ImmutableMap.of(
             new ResourceLocation(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".other", "")
             ),
-            new MockMetadataView(List.of("four", "five", "six"))
+            new MockMetadataView(ImmutableList.of("four", "five", "six"))
     );
     private final ImmutableMap<String, MetadataParser> MOCK_READERS = ImmutableMap.of(
             ".moremcmeta", MOCK_READER,
@@ -169,7 +169,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_PathsNull_NullPointerException() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png.moremcmeta",
                 "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -184,7 +184,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_PathNull_NullPointerException() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png.moremcmeta",
                 "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -199,7 +199,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_EmptyPath_IllegalArgException() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png.moremcmeta",
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -214,7 +214,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_SlashOnlyPath_IllegalArgException() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png.moremcmeta",
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -229,7 +229,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_PathStartsWithSlash_IllegalArgException() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png.moremcmeta",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png.moremcmeta",
                         "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -244,7 +244,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_ValidLocations_LoadsAllTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "textures/bat.png",
                 "textures/bat.png.moremcmeta",
                 "textures/creeper.png",
@@ -270,7 +270,7 @@ public final class TextureLoaderTest {
     @Test
     public void load_TwoConflictingMetadataFilesForSameTextureInLowerPack_DoesNotSkip() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of(
+                ImmutableSet.of(
                         "textures/bat.png",
                         "textures/bat.png.moremcmeta",
                         "textures/creeper.png",
@@ -278,7 +278,7 @@ public final class TextureLoaderTest {
                         "textures/zombie.png",
                         "textures/zombie.png.moremcmeta"
                 ),
-                Set.of(
+                ImmutableSet.of(
                         "textures/bat.png.moremcmeta",
                         "textures/bat2.png.moremcmeta"
                 )
@@ -288,9 +288,9 @@ public final class TextureLoaderTest {
                 (texStream, metadata) -> 1,
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
                     if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
-                        return Map.of(
+                        return ImmutableMap.of(
                                 new ResourceLocation("textures/bat.png"),
-                                new MockMetadataView(List.of("four", "one", "six"))
+                                new MockMetadataView(ImmutableList.of("four", "one", "six"))
                         );
                     }
 
@@ -309,7 +309,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_DifferentPath_LoadsAllTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "other/bat.png",
                 "other/bat.png.moremcmeta",
                 "other/creeper.png",
@@ -334,7 +334,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_FilteredLocations_LoadsFilteredTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "creeper",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "creeper",
                 "creeper.moremcmeta", "zombie.jpg", "zombie.jpg.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -351,7 +351,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_ResultsBasedOnSearch_MetadataAppliesToAllFoundTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "textures/bat_abcd.png", "textures/bat_abcd.png.moremcmeta",
                 "textures/creeper_abcd.png",
                 "zombie.png", "zombie.png.moremcmeta",
@@ -367,7 +367,7 @@ public final class TextureLoaderTest {
 
                     return locations.stream().collect(Collectors.toMap(
                             Function.identity(),
-                            (location) -> new MockMetadataView(List.of(location.getPath()))
+                            (location) -> new MockMetadataView(ImmutableList.of(location.getPath()))
                     ));
                 }),
                 LOGGER
@@ -382,7 +382,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_SearchRetrievesPack_CorrectResourcesFoundInPacks() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "textures/bat_abcd.png", "textures/bat_abcd.png.moremcmeta",
                 "textures/creeper_abcd.png",
                 "zombie.png", "zombie.png.moremcmeta",
@@ -406,7 +406,7 @@ public final class TextureLoaderTest {
 
                     return locations.stream().collect(Collectors.toMap(
                             Function.identity(),
-                            (location) -> new MockMetadataView(List.of(location.getPath()))
+                            (location) -> new MockMetadataView(ImmutableList.of(location.getPath()))
                     ));
                 }),
                 LOGGER
@@ -421,7 +421,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_MissingTextureLocations_LoadsNoMissingTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png", "textures/bat.png.moremcmeta",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta",
                 "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -438,7 +438,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_MissingMetadataLocations_LoadsNoMissingTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png", "textures/bat.png.moremcmeta",
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta",
                 "textures/creeper.png", "textures/zombie.png"));
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -455,7 +455,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_InvalidMetadataDuringRead_LoadsValidTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "textures/bat.png",
                 "textures/bat.png.moremcmeta",
                 "textures/creeper.png",
@@ -484,7 +484,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_InvalidMetadataAfterRead_LoadsValidTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "textures/bat.png",
                 "textures/bat.png.moremcmeta",
                 "textures/creeper.png",
@@ -511,7 +511,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_UnreadableTexture_LoadsValidTextures() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "textures/bat.png",
                 "textures/bat.png.moremcmeta",
                 "textures/creeper.png",
@@ -538,7 +538,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_UnknownException_ExceptionNotCaught() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "textures/bat.png",
                 "textures/bat.png.moremcmeta",
                 "textures/creeper.png",
@@ -566,7 +566,7 @@ public final class TextureLoaderTest {
     @Test
     public void load_ResourceManagerThrowsUnknownException_ExceptionNotCaught() {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
-                Set.of(new MockResourceCollection(Set.of(
+                ImmutableSet.of(new MockResourceCollection(ImmutableSet.of(
                         new ResourceLocation("textures/bat.png"),
                         new ResourceLocation("textures/creeper.png"),
                         new ResourceLocation("textures/zombie.png"),
@@ -594,7 +594,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_ResourceManagerReturnsNullTexture_NullPointerException() {
-        ResourceCollection collection = new MockResourceCollection(Set.of(
+        ResourceCollection collection = new MockResourceCollection(ImmutableSet.of(
                 new ResourceLocation("textures/bat.png"),
                 new ResourceLocation("textures/creeper.png"),
                 new ResourceLocation("textures/zombie.png"),
@@ -612,7 +612,7 @@ public final class TextureLoaderTest {
         };
         OrderedResourceRepository repository = new OrderedResourceRepository(
                 PackType.CLIENT_RESOURCES,
-                Set.of(collection)
+                ImmutableSet.of(collection)
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -627,7 +627,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_ResourceManagerReturnsNullMetadata_NullPointerException() {
-        ResourceCollection collection = new MockResourceCollection(Set.of(
+        ResourceCollection collection = new MockResourceCollection(ImmutableSet.of(
                 new ResourceLocation("textures/bat.png"),
                 new ResourceLocation("textures/creeper.png"),
                 new ResourceLocation("textures/zombie.png"),
@@ -645,7 +645,7 @@ public final class TextureLoaderTest {
         };
         OrderedResourceRepository repository = new OrderedResourceRepository(
                 PackType.CLIENT_RESOURCES,
-                Set.of(collection)
+                ImmutableSet.of(collection)
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -660,7 +660,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_ClosureIOException_LoadsValidTextures() {
-        ResourceCollection collection = new MockResourceCollection(Set.of(
+        ResourceCollection collection = new MockResourceCollection(ImmutableSet.of(
                 new ResourceLocation("textures/bat.png"),
                 new ResourceLocation("textures/creeper.png"),
                 new ResourceLocation("textures/zombie.png"),
@@ -688,7 +688,7 @@ public final class TextureLoaderTest {
         };
         OrderedResourceRepository repository = new OrderedResourceRepository(
                 PackType.CLIENT_RESOURCES,
-                Set.of(collection)
+                ImmutableSet.of(collection)
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -705,7 +705,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_ClosureUnknownException_ExceptionNotCaught() {
-        ResourceCollection collection = new MockResourceCollection(Set.of(
+        ResourceCollection collection = new MockResourceCollection(ImmutableSet.of(
                 new ResourceLocation("textures/bat.png"),
                 new ResourceLocation("textures/creeper.png"),
                 new ResourceLocation("textures/zombie.png"),
@@ -733,7 +733,7 @@ public final class TextureLoaderTest {
         };
         OrderedResourceRepository repository = new OrderedResourceRepository(
                 PackType.CLIENT_RESOURCES,
-                Set.of(collection)
+                ImmutableSet.of(collection)
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -749,9 +749,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_TextureAndMetadataInSamePacks_FindsTexture() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta"),
-                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -771,8 +771,8 @@ public final class TextureLoaderTest {
     @Test
     public void load_MetadataInPackAboveTexture_FindsTexture() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png.moremcmeta", "textures/zombie.png.moremcmeta"),
-                Set.of("textures/bat.png", "textures/creeper.png", "textures/creeper.png.moremcmeta",
+                ImmutableSet.of("textures/bat.png.moremcmeta", "textures/zombie.png.moremcmeta"),
+                ImmutableSet.of("textures/bat.png", "textures/creeper.png", "textures/creeper.png.moremcmeta",
                         "textures/zombie.png")
         );
 
@@ -793,9 +793,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_MetadataInPackBelowTexture_DoesNotFindTexture() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/creeper.png", "textures/creeper.png.moremcmeta",
+                ImmutableSet.of("textures/bat.png", "textures/creeper.png", "textures/creeper.png.moremcmeta",
                         "textures/zombie.png"),
-                Set.of("textures/bat.png.moremcmeta", "textures/zombie.png.moremcmeta")
+                ImmutableSet.of("textures/bat.png.moremcmeta", "textures/zombie.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -813,9 +813,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_DiffFormatMetadataInPackBelowTexture_IgnoresLowerMetadata() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta"),
-                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta", "textures/zombie.png.other")
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta", "textures/zombie.png.other")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -835,9 +835,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_DiffFormatMetadataInPackWithTexture_Conflict() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta", "textures/zombie.png.other"),
-                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -856,9 +856,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_DiffFormatMetadataInPackAboveTexture_Conflict() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta", "textures/creeper.png.other"),
-                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -877,9 +877,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_SameFormatMetadataInPackWithTexture_Combined() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta", "textures/zombie.png2.moremcmeta"),
-                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -899,7 +899,7 @@ public final class TextureLoaderTest {
                                                         Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
                                 assertEquals(new ResourceLocation("textures/zombie.png"), textureLocation);
                                 assertEquals(
-                                        Set.of(
+                                        ImmutableSet.of(
                                                 new ResourceLocation("textures/zombie.png2.moremcmeta"),
                                                 new ResourceLocation("textures/zombie.png.moremcmeta")
                                         ),
@@ -923,9 +923,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_SameFormatMetadataInPackAboveTexture_Combined() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta", "textures/creeper.png2.moremcmeta"),
-                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -945,7 +945,7 @@ public final class TextureLoaderTest {
                                                         Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
                                 assertEquals(new ResourceLocation("textures/creeper.png"), textureLocation);
                                 assertEquals(
-                                        Set.of(
+                                        ImmutableSet.of(
                                                 new ResourceLocation("textures/creeper.png2.moremcmeta"),
                                                 new ResourceLocation("textures/creeper.png.moremcmeta")
                                         ),
@@ -969,9 +969,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_SameFormatMetadataInPackAboveTexture_CombinerExceptionExcluded() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta", "textures/creeper.png2.moremcmeta"),
-                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -990,9 +990,9 @@ public final class TextureLoaderTest {
     @Test
     public void load_SameFormatMetadataInPackWithTexture_CombinerExceptionExcluded() {
         OrderedResourceRepository repository = makeMockRepository(
-                Set.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
                         "textures/zombie.png.moremcmeta", "textures/zombie.png2.moremcmeta"),
-                Set.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
         );
 
         TextureLoader<Integer> loader = new TextureLoader<>(
@@ -1011,7 +1011,7 @@ public final class TextureLoaderTest {
     @Test
     public void load_ResourceLocationException_ExceptionNotCaught() {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
-                Set.of(new MockResourceCollection(Set.of(
+                ImmutableSet.of(new MockResourceCollection(ImmutableSet.of(
                         new ResourceLocation("textures/bat.png"),
                         new ResourceLocation("textures/creeper.png"),
                         new ResourceLocation("textures/zombie.png"),
@@ -1040,7 +1040,7 @@ public final class TextureLoaderTest {
 
     @Test
     public void load_DiffNamespaces_AllLoaded() {
-        OrderedResourceRepository repository = makeMockRepository(Set.of(
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "test:textures/bat.png",
                 "test:textures/bat.png.moremcmeta",
                 "moremcmeta:textures/creeper.png",

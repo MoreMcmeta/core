@@ -26,6 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.util.GsonHelper;
+import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -39,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -260,7 +260,7 @@ public final class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         InputStream resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("one.png"));
 
-        String resourceString = new String(resource.readAllBytes());
+        String resourceString = IOUtils.toString(resource, StandardCharsets.UTF_8);
         assertEquals(new ResourceLocation("one.png").toString(), resourceString);
     }
 
@@ -273,7 +273,7 @@ public final class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         InputStream resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("four.png"));
 
-        String resourceString = new String(resource.readAllBytes());
+        String resourceString = IOUtils.toString(resource, StandardCharsets.UTF_8);
         assertEquals(new ResourceLocation("four.png").toString(), resourceString);
     }
 
@@ -286,7 +286,7 @@ public final class SpriteFrameSizeFixPackTest {
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
         InputStream resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("five.png"));
 
-        String resourceString = new String(resource.readAllBytes());
+        String resourceString = IOUtils.toString(resource, StandardCharsets.UTF_8);
         assertEquals(new ResourceLocation("five.png").toString(), resourceString);
     }
 
@@ -834,7 +834,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
 
-        assertEquals(Set.of("first", "second", "third", "minecraft"), pack.getNamespaces(PackType.CLIENT_RESOURCES));
+        assertEquals(ImmutableSet.of("first", "second", "third", "minecraft"), pack.getNamespaces(PackType.CLIENT_RESOURCES));
     }
 
     @Test

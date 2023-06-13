@@ -19,6 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
@@ -176,7 +177,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id()), foundIds);
         assertEquals(1, numAnalyzed);
     }
 
@@ -209,7 +210,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(1).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(1).id()), foundIds);
         assertEquals(1, numAnalyzed);
     }
 
@@ -245,7 +246,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id()), foundIds);
         assertEquals(1, numAnalyzed);
     }
 
@@ -358,7 +359,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
 
         assertEquals(100, data.frameSize().width());
@@ -394,7 +395,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
 
         assertTrue(data.blur());
@@ -429,7 +430,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
 
         assertFalse(data.blur());
@@ -464,7 +465,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
 
         assertTrue(data.clamp());
@@ -499,7 +500,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id()), foundIds);
         assertEquals(2, numAnalyzed);
 
         assertFalse(data.clamp());
@@ -535,7 +536,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
 
         assertEquals(100, data.frameSize().width());
@@ -572,7 +573,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
 
         assertTrue(data.blur());
@@ -608,7 +609,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
 
         assertFalse(data.blur());
@@ -644,7 +645,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
 
         assertTrue(data.clamp());
@@ -680,7 +681,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
 
         assertFalse(data.clamp());
@@ -716,7 +717,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
 
         assertFalse(data.blur());
@@ -752,7 +753,7 @@ public final class TextureDataReaderTest {
             numAnalyzed++;
         }
 
-        assertEquals(Set.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
+        assertEquals(ImmutableSet.of(plugins.get(0).id(), plugins.get(1).id(), plugins.get(2).id()), foundIds);
         assertEquals(3, numAnalyzed);
 
         assertFalse(data.clamp());
@@ -1114,7 +1115,7 @@ public final class TextureDataReaderTest {
         @Override
         public TextureComponent<CurrentFrameView> build(AnalyzedMetadata metadata,
                                                         FrameGroup<? extends MutableFrameView> frames) {
-            return new TextureComponent<>() {};
+            return new TextureComponent<CurrentFrameView>() {};
         }
 
         public String id() {

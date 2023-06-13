@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
@@ -66,7 +67,7 @@ public final class FrameGroupImpl<F extends FrameView> implements FrameGroup<F> 
                 .mapToObj(
                         (index) -> requireNonNull(viewConstructor, "View constructor cannot be null")
                                 .apply(requireNonNull(frames.get(index), "No frame can be null"), index)
-                ).toList()
+                ).collect(Collectors.toList())
         );
     }
 
