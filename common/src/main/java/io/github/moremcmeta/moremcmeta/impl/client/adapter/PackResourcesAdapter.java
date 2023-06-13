@@ -17,17 +17,16 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
-import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ResourceCollection;
-import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import org.apache.logging.log4j.Logger;
+import net.minecraft.server.packs.resources.IoSupplier;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -37,34 +36,58 @@ import static java.util.Objects.requireNonNull;
  * Allows Minecraft's {@link PackResources} to implement {@link ResourceCollection}.
  * @author soir20
  */
-public final class PackResourcesAdapter implements ResourceCollection {
+public class PackResourcesAdapter implements ResourceCollection {
     private final PackResources ORIGINAL;
-    private final Logger LOGGER;
 
     /**
      * Creates an adapter for resource packs.
      * @param original      the original pack to delegate to
-     * @param logger        logger to log warnings or errors
      */
-    public PackResourcesAdapter(PackResources original, Logger logger) {
+    public PackResourcesAdapter(PackResources original) {
         ORIGINAL = requireNonNull(original, "Original pack cannot be null");
-        LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
 
+    /**
+     * Gets a resource from this pack.
+     * @param resourceType      the type of resources to search
+     * @param location          the location of the resource to get
+     * @return the resource as a stream
+     * @throws IOException if the resource does not exist
+     */
     @Override
     public InputStream find(PackType resourceType, ResourceLocation location) throws IOException {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
-        return ORIGINAL.getResource(resourceType, location);
+
+        IoSupplier<InputStream> resourceSupplier = ORIGINAL.getResource(resourceType, location);
+        if (resourceSupplier == null) {
+            throw new IOException(String.format("Could not find %s in pack type %s", location, resourceType));
+        }
+
+        return resourceSupplier.get();
     }
 
+    /**
+     * Checks if this pack has a resource.
+     * @param resourceType      the type of resources to search
+     * @param location          the location of the resource to search for
+     * @return whether this pack contains the resource
+     */
     @Override
     public boolean contains(PackType resourceType, ResourceLocation location) {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
-        return ORIGINAL.hasResource(resourceType, location);
+        return ORIGINAL.getResource(resourceType, location) != null;
     }
 
+    /**
+     * Gets all the resource locations in this pack that match the provided filters.
+     * @param resourceType      type of resources to look for
+     * @param namespace         namespace of resources
+     * @param pathStart         start of the path of the resources (not including the namespace)
+     * @param fileFilter        filter for the file name
+     * @return all the matching resource locations
+     */
     @Override
     public Collection<ResourceLocation> list(PackType resourceType, String namespace, String pathStart,
                                              Predicate<String> fileFilter) {
@@ -73,21 +96,24 @@ public final class PackResourcesAdapter implements ResourceCollection {
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(fileFilter, "File filter cannot be null");
 
+        Set<ResourceLocation> resources = new HashSet<>();
+        PackResources.ResourceOutput output = (location, resourceSupplier) -> {
+            if (fileFilter.test(location.getPath())) {
+                resources.add(location);
+            }
+        };
 
-        /* We should catch ResourceLocation errors to prevent bad texture names/paths from
-           removing all resource packs. We can't filter invalid folder names, so we don't filter
-           invalid texture names for consistency.
-           NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
-        try {
-            return ORIGINAL.getResources(resourceType, namespace, pathStart, Integer.MAX_VALUE, fileFilter);
-        } catch (ResourceLocationException error) {
-            LOGGER.error("Found texture with invalid name in pack {}; cannot return any resources " +
-                            "from this pack: {}", ORIGINAL.getName(), error.toString());
-            return ImmutableList.of();
-        }
+        ORIGINAL.listResources(resourceType, namespace, pathStart, output);
 
+        return resources;
     }
 
+
+    /**
+     * Gets the namespaces of all resources in this pack.
+     * @param resourceType      the type of resources to search
+     * @return the unique namespaces of all resources in this pack
+     */
     @Override
     public Set<String> namespaces(PackType resourceType) {
         requireNonNull(resourceType, "Resource type cannot be null");

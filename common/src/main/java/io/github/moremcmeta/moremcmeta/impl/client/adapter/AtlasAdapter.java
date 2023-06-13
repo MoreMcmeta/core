@@ -71,12 +71,12 @@ public final class AtlasAdapter implements Atlas {
         ResourceLocation properSpriteName = SpriteName.fromTexturePath(location);
 
         TextureAtlasSprite sprite = ATLAS.getSprite(properSpriteName);
-        if (sprite.getName().equals(MissingTextureAtlasSprite.getLocation())) {
+        if (sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
             sprite = ATLAS.getSprite(location);
         }
 
         // Check the original location in case another mod added it by that name
-        if (sprite.getName().equals(MissingTextureAtlasSprite.getLocation())) {
+        if (sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
             return Optional.empty();
         }
 
@@ -110,12 +110,12 @@ public final class AtlasAdapter implements Atlas {
 
         @Override
         public ResourceLocation name() {
-            return SPRITE.getName();
+            return SPRITE.contents().name();
         }
 
         @Override
         public ResourceLocation atlas() {
-            return SPRITE.atlas().location();
+            return SPRITE.atlasLocation();
         }
 
         @Override
@@ -130,12 +130,12 @@ public final class AtlasAdapter implements Atlas {
 
         @Override
         public int width() {
-            return SPRITE.getWidth();
+            return SPRITE.contents().width();
         }
 
         @Override
         public int height() {
-            return SPRITE.getHeight();
+            return SPRITE.contents().height();
         }
 
         /**

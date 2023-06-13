@@ -50,6 +50,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.UploadComponent;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
@@ -210,16 +211,19 @@ public abstract class MoreMcmeta {
                     .map(Pack::getId)
                     .toList();
 
-            ModRepositorySource source = new ModRepositorySource(() -> {
-                OrderedResourceRepository repository = makeResourceRepository(packRepository, logger);
+            ModRepositorySource source = new ModRepositorySource(
+                    (packId) -> {
+                        OrderedResourceRepository repository = makeResourceRepository(packRepository);
 
-                List<String> currentPackIds = packIdGetter.get();
+                        List<String> currentPackIds = packIdGetter.get();
 
-                cache.load(repository, currentPackIds, "textures", "optifine");
-                METADATA_REGISTRY.set(cache.get(currentPackIds));
+                        cache.load(repository, currentPackIds, "textures", "optifine");
+                        METADATA_REGISTRY.set(cache.get(currentPackIds));
 
-                return new SpriteFrameSizeFixPack(cache.get(currentPackIds), repository);
-            });
+                        return new SpriteFrameSizeFixPack(cache.get(currentPackIds), repository);
+                    },
+                    SharedConstants.getCurrentVersion()
+            );
 
             addRepositorySource(packRepository, source);
 
@@ -522,15 +526,14 @@ public abstract class MoreMcmeta {
     /**
      * Gets the repository containing all the game's resources except the pack this mod adds.
      * @param packRepository    the repository containing all packs
-     * @param logger            logger to log warnings and errors
      * @return the repository with all resources
      */
-    private OrderedResourceRepository makeResourceRepository(PackRepository packRepository, Logger logger) {
+    private OrderedResourceRepository makeResourceRepository(PackRepository packRepository) {
         List<PackResourcesAdapter> otherPacks = new ArrayList<>(packRepository.getSelectedPacks()
                 .stream()
                 .filter((pack) -> !pack.getId().equals(ModRepositorySource.PACK_ID))
                 .map(Pack::open)
-                .map((pack) -> new PackResourcesAdapter(pack, logger))
+                .map(PackResourcesAdapter::new)
                 .toList());
 
         Collections.reverse(otherPacks);
@@ -662,9 +665,12 @@ public abstract class MoreMcmeta {
                         return new NativeImageAdapter(image, mipmapLevel, blur, clamp);
                     },
                     (image, mipmap) -> {
-                        int maxMipmapSettings = Minecraft.getInstance().options.mipmapLevels;
+                        int maxMipmapSettings = Minecraft.getInstance().options.mipmapLevels().get();
                         int maxMipmap = Math.min(maxMipmapSettings, mipmap);
-                        NativeImage[] mipmaps = MipmapGenerator.generateMipLevels(image.image(), maxMipmap);
+                        NativeImage[] mipmaps = MipmapGenerator.generateMipLevels(
+                                new NativeImage[]{ image.image() },
+                                maxMipmap
+                        );
 
                         List<NativeImageAdapter> wrappedMipmaps = new ArrayList<>();
                         for (int level = 0; level < mipmaps.length; level++) {

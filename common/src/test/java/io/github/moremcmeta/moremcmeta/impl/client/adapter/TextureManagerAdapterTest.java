@@ -17,8 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
-import com.google.common.collect.ImmutableList;
-import io.github.moremcmeta.moremcmeta.impl.client.resource.MockResourceManager;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockAnimatedTexture;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -29,16 +27,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link TextureManagerAdapter}.
  * @author soir20
  */
-@SuppressWarnings("resource")
-public final class TextureManagerAdapterTest {
-    private static final ResourceManager MOCK_RESOURCE_MANAGER =
-            new MockResourceManager(ImmutableList.of(), ImmutableList.of(), false);
+public class TextureManagerAdapterTest {
+    private static final ResourceManager MOCK_RESOURCE_MANAGER = ResourceManager.Empty.INSTANCE;
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -170,7 +167,7 @@ public final class TextureManagerAdapterTest {
     }
 
     /**
-     * Mock class combining {@link AbstractTexture} and {@link Tickable}.
+     * Mock animated texture for use in testing the adapter.
      * @author soir20
      */
     private static final class MockTickableAnimatedTexture extends MockAnimatedTexture implements Tickable {}

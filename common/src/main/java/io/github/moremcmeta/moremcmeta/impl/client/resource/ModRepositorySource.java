@@ -18,16 +18,17 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.WorldVersion;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.world.flag.FeatureFlagSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,39 +38,44 @@ import static java.util.Objects.requireNonNull;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class ModRepositorySource implements RepositorySource {
+public class ModRepositorySource implements RepositorySource {
 
     /**
      * The unique identifier for the mod's resource pack.
      */
     public static final String PACK_ID = "__moremcmeta-internal__";
-    private final Supplier<PackResources> PACK_GETTER;
+    private final Pack.ResourcesSupplier PACK_GETTER;
+    private final WorldVersion CURRENT_VERSION;
 
     /**
      * Creates a new resource pack repository.
      * @param packGetter        creates the resource pack added by this mod on each reload
+     * @param currentVersion    current game version
      */
-    public ModRepositorySource(Supplier<PackResources> packGetter) {
+    public ModRepositorySource(Pack.ResourcesSupplier packGetter, WorldVersion currentVersion) {
         PACK_GETTER = requireNonNull(packGetter, "Pack getter cannot be null");
+        CURRENT_VERSION = requireNonNull(currentVersion, "Current version cannot be null");
     }
 
     /**
      * Loads the pack added by this mod.
      * @param consumer          consumer that accepts the pack
-     * @param packConstructor   constructor to create a pack with default settings
      */
     @Override
-    public void loadPacks(Consumer<Pack> consumer, Pack.PackConstructor packConstructor) {
+    public void loadPacks(Consumer<Pack> consumer) {
         requireNonNull(consumer, "Pack consumer cannot be null");
-        requireNonNull(packConstructor, "Pack constructor cannot be null");
 
-        Pack pack = new Pack(
+        int packVersion = CURRENT_VERSION.getPackVersion(PackType.CLIENT_RESOURCES);
+        Pack pack = Pack.create(
                 PACK_ID,
+                Component.literal("MoreMcmeta Internal"),
                 true,
                 PACK_GETTER,
-                new TextComponent("MoreMcmeta Internal"),
-                new TextComponent("Used by the MoreMcmeta mod. Cannot be moved."),
-                PackCompatibility.COMPATIBLE,
+                new Pack.Info(
+                        Component.literal("Used by the MoreMcmeta mod. Cannot be moved."),
+                        packVersion, FeatureFlagSet.of()
+                ),
+                PackType.CLIENT_RESOURCES,
                 Pack.Position.TOP,
                 true,
                 PackSource.BUILT_IN
