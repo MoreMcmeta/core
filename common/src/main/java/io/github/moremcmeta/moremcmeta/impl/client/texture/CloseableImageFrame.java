@@ -27,6 +27,8 @@ import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
 import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
 import it.unimi.dsi.fastutil.longs.LongPriorityQueue;
 
+import java.util.function.LongConsumer;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -245,7 +247,7 @@ public class CloseableImageFrame {
 
         // Apply transformation to the original image
         Layer thisLayer = layer == TOP_LAYER_INDEX ? TOP_LAYER : LOWER_LAYERS.get(layer);
-        applyArea.forEach((point) -> {
+        applyArea.forEach((LongConsumer) (point) -> {
             int x = Point.x(point);
             int y = Point.y(point);
             checkPointInBounds(x, y);

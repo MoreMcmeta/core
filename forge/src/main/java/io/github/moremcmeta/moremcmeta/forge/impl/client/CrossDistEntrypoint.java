@@ -22,7 +22,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.NetworkConstants;
+import net.minecraftforge.fmllegacy.network.FMLNetworkConstants;
 
 import static io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta.MODID;
 
@@ -44,7 +44,7 @@ public class CrossDistEntrypoint {
         ModLoadingContext.get().registerExtensionPoint(
                 IExtensionPoint.DisplayTest.class,
                 ()-> new IExtensionPoint.DisplayTest(
-                        () -> NetworkConstants.IGNORESERVERONLY,
+                        () -> FMLNetworkConstants.IGNORESERVERONLY,
                         (remoteVersion, isServer)-> true
                 )
         );

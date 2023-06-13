@@ -48,14 +48,14 @@ public final class CombinedMetadataViewTest {
     private static final ImmutableList<MetadataView> MOCK_VIEWS = ImmutableList.of(
             new MockMetadataView(ImmutableMap.of("one", 1, "two", 2.0f)),
             new MockMetadataView(
-                    ImmutableMap.of(
-                            "three", "3",
-                            "four", true,
-                            "five", 5L,
-                            "six", 6.0D,
-                            "seven", MOCK_SUB_VIEW,
-                            "eight", MOCK_STREAM
-                    )
+                    new ImmutableMap.Builder<String, Object>()
+                            .put("three", "3")
+                            .put("four", true)
+                            .put("five", 5L)
+                            .put("six", 6.0D)
+                            .put("seven", MOCK_SUB_VIEW)
+                            .put("eight", MOCK_STREAM)
+                            .build()
             )
     );
 
