@@ -152,10 +152,11 @@ public final class TextureData<I extends CloseableImage> {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof FrameSize otherSize)) {
+            if (!(other instanceof FrameSize)) {
                 return false;
             }
 
+            FrameSize otherSize = (FrameSize) other;
             return width() == otherSize.width() && height() == otherSize.height();
         }
 
