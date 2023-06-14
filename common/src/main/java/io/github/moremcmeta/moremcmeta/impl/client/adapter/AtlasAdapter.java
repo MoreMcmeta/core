@@ -143,18 +143,7 @@ public final class AtlasAdapter implements Atlas {
          * @return the x and y-coordinates of the sprite's top left corner
          */
         private long findUploadPoint() {
-            String spriteStr = SPRITE.toString();
-            int labelLength = 2;
-
-            int xLabelIndex = spriteStr.indexOf("x=");
-            int xDelimiterIndex = spriteStr.indexOf(',', xLabelIndex);
-            int x = Integer.parseInt(spriteStr.substring(xLabelIndex + labelLength, xDelimiterIndex));
-
-            int yLabelIndex = spriteStr.indexOf("y=");
-            int yDelimiterIndex = spriteStr.indexOf(',', yLabelIndex);
-            int y = Integer.parseInt(spriteStr.substring(yLabelIndex + labelLength, yDelimiterIndex));
-
-            return Point.pack(x, y);
+            return Point.pack(SPRITE.getX(), SPRITE.getY());
         }
 
     }
