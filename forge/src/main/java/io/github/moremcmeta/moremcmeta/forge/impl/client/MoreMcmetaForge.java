@@ -31,6 +31,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
@@ -92,8 +93,8 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     protected ToIntFunction<TextureAtlasSprite> mipmapLevelGetter(Logger logger) {
         return (sprite) -> {
             try {
-                NativeImage[] mipmaps = ObfuscationReflectionHelper.getPrivateValue(TextureAtlasSprite.class,
-                        sprite, "f_118342_");
+                NativeImage[] mipmaps = ObfuscationReflectionHelper.getPrivateValue(SpriteContents.class,
+                        sprite.contents(), "f_243731_");
 
                 if (mipmaps != null) {
                     return mipmaps.length - 1;
