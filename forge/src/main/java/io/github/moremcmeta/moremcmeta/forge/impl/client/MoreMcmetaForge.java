@@ -150,7 +150,7 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     protected Optional<ReloadInstance> reloadInstance(LoadingOverlay overlay, Logger logger) {
         try {
             return Optional.ofNullable(
-                    ObfuscationReflectionHelper.getPrivateValue(LoadingOverlay.class, overlay, "f_96164_")
+                    ObfuscationReflectionHelper.getPrivateValue(LoadingOverlay.class, overlay, "field_212975_c")
             );
         } catch (ObfuscationReflectionHelper.UnableToAccessFieldException err) {
             logger.error("Unable to access LoadingOverlay's reload instance field. " +
