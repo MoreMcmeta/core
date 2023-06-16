@@ -78,6 +78,12 @@ subprojects {
         testImplementation "org.lwjgl:lwjgl:${rootProject.lwjglVersion}"
         testRuntimeOnly "org.lwjgl:lwjgl:${rootProject.lwjglVersion}:${lwjglNatives}"
     }
+
+    processResources {
+        filesMatching("**/*.mixins.json") {
+            expand "javaVersion": project.javaVersion
+        }
+    }
 }
 
 allprojects {
