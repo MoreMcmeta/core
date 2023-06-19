@@ -42,6 +42,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public final class TextureDataReader<I extends CloseableImage> implements TextureReader<TextureData<I>> {
+    private static final int MAX_PLUGINS_APPLIED = 100;
     private final Map<String, MoreMcmetaTexturePlugin> SECTION_TO_PLUGIN;
     private final ImageReader<? extends I> IMAGE_READER;
     private final BlurClampApplier<? super I, ? extends I> BLUR_CLAMP_APPLIER;
@@ -126,8 +127,13 @@ public final class TextureDataReader<I extends CloseableImage> implements Textur
         if (frameHeight <= 0) {
             throw new InvalidMetadataException("Frame height cannot be zero or negative: " + frameHeight);
         }
-
         TextureData.FrameSize frameSize = new TextureData.FrameSize(frameWidth, frameHeight);
+
+        if (analyzedSections.size() > MAX_PLUGINS_APPLIED) {
+            throw new InvalidMetadataException(
+                    analyzedSections.size() + " plugins applied, but " + MAX_PLUGINS_APPLIED + " is the maximum"
+            );
+        }
 
         return new TextureData<>(
                 frameSize,
