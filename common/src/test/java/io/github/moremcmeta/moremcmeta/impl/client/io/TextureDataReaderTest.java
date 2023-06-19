@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -979,6 +980,47 @@ public final class TextureDataReaderTest {
         reader.read(
                 DEMO_TEXTURE_STREAM,
                 new MockMetadataView(Arrays.asList("animation", "texture"))
+        );
+    }
+
+    @Test
+    public void read_MaxPlugins_NoException() throws IOException, InvalidMetadataException {
+        List<String> sectionList = IntStream.range(0, 100).mapToObj(String::valueOf).toList();
+        List<MockPlugin> plugins = sectionList.stream()
+                .map((section) -> new MockPlugin(section, null, null, null, null, null))
+                .toList();
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage(),
+                (image, blur, clamp) -> image
+        );
+
+        TextureData<MockCloseableImage> data = reader.read(
+                DEMO_TEXTURE_STREAM,
+                new MockMetadataView(sectionList)
+        );
+
+        assertEquals(100, data.analyzedMetadata().size());
+    }
+
+    @Test
+    public void read_TooManyPlugins_InvalidMetadataException() throws IOException, InvalidMetadataException {
+        List<String> sectionList = IntStream.range(0, 101).mapToObj(String::valueOf).toList();
+        List<MockPlugin> plugins = sectionList.stream()
+                        .map((section) -> new MockPlugin(section, null, null, null, null, null))
+                        .toList();
+
+        TextureDataReader<MockCloseableImage> reader = new TextureDataReader<>(
+                plugins,
+                (stream) -> new MockCloseableImage(),
+                (image, blur, clamp) -> image
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        reader.read(
+                DEMO_TEXTURE_STREAM,
+                new MockMetadataView(sectionList)
         );
     }
 
