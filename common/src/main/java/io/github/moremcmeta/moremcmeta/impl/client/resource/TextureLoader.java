@@ -308,7 +308,6 @@ public final class TextureLoader<R> {
         try {
             return Optional.of(repository.firstCollectionWith(location).collectionIndex());
         } catch (IOException err) {
-            LOGGER.error("Unable to read texture {}: {}", location, err);
             return Optional.empty();
         }
     }
