@@ -27,7 +27,6 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.flag.FeatureFlagSet;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
@@ -36,7 +35,6 @@ import static java.util.Objects.requireNonNull;
  * Supplies the {@link Pack} (and thus {@link PackResources}) added by this mod.
  * @author soir20
  */
-@ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ModRepositorySource implements RepositorySource {
 
