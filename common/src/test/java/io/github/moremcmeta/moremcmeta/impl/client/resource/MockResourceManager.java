@@ -27,7 +27,6 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleResource;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +42,6 @@ import java.util.stream.Stream;
  * @author soir20
  */
 @SuppressWarnings("unused")
-@ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MockResourceManager implements ResourceManager {
     public static final String DEFAULT_PACK_NAME = "test";

@@ -21,13 +21,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 /**
  * A fake tickable texture.
  * @author soir20
  */
-@ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MockAnimatedTexture extends AbstractTexture implements CustomTickable {
     private int ticks;
