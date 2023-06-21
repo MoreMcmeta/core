@@ -22,7 +22,6 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -34,7 +33,6 @@ import java.util.concurrent.Executor;
  * @param <T>   type of data that is loaded
  * @author soir20
  */
-@ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface StagedResourceReloadListener<T> extends PreparableReloadListener {
 

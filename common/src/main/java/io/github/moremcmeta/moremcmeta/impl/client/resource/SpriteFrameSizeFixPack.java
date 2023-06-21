@@ -27,7 +27,6 @@ import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +46,6 @@ import static java.util.Objects.requireNonNull;
  * onto the atlas, not all of them.
  * @author soir20
  */
-@ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
