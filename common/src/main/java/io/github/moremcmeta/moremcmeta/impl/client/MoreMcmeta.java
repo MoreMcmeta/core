@@ -67,7 +67,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -605,7 +604,6 @@ public abstract class MoreMcmeta {
      * no longer have metadata for this mod.
      * @author soir20
      */
-    @ParametersAreNonnullByDefault
     private class TextureResourceReloadListener
             implements StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> {
         private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED;

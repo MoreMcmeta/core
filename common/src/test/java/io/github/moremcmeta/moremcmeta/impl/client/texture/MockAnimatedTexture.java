@@ -20,13 +20,10 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 /**
  * A fake tickable texture.
  * @author soir20
  */
-@ParametersAreNonnullByDefault
 public class MockAnimatedTexture extends AbstractTexture implements CustomTickable {
     private int ticks;
 

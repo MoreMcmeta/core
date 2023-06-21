@@ -33,7 +33,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -392,7 +391,6 @@ public final class PackResourcesAdapterTest {
      * Dummy implementation of {@link PackResources} that always throws a runtime exception.
      * @author soir20
      */
-    @ParametersAreNonnullByDefault
     private static class ExceptionPackResources implements PackResources {
 
         @Override

@@ -24,7 +24,6 @@ import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -34,7 +33,6 @@ import static java.util.Objects.requireNonNull;
  * Supplies the {@link Pack} (and thus {@link PackResources}) added by this mod.
  * @author soir20
  */
-@ParametersAreNonnullByDefault
 public final class ModRepositorySource implements RepositorySource {
 
     /**
