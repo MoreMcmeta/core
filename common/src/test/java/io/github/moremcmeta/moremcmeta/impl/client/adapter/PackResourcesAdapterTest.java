@@ -28,7 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -344,7 +343,6 @@ public class PackResourcesAdapterTest {
      * @author soir20
      */
     @MethodsReturnNonnullByDefault
-    @ParametersAreNonnullByDefault
     private static class ExceptionPackResources implements PackResources {
 
         @Override
