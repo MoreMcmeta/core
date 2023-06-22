@@ -64,7 +64,11 @@ shadowJar {
     exclude "fabric.mod.json"
     exclude "architectury.common.json"
 
-    configurations = [project.configurations.shadowCommon]
+    configurations = [project.configurations.shadowCommon, project.configurations.include]
+
+    // We have to merge the mods.toml so that Forge processes all mod entrypoints correctly
+    append "META-INF/mods.toml"
+
     archiveClassifier.set "dev-shadow"
 }
 
