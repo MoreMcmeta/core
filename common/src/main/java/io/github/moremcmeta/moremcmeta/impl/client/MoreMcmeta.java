@@ -410,6 +410,10 @@ public abstract class MoreMcmeta {
             if (extension.contains(".")) {
                 throw new InvalidPluginException("Extension cannot contain a period (.)");
             }
+            if (extension.equals("mcmeta")) {
+                throw new InvalidPluginException("Implementing .mcmeta parser extensions is not allowed " +
+                        "due to the way Minecraft implements resource packs");
+            }
 
             if (extension.length() == 0) {
                 throw new InvalidPluginException("Extension cannot be empty");
