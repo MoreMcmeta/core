@@ -420,6 +420,219 @@ public final class TextureLoaderTest {
     }
 
     @Test
+    public void load_SearchRetrievesPackFloorNotPresent_CorrectResourcesFoundInPacks() {
+        OrderedResourceRepository repository = makeMockRepository(Set.of(
+                "textures/bat_abcd.png", "textures/bat_abcd.png.moremcmeta",
+                "textures/creeper_abcd.png",
+                "zombie.png", "zombie.png.moremcmeta",
+                "optifine/ghast_abcd.png", "optifine/ghast_abcd.png.moremcmeta"
+        ));
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
+                    Set<? extends ResourceLocation> locations = resourceRepository.list(
+                            (fileName) -> fileName.endsWith("_abcd.png")
+                    );
+
+                    Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
+                            new ResourceLocation("textures/bat_abcd.png"),
+                            new ResourceLocation("textures/bat_efgh.png")
+                    );
+                    assertTrue(pack.isPresent());
+                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+
+                    return locations.stream().collect(Collectors.toMap(
+                            Function.identity(),
+                            (location) -> new MockMetadataView(List.of(location.getPath()))
+                    ));
+                }),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+
+        assertEquals(2, locations.size());
+        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+    }
+
+    @Test
+    public void load_SearchRetrievesPackFloorBelow_CorrectResourcesFoundInPacks() {
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of(
+                        "textures/bat_abcd.png", "textures/bat_abcd.png.moremcmeta",
+                        "textures/creeper_abcd.png",
+                        "zombie.png", "zombie.png.moremcmeta",
+                        "optifine/ghast_abcd.png", "optifine/ghast_abcd.png.moremcmeta"
+                ),
+                Set.of(
+                        "textures/bat_efgh.png"
+                )
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
+                    Set<? extends ResourceLocation> locations = resourceRepository.list(
+                            (fileName) -> fileName.endsWith("_abcd.png")
+                    );
+
+                    Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
+                            new ResourceLocation("textures/bat_abcd.png"),
+                            new ResourceLocation("textures/bat_efgh.png")
+                    );
+                    assertTrue(pack.isPresent());
+                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+
+                    return locations.stream().collect(Collectors.toMap(
+                            Function.identity(),
+                            (location) -> new MockMetadataView(List.of(location.getPath()))
+                    ));
+                }),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+
+        assertEquals(2, locations.size());
+        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+    }
+
+    @Test
+    public void load_SearchRetrievesPackFloorInSame_CorrectResourcesFoundInPacks() {
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of(
+                        "textures/bat_abcd.png", "textures/bat_abcd.png.moremcmeta",
+                        "textures/creeper_abcd.png",
+                        "zombie.png", "zombie.png.moremcmeta",
+                        "optifine/ghast_abcd.png", "optifine/ghast_abcd.png.moremcmeta",
+                        "textures/bat_efgh.png"
+                )
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
+                    Set<? extends ResourceLocation> locations = resourceRepository.list(
+                            (fileName) -> fileName.endsWith("_abcd.png")
+                    );
+
+                    Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
+                            new ResourceLocation("textures/bat_abcd.png"),
+                            new ResourceLocation("textures/bat_efgh.png")
+                    );
+                    assertTrue(pack.isPresent());
+                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+
+                    return locations.stream().collect(Collectors.toMap(
+                            Function.identity(),
+                            (location) -> new MockMetadataView(List.of(location.getPath()))
+                    ));
+                }),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+
+        assertEquals(2, locations.size());
+        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+    }
+
+    @Test
+    public void load_SearchRetrievesPackFloorAbove_PackNotFound() {
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of(
+                        "textures/bat_efgh.png"
+                ),
+                Set.of(
+                        "textures/bat_abcd.png", "textures/bat_abcd.png.moremcmeta",
+                        "textures/creeper_abcd.png",
+                        "zombie.png", "zombie.png.moremcmeta",
+                        "optifine/ghast_abcd.png", "optifine/ghast_abcd.png.moremcmeta"
+                )
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
+                    Set<? extends ResourceLocation> locations = resourceRepository.list(
+                            (fileName) -> fileName.endsWith("_abcd.png")
+                    );
+
+                    assertFalse(
+                            resourceRepository.highestPackWith(
+                                    new ResourceLocation("textures/bat_abcd.png"),
+                                    new ResourceLocation("textures/bat_efgh.png")
+                            ).isPresent()
+                    );
+
+                    return locations.stream().collect(Collectors.toMap(
+                            Function.identity(),
+                            (location) -> new MockMetadataView(List.of(location.getPath()))
+                    ));
+                }),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+
+        assertEquals(2, locations.size());
+        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+    }
+
+    @Test
+    public void load_SearchRetrievesPackSameAsFloor_CorrectResourcesFoundInPacks() {
+        OrderedResourceRepository repository = makeMockRepository(
+                Set.of(
+                        "textures/bat_abcd.png", "textures/bat_abcd.png.moremcmeta",
+                        "textures/creeper_abcd.png",
+                        "zombie.png", "zombie.png.moremcmeta",
+                        "optifine/ghast_abcd.png", "optifine/ghast_abcd.png.moremcmeta"
+                )
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
+                    Set<? extends ResourceLocation> locations = resourceRepository.list(
+                            (fileName) -> fileName.endsWith("_abcd.png")
+                    );
+
+                    Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
+                            new ResourceLocation("textures/bat_abcd.png"),
+                            new ResourceLocation("textures/bat_abcd.png")
+                    );
+                    assertTrue(pack.isPresent());
+                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+
+                    return locations.stream().collect(Collectors.toMap(
+                            Function.identity(),
+                            (location) -> new MockMetadataView(List.of(location.getPath()))
+                    ));
+                }),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+
+        assertEquals(2, locations.size());
+        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+    }
+
+    @Test
     public void load_MissingTextureLocations_LoadsNoMissingTextures() {
         OrderedResourceRepository repository = makeMockRepository(Set.of("textures/bat.png", "textures/bat.png.moremcmeta",
                 "textures/creeper.png.moremcmeta", "textures/zombie.png.moremcmeta"));
