@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -126,23 +128,46 @@ public final class TextureLoader<R> {
      * @return wrapped resource repository
      */
     private ResourceRepository wrapRepository(OrderedResourceRepository original, String[] paths) {
+        Function<ResourceLocation, Optional<OrderedResourceRepository.ResourceCollectionResult>> collectionFinder =
+                (location) -> {
+                    try {
+                        return Optional.of(original.firstCollectionWith(location));
+                    } catch (IOException err) {
+                        return Optional.empty();
+                    }
+                };
+
+        BiFunction<ResourceLocation, Integer, Optional<ResourceRepository.Pack>> highestPackWith = (loc, maxIndex) -> {
+            Optional<OrderedResourceRepository.ResourceCollectionResult> result = collectionFinder.apply(loc);
+            if (!result.isPresent() || result.get().collectionIndex() > maxIndex) {
+                return Optional.empty();
+            }
+
+            ResourceCollection pack = result.get().collection();
+            return Optional.of(
+                    (locationInPack) -> {
+                        try {
+                            return Optional.of(pack.find(original.resourceType(), locationInPack));
+                        } catch (IOException err) {
+                            return Optional.empty();
+                        }
+                    }
+            );
+        };
+        
         return new ResourceRepository() {
             @Override
             public Optional<Pack> highestPackWith(ResourceLocation location) {
-                try {
-                    ResourceCollection pack = original.firstCollectionWith(location).collection();
-                    return Optional.of(
-                            (locationInPack) -> {
-                                try {
-                                    return Optional.of(pack.find(original.resourceType(), locationInPack));
-                                } catch (IOException err) {
-                                    return Optional.empty();
-                                }
-                            }
-                    );
-                } catch (IOException err) {
-                    return Optional.empty();
-                }
+                return highestPackWith.apply(location, Integer.MAX_VALUE);
+            }
+
+            @Override
+            public Optional<Pack> highestPackWith(ResourceLocation location, ResourceLocation floor) {
+                int maxIndex = collectionFinder.apply(floor)
+                        .map(OrderedResourceRepository.ResourceCollectionResult::collectionIndex)
+                        .orElse(Integer.MAX_VALUE);
+
+                return highestPackWith.apply(location, maxIndex);
             }
 
             @Override
