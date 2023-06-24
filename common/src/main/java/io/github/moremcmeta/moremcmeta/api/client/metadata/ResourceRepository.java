@@ -44,6 +44,16 @@ public interface ResourceRepository {
     Optional<Pack> highestPackWith(ResourceLocation location);
 
     /**
+     * Gets the highest pack that has a given resource, if it is at or above the highest pack that
+     * contains the "floor" resource.
+     * @param location      location of the resource
+     * @param floor         resource whose highest pack to use as a floor to
+     *                      retrieve the given resource's pack
+     * @return highest pack that has a given resource, if any
+     */
+    Optional<Pack> highestPackWith(ResourceLocation location, ResourceLocation floor);
+
+    /**
      * Searches for resources that exist in any currently-applied resource pack.
      * @param fileFilter    returns true for resource location paths that should be included in the results
      * @return all resources that match the provided filter
