@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for MoreMcmeta
 title: ''
-labels: suggestion
+labels: 'type: suggestion'
 assignees: soir20
 
 ---

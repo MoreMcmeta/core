@@ -2,7 +2,7 @@
 name: Bug report
 about: Report something that isn't right
 title: ''
-labels: bug
+labels: 'type: bug'
 assignees: soir20
 
 ---

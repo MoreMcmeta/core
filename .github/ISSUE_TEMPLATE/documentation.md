@@ -2,7 +2,7 @@
 name: Documentation
 about: Suggest improvements for MoreMcmeta's documentation
 title: ''
-labels: documentation
+labels: 'type: documentation'
 assignees: soir20
 
 ---
