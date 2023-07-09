@@ -31,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -94,7 +95,12 @@ public class SpriteFrameSizeFixPack implements PackResources {
             return null;
         }
 
-        ResourceLocation textureLocation = getTextureLocation(location);
+        Optional<ResourceLocation> textureLocationOptional = getTextureLocation(location);
+        if (textureLocationOptional.isEmpty()) {
+            return null;
+        }
+
+        ResourceLocation textureLocation = textureLocationOptional.get();
         boolean isKnownTexture = TEXTURES.containsKey(textureLocation);
         boolean isVanillaMetadata = location.getPath().endsWith(VANILLA_METADATA_EXTENSION);
 
@@ -152,8 +158,12 @@ public class SpriteFrameSizeFixPack implements PackResources {
             if (isRightNamespace && isRightPath) {
                 resourceOutput.accept(location, getResource(PackType.CLIENT_RESOURCES, location));
 
-                ResourceLocation metadataLocation = getMetadataLocation(location);
-                resourceOutput.accept(metadataLocation, getResource(PackType.CLIENT_RESOURCES, metadataLocation));
+                getMetadataLocation(location).ifPresent(
+                        (metadataLocation) -> resourceOutput.accept(
+                                metadataLocation,
+                                getResource(PackType.CLIENT_RESOURCES, metadataLocation)
+                        )
+                );
             }
         });
 
@@ -206,10 +216,13 @@ public class SpriteFrameSizeFixPack implements PackResources {
      * @return location of the texture associated with the metadata or the same location
      *         if it is not the location of vanilla metadata
      */
-    private ResourceLocation getTextureLocation(ResourceLocation location) {
-        return new ResourceLocation(
+    private Optional<ResourceLocation> getTextureLocation(ResourceLocation location) {
+
+        // Some mods allow invalid resource locations to be created, so we ignore them like vanilla packs do
+        return Optional.ofNullable(ResourceLocation.tryBuild(
                 location.getNamespace(), location.getPath().replace(VANILLA_METADATA_EXTENSION, "")
-        );
+        ));
+
     }
 
     /**
@@ -217,10 +230,13 @@ public class SpriteFrameSizeFixPack implements PackResources {
      * @param location      location of texture
      * @return location of the metadata  associated with the texture
      */
-    private ResourceLocation getMetadataLocation(ResourceLocation location) {
-        return new ResourceLocation(
+    private Optional<ResourceLocation> getMetadataLocation(ResourceLocation location) {
+
+        // Some mods allow invalid resource locations to be created, so we ignore them like vanilla packs do
+        return Optional.ofNullable(ResourceLocation.tryBuild(
                 location.getNamespace(), location.getPath() + VANILLA_METADATA_EXTENSION
-        );
+        ));
+
     }
 
     /**
