@@ -26,6 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -324,6 +325,23 @@ public final class SpriteFrameSizeFixPackTest {
 
         expectedException.expect(IOException.class);
         pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("three.png"));
+    }
+
+    @Test
+    public void getResource_BadResourceLocation_Null() throws IOException {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        expectedException.expect(IOException.class);
+        pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("one.png") {
+            @Override
+            public @NotNull String getNamespace() {
+                return "bad namespace";
+            }
+        });
     }
 
     @Test
@@ -807,7 +825,27 @@ public final class SpriteFrameSizeFixPackTest {
         assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/other.png")));
     }
 
-    @SuppressWarnings("DataFlowIssue")
+    @Test
+    public void hasResource_BadResourceLocation_NotFound() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("textures/one.png"),
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("textures/five.png"),
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        assertFalse(pack.hasResource(
+                PackType.CLIENT_RESOURCES,
+                new ResourceLocation("textures/one.png") {
+                    @Override
+                    public @NotNull String getNamespace() {
+                        return "bad namespace";
+                    }
+                }
+        ));
+    }
+
     @Test
     public void getNamespaces_NullPackType_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();

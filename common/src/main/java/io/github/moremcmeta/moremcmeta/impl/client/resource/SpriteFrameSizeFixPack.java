@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -34,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -99,7 +101,12 @@ public final class SpriteFrameSizeFixPack implements PackResources {
             throw new IOException("MoreMcmeta's internal pack only contains client resources");
         }
 
-        ResourceLocation textureLocation = textureLocation(location);
+        Optional<ResourceLocation> textureLocationOptional = textureLocation(location);
+        if (textureLocationOptional.isEmpty()) {
+            throw new IOException("Requested invalid resource location: " + location);
+        }
+
+        ResourceLocation textureLocation = textureLocationOptional.get();
         TextureData<?> textureData = TEXTURES.get(textureLocation);
 
         boolean isKnownTexture = textureData != null;
@@ -185,7 +192,8 @@ public final class SpriteFrameSizeFixPack implements PackResources {
             return false;
         }
 
-        return TEXTURES.containsKey(textureLocation(location));
+        Optional<ResourceLocation> textureLocationOptional = textureLocation(location);
+        return textureLocationOptional.isPresent() && TEXTURES.containsKey(textureLocationOptional.get());
     }
 
     /**
@@ -235,10 +243,17 @@ public final class SpriteFrameSizeFixPack implements PackResources {
      * @return location of the texture associated with the metadata or the same location
      *         if it is not the location of vanilla metadata
      */
-    private ResourceLocation textureLocation(ResourceLocation location) {
-        return new ResourceLocation(
-                location.getNamespace(), location.getPath().replace(VANILLA_METADATA_EXTENSION, "")
-        );
+    private Optional<ResourceLocation> textureLocation(ResourceLocation location) {
+
+        // Some mods allow invalid resource locations to be created, so we ignore them like vanilla packs do
+        try {
+            return Optional.of(new ResourceLocation(
+                    location.getNamespace(), location.getPath().replace(VANILLA_METADATA_EXTENSION, "")
+            ));
+        } catch (ResourceLocationException err) {
+            return Optional.empty();
+        }
+
     }
 
     /**
