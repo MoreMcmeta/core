@@ -26,7 +26,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -333,6 +335,23 @@ public class SpriteFrameSizeFixPackTest {
     }
 
     @Test
+    public void getResource_BadResourceLocation_Null() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+        IoSupplier<InputStream> resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("one.png") {
+            @Override
+            public @NotNull String getNamespace() {
+                return "bad namespace";
+            }
+        });
+
+        assertNull(resource);
+    }
+
+    @Test
     public void getResources_ServerPackType_NoResources() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
@@ -510,6 +529,34 @@ public class SpriteFrameSizeFixPackTest {
         assertTrue(results.contains(new ResourceLocation("textures/folder/two.png")));
         assertTrue(results.contains(new ResourceLocation("textures/folder/folder2/folder3/five.png")));
         assertTrue(results.contains(new ResourceLocation("textures/folder/two.png.mcmeta")));
+        assertTrue(results.contains(new ResourceLocation("textures/folder/folder2/folder3/five.png.mcmeta")));
+    }
+
+    @Test
+    public void getResources_BadResourceLocation_BadLocationSkipped() {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("one.jpg"),
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(
+                new ResourceLocation("textures/folder/two.png") {
+                    @Override
+                    public @NotNull String getNamespace() {
+                        return "bad namespace";
+                    }
+                },
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("other", "textures/folder/three.png"),
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("other/folder/four.png"),
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
+                new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, DUMMY_REPO);
+
+        Collection<ResourceLocation> results = getResources(pack, PackType.CLIENT_RESOURCES, "minecraft", "textures");
+        assertEquals(2, results.size());
+        assertTrue(results.contains(new ResourceLocation("textures/folder/folder2/folder3/five.png")));
         assertTrue(results.contains(new ResourceLocation("textures/folder/folder2/folder3/five.png.mcmeta")));
     }
 
