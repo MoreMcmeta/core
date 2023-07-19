@@ -79,7 +79,12 @@ public final class PackResourcesAdapter implements ResourceCollection {
            invalid texture names for consistency.
            NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
         try {
-            return ORIGINAL.getResources(resourceType, namespace, pathStart, Integer.MAX_VALUE, fileFilter);
+            return ORIGINAL.getResources(
+                    resourceType,
+                    namespace,
+                    pathStart,
+                    (location) -> fileFilter.test(location.getPath())
+            );
         } catch (ResourceLocationException error) {
             LOGGER.error("Found texture with invalid name in pack {}; cannot return any resources " +
                             "from this pack: {}", ORIGINAL.getName(), error.toString());

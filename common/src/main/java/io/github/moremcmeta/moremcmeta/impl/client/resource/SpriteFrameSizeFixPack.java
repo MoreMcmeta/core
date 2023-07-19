@@ -25,7 +25,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
@@ -141,21 +140,16 @@ public final class SpriteFrameSizeFixPack implements PackResources {
      * @param packType          client or server resources. Only client resources are available.
      * @param namespace         namespace of the requested resources
      * @param pathStart         required start of the resources' paths (like folders, no trailing slash)
-     * @param depth             maximum depth of directory tree to search
      * @param pathFilter        filter for entire paths, including the file name and extension
      * @return the matching resources in this pack
      */
     @Override
     public Collection<ResourceLocation> getResources(PackType packType, String namespace, String pathStart,
-                                                     int depth, Predicate<String> pathFilter) {
+                                                     Predicate<ResourceLocation> pathFilter) {
         requireNonNull(packType, "Pack type cannot be null");
         requireNonNull(namespace, "Namespace cannot be null");
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(pathFilter, "Path filter cannot be null");
-
-        if (depth < 0) {
-            throw new IllegalArgumentException("Depth is negative");
-        }
 
         if (packType == PackType.SERVER_DATA) {
             return new ArrayList<>();
@@ -167,11 +161,9 @@ public final class SpriteFrameSizeFixPack implements PackResources {
         return TEXTURES.keySet().stream().filter((location) -> {
             String path = location.getPath();
             boolean isRightNamespace = location.getNamespace().equals(namespace);
-            boolean isRightPath = path.startsWith(directoryStart) && pathFilter.test(path);
-            boolean isRightDepth = isRightPath &&
-                    StringUtils.countMatches(path.substring(directoryStart.length()), '/') <= depth - 1;
+            boolean isRightPath = path.startsWith(directoryStart) && pathFilter.test(location);
 
-            return isRightNamespace && isRightDepth;
+            return isRightNamespace && isRightPath;
         }).collect(Collectors.toList());
 
     }

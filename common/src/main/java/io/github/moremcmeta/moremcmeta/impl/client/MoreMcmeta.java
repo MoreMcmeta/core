@@ -664,7 +664,7 @@ public abstract class MoreMcmeta {
                         return new NativeImageAdapter(image, mipmapLevel, blur, clamp);
                     },
                     (image, mipmap) -> {
-                        int maxMipmapSettings = Minecraft.getInstance().options.mipmapLevels;
+                        int maxMipmapSettings = Minecraft.getInstance().options.mipmapLevels().get();
                         int maxMipmap = Math.min(maxMipmapSettings, mipmap);
                         NativeImage[] mipmaps = MipmapGenerator.generateMipLevels(image.image(), maxMipmap);
 

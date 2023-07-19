@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
@@ -65,8 +65,8 @@ public final class ModRepositorySource implements RepositorySource {
                 PACK_ID,
                 true,
                 PACK_GETTER,
-                new TextComponent("MoreMcmeta Internal"),
-                new TextComponent("Used by the MoreMcmeta mod. Cannot be moved."),
+                Component.literal("MoreMcmeta Internal"),
+                Component.literal("Used by the MoreMcmeta mod. Cannot be moved."),
                 PackCompatibility.COMPATIBLE,
                 Pack.Position.TOP,
                 true,

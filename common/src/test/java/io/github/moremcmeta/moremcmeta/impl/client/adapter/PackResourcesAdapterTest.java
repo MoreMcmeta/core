@@ -290,8 +290,8 @@ public final class PackResourcesAdapterTest {
                 ) {
                     @Override
                     public @NotNull Collection<ResourceLocation> getResources(@NotNull PackType packType, @NotNull String namespace,
-                                                                              @NotNull String pathStart, int maxDepth,
-                                                                              @NotNull Predicate<String> pathFilter) {
+                                                                              @NotNull String pathStart,
+                                                                              @NotNull Predicate<ResourceLocation> pathFilter) {
                         throw new ResourceLocationException("dummy exception");
                     }
 
@@ -404,7 +404,7 @@ public final class PackResourcesAdapterTest {
 
         @Override
         public Collection<ResourceLocation> getResources(PackType packType, String namespace, String pathStart,
-                                                         int maxDepth, Predicate<String> fileFilter) {
+                                                         Predicate<ResourceLocation> fileFilter) {
             throw new RuntimeException("dummy getResources exception");
         }
 
