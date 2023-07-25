@@ -233,7 +233,9 @@ public final class TextureLoader<R> {
             LOGGER.error("Texture associated with metadata in file {} is missing: {}",
                     metadataLocation, ioException);
         } catch (InvalidMetadataException metadataError) {
-            LOGGER.error("Invalid metadata in file {}: {}", metadataLocation, metadataError);
+            if (!metadataError.silenced()) {
+                LOGGER.error("Invalid metadata in file {}: {}", metadataLocation, metadataError);
+            }
         }
     }
 
@@ -304,12 +306,14 @@ public final class TextureLoader<R> {
                     combinedMetadata = PARSERS.get(extension)
                             .combine(textureLocation, allMetadata.metadataByLocation());
                 } catch (InvalidMetadataException err) {
-                    LOGGER.error(
-                            "Unable to combine metadata for texture {} (applied {}): {}",
-                            textureLocation,
-                            join(allMetadata.metadataLocations()),
-                            err
-                    );
+                    if (!err.silenced()) {
+                        LOGGER.error(
+                                "Unable to combine metadata for texture {} (applied {}): {}",
+                                textureLocation,
+                                join(allMetadata.metadataLocations()),
+                                err
+                        );
+                    }
                     return;
                 }
             } else {
@@ -362,7 +366,9 @@ public final class TextureLoader<R> {
         } catch (IOException err) {
             LOGGER.error("Unable to read texture {}: {}", textureLocation, err);
         } catch (InvalidMetadataException metadataError) {
-            LOGGER.error("Invalid metadata for texture {}: {}", textureLocation, metadataError);
+            if (!metadataError.silenced()) {
+                LOGGER.error("Invalid metadata for texture {}: {}", textureLocation, metadataError);
+            }
         }
     }
 

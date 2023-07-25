@@ -723,6 +723,62 @@ public final class TextureLoaderTest {
     }
 
     @Test
+    public void load_SilencedInvalidMetadataDuringRead_LoadsValidTextures() {
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
+                "textures/bat.png",
+                "textures/bat.png.moremcmeta",
+                "textures/creeper.png",
+                "textures/zombie.png",
+                "textures/creeper.png.moremcmeta",
+                "textures/zombie.png.moremcmeta"
+        ));
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
+                    if (metadataLocation.getPath().contains("creeper")) {
+                        throw new InvalidMetadataException("Dummy exception", new Exception(), true);
+                    }
+
+                    return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
+                }),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        assertEquals(2, locations.size());
+        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
+    }
+
+    @Test
+    public void load_SilencedInvalidMetadataAfterRead_LoadsValidTextures() {
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
+                "textures/bat.png",
+                "textures/bat.png.moremcmeta",
+                "textures/creeper.png",
+                "textures/zombie.png",
+                "textures/creeper.png.moremcmeta",
+                "textures/zombie.png.moremcmeta"
+        ));
+
+        AtomicInteger texturesLoaded = new AtomicInteger();
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> {
+                    if (texturesLoaded.getAndIncrement() < 1) {
+                        throw new InvalidMetadataException("Dummy exception", true);
+                    }
+                    return 1;
+                },
+                MOCK_READERS,
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
+        assertEquals(2, locations.size());
+    }
+
+    @Test
     public void load_UnreadableTexture_LoadsValidTextures() {
         OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
                 "textures/bat.png",
