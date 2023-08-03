@@ -47,6 +47,7 @@ public final class InvalidMetadataException extends Exception {
      * Creates a new exception with a detail message.
      * @param reason        the reason the metadata is invalid
      * @param silenced      whether the exception should be silenced in logs
+     * @since 4.1.0
      */
     public InvalidMetadataException(String reason, boolean silenced) {
         super(reason);
@@ -58,6 +59,7 @@ public final class InvalidMetadataException extends Exception {
      * @param reason        the reason the metadata is invalid
      * @param cause         the exception that caused this exception to be thrown
      * @param silenced      whether the exception should be silenced in logs
+     * @since 4.1.0
      */
     public InvalidMetadataException(String reason, Throwable cause, boolean silenced) {
         super(reason, cause);
@@ -67,6 +69,7 @@ public final class InvalidMetadataException extends Exception {
     /**
      * Checks whether this exception should be silenced in logs.
      * @return whether the exception should be silenced in logs
+     * @since 4.1.0
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean silenced() {
