@@ -25,6 +25,7 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataExcept
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ResourceRepository;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.RootResourceName;
 import io.github.moremcmeta.moremcmeta.impl.client.io.MockMetadataView;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
@@ -40,6 +41,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -417,6 +419,45 @@ public final class TextureLoaderTest {
         assertEquals(2, locations.size());
         assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
         assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+    }
+
+    @Test
+    public void load_SearchRetrievesPack_PackGeneratesRootResourceNames() {
+        OrderedResourceRepository repository = makeMockRepository(ImmutableSet.of(
+                "textures/bat_abcd.png", "textures/bat_abcd.png.moremcmeta",
+                "textures/creeper_abcd.png",
+                "zombie.png", "zombie.png.moremcmeta",
+                "optifine/ghast_abcd.png", "optifine/ghast_abcd.png.moremcmeta"
+        ));
+
+        AtomicBoolean executed = new AtomicBoolean();
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
+                    Set<? extends ResourceLocation> locations = resourceRepository.list(
+                            (fileName) -> fileName.endsWith("_abcd.png")
+                    );
+
+                    ResourceRepository.Pack pack = resourceRepository.highestPackWith(
+                            new ResourceLocation("textures/bat_abcd.png")
+                    ).get();
+
+                    assertEquals(
+                            pack.locateRootResource(new RootResourceName("pack.png")),
+                            new ResourceLocation("pack.png")
+                    );
+                    executed.set(true);
+
+                    return locations.stream().collect(Collectors.toMap(
+                            Function.identity(),
+                            (location) -> new MockMetadataView(ImmutableList.of(location.getPath()))
+                    ));
+                }),
+                LOGGER
+        );
+
+        loader.load(repository, "textures");
+        assertTrue(executed.get());
     }
 
     @Test
@@ -1275,6 +1316,122 @@ public final class TextureLoaderTest {
         assertEquals(2, results.size());
         assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
         assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+    }
+
+    @Test
+    public void load_SameFormatRootMetadataInPackWithTexture_Combined() {
+        OrderedResourceRepository repository = makeMockRepository(
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                        "textures/zombie.png.moremcmeta", "textures/zombie.png2.moremcmeta"),
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(
+                        ".moremcmeta", new MetadataParser() {
+                            @Override
+                            public Map<? extends ResourceLocation, ? extends MetadataView> parse(ResourceLocation metadataLocation,
+                                                                                                 InputStream metadataStream,
+                                                                                                 ResourceRepository resourceRepository)
+                                    throws InvalidMetadataException {
+                                return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
+                            }
+
+                            @Override
+                            public Map<? extends RootResourceName, ? extends Map<? extends RootResourceName, ? extends MetadataView>> parse(
+                                    ResourceRepository.Pack pack) {
+                                return ImmutableMap.of(
+                                        new RootResourceName("pack.png"),
+                                        ImmutableMap.of(
+                                                new RootResourceName("pack.png.moremcmeta"),
+                                                new MockMetadataView(ImmutableList.of("root"))
+                                        )
+                                );
+                            }
+
+                            @Override
+                            public MetadataView combine(ResourceLocation textureLocation,
+                                                        Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
+                                assertEquals(new ResourceLocation("textures/zombie.png"), textureLocation);
+                                assertEquals(
+                                        ImmutableSet.of(
+                                                new ResourceLocation("textures/zombie.png2.moremcmeta"),
+                                                new ResourceLocation("textures/zombie.png.moremcmeta")
+                                        ),
+                                        metadataByLocation.keySet()
+                                );
+                                return new CombinedMetadataView(metadataByLocation.values());
+                            }
+                        }
+                ),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
+
+        assertEquals(3, results.size());
+        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+    }
+
+    @Test
+    public void load_SameFormatRootMetadataInPackWithTextureDiffExtension_Combined() {
+        OrderedResourceRepository repository = makeMockRepository(
+                ImmutableSet.of("textures/bat.png", "textures/bat.png.moremcmeta", "textures/zombie.png",
+                        "textures/zombie.png.moremcmeta", "textures/zombie.png2.moremcmeta"),
+                ImmutableSet.of("textures/creeper.png", "textures/creeper.png.moremcmeta")
+        );
+
+        TextureLoader<Integer> loader = new TextureLoader<>(
+                (texStream, metadata) -> 1,
+                ImmutableMap.of(
+                        ".moremcmeta", new MetadataParser() {
+                            @Override
+                            public Map<? extends ResourceLocation, ? extends MetadataView> parse(ResourceLocation metadataLocation,
+                                                                                                 InputStream metadataStream,
+                                                                                                 ResourceRepository resourceRepository)
+                                    throws InvalidMetadataException {
+                                return MOCK_READER.parse(metadataLocation, metadataStream, resourceRepository);
+                            }
+
+                            @Override
+                            public Map<? extends RootResourceName, ? extends Map<? extends RootResourceName, ? extends MetadataView>> parse(
+                                    ResourceRepository.Pack pack) {
+                                return ImmutableMap.of(
+                                        new RootResourceName("pack.png"),
+                                        ImmutableMap.of(
+                                                new RootResourceName("pack.png.other"),
+                                                new MockMetadataView(ImmutableList.of("root"))
+                                        )
+                                );
+                            }
+
+                            @Override
+                            public MetadataView combine(ResourceLocation textureLocation,
+                                                        Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
+                                assertEquals(new ResourceLocation("textures/zombie.png"), textureLocation);
+                                assertEquals(
+                                        ImmutableSet.of(
+                                                new ResourceLocation("textures/zombie.png2.moremcmeta"),
+                                                new ResourceLocation("textures/zombie.png.moremcmeta")
+                                        ),
+                                        metadataByLocation.keySet()
+                                );
+                                return new CombinedMetadataView(metadataByLocation.values());
+                            }
+                        }
+                ),
+                LOGGER
+        );
+
+        Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
+
+        assertEquals(3, results.size());
+        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
     }
 
     @Test

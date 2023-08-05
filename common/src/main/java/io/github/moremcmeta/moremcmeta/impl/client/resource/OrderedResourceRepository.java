@@ -23,6 +23,7 @@ import net.minecraft.server.packs.PackType;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -62,6 +63,14 @@ public class OrderedResourceRepository {
      */
     public PackType resourceType() {
         return RESOURCE_TYPE;
+    }
+
+    /**
+     * Gets all collections in this repository, in order.
+     * @return all collections in this repository
+     */
+    public List<ResourceCollection> collections() {
+        return COLLECTIONS;
     }
 
     /**

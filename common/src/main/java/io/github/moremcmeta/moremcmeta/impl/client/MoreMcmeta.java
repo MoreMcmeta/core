@@ -32,6 +32,7 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataRegistry;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.AtlasAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.NativeImageAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.PackResourcesAdapter;
+import io.github.moremcmeta.moremcmeta.impl.client.adapter.RootResourcesAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.adapter.TextureManagerAdapter;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataAssembler;
@@ -39,6 +40,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataReader;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MetadataRegistryImpl;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ModRepositorySource;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.OrderedResourceRepository;
+import io.github.moremcmeta.moremcmeta.impl.client.resource.ResourceCollection;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.SpriteFrameSizeFixPack;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureCache;
@@ -409,15 +411,16 @@ public abstract class MoreMcmeta {
 
             String extension = plugin.extension();
             requirePluginItem(extension, "extension", plugin.id());
-            if (extension.contains(".")) {
-                throw new InvalidPluginException("Extension cannot contain a period (.)");
+            String regex = "[a-z0-9_-]+";
+            if (!extension.matches(regex)) {
+                throw new InvalidPluginException("Extension must match " + regex);
             }
             if (extension.equals("mcmeta")) {
                 throw new InvalidPluginException("Implementing .mcmeta parser extensions is not allowed " +
                         "due to the way Minecraft implements resource packs");
             }
 
-            if (extension.length() == 0) {
+            if (extension.isEmpty()) {
                 throw new InvalidPluginException("Extension cannot be empty");
             }
 
@@ -526,21 +529,28 @@ public abstract class MoreMcmeta {
 
     /**
      * Gets the repository containing all the game's resources except the pack this mod adds.
-     * @param packRepository    the repository containing all packs
+     * @param packRepository        the repository containing all packs
      * @param logger            logger to log warnings and errors
      * @return the repository with all resources
      */
     private OrderedResourceRepository makeResourceRepository(PackRepository packRepository, Logger logger) {
-        List<PackResourcesAdapter> otherPacks = packRepository.getSelectedPacks()
+        List<ResourceCollection> packs = packRepository.getSelectedPacks()
                 .stream()
                 .filter((pack) -> !pack.getId().equals(ModRepositorySource.PACK_ID))
                 .map(Pack::open)
                 .map((pack) -> new PackResourcesAdapter(pack, logger))
                 .collect(Collectors.toList());
 
-        Collections.reverse(otherPacks);
+        Collections.reverse(packs);
 
-        return new OrderedResourceRepository(PackType.CLIENT_RESOURCES, otherPacks);
+        Collection<String> selectedIds = packRepository.getSelectedIds();
+        packRepository.getAvailablePacks().stream()
+                .filter((pack) -> !selectedIds.contains(pack.getId()))
+                .map(Pack::open)
+                .map(RootResourcesAdapter::new)
+                .forEach(packs::add);
+
+        return new OrderedResourceRepository(PackType.CLIENT_RESOURCES, packs);
     }
 
     /**

@@ -160,7 +160,7 @@ public final class SpriteFrameSizeFixPack implements PackResources {
             return new ArrayList<>();
         }
 
-        String directoryStart = pathStart.length() > 0 ? pathStart + "/" : "";
+        String directoryStart = !pathStart.isEmpty() ? pathStart + "/" : "";
 
         // Vanilla packs exclude .mcmeta metadata files, so we should not include them here
         return TEXTURES.keySet().stream().filter((location) -> {

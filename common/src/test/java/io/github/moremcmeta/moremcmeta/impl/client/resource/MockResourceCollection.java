@@ -89,4 +89,9 @@ public class MockResourceCollection implements ResourceCollection {
 
         return SERVER_RESOURCES.stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet());
     }
+
+    @Override
+    public ResourceLocation locateRootResource(String rootResource) {
+        return new ResourceLocation(rootResource);
+    }
 }
