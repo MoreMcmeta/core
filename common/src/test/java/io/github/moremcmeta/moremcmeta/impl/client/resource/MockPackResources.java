@@ -81,7 +81,7 @@ public class MockPackResources implements PackResources {
     public Collection<ResourceLocation> getResources(PackType packType, String namespace, String pathStart,
                                                      int maxDepth, Predicate<String> pathFilter) {
 
-        String directoryStart = pathStart.length() > 0 ? pathStart + "/" : "";
+        String directoryStart = !pathStart.isEmpty() ? pathStart + "/" : "";
 
         // Simplified code from the SpriteFrameSizeFixPack
         return REGULAR_RESOURCES.getOrDefault(packType, new HashSet<>()).stream().filter((location) -> {

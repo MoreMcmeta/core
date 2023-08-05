@@ -32,7 +32,7 @@ import static io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta.MODID;
  */
 @SuppressWarnings("unused")
 @Mod(MODID)
-public class CrossDistEntrypoint {
+public final class CrossDistEntrypoint {
 
     /**
      * Mod constructor for both client and server.
