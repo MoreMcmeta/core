@@ -36,15 +36,17 @@ import static java.util.Objects.requireNonNull;
  * Allows Minecraft's {@link PackResources} to implement {@link ResourceCollection}.
  * @author soir20
  */
-public class PackResourcesAdapter implements ResourceCollection {
+public final class PackResourcesAdapter implements ResourceCollection {
     private final PackResources ORIGINAL;
+    private final RootResourcesAdapter ROOT_RESOURCES;
 
     /**
      * Creates an adapter for resource packs.
-     * @param original      the original pack to delegate to
+     * @param original          the original pack to delegate to
      */
     public PackResourcesAdapter(PackResources original) {
         ORIGINAL = requireNonNull(original, "Original pack cannot be null");
+        ROOT_RESOURCES = new RootResourcesAdapter(original);
     }
 
     /**
@@ -59,7 +61,12 @@ public class PackResourcesAdapter implements ResourceCollection {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
 
+        if (ROOT_RESOURCES.contains(resourceType, location)) {
+            return ROOT_RESOURCES.find(resourceType, location);
+        }
+
         IoSupplier<InputStream> resourceSupplier = ORIGINAL.getResource(resourceType, location);
+
         if (resourceSupplier == null) {
             throw new IOException(String.format("Could not find %s in pack type %s", location, resourceType));
         }
@@ -77,7 +84,7 @@ public class PackResourcesAdapter implements ResourceCollection {
     public boolean contains(PackType resourceType, ResourceLocation location) {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
-        return ORIGINAL.getResource(resourceType, location) != null;
+        return ROOT_RESOURCES.contains(resourceType, location) || ORIGINAL.getResource(resourceType, location) != null;
     }
 
     /**
@@ -97,6 +104,7 @@ public class PackResourcesAdapter implements ResourceCollection {
         requireNonNull(fileFilter, "File filter cannot be null");
 
         Set<ResourceLocation> resources = new HashSet<>();
+
         PackResources.ResourceOutput output = (location, resourceSupplier) -> {
             if (fileFilter.test(location.getPath())) {
                 resources.add(location);
@@ -105,9 +113,10 @@ public class PackResourcesAdapter implements ResourceCollection {
 
         ORIGINAL.listResources(resourceType, namespace, pathStart, output);
 
+        resources.addAll(ROOT_RESOURCES.list(resourceType, namespace, pathStart, fileFilter));
+
         return resources;
     }
-
 
     /**
      * Gets the namespaces of all resources in this pack.
@@ -117,7 +126,17 @@ public class PackResourcesAdapter implements ResourceCollection {
     @Override
     public Set<String> namespaces(PackType resourceType) {
         requireNonNull(resourceType, "Resource type cannot be null");
-        return ORIGINAL.getNamespaces(resourceType);
+
+        Set<String> namespaces = new HashSet<>(ORIGINAL.getNamespaces(resourceType));
+        namespaces.addAll(ROOT_RESOURCES.namespaces(resourceType));
+
+        return namespaces;
+    }
+
+    @Override
+    public ResourceLocation locateRootResource(String rootResource) {
+        requireNonNull(rootResource, "Root resource name cannot be null");
+        return ROOT_RESOURCES.locateRootResource(rootResource);
     }
 
 }

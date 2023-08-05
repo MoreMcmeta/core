@@ -24,6 +24,7 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataExcept
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ResourceRepository;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.RootResourceName;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureReader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -36,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -44,6 +46,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -94,13 +97,13 @@ public final class TextureLoader<R> {
             throw new IllegalArgumentException("Path cannot be empty or start with a slash: " + invalidPath.get());
         }
 
-        Set<ResourceLocation> textureCandidates = searchResources(
+        Set<ResourceLocation> metadataCandidates = searchResources(
                 repository,
                 paths,
                 (fileName) -> PARSERS.keySet().stream().anyMatch(fileName::endsWith)
         );
 
-        return makeTextures(textureCandidates, repository, paths);
+        return makeTextures(metadataCandidates, repository, paths);
     }
 
     /**
@@ -122,12 +125,36 @@ public final class TextureLoader<R> {
     }
 
     /**
+     * Wraps a {@link ResourceCollection} to fulfill the {@link ResourceRepository.Pack} interface.
+     * @param original      original collection to wrap
+     * @param resourceType  type of resources in the collection
+     * @return the given collection wrapped as a {@link ResourceRepository.Pack}
+     */
+    private ResourceRepository.Pack wrap(ResourceCollection original, PackType resourceType) {
+        return new ResourceRepository.Pack() {
+            @Override
+            public Optional<InputStream> resource(ResourceLocation location) {
+                try {
+                    return Optional.of(original.find(resourceType, location));
+                } catch (IOException err) {
+                    return Optional.empty();
+                }
+            }
+
+            @Override
+            public ResourceLocation locateRootResource(RootResourceName rootResource) {
+                return original.locateRootResource(rootResource.toString());
+            }
+        };
+    }
+
+    /**
      * Wraps the {@link OrderedResourceRepository} in a more limited interface to pass on to external plugins.
      * @param original      original repository to wrap
      * @param paths         start of paths to search in (must not be empty)
      * @return wrapped resource repository
      */
-    private ResourceRepository wrapRepository(OrderedResourceRepository original, String[] paths) {
+    private ResourceRepository wrap(OrderedResourceRepository original, String[] paths) {
         Function<ResourceLocation, Optional<OrderedResourceRepository.ResourceCollectionResult>> collectionFinder =
                 (location) -> {
                     try {
@@ -143,16 +170,7 @@ public final class TextureLoader<R> {
                 return Optional.empty();
             }
 
-            ResourceCollection pack = result.get().collection();
-            return Optional.of(
-                    (locationInPack) -> {
-                        try {
-                            return Optional.of(pack.find(original.resourceType(), locationInPack));
-                        } catch (IOException err) {
-                            return Optional.empty();
-                        }
-                    }
-            );
+            return Optional.of(wrap(result.get().collection(), original.resourceType()));
         };
         
         return new ResourceRepository() {
@@ -189,6 +207,8 @@ public final class TextureLoader<R> {
                                                            String... paths) {
         Map<ResourceLocation, ReadMetadataFile> locationToMetadata = new ConcurrentHashMap<>();
 
+        readRootMetadata(repository, locationToMetadata);
+
         // Read metadata from unique candidates
         candidates.stream().distinct().parallel().forEach(
                 (metadataLocation) -> readMetadata(repository, metadataLocation, locationToMetadata, paths)
@@ -201,6 +221,36 @@ public final class TextureLoader<R> {
                 .forEach((entry) -> readTexture(repository, entry.getKey(), entry.getValue(), textures));
 
         return ImmutableMap.copyOf(textures);
+    }
+
+    /**
+     * Reads metadata from the root of all {@link ResourceCollection}s, adding it to the provided results map.
+     * @param repository    repository to retrieve collections from
+     * @param results       map to add retrieved metadata to
+     */
+    private void readRootMetadata(OrderedResourceRepository repository, Map<ResourceLocation, ReadMetadataFile> results) {
+        List<ResourceCollection> collections = repository.collections();
+
+        IntStream.range(0, collections.size()).parallel().forEach((index) -> {
+            ResourceRepository.Pack pack = wrap(collections.get(index), repository.resourceType());
+
+            PARSERS.forEach((extension, parser) -> {
+                Map<ResourceLocation, ReadMetadataFile> metadata = parser.parse(pack).entrySet().stream().collect(Collectors.toMap(
+                        (metadataEntry) -> pack.locateRootResource(metadataEntry.getKey()),
+
+                        (metadataEntry) -> new ReadMetadataFile(
+                                metadataEntry.getValue().entrySet().stream().collect(Collectors.toMap(
+                                        (textureEntry) -> pack.locateRootResource(textureEntry.getKey()),
+                                        Map.Entry::getValue
+                                )),
+                                index,
+                                extension
+                        )
+                ));
+
+                results.putAll(metadata);
+            });
+        });
     }
 
     /**
@@ -225,7 +275,7 @@ public final class TextureLoader<R> {
             InputStream metadataStream = metadataResources.collection().find(resourceType, metadataLocation);
             Map<? extends ResourceLocation, ? extends MetadataView> metadata = PARSERS
                     .get(extension)
-                    .parse(metadataLocation, metadataStream, wrapRepository(repository, paths));
+                    .parse(metadataLocation, metadataStream, wrap(repository, paths));
             metadataStream.close();
 
             results.put(metadataLocation, new ReadMetadataFile(metadata, metadataResources.collectionIndex(), extension));
@@ -282,7 +332,7 @@ public final class TextureLoader<R> {
             allMetadata = allMetadata.metadataApplicableToTextureIn(textureCollectionIndex);
 
             Set<String> extensions = allMetadata.extensions();
-            if (extensions.size() == 0) {
+            if (extensions.isEmpty()) {
 
                 // All metadata is in lower packs
                 return;

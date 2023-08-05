@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link TextureManagerAdapter}.
  * @author soir20
  */
-public class TextureManagerAdapterTest {
+public final class TextureManagerAdapterTest {
     private static final ResourceManager MOCK_RESOURCE_MANAGER = ResourceManager.Empty.INSTANCE;
 
     @Rule

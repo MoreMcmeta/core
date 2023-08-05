@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 @SuppressWarnings("ConstantConditions")
-public class ModRepositorySourceTest {
+public final class ModRepositorySourceTest {
     private static final WorldVersion DUMMY_VERSION = DetectedVersion.BUILT_IN;
 
     @Rule

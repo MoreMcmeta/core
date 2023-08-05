@@ -55,7 +55,7 @@ import static org.junit.Assert.assertTrue;
  * @author soir20
  */
 @SuppressWarnings({"resource", "DataFlowIssue"})
-public class SpriteFrameSizeFixPackTest {
+public final class SpriteFrameSizeFixPackTest {
     private final OrderedResourceRepository DUMMY_REPO = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
             ImmutableList.of(
                     new MockResourceCollection(

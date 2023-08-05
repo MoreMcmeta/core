@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
+import com.google.common.hash.Hashing;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MockPackResources;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -43,7 +44,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link PackResourcesAdapter}.
  * @author soir20
  */
-public class PackResourcesAdapterTest {
+public final class PackResourcesAdapterTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
@@ -124,6 +125,33 @@ public class PackResourcesAdapterTest {
     }
 
     @Test
+    public void find_GetPresentRootResource_ResourceRetrieved() throws IOException {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("root.png.moremcmeta");
+        InputStream resource = adapter.find(PackType.CLIENT_RESOURCES, location);
+
+        assertEquals("root.png.moremcmeta", new String(resource.readAllBytes()));
+    }
+
+    @Test
+    public void find_GetRootResourceInPackButNotRoot_ResourceRetrieved() throws IOException {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("in-pack.png.moremcmeta");
+        InputStream resource = adapter.find(PackType.CLIENT_RESOURCES, location);
+
+        assertEquals(location.getPath(), new String(resource.readAllBytes()));
+    }
+
+    @Test
+    public void find_GetRootResourceNotRootOrInPack_IOException() throws IOException {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("in-neither.png.moremcmeta");
+
+        expectedException.expect(IOException.class);
+        adapter.find(PackType.CLIENT_RESOURCES, location);
+    }
+
+    @Test
     public void contains_ResourceTypeNull_NullPointerException() {
         PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources());
         expectedException.expect(NullPointerException.class);
@@ -181,6 +209,27 @@ public class PackResourcesAdapterTest {
 
         expectedException.expect(RuntimeException.class);
         adapter.contains(PackType.SERVER_DATA, location);
+    }
+
+    @Test
+    public void contains_GetPresentRootResource_ResourceFound() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("root.png.moremcmeta");
+        assertTrue(adapter.contains(PackType.CLIENT_RESOURCES, location));
+    }
+
+    @Test
+    public void contains_GetRootResourceInPackButNotRoot_ResourceFound() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("in-pack.png.moremcmeta");
+        assertTrue(adapter.contains(PackType.CLIENT_RESOURCES, location));
+    }
+
+    @Test
+    public void contains_GetRootResourceNotRootOrInPack_ResourceNotFound() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("in-neither.png.moremcmeta");
+        assertFalse(adapter.contains(PackType.CLIENT_RESOURCES, location));
     }
 
     @Test
@@ -301,6 +350,39 @@ public class PackResourcesAdapterTest {
     }
 
     @Test
+    public void list_AllRootResources_NonRootInPackFound() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+
+        Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
+                "minecraft", "pack", (file) -> true);
+
+        assertEquals(1, resources.size());
+        assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
+    }
+
+    @Test
+    public void list_SomeMatchPathStart_NonRootMatchingInPackFound() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+
+        Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
+                "minecraft", "pack", (file) -> true);
+
+        assertEquals(1, resources.size());
+        assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
+    }
+
+    @Test
+    public void list_SomeMatchFileFilter_NonRootMatchingInPackFound() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+
+        Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
+                "minecraft", "pack", (file) -> file.contains(".png"));
+
+        assertEquals(1, resources.size());
+        assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
+    }
+
+    @Test
     public void getNamespaces_TypeNull_NullPointerException() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
@@ -311,23 +393,87 @@ public class PackResourcesAdapterTest {
     @Test
     public void getNamespaces_ClientType_ClientNamespaces() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        assertEquals(Set.of("minecraft", "sea", "moremcmeta"), adapter.namespaces(PackType.CLIENT_RESOURCES));
+        assertEquals(
+                Set.of("minecraft", "sea", "moremcmeta"),
+                adapter.namespaces(PackType.CLIENT_RESOURCES)
+        );
     }
 
     @Test
     public void getNamespaces_ServerType_ServerNamespaces() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        assertEquals(Set.of("minecraft", "sea"), adapter.namespaces(PackType.SERVER_DATA));
+        assertEquals(
+                Set.of("minecraft", "sea"),
+                adapter.namespaces(PackType.SERVER_DATA)
+        );
+    }
+
+    @Test
+    public void getNamespaces_RootResourcesInPack_RootResourceNamespaceExcluded() {
+        Set<String> rootResources = Set.of("image.png", "info.txt", "readme.md");
+        Map<PackType, Set<ResourceLocation>> regularResources = new HashMap<>();
+        regularResources.put(PackType.CLIENT_RESOURCES, Set.of(new ResourceLocation("sea", "textures/hello.png"),
+                new ResourceLocation("sea", "textures/block/sea/rock/gravel.png"),
+                new ResourceLocation("sea", "textures/block/coral.png"),
+                new ResourceLocation("sea", "lang/en/us/words.txt"),
+                new ResourceLocation("moremcmeta", "config/textures/settings.json")));
+        regularResources.put(PackType.SERVER_DATA, Set.of(new ResourceLocation("settings/server/network/config.json"),
+                new ResourceLocation("sea", "lang/en/us/words.txt"),
+                new ResourceLocation("sea", "textures/block/coral.png"),
+                new ResourceLocation("sea", "textures/block/sea/rock/gravel.png")));
+
+        PackResources original = new MockPackResources(rootResources, regularResources, "pack name");
+
+        PackResourcesAdapter adapter = new PackResourcesAdapter(
+                original
+        );
+        assertEquals(
+                Set.of("sea", "moremcmeta"),
+                adapter.namespaces(PackType.CLIENT_RESOURCES)
+        );
+    }
+
+    @Test
+    public void locateRootResource_Null_NullPointerException() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        expectedException.expect(NullPointerException.class);
+        adapter.locateRootResource(null);
+    }
+
+    @Test
+    public void locateRootResource_PackPng_UniqueLocationRetrieved() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("pack.png");
+        assertEquals(new ResourceLocation("minecraft:pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon"), location);
+    }
+
+    @Test
+    public void locateRootResource_PackMetadata_UniqueLocationRetrieved() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("pack.png.moremcmeta");
+        assertEquals(new ResourceLocation("minecraft:pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon.moremcmeta"), location);
+    }
+
+    @Test
+    public void locateRootResource_NonPackPng_UniqueLocationRetrieved() {
+        PackResourcesAdapter adapter = makeAdapterWithResources();
+        ResourceLocation location = adapter.locateRootResource("root.png");
+        assertEquals(new ResourceLocation("minecraft:pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/root.png"), location);
     }
 
     private PackResourcesAdapter makeAdapterWithResources() {
-        Set<String> rootResources = Set.of("image.png", "info.txt", "readme.md");
+        Set<String> rootResources = Set.of("image.png", "info.txt", "readme.md", "root.png.moremcmeta");
         Map<PackType, Set<ResourceLocation>> regularResources = new HashMap<>();
+
+        //noinspection deprecation
         regularResources.put(PackType.CLIENT_RESOURCES, Set.of(new ResourceLocation("textures/hello.png"),
                 new ResourceLocation("textures/block/sea/rock/gravel.png"),
                 new ResourceLocation("sea", "textures/block/coral.png"),
                 new ResourceLocation("lang/en/us/words.txt"),
-                new ResourceLocation("moremcmeta", "config/textures/settings.json")));
+                new ResourceLocation("moremcmeta", "config/textures/settings.json"),
+                new ResourceLocation("pack/pack_name/" + Hashing.sha1().hashUnencodedChars("pack name")
+                        + "/in-pack.png.moremcmeta")));
+
         regularResources.put(PackType.SERVER_DATA, Set.of(new ResourceLocation("settings/server/network/config.json"),
                 new ResourceLocation("lang/en/us/words.txt"),
                 new ResourceLocation("sea", "textures/block/coral.png"),
@@ -373,7 +519,7 @@ public class PackResourcesAdapterTest {
 
         @Override
         public String packId() {
-            throw new RuntimeException("dummy getName exception");
+            return "exception ID";
         }
 
         @Override
