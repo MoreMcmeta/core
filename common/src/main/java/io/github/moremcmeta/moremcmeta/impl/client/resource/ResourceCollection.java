@@ -67,4 +67,13 @@ public interface ResourceCollection {
      */
     Set<String> namespaces(PackType resourceType);
 
+    /**
+     * Finds the {@link ResourceLocation} that can be used to retrieve the given resource at the
+     * root of this collection. This method returns a location regardless of whether the resource is
+     * present in the collection.
+     * @param rootResource      resource at the root of this collection
+     * @return the full location where the given root resource is located in this collection
+     */
+    ResourceLocation locateRootResource(String rootResource);
+
 }

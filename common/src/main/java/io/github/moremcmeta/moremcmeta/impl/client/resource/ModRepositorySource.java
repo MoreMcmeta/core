@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 @MethodsReturnNonnullByDefault
-public class ModRepositorySource implements RepositorySource {
+public final class ModRepositorySource implements RepositorySource {
 
     /**
      * The unique identifier for the mod's resource pack.

@@ -74,6 +74,20 @@ public interface ResourceRepository {
          */
         Optional<InputStream> resource(ResourceLocation location);
 
+        /**
+         * <p>Finds the {@link ResourceLocation} that can be used to retrieve the given resource at the
+         * root of this pack. This method returns a location regardless of whether the resource is
+         * present in the pack.</p>
+         *
+         * <p>Within a single game session, this method will always return the same location. However, it
+         * is not safe to assume that a given pack will return the same location between sessions, or that
+         * different packs will return locations in the same format.</p>
+         * @param rootResource      resource at the root of this pack
+         * @return the full location where the given root resource is located in this pack
+         * @since 4.2.0
+         */
+        ResourceLocation locateRootResource(RootResourceName rootResource);
+
     }
 
 }

@@ -44,7 +44,7 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 @MethodsReturnNonnullByDefault
-public class SpriteFrameSizeFixPack implements PackResources {
+public final class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
 
@@ -149,7 +149,7 @@ public class SpriteFrameSizeFixPack implements PackResources {
             return;
         }
 
-        String directoryStart = pathStart.length() > 0 ? pathStart + "/" : "";
+        String directoryStart = !pathStart.isEmpty() ? pathStart + "/" : "";
 
         TEXTURES.keySet().forEach((location) -> {
             String path = location.getPath();

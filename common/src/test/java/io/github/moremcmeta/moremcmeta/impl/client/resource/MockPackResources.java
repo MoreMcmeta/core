@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * @author soir20
  */
 @MethodsReturnNonnullByDefault
-public class MockPackResources implements PackResources {
+public final class MockPackResources implements PackResources {
     private final Set<String> ROOT_RESOURCES;
     private final Map<PackType, Set<ResourceLocation>> REGULAR_RESOURCES;
     private final String NAME;
@@ -80,7 +80,7 @@ public class MockPackResources implements PackResources {
     @Override
     public void listResources(PackType packType, String namespace, String pathStart, ResourceOutput resourceOutput) {
 
-        String directoryStart = pathStart.length() > 0 ? pathStart + "/" : "";
+        String directoryStart = !pathStart.isEmpty() ? pathStart + "/" : "";
 
         // Simplified code from the SpriteFrameSizeFixPack
         REGULAR_RESOURCES.getOrDefault(packType, new HashSet<>()).stream().filter((location) -> {
