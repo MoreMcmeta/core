@@ -17,7 +17,6 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
-import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ResourceCollection;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
@@ -28,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -39,15 +39,17 @@ import static java.util.Objects.requireNonNull;
  */
 public final class PackResourcesAdapter implements ResourceCollection {
     private final PackResources ORIGINAL;
+    private final RootResourcesAdapter ROOT_RESOURCES;
     private final Logger LOGGER;
 
     /**
      * Creates an adapter for resource packs.
-     * @param original      the original pack to delegate to
+     * @param original          the original pack to delegate to
      * @param logger        logger to log warnings or errors
      */
     public PackResourcesAdapter(PackResources original, Logger logger) {
         ORIGINAL = requireNonNull(original, "Original pack cannot be null");
+        ROOT_RESOURCES = new RootResourcesAdapter(original);
         LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
 
@@ -55,6 +57,11 @@ public final class PackResourcesAdapter implements ResourceCollection {
     public InputStream find(PackType resourceType, ResourceLocation location) throws IOException {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
+
+        if (ROOT_RESOURCES.contains(resourceType, location)) {
+            return ROOT_RESOURCES.find(resourceType, location);
+        }
+
         return ORIGINAL.getResource(resourceType, location);
     }
 
@@ -62,7 +69,7 @@ public final class PackResourcesAdapter implements ResourceCollection {
     public boolean contains(PackType resourceType, ResourceLocation location) {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
-        return ORIGINAL.hasResource(resourceType, location);
+        return ROOT_RESOURCES.contains(resourceType, location) || ORIGINAL.hasResource(resourceType, location);
     }
 
     @Override
@@ -73,30 +80,45 @@ public final class PackResourcesAdapter implements ResourceCollection {
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(fileFilter, "File filter cannot be null");
 
+        Set<ResourceLocation> resources = new HashSet<>();
 
         /* We should catch ResourceLocation errors to prevent bad texture names/paths from
            removing all resource packs. We can't filter invalid folder names, so we don't filter
            invalid texture names for consistency.
            NOTE: Some pack types (like FolderPack) handle bad locations before we see them. */
         try {
-            return ORIGINAL.getResources(
-                    resourceType,
-                    namespace,
-                    pathStart,
-                    (location) -> fileFilter.test(location.getPath())
+            resources.addAll(
+                    ORIGINAL.getResources(
+                            resourceType,
+                            namespace,
+                            pathStart,
+                            (location) -> fileFilter.test(location.getPath())
+                    )
             );
         } catch (ResourceLocationException error) {
             LOGGER.error("Found texture with invalid name in pack {}; cannot return any resources " +
                             "from this pack: {}", ORIGINAL.getName(), error.toString());
-            return ImmutableList.of();
         }
 
+        resources.addAll(ROOT_RESOURCES.list(resourceType, namespace, pathStart, fileFilter));
+
+        return resources;
     }
 
     @Override
     public Set<String> namespaces(PackType resourceType) {
         requireNonNull(resourceType, "Resource type cannot be null");
-        return ORIGINAL.getNamespaces(resourceType);
+
+        Set<String> namespaces = new HashSet<>(ORIGINAL.getNamespaces(resourceType));
+        namespaces.addAll(ROOT_RESOURCES.namespaces(resourceType));
+
+        return namespaces;
+    }
+
+    @Override
+    public ResourceLocation locateRootResource(String rootResource) {
+        requireNonNull(rootResource, "Root resource name cannot be null");
+        return ROOT_RESOURCES.locateRootResource(rootResource);
     }
 
 }
