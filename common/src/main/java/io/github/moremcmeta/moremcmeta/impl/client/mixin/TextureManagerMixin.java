@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.mixin;
 
 import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.NamedTexture;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
@@ -42,8 +43,20 @@ public abstract class TextureManagerMixin {
      * @param callbackInfo      callback information from Mixin
      */
     @Inject(method = "register(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/renderer/texture/AbstractTexture;)V",
-            at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD)
+            at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void moremcmeta_onRegister(ResourceLocation location, AbstractTexture texture, CallbackInfo callbackInfo) {
+
+        // Prevent MoreMcmeta pack icon textures from being overwritten by PackSelectionScreen
+        String path = location.getPath();
+        if (path.startsWith("pack/") && path.endsWith("/icon")) {
+            TextureManager textureManager = ((TextureManager) (Object) this);
+
+            if (textureManager.getTexture(location) instanceof EventDrivenTexture) {
+                callbackInfo.cancel();
+                return;
+            }
+        }
+
         ((NamedTexture) texture).moremcmeta_addName(location);
     }
 
