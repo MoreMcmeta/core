@@ -51,19 +51,25 @@ public final class RootResourcesAdapterTest {
     @Test
     public void construct_OriginalNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new RootResourcesAdapter(null);
+        new RootResourcesAdapter(null, "dummy-pack");
+    }
+
+    @Test
+    public void construct_PackIdNull_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new RootResourcesAdapter(new MockPackResources(), null);
     }
 
     @Test
     public void find_ResourceTypeNull_NullPointerException() throws IOException {
-        RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources());
+        RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources(), "dummy-pack");
         expectedException.expect(NullPointerException.class);
         adapter.find(null, new ResourceLocation("testing"));
     }
 
     @Test
     public void find_LocationNull_NullPointerException() throws IOException {
-        RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources());
+        RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources(), "dummy-pack");
         expectedException.expect(NullPointerException.class);
         adapter.find(PackType.CLIENT_RESOURCES, null);
     }
@@ -106,14 +112,14 @@ public final class RootResourcesAdapterTest {
 
     @Test
     public void contains_ResourceTypeNull_NullPointerException() {
-        RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources());
+        RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources(), "dummy-pack");
         expectedException.expect(NullPointerException.class);
         adapter.contains(null, new ResourceLocation("testing"));
     }
 
     @Test
     public void contains_LocationNull_NullPointerException() {
-        RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources());
+        RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources(), "dummy-pack");
         expectedException.expect(NullPointerException.class);
         adapter.contains(PackType.CLIENT_RESOURCES, null);
     }
@@ -219,24 +225,26 @@ public final class RootResourcesAdapterTest {
     public void locateRootResource_PackPng_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png");
-        assertEquals(new ResourceLocation("minecraft:pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon"), location);
+        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon"), location);
     }
 
     @Test
     public void locateRootResource_PackMetadata_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png.moremcmeta");
-        assertEquals(new ResourceLocation("minecraft:pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon.moremcmeta"), location);
+        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon.moremcmeta"), location);
     }
 
     @Test
     public void locateRootResource_NonPackPng_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("root.png");
-        assertEquals(new ResourceLocation("minecraft:pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/root.png"), location);
+        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/root.png"), location);
     }
 
     private RootResourcesAdapter makeAdapterWithResources() {
+        String packId = "dummy-pack";
+
         Set<String> rootResources = ImmutableSet.of("image.png", "info.txt", "readme.md", "root.png.moremcmeta");
         Map<PackType, Set<ResourceLocation>> regularResources = new HashMap<>();
 
@@ -246,7 +254,7 @@ public final class RootResourcesAdapterTest {
                 new ResourceLocation("sea", "textures/block/coral.png"),
                 new ResourceLocation("lang/en/us/words.txt"),
                 new ResourceLocation("moremcmeta", "config/textures/settings.json"),
-                new ResourceLocation("pack/pack_name/" + Hashing.sha1().hashUnencodedChars("pack name")
+                new ResourceLocation("pack/dummy-pack/" + Hashing.sha1().hashUnencodedChars(packId)
                         + "/in-pack.png.moremcmeta")));
 
         regularResources.put(PackType.SERVER_DATA, ImmutableSet.of(new ResourceLocation("settings/server/network/config.json"),
@@ -256,7 +264,7 @@ public final class RootResourcesAdapterTest {
 
         PackResources original = new MockPackResources(rootResources, regularResources, "pack name");
 
-        return new RootResourcesAdapter(original);
+        return new RootResourcesAdapter(original, packId);
     }
 
 }

@@ -537,8 +537,7 @@ public abstract class MoreMcmeta {
         List<ResourceCollection> packs = packRepository.getSelectedPacks()
                 .stream()
                 .filter((pack) -> !pack.getId().equals(ModRepositorySource.PACK_ID))
-                .map(Pack::open)
-                .map((pack) -> new PackResourcesAdapter(pack, logger))
+                .map((pack) -> new PackResourcesAdapter(pack.open(), pack.getId(), logger))
                 .collect(Collectors.toList());
 
         Collections.reverse(packs);
@@ -546,8 +545,7 @@ public abstract class MoreMcmeta {
         Collection<String> selectedIds = packRepository.getSelectedIds();
         packRepository.getAvailablePacks().stream()
                 .filter((pack) -> !selectedIds.contains(pack.getId()))
-                .map(Pack::open)
-                .map(RootResourcesAdapter::new)
+                .map((pack) -> new RootResourcesAdapter(pack.open(), pack.getId()))
                 .forEach(packs::add);
 
         return new OrderedResourceRepository(PackType.CLIENT_RESOURCES, packs);
