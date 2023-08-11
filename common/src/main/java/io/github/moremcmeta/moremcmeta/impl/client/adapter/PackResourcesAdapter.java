@@ -45,11 +45,13 @@ public final class PackResourcesAdapter implements ResourceCollection {
     /**
      * Creates an adapter for resource packs.
      * @param original          the original pack to delegate to
-     * @param logger        logger to log warnings or errors
+     * @param packId            ID of the resource pack
+     * @param logger            logger to log warnings or errors
      */
-    public PackResourcesAdapter(PackResources original, Logger logger) {
+    public PackResourcesAdapter(PackResources original, String packId, Logger logger) {
         ORIGINAL = requireNonNull(original, "Original pack cannot be null");
-        ROOT_RESOURCES = new RootResourcesAdapter(original);
+        requireNonNull(packId, "Pack ID cannot be null");
+        ROOT_RESOURCES = new RootResourcesAdapter(original, packId);
         LOGGER = requireNonNull(logger, "Logger cannot be null");
     }
 

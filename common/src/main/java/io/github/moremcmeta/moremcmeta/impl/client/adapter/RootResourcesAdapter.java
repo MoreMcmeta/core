@@ -48,12 +48,13 @@ public final class RootResourcesAdapter implements ResourceCollection {
     /**
      * Creates a new adapter for root pack resources.
      * @param original      original resource pack to wrap
+     * @param packId        ID of the resource pack
      */
-    public RootResourcesAdapter(PackResources original) {
+    public RootResourcesAdapter(PackResources original, String packId) {
         ORIGINAL = requireNonNull(original, "Original pack cannot be null");
+        requireNonNull(packId, "Pack ID cannot be null");
         ROOT_RESOURCES = new ConcurrentHashMap<>();
 
-        String packId = ORIGINAL.getName();
         String sanitizedName = Util.sanitizeName(packId, ResourceLocation::validPathChar);
 
         @SuppressWarnings({"deprecation", "UnstableApiUsage"})
