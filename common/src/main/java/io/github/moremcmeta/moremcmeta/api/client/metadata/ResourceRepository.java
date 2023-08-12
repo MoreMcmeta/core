@@ -37,14 +37,14 @@ import java.util.function.Predicate;
 public interface ResourceRepository {
 
     /**
-     * Gets the highest pack that has a given resource.
+     * Gets the highest pack that has a given non-root resource.
      * @param location      location of the resource
      * @return highest pack that has a given resource, if any
      */
     Optional<Pack> highestPackWith(ResourceLocation location);
 
     /**
-     * Gets the highest pack that has a given resource, if it is at or above the highest pack that
+     * Gets the highest pack that has a given non-root resource, if it is at or above the highest pack that
      * contains the "floor" resource.
      * @param location      location of the resource
      * @param floor         resource whose highest pack to use as a floor to
@@ -54,14 +54,15 @@ public interface ResourceRepository {
     Optional<Pack> highestPackWith(ResourceLocation location, ResourceLocation floor);
 
     /**
-     * Searches for resources that exist in any currently-applied resource pack.
+     * Searches for non-root resources that exist in any currently-applied resource pack.
      * @param fileFilter    returns true for resource location paths that should be included in the results
      * @return all resources that match the provided filter
      */
     Set<? extends ResourceLocation> list(Predicate<String> fileFilter);
 
     /**
-     * A pack that contains resources as streams of bytes.
+     * A pack that contains resources as streams of bytes. If the underlying resource pack is not currently
+     * applied, then only root resources will be available.
      * @author soir20
      * @since 4.0.0
      */
