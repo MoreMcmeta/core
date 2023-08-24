@@ -24,12 +24,12 @@ The [Code of Conduct](CODE_OF_CONDUCT.md) describes acceptable vs. inappropriate
 ### Build
 MoreMcmeta uses Gradle and the [Architectury Plugin](https://github.com/architectury/architectury-plugin) for cross-mod loader builds. However, it does not use the Architectury API. There simply isn't enough boilerplate code that MoreMcmeta needs to justify another dependency. JUnit is the unit testing framework.
 
+If you've set up a modded Minecraft environment before, MoreMcmeta is not much different. The main difference is that you'll need to [provide credentials](https://github.com/MoreMcmeta/core/wiki/Plugin-Docs:-Maven) to download MoreMcmeta Maven packages from GitHub Packages. Gradle will do most of the work after you import the project.
+
 There's a lot of build tasks, but the important ones are the `build` and `test` tasks under `common` (cross-loader), `forge`, and `fabric`. These correspond to MoreMcmeta's three source directories/Gradle subprojects.
 
 * The `build` task generates a finished mod in `fabric/build/libs` or `forge/build/libs`.
 * The `test` task runs unit tests for the given directory. The best way to view code coverage is to run the task for all subprojects and add the results together.
-
-If you've set up a modded Minecraft environment before, MoreMcmeta is not much different. Gradle will do most of the work after you import the project.
 
 ### Run
 After you import the Gradle project, the Architectury plugin should automatically generate run configurations for the client and server on Forge and Fabric. MoreMcmeta is a client-sided mod, but the server tasks are important to verify that it does not crash a dedicated server.
