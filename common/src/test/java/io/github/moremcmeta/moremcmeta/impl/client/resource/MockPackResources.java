@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * @author soir20
  */
 @MethodsReturnNonnullByDefault
-public final class MockPackResources implements PackResources {
+public class MockPackResources implements PackResources {
     private final Set<String> ROOT_RESOURCES;
     private final Map<PackType, Set<ResourceLocation>> REGULAR_RESOURCES;
     private final String NAME;
