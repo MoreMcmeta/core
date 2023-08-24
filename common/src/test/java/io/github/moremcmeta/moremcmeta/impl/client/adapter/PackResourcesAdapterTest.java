@@ -131,6 +131,25 @@ public final class PackResourcesAdapterTest {
     }
 
     @Test
+    public void getResource_OriginalReturnsNull_IOException() throws IOException {
+        PackResourcesAdapter adapter = new PackResourcesAdapter(
+                new MockPackResources() {
+
+                    @Override
+                    public InputStream getResource(PackType packType, ResourceLocation resourceLocation) {
+                        return null;
+                    }
+                },
+                "test",
+                LOGGER
+        );
+        ResourceLocation location = new ResourceLocation("textures/block/sea/rock/other.png");
+
+        expectedException.expect(IOException.class);
+        adapter.find(PackType.CLIENT_RESOURCES, location);
+    }
+
+    @Test
     public void getResource_OriginalThrowsException_ThrowsException() throws IOException {
         PackResources original = new ExceptionPackResources();
         PackResourcesAdapter adapter = new PackResourcesAdapter(original, "dummy-pack", LOGGER);
