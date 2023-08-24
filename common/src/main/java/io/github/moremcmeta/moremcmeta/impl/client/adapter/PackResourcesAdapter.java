@@ -64,7 +64,12 @@ public final class PackResourcesAdapter implements ResourceCollection {
             return ROOT_RESOURCES.find(resourceType, location);
         }
 
-        return ORIGINAL.getResource(resourceType, location);
+        InputStream resource = ORIGINAL.getResource(resourceType, location);
+        if (resource == null) {
+            throw new IOException("Unable to find resource " + location);
+        }
+
+        return resource;
     }
 
     @Override
