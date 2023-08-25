@@ -726,7 +726,10 @@ public abstract class MoreMcmeta {
             return CompletableFuture.runAsync(() -> {
                 LAST_TEXTURES_ADDED.keySet().forEach(TEX_MANAGER::unregister);
                 LAST_TEXTURES_ADDED.clear();
-                LAST_TEXTURES_ADDED.putAll(data);
+                LAST_TEXTURES_ADDED.putAll(data.entrySet().stream().collect(Collectors.toMap(
+                        (entry) -> RootResourcesAdapter.locateForPackScreen(entry.getKey()),
+                        Map.Entry::getValue
+                )));
 
                 /* Clear any existing texture immediately to prevent PreloadedTextures
                    from re-adding themselves. The texture manager will reload before the
