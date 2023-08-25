@@ -49,6 +49,24 @@ public final class RootResourcesAdapterTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
+    public void locateForPackScreen_NullLocation_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        RootResourcesAdapter.locateForPackScreen(null);
+    }
+
+    @Test
+    public void locateForPackScreen_NonRootLocation_SameLocationReturned() {
+        ResourceLocation location = new ResourceLocation("test.png");
+        assertEquals(location, RootResourcesAdapter.locateForPackScreen(location));
+    }
+
+    @Test
+    public void locateForPackScreen_NonRootLocation_UsesMinecraftNamespace() {
+        ResourceLocation location = new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "test.png");
+        assertEquals(new ResourceLocation("minecraft", "test.png"), RootResourcesAdapter.locateForPackScreen(location));
+    }
+
+    @Test
     public void construct_OriginalNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new RootResourcesAdapter(null, "dummy-pack");
@@ -205,13 +223,13 @@ public final class RootResourcesAdapterTest {
     @Test
     public void getNamespaces_ClientType_None() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
-        assertTrue(adapter.namespaces(PackType.CLIENT_RESOURCES).isEmpty());
+        assertEquals(ImmutableSet.of(RootResourcesAdapter.ROOT_NAMESPACE), adapter.namespaces(PackType.CLIENT_RESOURCES));
     }
 
     @Test
-    public void getNamespaces_ServerType_None() {
+    public void getNamespaces_ServerType_Minecraft() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
-        assertTrue(adapter.namespaces(PackType.SERVER_DATA).isEmpty());
+        assertEquals(ImmutableSet.of(RootResourcesAdapter.ROOT_NAMESPACE), adapter.namespaces(PackType.SERVER_DATA));
     }
 
     @Test
@@ -225,21 +243,21 @@ public final class RootResourcesAdapterTest {
     public void locateRootResource_PackPng_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png");
-        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon"), location);
+        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon"), location);
     }
 
     @Test
     public void locateRootResource_PackMetadata_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png.moremcmeta");
-        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon.moremcmeta"), location);
+        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon.moremcmeta"), location);
     }
 
     @Test
     public void locateRootResource_NonPackPng_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("root.png");
-        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/root.png"), location);
+        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/root.png"), location);
     }
 
     private RootResourcesAdapter makeAdapterWithResources() {

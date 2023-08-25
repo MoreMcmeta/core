@@ -429,7 +429,7 @@ public final class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
-                "minecraft", "pack", (file) -> true);
+                RootResourcesAdapter.ROOT_NAMESPACE, "pack", (file) -> true);
 
         assertEquals(1, resources.size());
         assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
@@ -440,7 +440,7 @@ public final class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
-                "minecraft", "pack", (file) -> true);
+                RootResourcesAdapter.ROOT_NAMESPACE, "pack", (file) -> true);
 
         assertEquals(1, resources.size());
         assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
@@ -451,7 +451,7 @@ public final class PackResourcesAdapterTest {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
-                "minecraft", "pack", (file) -> file.contains(".png"));
+                RootResourcesAdapter.ROOT_NAMESPACE, "pack", (file) -> file.contains(".png"));
 
         assertEquals(1, resources.size());
         assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
@@ -469,7 +469,7 @@ public final class PackResourcesAdapterTest {
     public void getNamespaces_ClientType_ClientNamespaces() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         assertEquals(
-                ImmutableSet.of("minecraft", "sea", "moremcmeta"),
+                ImmutableSet.of(RootResourcesAdapter.ROOT_NAMESPACE, "minecraft", "sea", "moremcmeta"),
                 adapter.namespaces(PackType.CLIENT_RESOURCES)
         );
     }
@@ -478,13 +478,13 @@ public final class PackResourcesAdapterTest {
     public void getNamespaces_ServerType_ServerNamespaces() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         assertEquals(
-                ImmutableSet.of("minecraft", "sea"),
+                ImmutableSet.of(RootResourcesAdapter.ROOT_NAMESPACE, "minecraft", "sea"),
                 adapter.namespaces(PackType.SERVER_DATA)
         );
     }
 
     @Test
-    public void getNamespaces_RootResourcesInPack_RootResourceNamespaceExcluded() {
+    public void getNamespaces_RootResourcesInPack_RootResourceNamespaceIncluded() {
         Set<String> rootResources = ImmutableSet.of("image.png", "info.txt", "readme.md");
         Map<PackType, Set<ResourceLocation>> regularResources = new HashMap<>();
         regularResources.put(PackType.CLIENT_RESOURCES, ImmutableSet.of(new ResourceLocation("sea", "textures/hello.png"),
@@ -505,7 +505,7 @@ public final class PackResourcesAdapterTest {
                 LogManager.getLogger()
         );
         assertEquals(
-                ImmutableSet.of("sea", "moremcmeta"),
+                ImmutableSet.of("sea", "moremcmeta", RootResourcesAdapter.ROOT_NAMESPACE),
                 adapter.namespaces(PackType.CLIENT_RESOURCES)
         );
     }
@@ -521,21 +521,21 @@ public final class PackResourcesAdapterTest {
     public void locateRootResource_PackPng_UniqueLocationRetrieved() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png");
-        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon"), location);
+        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon"), location);
     }
 
     @Test
     public void locateRootResource_PackMetadata_UniqueLocationRetrieved() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png.moremcmeta");
-        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon.moremcmeta"), location);
+        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/icon.moremcmeta"), location);
     }
 
     @Test
     public void locateRootResource_NonPackPng_UniqueLocationRetrieved() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("root.png");
-        assertEquals(new ResourceLocation("minecraft:pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/root.png"), location);
+        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/dummy-pack/1838f274a7ef6e95946a2ff69b5d1aab67bcc566/root.png"), location);
     }
 
     private PackResourcesAdapter makeAdapterWithResources() {
@@ -550,7 +550,7 @@ public final class PackResourcesAdapterTest {
                 new ResourceLocation("sea", "textures/block/coral.png"),
                 new ResourceLocation("lang/en/us/words.txt"),
                 new ResourceLocation("moremcmeta", "config/textures/settings.json"),
-                new ResourceLocation("pack/dummy-pack/" + Hashing.sha1().hashUnencodedChars(packId)
+                new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/dummy-pack/" + Hashing.sha1().hashUnencodedChars(packId)
                         + "/in-pack.png.moremcmeta")));
 
         regularResources.put(PackType.SERVER_DATA, ImmutableSet.of(new ResourceLocation("settings/server/network/config.json"),
