@@ -41,9 +41,38 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public final class RootResourcesAdapter implements ResourceCollection {
+
+    /**
+     * Pseudo-namespace that all locations returned by {@link PackResourcesAdapter#locateRootResource(String)}
+     * will have. Some mods scan all resources inside a resource pack, producing {@link StackOverflowError}s
+     * in infinite recursion with the
+     * {@link io.github.moremcmeta.moremcmeta.impl.client.resource.SpriteFrameSizeFixPack}. A unique
+     * pseudo-namespace sidesteps this issue because those resource packs probably need to use their own unique
+     * namespace to avoid an infinite recursion in Minecraft's resource retrieval methods. This means the
+     * {@link io.github.moremcmeta.moremcmeta.impl.client.resource.OrderedResourceRepository} in the sprite
+     * fix pack won't check the other mod's pack for most resources.
+     */
+    public static final String ROOT_NAMESPACE = "__moremcmeta_root__";
+
     private final PackResources ORIGINAL;
     private final Map<ResourceLocation, String> ROOT_RESOURCES;
     private final String ROOT_PATH_PREFIX;
+
+    /**
+     * Converts a root resource location returned from a {@link RootResourcesAdapter} to one compatible
+     * with the resource pack screen.
+     * @param location      location to convert
+     * @return location for the pack screen, or the original location if not a root location
+     */
+    public static ResourceLocation locateForPackScreen(ResourceLocation location) {
+        requireNonNull(location, "Location cannot be null");
+
+        if (location.getNamespace().equals(ROOT_NAMESPACE)) {
+            return new ResourceLocation("minecraft", location.getPath());
+        }
+
+        return location;
+    }
 
     /**
      * Creates a new adapter for root pack resources.
@@ -95,7 +124,7 @@ public final class RootResourcesAdapter implements ResourceCollection {
     @Override
     public Set<String> namespaces(PackType resourceType) {
         requireNonNull(resourceType, "Resource type cannot be null");
-        return ImmutableSet.of();
+        return ImmutableSet.of(ROOT_NAMESPACE);
     }
 
     @Override
@@ -104,7 +133,7 @@ public final class RootResourcesAdapter implements ResourceCollection {
         String fileName = rootResource.replaceAll("^pack.png", "icon");
 
         // Must be the same ResourceLocation as generated in PackSelectionScreen#loadPackIcon()
-        ResourceLocation location = new ResourceLocation(ROOT_PATH_PREFIX + fileName);
+        ResourceLocation location = new ResourceLocation(ROOT_NAMESPACE, ROOT_PATH_PREFIX + fileName);
 
         try {
             if (ORIGINAL.getRootResource(rootResource) != null) {

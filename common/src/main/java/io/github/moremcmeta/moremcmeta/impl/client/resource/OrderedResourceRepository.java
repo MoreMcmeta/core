@@ -18,12 +18,15 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -40,6 +43,7 @@ import static java.util.Objects.requireNonNull;
 public class OrderedResourceRepository {
     private final PackType RESOURCE_TYPE;
     private final ImmutableList<ResourceCollection> COLLECTIONS;
+    private final ImmutableMap<String, List<ResourceCollectionResult>> COLLECTIONS_BY_NAMESPACE;
 
     /**
      * Creates a new ordered group of {@link ResourceCollection}s.
@@ -55,6 +59,23 @@ public class OrderedResourceRepository {
         }
 
         COLLECTIONS = ImmutableList.copyOf(resourceCollections);
+
+        Map<String, ImmutableList.Builder<ResourceCollectionResult>> builders = new HashMap<>();
+        IntStream.range(0, COLLECTIONS.size())
+                .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index))
+                .forEach(
+                        (collection) -> collection.collection().namespaces(resourceType).forEach(
+                                (namespace) -> builders.computeIfAbsent(
+                                        namespace,
+                                        (ns) -> new ImmutableList.Builder<>()
+                                ).add(collection)
+                        )
+                );
+
+        COLLECTIONS_BY_NAMESPACE = ImmutableMap.copyOf(builders.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                (entry) -> entry.getValue().build()
+        )));
     }
 
     /**
@@ -82,9 +103,11 @@ public class OrderedResourceRepository {
     public ResourceCollectionResult firstCollectionWith(ResourceLocation location) throws IOException {
         requireNonNull(location, "Location cannot be null");
 
-        Optional<ResourceCollectionResult> collectionWithResource = IntStream.range(0, COLLECTIONS.size())
-                .filter((index) -> COLLECTIONS.get(index).contains(RESOURCE_TYPE, location))
-                .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index)).findFirst();
+        Optional<ResourceCollectionResult> collectionWithResource = COLLECTIONS_BY_NAMESPACE
+                .getOrDefault(location.getNamespace(), ImmutableList.of())
+                .stream()
+                .filter((collectionResult) -> collectionResult.collection().contains(RESOURCE_TYPE, location))
+                .findFirst();
 
         if (collectionWithResource.isEmpty()) {
             throw new IOException("Resource not found in any collection: " + location);
@@ -101,9 +124,9 @@ public class OrderedResourceRepository {
     public boolean contains(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
 
-        return COLLECTIONS.stream().anyMatch((collection) ->
-                collection.contains(RESOURCE_TYPE, location)
-        );
+        return COLLECTIONS_BY_NAMESPACE.getOrDefault(location.getNamespace(), ImmutableList.of())
+                .stream()
+                .anyMatch((collectionResult) -> collectionResult.collection().contains(RESOURCE_TYPE, location));
     }
 
     /**
