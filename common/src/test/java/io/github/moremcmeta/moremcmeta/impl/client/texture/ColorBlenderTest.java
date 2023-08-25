@@ -23,8 +23,6 @@ import org.junit.Test;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertTrue;
 
@@ -1060,9 +1058,6 @@ public final class ColorBlenderTest {
 
     @Test
     public void alphaBlend_Random1000_AllMatch() {
-        System.out.println(Arrays.toString(IntStream.range(0, RAND_GROUP_1.length).map((i) -> ColorBlender.alphaBlend(RAND_GROUP_1[i], RAND_GROUP_2[i]))
-                .toArray()));
-
         for (int index = 0; index < RAND_GROUP_1.length; index++) {
             int expected = EXPECTED_ALPHA_BLEND[index];
 
