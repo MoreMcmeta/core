@@ -28,6 +28,7 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -115,14 +116,19 @@ public final class SpriteFrameSizeFixPack implements PackResources {
             return null;
         }
 
-        // Don't let a potential bug be silenced as an IOException
-        if (!RESOURCE_REPOSITORY.contains(textureLocation)) {
+        ResourceCollection collection;
+        try {
+            collection = RESOURCE_REPOSITORY.firstCollectionWith(textureLocation).collection();
+        } catch (IOException err) {
+
+            // Don't let a potential bug be silenced as an IOException
             throw new IllegalStateException("A texture given to the sprite fix pack as one being controlled by " +
                     "this mod does not actually exist");
+
         }
 
-        // If the texture is controlled by the mod, we already know it's in the topmost pack
-        return () -> RESOURCE_REPOSITORY.firstCollectionWith(textureLocation).collection().find(
+        // If the texture is controlled by the mod, we already know it's in a pack
+        return () -> collection.find(
                 PackType.CLIENT_RESOURCES,
                 textureLocation
         );
