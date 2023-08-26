@@ -172,12 +172,12 @@ public final class PackResourcesAdapterTest {
     }
 
     @Test
-    public void find_GetRootResourceInPackButNotRoot_ResourceFound() throws IOException {
+    public void find_GetRootResourceInPackButNotRoot_IOException() throws IOException {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("in-pack.png.moremcmeta");
-        InputStream resource = adapter.find(PackType.CLIENT_RESOURCES, location);
 
-        assertEquals(location.getPath(), IOUtils.toString(resource, StandardCharsets.UTF_8));
+        expectedException.expect(IOException.class);
+        adapter.find(PackType.CLIENT_RESOURCES, location);
     }
 
     @Test
@@ -257,10 +257,10 @@ public final class PackResourcesAdapterTest {
     }
 
     @Test
-    public void contains_GetRootResourceInPackButNotRoot_ResourceFound() {
+    public void contains_GetRootResourceInPackButNotRoot_ResourceNotFound() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("in-pack.png.moremcmeta");
-        assertTrue(adapter.contains(PackType.CLIENT_RESOURCES, location));
+        assertFalse(adapter.contains(PackType.CLIENT_RESOURCES, location));
     }
 
     @Test
@@ -425,36 +425,33 @@ public final class PackResourcesAdapterTest {
     }
 
     @Test
-    public void list_AllRootResources_NonRootInPackFound() {
+    public void list_AllRootResources_NoneFoundForRootNamespace() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
                 RootResourcesAdapter.ROOT_NAMESPACE, "pack", (file) -> true);
 
-        assertEquals(1, resources.size());
-        assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
+        assertTrue(resources.isEmpty());
     }
 
     @Test
-    public void list_SomeMatchPathStart_NonRootMatchingInPackFound() {
+    public void list_SomeNonRootMatchPathStart_NoneFoundForRootNamespace() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
                 RootResourcesAdapter.ROOT_NAMESPACE, "pack", (file) -> true);
 
-        assertEquals(1, resources.size());
-        assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
+        assertTrue(resources.isEmpty());
     }
 
     @Test
-    public void list_SomeMatchFileFilter_NonRootMatchingInPackFound() {
+    public void list_SomeNonRootMatchFileFilter_NoneFoundForRootNamespace() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
 
         Collection<ResourceLocation> resources = adapter.list(PackType.CLIENT_RESOURCES,
                 RootResourcesAdapter.ROOT_NAMESPACE, "pack", (file) -> file.contains(".png"));
 
-        assertEquals(1, resources.size());
-        assertTrue(resources.contains(adapter.locateRootResource("in-pack.png.moremcmeta")));
+        assertTrue(resources.isEmpty());
     }
 
     @Test

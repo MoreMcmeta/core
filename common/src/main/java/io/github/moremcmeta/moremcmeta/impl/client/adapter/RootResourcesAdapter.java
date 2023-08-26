@@ -59,6 +59,16 @@ public final class RootResourcesAdapter implements ResourceCollection {
     private final String ROOT_PATH_PREFIX;
 
     /**
+     * Checks if the given location is that of a root resource.
+     * @param location      location to check
+     * @return whether the location is that of a root resource
+     */
+    public static boolean isRootResource(ResourceLocation location) {
+        requireNonNull(location, "Location cannot be null");
+        return ROOT_NAMESPACE.equals(location.getNamespace());
+    }
+
+    /**
      * Converts a root resource location returned from a {@link RootResourcesAdapter} to one compatible
      * with the resource pack screen.
      * @param location      location to convert
@@ -67,7 +77,7 @@ public final class RootResourcesAdapter implements ResourceCollection {
     public static ResourceLocation locateForPackScreen(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
 
-        if (location.getNamespace().equals(ROOT_NAMESPACE)) {
+        if (isRootResource(location)) {
             return new ResourceLocation("minecraft", location.getPath());
         }
 

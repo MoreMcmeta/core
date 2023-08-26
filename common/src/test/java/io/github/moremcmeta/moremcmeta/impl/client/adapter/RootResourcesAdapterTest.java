@@ -67,6 +67,24 @@ public final class RootResourcesAdapterTest {
     }
 
     @Test
+    public void isRootResource_NullLocation_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        RootResourcesAdapter.isRootResource(null);
+    }
+
+    @Test
+    public void isRootResource_NonRootLocation_False() {
+        ResourceLocation location = new ResourceLocation("test.png");
+        assertFalse(RootResourcesAdapter.isRootResource(location));
+    }
+
+    @Test
+    public void isRootResource_NonRootLocation_True() {
+        ResourceLocation location = new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "test.png");
+        assertTrue(RootResourcesAdapter.isRootResource(location));
+    }
+
+    @Test
     public void construct_OriginalNull_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new RootResourcesAdapter(null, "dummy-pack");
