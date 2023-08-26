@@ -60,7 +60,7 @@ public final class PackResourcesAdapter implements ResourceCollection {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
 
-        if (ROOT_RESOURCES.contains(resourceType, location)) {
+        if (RootResourcesAdapter.isRootResource(location)) {
             return ROOT_RESOURCES.find(resourceType, location);
         }
 
@@ -76,7 +76,8 @@ public final class PackResourcesAdapter implements ResourceCollection {
     public boolean contains(PackType resourceType, ResourceLocation location) {
         requireNonNull(resourceType, "Resource type cannot be null");
         requireNonNull(location, "Location cannot be null");
-        return ROOT_RESOURCES.contains(resourceType, location) || ORIGINAL.hasResource(resourceType, location);
+        return ROOT_RESOURCES.contains(resourceType, location)
+                || (!RootResourcesAdapter.isRootResource(location) && ORIGINAL.hasResource(resourceType, location));
     }
 
     @Override
@@ -86,6 +87,10 @@ public final class PackResourcesAdapter implements ResourceCollection {
         requireNonNull(namespace, "Namespace cannot be null");
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(fileFilter, "File filter cannot be null");
+
+        if (RootResourcesAdapter.ROOT_NAMESPACE.equals(namespace)) {
+            return ROOT_RESOURCES.list(resourceType, namespace, pathStart, fileFilter);
+        }
 
         Set<ResourceLocation> resources = new HashSet<>();
 
@@ -106,8 +111,6 @@ public final class PackResourcesAdapter implements ResourceCollection {
             LOGGER.error("Found texture with invalid name in pack {}; cannot return any resources " +
                             "from this pack: {}", ORIGINAL.getName(), error.toString());
         }
-
-        resources.addAll(ROOT_RESOURCES.list(resourceType, namespace, pathStart, fileFilter));
 
         return resources;
     }
