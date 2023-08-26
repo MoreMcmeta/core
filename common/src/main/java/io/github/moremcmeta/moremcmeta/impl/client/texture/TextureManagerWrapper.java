@@ -20,8 +20,8 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.requireNonNull;
 
@@ -41,7 +41,7 @@ public final class TextureManagerWrapper<T extends AbstractTexture & CustomTicka
      */
     public TextureManagerWrapper(Manager<? super AbstractTexture> delegate) {
         DELEGATE = requireNonNull(delegate, "Delegate manager cannot be null");
-        TICKABLE_TEXTURES = new HashMap<>();
+        TICKABLE_TEXTURES = new ConcurrentHashMap<>();
     }
 
     @Override
