@@ -51,6 +51,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.SpriteFinder;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.UploadComponent;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
@@ -69,6 +70,9 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -213,6 +217,7 @@ public abstract class MoreMcmeta {
                     .map(Pack::getId)
                     .collect(Collectors.toList());
 
+            int packVersion = SharedConstants.getCurrentVersion().getPackVersion();
             ModRepositorySource source = new ModRepositorySource(() -> {
                 OrderedResourceRepository repository = makeResourceRepository(packRepository, logger);
 
@@ -221,7 +226,18 @@ public abstract class MoreMcmeta {
                 cache.load(repository, currentPackIds, "textures", "optifine");
                 METADATA_REGISTRY.set(cache.get(currentPackIds));
 
-                return new SpriteFrameSizeFixPack(cache.get(currentPackIds));
+                ResourceLocation packIcon = new ResourceLocation(MODID, "pack.png");
+                return new SpriteFrameSizeFixPack(
+                        cache.get(currentPackIds),
+                        ImmutableMap.of(
+                                "pack.png",
+                                () -> repository.firstCollectionWith(packIcon)
+                                        .collection()
+                                        .find(PackType.CLIENT_RESOURCES, packIcon),
+                                "pack.mcmeta",
+                                () -> makePackMetadataStream(packVersion, ModRepositorySource.DESCRIPTION)
+                        )
+                );
             });
 
             addRepositorySource(packRepository, source);
@@ -549,6 +565,19 @@ public abstract class MoreMcmeta {
                 .forEach(packs::add);
 
         return new OrderedResourceRepository(PackType.CLIENT_RESOURCES, packs);
+    }
+
+    /**
+     * Creates a metadata stream for the internal pack metadata.
+     * @param version       pack version
+     * @param description   pack description
+     * @return stream for the internal pack metadata
+     */
+    private InputStream makePackMetadataStream(int version, String description) {
+        return new ByteArrayInputStream(
+                String.format("{ \"pack\": { \"pack_format\": %s, \"description\": \"%s\"} }", version, description)
+                        .getBytes(StandardCharsets.UTF_8)
+        );
     }
 
     /**
