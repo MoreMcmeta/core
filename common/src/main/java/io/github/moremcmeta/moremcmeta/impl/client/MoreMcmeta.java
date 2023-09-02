@@ -221,7 +221,7 @@ public abstract class MoreMcmeta {
                 cache.load(repository, currentPackIds, "textures", "optifine");
                 METADATA_REGISTRY.set(cache.get(currentPackIds));
 
-                return new SpriteFrameSizeFixPack(cache.get(currentPackIds), repository);
+                return new SpriteFrameSizeFixPack(cache.get(currentPackIds));
             });
 
             addRepositorySource(packRepository, source);
