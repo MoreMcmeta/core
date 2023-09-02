@@ -41,6 +41,12 @@ public final class ModRepositorySource implements RepositorySource {
      * The unique identifier for the mod's resource pack.
      */
     public static final String PACK_ID = "__moremcmeta-internal__";
+
+    /**
+     * The description for the mod's resource pack.
+     */
+    public static final String DESCRIPTION = "Used by the MoreMcmeta mod. Cannot be moved.";
+
     private final Supplier<PackResources> PACK_GETTER;
 
     /**
@@ -66,7 +72,7 @@ public final class ModRepositorySource implements RepositorySource {
                 true,
                 PACK_GETTER,
                 new TextComponent("MoreMcmeta Internal"),
-                new TextComponent("Used by the MoreMcmeta mod. Cannot be moved."),
+                new TextComponent(DESCRIPTION),
                 PackCompatibility.COMPATIBLE,
                 Pack.Position.TOP,
                 true,
