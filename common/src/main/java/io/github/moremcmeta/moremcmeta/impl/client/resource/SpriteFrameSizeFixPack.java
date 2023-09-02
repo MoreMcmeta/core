@@ -28,7 +28,6 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -49,21 +48,12 @@ public final class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
 
-    private final OrderedResourceRepository RESOURCE_REPOSITORY;
-
     /**
      * Creates a new sprite fix pack.
      * @param textures              textures controlled by the mod. Every texture must have an image set.
-     * @param resourceRepository    repository of all resources to search, excluding this pack
      */
-    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures,
-                                  OrderedResourceRepository resourceRepository) {
+    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures) {
         requireNonNull(textures, "Textures cannot be null");
-        RESOURCE_REPOSITORY = requireNonNull(resourceRepository, "Packs cannot be null");
-        if (RESOURCE_REPOSITORY.resourceType() != PackType.CLIENT_RESOURCES) {
-            throw new IllegalArgumentException("Resource repository must have client resources");
-        }
-
         TEXTURES = ImmutableMap.copyOf(textures);
     }
 
@@ -112,27 +102,9 @@ public final class SpriteFrameSizeFixPack implements PackResources {
             return () -> new ByteArrayInputStream(
                     makeEmptyAnimationJson(frameWidth, frameHeight).getBytes(StandardCharsets.UTF_8)
             );
-        } else if (!isKnownTexture) {
-            return null;
         }
 
-        ResourceCollection collection;
-        try {
-            collection = RESOURCE_REPOSITORY.firstCollectionWith(textureLocation).collection();
-        } catch (IOException err) {
-
-            // Don't let a potential bug be silenced as an IOException
-            throw new IllegalStateException("A texture given to the sprite fix pack as one being controlled by " +
-                    "this mod does not actually exist");
-
-        }
-
-        // If the texture is controlled by the mod, we already know it's in a pack
-        return () -> collection.find(
-                PackType.CLIENT_RESOURCES,
-                textureLocation
-        );
-
+        return null;
     }
 
     /**
@@ -162,8 +134,6 @@ public final class SpriteFrameSizeFixPack implements PackResources {
             boolean isRightNamespace = location.getNamespace().equals(namespace);
             boolean isRightPath = path.startsWith(directoryStart);
             if (isRightNamespace && isRightPath) {
-                resourceOutput.accept(location, getResource(PackType.CLIENT_RESOURCES, location));
-
                 getMetadataLocation(location).ifPresent(
                         (metadataLocation) -> resourceOutput.accept(
                                 metadataLocation,
