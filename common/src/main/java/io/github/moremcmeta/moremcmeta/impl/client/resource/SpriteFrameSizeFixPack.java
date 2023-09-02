@@ -51,14 +51,19 @@ import static java.util.Objects.requireNonNull;
 public final class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
+    private final ImmutableMap<? extends String, ? extends StreamSource> ROOT_RESOURCES;
 
     /**
      * Creates a new sprite fix pack.
      * @param textures              textures controlled by the mod. Every texture must have an image set.
+     * @param rootResources         root resources for this pack
      */
-    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures) {
+    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures,
+                                  Map<? extends String, ? extends StreamSource> rootResources) {
         requireNonNull(textures, "Textures cannot be null");
+        requireNonNull(rootResources, "Root resources cannot be null");
         TEXTURES = ImmutableMap.copyOf(textures);
+        ROOT_RESOURCES = ImmutableMap.copyOf(rootResources);
     }
 
     /**
@@ -68,8 +73,13 @@ public final class SpriteFrameSizeFixPack implements PackResources {
      */
     @Nullable
     @Override
-    public InputStream getRootResource(String resourceName) {
+    public InputStream getRootResource(String resourceName) throws IOException {
         requireNonNull(resourceName, "Resource name cannot be null");
+
+        if (ROOT_RESOURCES.containsKey(resourceName)) {
+            return ROOT_RESOURCES.get(resourceName).get();
+        }
+
         return null;
     }
 
@@ -155,7 +165,8 @@ public final class SpriteFrameSizeFixPack implements PackResources {
         }
 
         Optional<ResourceLocation> textureLocationOptional = textureLocation(location);
-        return textureLocationOptional.isPresent() && TEXTURES.containsKey(textureLocationOptional.get());
+        return textureLocationOptional.isPresent() && TEXTURES.containsKey(textureLocationOptional.get())
+                && location.getPath().endsWith(VANILLA_METADATA_EXTENSION);
     }
 
     /**
