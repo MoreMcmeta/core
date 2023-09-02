@@ -19,7 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import net.minecraft.DetectedVersion;
 import net.minecraft.SharedConstants;
-import net.minecraft.WorldVersion;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,26 +37,20 @@ import static org.junit.Assert.assertEquals;
  */
 @SuppressWarnings("ConstantConditions")
 public final class ModRepositorySourceTest {
-    private static final WorldVersion DUMMY_VERSION = DetectedVersion.BUILT_IN;
+    private static final int DUMMY_VERSION = DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES);
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
-        SharedConstants.setVersion(DUMMY_VERSION);
+        SharedConstants.setVersion(DetectedVersion.BUILT_IN);
     }
 
     @Test
     public void construct_NullPackGetter_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new ModRepositorySource(null, DUMMY_VERSION);
-    }
-
-    @Test
-    public void construct_NullVersion_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new ModRepositorySource((id) -> new MockPackResources(), null);
     }
 
     @Test
