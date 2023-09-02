@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -31,7 +32,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -52,21 +52,12 @@ public final class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
 
-    private final OrderedResourceRepository RESOURCE_REPOSITORY;
-
     /**
      * Creates a new sprite fix pack.
      * @param textures              textures controlled by the mod. Every texture must have an image set.
-     * @param resourceRepository    repository of all resources to search, excluding this pack
      */
-    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures,
-                                  OrderedResourceRepository resourceRepository) {
+    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures) {
         requireNonNull(textures, "Textures cannot be null");
-        RESOURCE_REPOSITORY = requireNonNull(resourceRepository, "Packs cannot be null");
-        if (RESOURCE_REPOSITORY.resourceType() != PackType.CLIENT_RESOURCES) {
-            throw new IllegalArgumentException("Resource repository must have client resources");
-        }
-
         TEXTURES = ImmutableMap.copyOf(textures);
     }
 
@@ -117,26 +108,9 @@ public final class SpriteFrameSizeFixPack implements PackResources {
             return new ByteArrayInputStream(
                     makeEmptyAnimationJson(frameWidth, frameHeight).getBytes(StandardCharsets.UTF_8)
             );
-        } else if (!isKnownTexture) {
-            throw new IOException("Requested non-MoreMcmeta-controlled resource from MoreMcmeta's internal pack");
         }
 
-        ResourceCollection collection;
-        try {
-            collection = RESOURCE_REPOSITORY.firstCollectionWith(textureLocation).collection();
-        } catch (IOException err) {
-
-            // Don't let a potential bug be silenced as an IOException
-            throw new IllegalStateException("A texture given to the sprite fix pack as one being controlled by this " +
-                    "mod does not actually exist");
-        }
-
-        // If the texture is controlled by the mod, we already know it's in a pack
-        return collection.find(
-                PackType.CLIENT_RESOURCES,
-                textureLocation
-        );
-
+        throw new IOException("Resource not found in sprite fix pack: " + location);
     }
 
     /**
@@ -155,22 +129,7 @@ public final class SpriteFrameSizeFixPack implements PackResources {
         requireNonNull(namespace, "Namespace cannot be null");
         requireNonNull(pathStart, "Path start cannot be null");
         requireNonNull(pathFilter, "Path filter cannot be null");
-
-        if (packType == PackType.SERVER_DATA) {
-            return new ArrayList<>();
-        }
-
-        String directoryStart = !pathStart.isEmpty() ? pathStart + "/" : "";
-
-        // Vanilla packs exclude .mcmeta metadata files, so we should not include them here
-        return TEXTURES.keySet().stream().filter((location) -> {
-            String path = location.getPath();
-            boolean isRightNamespace = location.getNamespace().equals(namespace);
-            boolean isRightPath = path.startsWith(directoryStart) && pathFilter.test(location);
-
-            return isRightNamespace && isRightPath;
-        }).collect(Collectors.toList());
-
+        return ImmutableList.of();
     }
 
     /**
