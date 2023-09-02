@@ -47,14 +47,19 @@ import static java.util.Objects.requireNonNull;
 public final class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
+    private final ImmutableMap<? extends String, ? extends StreamSource> ROOT_RESOURCES;
 
     /**
      * Creates a new sprite fix pack.
      * @param textures              textures controlled by the mod. Every texture must have an image set.
+     * @param rootResources         root resources for this pack
      */
-    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures) {
+    public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures,
+                                  Map<? extends String, ? extends StreamSource> rootResources) {
         requireNonNull(textures, "Textures cannot be null");
+        requireNonNull(rootResources, "Root resources cannot be null");
         TEXTURES = ImmutableMap.copyOf(textures);
+        ROOT_RESOURCES = ImmutableMap.copyOf(rootResources);
     }
 
     /**
@@ -66,6 +71,11 @@ public final class SpriteFrameSizeFixPack implements PackResources {
     @Override
     public IoSupplier<InputStream> getRootResource(String... resourceNames) {
         requireNonNull(resourceNames, "Resource name cannot be null");
+
+        if (resourceNames.length > 0 && ROOT_RESOURCES.containsKey(resourceNames[0])) {
+            return () -> ROOT_RESOURCES.get(resourceNames[0]).get();
+        }
+
         return null;
     }
 

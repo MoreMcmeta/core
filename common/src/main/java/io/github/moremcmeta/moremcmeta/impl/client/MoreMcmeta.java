@@ -71,6 +71,9 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -212,6 +215,7 @@ public abstract class MoreMcmeta {
                     .map(Pack::getId)
                     .toList();
 
+            int packVersion = SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES);
             ModRepositorySource source = new ModRepositorySource(
                     (packId) -> {
                         OrderedResourceRepository repository = makeResourceRepository(packRepository);
@@ -221,9 +225,22 @@ public abstract class MoreMcmeta {
                         cache.load(repository, currentPackIds, "textures", "optifine");
                         METADATA_REGISTRY.set(cache.get(currentPackIds));
 
-                        return new SpriteFrameSizeFixPack(cache.get(currentPackIds));
+
+                        ResourceLocation packIcon = new ResourceLocation(MODID, "pack.png");
+
+                        return new SpriteFrameSizeFixPack(
+                                cache.get(currentPackIds),
+                                ImmutableMap.of(
+                                        "pack.png",
+                                        () -> repository.firstCollectionWith(packIcon)
+                                                .collection()
+                                                .find(PackType.CLIENT_RESOURCES, packIcon),
+                                        "pack.mcmeta",
+                                        () -> makePackMetadataStream(packVersion, ModRepositorySource.DESCRIPTION)
+                                )
+                        );
                     },
-                    SharedConstants.getCurrentVersion()
+                    packVersion
             );
 
             addRepositorySource(packRepository, source);
@@ -552,6 +569,19 @@ public abstract class MoreMcmeta {
                 .forEach(packs::add);
 
         return new OrderedResourceRepository(PackType.CLIENT_RESOURCES, packs);
+    }
+
+    /**
+     * Creates a metadata stream for the internal pack metadata.
+     * @param version       pack version
+     * @param description   pack description
+     * @return stream for the internal pack metadata
+     */
+    private InputStream makePackMetadataStream(int version, String description) {
+        return new ByteArrayInputStream(
+                String.format("{ \"pack\": { \"pack_format\": %s, \"description\": \"%s\"} }", version, description)
+                        .getBytes(StandardCharsets.UTF_8)
+        );
     }
 
     /**
