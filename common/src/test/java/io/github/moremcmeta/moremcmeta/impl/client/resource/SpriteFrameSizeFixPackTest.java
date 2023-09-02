@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.MockCloseableImage;
@@ -25,12 +26,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.util.GsonHelper;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,43 +61,79 @@ public final class SpriteFrameSizeFixPackTest {
     @Test
     public void construct_NullTextures_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new SpriteFrameSizeFixPack(null);
+        new SpriteFrameSizeFixPack(null, ImmutableMap.of());
     }
 
     @Test
-    public void construct_EmptyTextures_NoException() {
-        new SpriteFrameSizeFixPack(new HashMap<>());
-    }
-
-    @Test
-    public void getRootResource_NullName_NullPointerException() {
+    public void construct_NullRootResources_NullPointerException() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        expectedException.expect(NullPointerException.class);
+        new SpriteFrameSizeFixPack(textures1, null);
+    }
+
+    @Test
+    public void construct_EmptyTexturesAndRootResources_NoException() {
+        new SpriteFrameSizeFixPack(new HashMap<>(), ImmutableMap.of());
+    }
+
+    @Test
+    public void getRootResource_NullName_NullPointerException() throws IOException {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         expectedException.expect(NullPointerException.class);
         pack.getRootResource(null);
     }
 
     @Test
-    public void getRootResource_NonNullName_Null() {
+    public void getRootResource_NonNullName_Null() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         assertNull(pack.getRootResource("one.png"));
     }
 
     @Test
-    public void getRootResource_EmptyName_Null() {
+    public void getRootResource_EmptyName_Null() throws IOException {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         assertNull(pack.getRootResource(""));
+    }
+
+    @Test
+    public void getRootResource_MissingName_Null() throws IOException {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+
+        Map<String, StreamSource> rootResources = new HashMap<>();
+        rootResources.put("pack.png", () -> new ByteArrayInputStream("Hello, world!".getBytes(StandardCharsets.UTF_8)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, rootResources);
+        assertNull(pack.getRootResource("missing"));
+    }
+
+    @Test
+    public void getRootResource_PresentName_ResourceFound() throws IOException {
+        Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
+        textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+        textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
+
+        Map<String, StreamSource> rootResources = new HashMap<>();
+        rootResources.put("pack.png", () -> new ByteArrayInputStream("Hello, world!".getBytes(StandardCharsets.UTF_8)));
+
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, rootResources);
+        assertEquals("Hello, world!", IOUtils.toString(pack.getRootResource("pack.png"), StandardCharsets.UTF_8));
     }
 
     @Test
@@ -103,7 +142,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         expectedException.expect(NullPointerException.class);
         pack.getResource(null, new ResourceLocation("one.png"));
     }
@@ -114,7 +153,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         expectedException.expect(NullPointerException.class);
         pack.getResource(PackType.CLIENT_RESOURCES, null);
     }
@@ -125,7 +164,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         expectedException.expect(IOException.class);
         pack.getResource(PackType.SERVER_DATA, new ResourceLocation("one.png"));
     }
@@ -136,7 +175,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         expectedException.expect(IOException.class);
         pack.getResource(PackType.SERVER_DATA, new ResourceLocation("server-one.png"));
     }
@@ -147,7 +186,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         InputStream resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("one.png.mcmeta"));
 
@@ -164,7 +203,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         InputStream resource = pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("one.png.mcmeta"));
 
@@ -181,7 +220,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(IOException.class);
         pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("three.png.mcmeta"));
@@ -193,7 +232,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         expectedException.expect(IOException.class);
         pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("one.png"));
     }
@@ -204,7 +243,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("four.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         expectedException.expect(IOException.class);
         pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("four.png"));
     }
@@ -215,7 +254,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         expectedException.expect(IOException.class);
         pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("five.png"));
     }
@@ -226,7 +265,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(IOException.class);
         pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("three.png"));
@@ -238,7 +277,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("two.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(IOException.class);
         pack.getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("one.png") {
@@ -255,7 +294,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertTrue(pack.getResources(PackType.SERVER_DATA, "minecraft", "textures",
                 (fileName) -> true).isEmpty());
@@ -267,7 +306,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(NullPointerException.class);
         pack.getResources(null, "minecraft", "textures", (fileName) -> true);
@@ -279,7 +318,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(NullPointerException.class);
         pack.getResources(PackType.CLIENT_RESOURCES, null, "textures", (fileName) -> true);
@@ -291,7 +330,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(NullPointerException.class);
         pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", null, (fileName) -> true);
@@ -303,7 +342,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/one.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"), new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(NullPointerException.class);
         pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures", null);
@@ -317,7 +356,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("/textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
                 (path) -> true);
@@ -332,7 +371,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/folder/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "other",
                 (path) -> true);
@@ -347,7 +386,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "",
                 (path) -> true);
@@ -362,7 +401,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/folder/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "text",
                 (path) -> true);
@@ -377,7 +416,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/folder/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures/",
                 (path) -> true);
@@ -392,7 +431,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/folder/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
                 (path) -> false);
@@ -407,7 +446,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/folder/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
                 (location) -> location.getPath().endsWith("five.png"));
@@ -418,7 +457,7 @@ public final class SpriteFrameSizeFixPackTest {
     public void getResources_NoTextures_NoneMatch() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
                 (path) -> true);
@@ -439,7 +478,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/folder/folder2/folder3/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         Collection<ResourceLocation> results = pack.getResources(PackType.CLIENT_RESOURCES, "minecraft", "textures",
                 (location) -> location.getPath().endsWith(".png"));
@@ -454,7 +493,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(NullPointerException.class);
         pack.hasResource(null, new ResourceLocation("textures/one.png"));
@@ -468,7 +507,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(NullPointerException.class);
         pack.hasResource(PackType.CLIENT_RESOURCES, null);
@@ -482,7 +521,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertFalse(pack.hasResource(PackType.SERVER_DATA, new ResourceLocation("textures/one.png")));
     }
@@ -495,7 +534,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png.mcmeta")));
     }
@@ -508,22 +547,22 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/two.png.mcmeta")));
     }
 
     @Test
-    public void hasResource_HasOtherResource_Found() {
+    public void hasResource_HasOtherResource_NotFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png.moremcmeta"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
-        assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png.moremcmeta")));
+        assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png.moremcmeta")));
     }
 
     @Test
@@ -534,22 +573,22 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png.moremcmeta")));
     }
 
     @Test
-    public void hasResource_HasTexture_Found() {
+    public void hasResource_HasTexture_NotFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
-        assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png")));
+        assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png")));
     }
 
     @Test
@@ -560,7 +599,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/two.png")));
     }
@@ -568,13 +607,13 @@ public final class SpriteFrameSizeFixPackTest {
     @Test
     public void hasResource_NoTextures_NotFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/one.png")));
     }
 
     @Test
-    public void hasResource_NotInRepo_Found() {
+    public void hasResource_NotInRepo_NotFound() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
         textures1.put(new ResourceLocation("textures/one.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
@@ -582,9 +621,9 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/other.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
-        assertTrue(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/other.png")));
+        assertFalse(pack.hasResource(PackType.CLIENT_RESOURCES, new ResourceLocation("textures/other.png")));
     }
 
     @Test
@@ -595,7 +634,7 @@ public final class SpriteFrameSizeFixPackTest {
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
 
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertFalse(pack.hasResource(
                 PackType.CLIENT_RESOURCES,
@@ -615,7 +654,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(NullPointerException.class);
         pack.getNamespaces(null);
@@ -632,7 +671,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertEquals(Set.of("first", "second", "third", "minecraft"), pack.getNamespaces(PackType.CLIENT_RESOURCES));
     }
@@ -648,7 +687,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertTrue(pack.getNamespaces(PackType.SERVER_DATA).isEmpty());
     }
@@ -656,7 +695,7 @@ public final class SpriteFrameSizeFixPackTest {
     @Test
     public void getNamespaces_NoTextures_None() {
         Map<ResourceLocation, TextureData<?>> textures1 = new HashMap<>();
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
         assertTrue(pack.getNamespaces(PackType.CLIENT_RESOURCES).isEmpty());
     }
 
@@ -667,7 +706,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         expectedException.expect(NullPointerException.class);
         pack.getMetadataSection(null);
@@ -680,7 +719,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertNull(pack.getMetadataSection(PackMetadataSection.SERIALIZER));
     }
@@ -692,7 +731,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         assertNotEquals(0, pack.getName().length());
     }
@@ -704,7 +743,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
 
         Map<ResourceLocation, TextureData<?>> textures2 = new HashMap<>();
@@ -712,7 +751,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures2.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack2 = new SpriteFrameSizeFixPack(textures2);
+        SpriteFrameSizeFixPack pack2 = new SpriteFrameSizeFixPack(textures2, ImmutableMap.of());
 
         assertEquals(pack.getName(), pack2.getName());
     }
@@ -724,7 +763,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         pack.close();
     }
@@ -736,7 +775,7 @@ public final class SpriteFrameSizeFixPackTest {
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
         textures1.put(new ResourceLocation("textures/five.png"),
                 new TextureData<>(new TextureData.FrameSize(1, 2), false, false, new MockCloseableImage(10, 10), ImmutableList.of()));
-        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1);
+        SpriteFrameSizeFixPack pack = new SpriteFrameSizeFixPack(textures1, ImmutableMap.of());
 
         pack.close();
         pack.close();
