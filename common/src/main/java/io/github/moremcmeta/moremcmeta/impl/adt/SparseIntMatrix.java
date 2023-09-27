@@ -18,7 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.adt;
 
 import java.util.BitSet;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
 /**
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  */
 public final class SparseIntMatrix {
     private final BitSet[] IS_PRESENT;
-    private final ReentrantLock[] LOCKS;
+    private final ReentrantReadWriteLock[] LOCKS;
     private final int WIDTH;
     private final int HEIGHT;
     private final int[][] MATRIX;
@@ -91,9 +91,9 @@ public final class SparseIntMatrix {
         IS_PRESENT = Stream.generate(() -> new BitSet(SECTOR_SIZE))
                 .limit((long) SECTORS_PER_ROW * rows)
                 .toArray(BitSet[]::new);
-        LOCKS = Stream.generate(ReentrantLock::new)
+        LOCKS = Stream.generate(ReentrantReadWriteLock::new)
                 .limit((long) SECTORS_PER_ROW * rows)
-                .toArray(ReentrantLock[]::new);
+                .toArray(ReentrantReadWriteLock[]::new);
     }
 
     /**
@@ -108,7 +108,7 @@ public final class SparseIntMatrix {
         int sectorIndex = sectorIndex(x, y);
         int indexInSector = indexInSector(x, y);
 
-        ReentrantLock lock = LOCKS[sectorIndex];
+        ReentrantReadWriteLock.ReadLock lock = LOCKS[sectorIndex].readLock();
         lock.lock();
 
         if (!IS_PRESENT[sectorIndex].get(indexInSector)) {
@@ -132,7 +132,7 @@ public final class SparseIntMatrix {
         int sectorIndex = sectorIndex(x, y);
         int indexInSector = indexInSector(x, y);
 
-        ReentrantLock lock = LOCKS[sectorIndex];
+        ReentrantReadWriteLock.ReadLock lock = LOCKS[sectorIndex].readLock();
 
         lock.lock();
         boolean isSet = IS_PRESENT[sectorIndex].get(indexInSector);
@@ -154,7 +154,7 @@ public final class SparseIntMatrix {
         int sectorIndex = sectorIndex(x, y);
         int indexInSector = indexInSector(x, y);
 
-        ReentrantLock lock = LOCKS[sectorIndex];
+        ReentrantReadWriteLock.WriteLock lock = LOCKS[sectorIndex].writeLock();
         lock.lock();
 
         if (MATRIX[sectorIndex] == null) {
