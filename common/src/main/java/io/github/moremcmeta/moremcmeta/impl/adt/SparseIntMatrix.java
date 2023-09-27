@@ -18,6 +18,8 @@
 package io.github.moremcmeta.moremcmeta.impl.adt;
 
 import java.util.BitSet;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Stream;
 
 /**
  * <p>Stores integers in a two-dimensional matrix. At each position, an integer may or may not be set.
@@ -31,13 +33,16 @@ import java.util.BitSet;
  * of 2. This power is called the sector power; for example, if sectors are 8x8, the sector power is 3
  * because 2^3 = 8. The maximum sector power is configurable, but a smaller power may be used if the
  * maximum power is unnecessarily large or too large to work correctly with the provided dimensions.</p>
+ *
+ * <p>Supports concurrent access and modification.</p>
  * @author soir20
  */
 public final class SparseIntMatrix {
-    private final BitSet IS_PRESENT;
+    private final BitSet[] IS_PRESENT;
+    private final ReentrantLock[] LOCKS;
     private final int WIDTH;
     private final int HEIGHT;
-    private final int[][][] MATRIX;
+    private final int[][] MATRIX;
     private final int SECTOR_POWER;
     private final int SECTORS_PER_ROW;
     private final int POINTS_PER_SECTOR_ROW;
@@ -59,7 +64,6 @@ public final class SparseIntMatrix {
             );
         }
 
-        IS_PRESENT = new BitSet(width * height);
         WIDTH = width;
         HEIGHT = height;
 
@@ -83,7 +87,13 @@ public final class SparseIntMatrix {
         SECTOR_COORD_MASK = POINTS_PER_SECTOR_ROW - 1;
         SECTOR_SIZE = POINTS_PER_SECTOR_ROW * POINTS_PER_SECTOR_ROW;
 
-        MATRIX = new int[rows][][];
+        MATRIX = new int[SECTORS_PER_ROW * rows][];
+        IS_PRESENT = Stream.generate(() -> new BitSet(SECTOR_SIZE))
+                .limit((long) SECTORS_PER_ROW * rows)
+                .toArray(BitSet[]::new);
+        LOCKS = Stream.generate(ReentrantLock::new)
+                .limit((long) SECTORS_PER_ROW * rows)
+                .toArray(ReentrantLock[]::new);
     }
 
     /**
@@ -95,12 +105,20 @@ public final class SparseIntMatrix {
      */
     public int get(int x, int y) {
         checkInBounds(x, y);
+        int sectorIndex = sectorIndex(x, y);
+        int indexInSector = indexInSector(x, y);
 
-        if (!IS_PRESENT.get(bitIndex(x, y))) {
+        ReentrantLock lock = LOCKS[sectorIndex];
+        lock.lock();
+
+        if (!IS_PRESENT[sectorIndex].get(indexInSector)) {
             throw new IllegalStateException(String.format("Point (%s, %s) has not been set", x, y));
         }
 
-        return sector(x, y)[indexInSector(x, y)];
+        int value = MATRIX[sectorIndex][indexInSector];
+        lock.unlock();
+
+        return value;
     }
 
     /**
@@ -111,7 +129,16 @@ public final class SparseIntMatrix {
      */
     public boolean isSet(int x, int y) {
         checkInBounds(x, y);
-        return IS_PRESENT.get(bitIndex(x, y));
+        int sectorIndex = sectorIndex(x, y);
+        int indexInSector = indexInSector(x, y);
+
+        ReentrantLock lock = LOCKS[sectorIndex];
+
+        lock.lock();
+        boolean isSet = IS_PRESENT[sectorIndex].get(indexInSector);
+        lock.unlock();
+
+        return isSet;
     }
 
     /**
@@ -124,8 +151,19 @@ public final class SparseIntMatrix {
      */
     public void set(int x, int y, int value) {
         checkInBounds(x, y);
-        sector(x, y)[indexInSector(x, y)] = value;
-        IS_PRESENT.set(bitIndex(x, y));
+        int sectorIndex = sectorIndex(x, y);
+        int indexInSector = indexInSector(x, y);
+
+        ReentrantLock lock = LOCKS[sectorIndex];
+        lock.lock();
+
+        if (MATRIX[sectorIndex] == null) {
+            MATRIX[sectorIndex] = new int[SECTOR_SIZE];
+        }
+
+        MATRIX[sectorIndex][indexInSector] = value;
+        IS_PRESENT[sectorIndex].set(indexInSector);
+        lock.unlock();
     }
 
     /**
@@ -142,35 +180,13 @@ public final class SparseIntMatrix {
     }
 
     /**
-     * Converts coordinates to the index of a bit in a bit set that contains bits for all
-     * coordinates in the matrix.
-     * @param x         horizontal coordinate to convert
-     * @param y         vertical coordinate to convert
-     * @return the index of the bit corresponding to the coordinates
+     * Computes the index of a sector that contains the given point.
+     * @param x     x-coordinate of the point
+     * @param y     y-coordinate of the point
+     * @return index of the sector
      */
-    private int bitIndex(int x, int y) {
-        return y * WIDTH + x;
-    }
-
-    /**
-     * Retrieves the sector that contains the given coordinates, allocating that sector if necessary.
-     * @param x         horizontal coordinate inside the sector
-     * @param y         vertical coordinate inside the sector
-     * @return the sector containing the given coordinates
-     */
-    private int[] sector(int x, int y) {
-        int hSectorIndex = x >> SECTOR_POWER;
-        int vSectorIndex = y >> SECTOR_POWER;
-
-        if (MATRIX[vSectorIndex] == null) {
-            MATRIX[vSectorIndex] = new int[SECTORS_PER_ROW][];
-        }
-
-        if (MATRIX[vSectorIndex][hSectorIndex] == null) {
-            MATRIX[vSectorIndex][hSectorIndex] = new int[SECTOR_SIZE];
-        }
-
-        return MATRIX[vSectorIndex][hSectorIndex];
+    private int sectorIndex(int x, int y) {
+        return (y >> SECTOR_POWER) * SECTORS_PER_ROW + (x >> SECTOR_POWER);
     }
 
     /**
