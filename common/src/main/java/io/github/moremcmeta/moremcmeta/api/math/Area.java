@@ -31,7 +31,12 @@ import it.unimi.dsi.fastutil.longs.LongIterators;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents an unordered collection of points.
@@ -72,6 +77,7 @@ public final class Area implements LongIterable {
 
     // Each long list represents a segment of (leftX, segmentWidth) pairs
     private final Int2ObjectSortedMap<LongList> ROWS;
+    private final int SIZE;
 
     /**
      * Creates a new area that represents a rectangle.
@@ -96,6 +102,7 @@ public final class Area implements LongIterable {
         }
 
         ROWS = new Int2ObjectRBTreeMap<>();
+        SIZE = width * height;
 
         if (width > 0) {
             for (int y = topLeftY; y < topLeftY + height; y++) {
@@ -111,6 +118,57 @@ public final class Area implements LongIterable {
     @Override
     public @NotNull LongIterator iterator() {
         return new PointIterator();
+    }
+
+    /**
+     * Gets the number of points in this area.
+     * @return number of points in this area
+     */
+    public int size() {
+        return SIZE;
+    }
+
+    /**
+     * Splits this area into multiple smaller areas that are approximately the size of the provided
+     * <pre>sizeHint</pre>. The returned areas may be larger or smaller than the <pre>sizeHint</pre>.
+     * Does not modify the original area. Intended for splitting operations over a large area into
+     * smaller sections for parallelization.
+     * @param sizeHint      approximate size of each of the smaller areas to return
+     * @return smaller areas that collectively contain all points in the original area
+     */
+    public Collection<Area> split(int sizeHint) {
+        if (sizeHint < 0) {
+            throw new NegativeDimensionException(sizeHint);
+        }
+
+        Deque<Int2ObjectSortedMap<LongList>> buckets = new ArrayDeque<>(SIZE / Math.max(sizeHint, 1) + 1);
+        buckets.add(new Int2ObjectRBTreeMap<>());
+        int currentSize = 0;
+
+        List<Area> resultAreas = new ArrayList<>();
+
+        Iterator<Int2ObjectMap.Entry<LongList>> rowIterator = ROWS.int2ObjectEntrySet().stream().iterator();
+        while (rowIterator.hasNext()) {
+            Int2ObjectMap.Entry<LongList> row = rowIterator.next();
+            LongIterator segmentIterator = row.getValue().longIterator();
+
+            while (segmentIterator.hasNext()) {
+                long segment = segmentIterator.nextLong();
+                Int2ObjectSortedMap<LongList> bucket = buckets.peekLast();
+
+                bucket.computeIfAbsent(row.getIntKey(), (key) -> new LongArrayList())
+                        .add(segment);
+                currentSize += Point.y(segment);
+
+                if (currentSize >= sizeHint || (!rowIterator.hasNext()) && !segmentIterator.hasNext()) {
+                    resultAreas.add(new Area(bucket, currentSize));
+                    buckets.add(new Int2ObjectRBTreeMap<>());
+                    currentSize = 0;
+                }
+            }
+        }
+
+        return resultAreas;
     }
 
     /**
@@ -157,6 +215,7 @@ public final class Area implements LongIterable {
          */
         public Area build() {
             Int2ObjectSortedMap<LongList> rows = new Int2ObjectRBTreeMap<>();
+            int size = 0;
 
             for (Int2ObjectMap.Entry<IntList> entry : ROWS.int2ObjectEntrySet()) {
                 IntList xPoints = entry.getValue();
@@ -172,6 +231,8 @@ public final class Area implements LongIterable {
 
                     if (isRowEnd) {
                         int width = pointIndex - startIndex + 1;
+                        size += width;
+
                         int y = entry.getIntKey();
                         rows.computeIfAbsent(y, (key) -> new LongArrayList())
                                 .add(Point.pack(xPoints.getInt(startIndex), width));
@@ -181,7 +242,7 @@ public final class Area implements LongIterable {
                 }
             }
 
-            return new Area(rows);
+            return new Area(rows, size);
         }
 
     }
@@ -189,9 +250,11 @@ public final class Area implements LongIterable {
     /**
      * Creates a new area.
      * @param rows  all the horizontal strips in this image
+     * @param size  number of points in the area
      */
-    private Area(Int2ObjectSortedMap<LongList> rows) {
+    private Area(Int2ObjectSortedMap<LongList> rows, int size) {
         ROWS = rows;
+        SIZE = size;
     }
 
     /**
