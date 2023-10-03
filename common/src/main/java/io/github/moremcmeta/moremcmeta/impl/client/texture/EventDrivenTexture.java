@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -347,6 +348,7 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
         /**
          * Flags the texture as needing an upload.
          */
+        @VisibleForTesting
         public void markNeedsUpload() {
             checkValid();
             STATE.markNeedsUpload();
