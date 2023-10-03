@@ -207,6 +207,12 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
                 }
 
                 @Override
+                public void onUse(TextureAndFrameView currentFrame,
+                                   FrameGroup<? extends PersistentFrameView> predefinedFrames) {
+                    component.onUse(currentFrame, predefinedFrames);
+                }
+
+                @Override
                 public void onClose(TextureAndFrameView currentFrame,
                                     FrameGroup<? extends PersistentFrameView> predefinedFrames) {
                     component.onClose(currentFrame, predefinedFrames);
