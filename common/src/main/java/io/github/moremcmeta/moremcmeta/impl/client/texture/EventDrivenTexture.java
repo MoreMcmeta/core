@@ -64,14 +64,27 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
     private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
 
-    /**
-     * Fires registration listeners when this texture is put into the texture manager.
-     * @param resourceManager   resource manager (unused; texture resources should
-     *                          already be retrieved by the time this is called)
-     */
+    @Override
+    public void setFilter(boolean blur, boolean clamp) {
+
+        // Prevent blur and clamp settings in the NativeImageAdapter from being overridden by TextureStateShard
+        this.bind();
+
+    }
+
     @Override
     public void load(@Nullable ResourceManager resourceManager) {
         runListeners((component, view) -> component.onRegistration(view, CURRENT_STATE.predefinedFrames()));
+    }
+
+    @Override
+    public void tick() {
+        runListeners((component, view) -> component.onTick(view, CURRENT_STATE.predefinedFrames()));
+    }
+
+    @Override
+    public void close() {
+        runListeners((component, view) -> component.onClose(view, CURRENT_STATE.predefinedFrames()));
     }
 
     /**
@@ -86,22 +99,6 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
 
             runListeners((textureComponent, textureAndFrameView) -> textureComponent.onUpload(textureAndFrameView, base));
         }
-    }
-
-    /**
-     * Fires tick listeners when this texture is ticked.
-     */
-    @Override
-    public void tick() {
-        runListeners((component, view) -> component.onTick(view, CURRENT_STATE.predefinedFrames()));
-    }
-
-    /**
-     * Fires close listeners when this texture is closed.
-     */
-    @Override
-    public void close() {
-        runListeners((component, view) -> component.onClose(view, CURRENT_STATE.predefinedFrames()));
     }
 
     /**
