@@ -29,7 +29,9 @@ public interface MutableFrameView extends FrameView {
     /**
      * Modifies the predefined frame by applying the given {@link ColorTransform} over
      * the given area. There is no ordering guaranteed for how the transform will be applied
-     * over the provided points.
+     * over the provided points. <b>This method may be called from multiple threads concurrently.
+     * If there is any state shared between calls, it must be synchronized properly for
+     * concurrent usage.</b>
      * @param transform     the transformation to apply to the given points
      * @param applyArea     the points to apply the transformation to
      * @throws PixelOutOfBoundsException if a pixel in `applyArea` is out of the frame's bounds
