@@ -94,6 +94,8 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
     public void upload(ResourceLocation base) {
         requireNonNull(base, "Base cannot be null");
 
+        runListeners((component, view) -> component.onUse(view, CURRENT_STATE.predefinedFrames()));
+
         if (!CURRENT_STATE.BASES_UPLOADED_SINCE_UPDATE.contains(base)) {
             CURRENT_STATE.BASES_UPLOADED_SINCE_UPDATE.add(base);
 

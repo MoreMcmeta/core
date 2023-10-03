@@ -422,25 +422,25 @@ public final class EventDrivenTextureTest {
 
     @Test
     public void bind_SecondUploadNotNeeded_UploadFiredInOrderOnce() {
-        Integer[] expected = {4, 5, 6};
+        Integer[] expected = {13, 14, 15, 4, 5, 6, 13, 14, 15};
         testExpectedOrder((texture) -> {texture.upload(DUMMY_BASE_LOCATION); texture.upload(DUMMY_BASE_LOCATION);}, false, expected);
     }
 
     @Test
     public void bind_SecondUploadNeeded_UploadFiredInOrder() {
-        Integer[] expected = {4, 5, 6, 7, 8, 9, 4, 5, 6};
+        Integer[] expected = {13, 14, 15, 4, 5, 6, 7, 8, 9, 13, 14, 15, 4, 5, 6};
         testExpectedOrder((texture) -> {texture.upload(DUMMY_BASE_LOCATION); texture.tick(); texture.upload(DUMMY_BASE_LOCATION);}, true, expected);
     }
 
     @Test
     public void upload_FirstUpload_UploadFiredInOrder() {
-        Integer[] expected = {4, 5, 6};
+        Integer[] expected = {13, 14, 15, 4, 5, 6};
         testExpectedOrder((texture) -> texture.upload(new ResourceLocation("dummy.png")), false, expected);
     }
 
     @Test
     public void upload_SecondUploadNotNeeded_FirstUploadOnly() {
-        Integer[] expected = {4, 5, 6};
+        Integer[] expected = {13, 14, 15, 4, 5, 6, 13, 14, 15};
         ResourceLocation dummyBase = new ResourceLocation("dummy.png");
         testExpectedOrder((texture) -> {texture.upload(dummyBase); texture.upload(dummyBase);}, false, expected);
 
@@ -1183,6 +1183,7 @@ public final class EventDrivenTextureTest {
         final int UPLOAD_ID_BASE = 4;
         final int TICK_ID_BASE = 7;
         final int CLOSE_ID_BASE = 10;
+        final int USE_ID_BASE = 13;
 
         List<Integer> execOrder = new ArrayList<>();
 
@@ -1211,6 +1212,12 @@ public final class EventDrivenTextureTest {
                 public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(UPLOAD_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onUse(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(USE_ID_BASE + finalIndex);
                 }
             });
         }
