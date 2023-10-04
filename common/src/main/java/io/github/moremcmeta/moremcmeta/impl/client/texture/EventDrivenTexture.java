@@ -63,6 +63,7 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
 
     private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
+    private int ticks;
 
     @Override
     public void setFilter(boolean blur, boolean clamp) {
@@ -80,6 +81,7 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
     @Override
     public void tick() {
         runListeners((component, view) -> component.onTick(view, CURRENT_STATE.predefinedFrames()));
+        ticks = Math.max(0, ticks + 1);
     }
 
     @Override
@@ -94,7 +96,8 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
     public void upload(ResourceLocation base) {
         requireNonNull(base, "Base cannot be null");
 
-        runListeners((component, view) -> component.onUse(view, CURRENT_STATE.predefinedFrames()));
+        runListeners((component, view) -> component.onTick(view, CURRENT_STATE.predefinedFrames(), ticks));
+        ticks = 0;
 
         if (!CURRENT_STATE.BASES_UPLOADED_SINCE_UPDATE.contains(base)) {
             CURRENT_STATE.BASES_UPLOADED_SINCE_UPDATE.add(base);
@@ -207,9 +210,9 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
                 }
 
                 @Override
-                public void onUse(TextureAndFrameView currentFrame,
-                                   FrameGroup<? extends PersistentFrameView> predefinedFrames) {
-                    component.onUse(currentFrame, predefinedFrames);
+                public void onTick(TextureAndFrameView currentFrame,
+                                   FrameGroup<? extends PersistentFrameView> predefinedFrames, int ticks) {
+                    component.onTick(currentFrame, predefinedFrames, ticks);
                 }
 
                 @Override

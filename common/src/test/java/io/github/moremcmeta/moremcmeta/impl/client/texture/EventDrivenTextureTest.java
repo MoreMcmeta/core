@@ -1183,7 +1183,7 @@ public final class EventDrivenTextureTest {
         final int UPLOAD_ID_BASE = 4;
         final int TICK_ID_BASE = 7;
         final int CLOSE_ID_BASE = 10;
-        final int USE_ID_BASE = 13;
+        final int TICK_2_ID_BASE = 13;
 
         List<Integer> execOrder = new ArrayList<>();
 
@@ -1194,6 +1194,12 @@ public final class EventDrivenTextureTest {
                 public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(TICK_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames, int ticks) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(TICK_2_ID_BASE + finalIndex);
                 }
 
                 @Override
@@ -1212,12 +1218,6 @@ public final class EventDrivenTextureTest {
                 public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(UPLOAD_ID_BASE + finalIndex);
-                }
-
-                @Override
-                public void onUse(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
-                    if (flagForUpload) currentFrame.markNeedsUpload();
-                    execOrder.add(USE_ID_BASE + finalIndex);
                 }
             });
         }
