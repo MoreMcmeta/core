@@ -422,25 +422,25 @@ public final class EventDrivenTextureTest {
 
     @Test
     public void bind_SecondUploadNotNeeded_UploadFiredInOrderOnce() {
-        Integer[] expected = {13, 14, 15, 4, 5, 6, 13, 14, 15};
+        Integer[] expected = {4, 5, 6};
         testExpectedOrder((texture) -> {texture.upload(DUMMY_BASE_LOCATION); texture.upload(DUMMY_BASE_LOCATION);}, false, expected);
     }
 
     @Test
     public void bind_SecondUploadNeeded_UploadFiredInOrder() {
-        Integer[] expected = {13, 14, 15, 4, 5, 6, 7, 8, 9, 13, 14, 15, 4, 5, 6};
+        Integer[] expected = {4, 5, 6, 7, 8, 9, 13, 14, 15, 4, 5, 6};
         testExpectedOrder((texture) -> {texture.upload(DUMMY_BASE_LOCATION); texture.tick(); texture.upload(DUMMY_BASE_LOCATION);}, true, expected);
     }
 
     @Test
     public void upload_FirstUpload_UploadFiredInOrder() {
-        Integer[] expected = {13, 14, 15, 4, 5, 6};
+        Integer[] expected = {4, 5, 6};
         testExpectedOrder((texture) -> texture.upload(new ResourceLocation("dummy.png")), false, expected);
     }
 
     @Test
     public void upload_SecondUploadNotNeeded_FirstUploadOnly() {
-        Integer[] expected = {13, 14, 15, 4, 5, 6, 13, 14, 15};
+        Integer[] expected = {4, 5, 6};
         ResourceLocation dummyBase = new ResourceLocation("dummy.png");
         testExpectedOrder((texture) -> {texture.upload(dummyBase); texture.upload(dummyBase);}, false, expected);
 
