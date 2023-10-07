@@ -1475,6 +1475,122 @@ public final class CloseableImageFrameTest {
     }
 
     @Test
+    public void applyTransform_LargeApplyAreaTransformThrowsException_RuntimeException() {
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(256, 256, 0, 0),
+                ImmutableList.of(
+                        new MockCloseableImage(256, 256),
+                        new MockCloseableImage(128, 128),
+                        new MockCloseableImage(64, 64)
+                ),
+                1
+        );
+
+        expectedException.expect(RuntimeException.class);
+        frame.applyTransform((x, y, depFunction) -> Color.pack(100, 100, 100, 100), new Area(1, 0, 256, 256), 0);
+    }
+
+    @Test
+    public void applyTransform_LargeApplyArea_OriginalUpdated() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(256, 256),
+                new MockCloseableImage(128, 128),
+                new MockCloseableImage(64, 64)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(256, 256, 0, 0),
+                images,
+                1
+        );
+
+        Long2IntMap pointToColor = new Long2IntOpenHashMap();
+        pointToColor.put(Point.pack(48, 100), 1767640594);
+        pointToColor.put(Point.pack(48, 101), 1177013896);
+        pointToColor.put(Point.pack(48, 102), 721898013);
+        pointToColor.put(Point.pack(48, 103), 450605672);
+        pointToColor.put(Point.pack(49, 100), -557109892);
+        pointToColor.put(Point.pack(49, 101), -172022466);
+        pointToColor.put(Point.pack(49, 102), -2092001461);
+        pointToColor.put(Point.pack(49, 103), 208915787);
+        pointToColor.put(Point.pack(50, 100), 673006803);
+        pointToColor.put(Point.pack(50, 101), -1839062270);
+        pointToColor.put(Point.pack(50, 102), -997731251);
+        pointToColor.put(Point.pack(50, 103), 796332458);
+        pointToColor.put(Point.pack(51, 100), -1242096477);
+        pointToColor.put(Point.pack(51, 101), -327745376);
+        pointToColor.put(Point.pack(51, 102), -1450384761);
+        pointToColor.put(Point.pack(51, 103), 1864744117);
+
+        frame.applyTransform(
+                (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
+                Area.of(pointToColor.keySet()),
+                0
+        );
+
+        for (long point : pointToColor.keySet()) {
+            assertEquals(pointToColor.get(point), images.get(0).color(Point.x(point), Point.y(point)));
+        }
+    }
+
+    @Test
+    public void applyTransform_LargeApplyArea_MipmapsBlended() {
+        ImmutableList<MockCloseableImage> images = ImmutableList.of(
+                new MockCloseableImage(256, 256),
+                new MockCloseableImage(128, 128),
+                new MockCloseableImage(64, 64)
+        );
+
+        CloseableImageFrame frame = new CloseableImageFrame(
+                new FrameReader.FrameData(256, 256, 0, 0),
+                images,
+                1
+        );
+
+        Long2IntMap pointToColor = new Long2IntOpenHashMap();
+        pointToColor.put(Point.pack(48, 100), 1767640594);
+        pointToColor.put(Point.pack(48, 101), 1177013896);
+        pointToColor.put(Point.pack(48, 102), 721898013);
+        pointToColor.put(Point.pack(48, 103), 450605672);
+        pointToColor.put(Point.pack(49, 100), -557109892);
+        pointToColor.put(Point.pack(49, 101), -172022466);
+        pointToColor.put(Point.pack(49, 102), -2092001461);
+        pointToColor.put(Point.pack(49, 103), 208915787);
+        pointToColor.put(Point.pack(50, 100), 673006803);
+        pointToColor.put(Point.pack(50, 101), -1839062270);
+        pointToColor.put(Point.pack(50, 102), -997731251);
+        pointToColor.put(Point.pack(50, 103), 796332458);
+        pointToColor.put(Point.pack(51, 100), -1242096477);
+        pointToColor.put(Point.pack(51, 101), -327745376);
+        pointToColor.put(Point.pack(51, 102), -1450384761);
+        pointToColor.put(Point.pack(51, 103), 1864744117);
+
+        frame.applyTransform(
+                (x, y, depFunction) -> pointToColor.getOrDefault(Point.pack(x, y), 1013857456),
+                Area.of(pointToColor.keySet()),
+                0
+        );
+
+        int topLeftColorMip1 = ColorBlender.blend(1767640594, 1177013896, -557109892, -172022466);
+        int topRightColorMip1 = ColorBlender.blend(673006803, -1839062270, -1242096477, -327745376);
+        int bottomLeftColorMip1 = ColorBlender.blend(721898013, 450605672, -2092001461, 208915787);
+        int bottomRightColorMip1 = ColorBlender.blend(-997731251, 796332458, -1450384761, 1864744117);
+
+        assertEquals(topLeftColorMip1, images.get(1).color(24, 50));
+        assertEquals(topRightColorMip1, images.get(1).color(25, 50));
+        assertEquals(bottomLeftColorMip1, images.get(1).color(24, 51));
+        assertEquals(bottomRightColorMip1, images.get(1).color(25, 51));
+
+        int colorMip2 = ColorBlender.blend(
+                topLeftColorMip1,
+                topRightColorMip1,
+                bottomLeftColorMip1,
+                bottomRightColorMip1
+        );
+        assertEquals(colorMip2, images.get(2).color(12, 25));
+    }
+
+    @Test
     public void applyTransform_WriteToTopBeforeWritingToBottom_DependencyRetrievedFromCorrectLayer() {
         ImmutableList<MockCloseableImage> images = ImmutableList.of(
                 new MockCloseableImage(100, 200),

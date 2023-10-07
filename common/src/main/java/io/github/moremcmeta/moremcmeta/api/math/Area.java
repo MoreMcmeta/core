@@ -17,17 +17,25 @@
 
 package io.github.moremcmeta.moremcmeta.api.math;
 
+import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongIterable;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongIterators;
+import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * Represents an unordered collection of points.
@@ -66,7 +74,9 @@ public final class Area implements LongIterable {
         return builder.build();
     }
 
-    private final Set<Row> ROWS;
+    // Each long list represents a segment of (leftX, segmentWidth) pairs
+    private final Int2ObjectSortedMap<LongList> ROWS;
+    private final int SIZE;
 
     /**
      * Creates a new area that represents a rectangle.
@@ -90,11 +100,12 @@ public final class Area implements LongIterable {
             throw new RectangleOverflowException(topLeftX, topLeftY, width, height);
         }
 
-        ROWS = new HashSet<>();
+        ROWS = new Int2ObjectRBTreeMap<>();
+        SIZE = width * height;
 
         if (width > 0) {
             for (int y = topLeftY; y < topLeftY + height; y++) {
-                ROWS.add(new Row(topLeftX, y, width));
+                ROWS.put(y, new LongArrayList(ImmutableList.of(Point.pack(topLeftX, width))));
             }
         }
     }
@@ -105,7 +116,58 @@ public final class Area implements LongIterable {
      */
     @Override
     public @NotNull LongIterator iterator() {
-        return new PointIterator(ROWS);
+        return new PointIterator();
+    }
+
+    /**
+     * Gets the number of points in this area.
+     * @return number of points in this area
+     */
+    public int size() {
+        return SIZE;
+    }
+
+    /**
+     * Splits this area into multiple smaller areas that are approximately the size of the provided
+     * <pre>sizeHint</pre>. The returned areas may be larger or smaller than the <pre>sizeHint</pre>.
+     * Does not modify the original area. Intended for splitting operations over a large area into
+     * smaller sections for parallelization.
+     * @param sizeHint      approximate size of each of the smaller areas to return
+     * @return smaller areas that collectively contain all points in the original area
+     */
+    public Collection<Area> split(int sizeHint) {
+        if (sizeHint < 0) {
+            throw new NegativeDimensionException(sizeHint);
+        }
+
+        Deque<Int2ObjectSortedMap<LongList>> buckets = new ArrayDeque<>(SIZE / Math.max(sizeHint, 1) + 1);
+        buckets.add(new Int2ObjectRBTreeMap<>());
+        int currentSize = 0;
+
+        List<Area> resultAreas = new ArrayList<>();
+
+        Iterator<Int2ObjectMap.Entry<LongList>> rowIterator = ROWS.int2ObjectEntrySet().stream().iterator();
+        while (rowIterator.hasNext()) {
+            Int2ObjectMap.Entry<LongList> row = rowIterator.next();
+            LongIterator segmentIterator = row.getValue().iterator();
+
+            while (segmentIterator.hasNext()) {
+                long segment = segmentIterator.nextLong();
+                Int2ObjectSortedMap<LongList> bucket = buckets.peekLast();
+
+                bucket.computeIfAbsent(row.getIntKey(), (key) -> new LongArrayList())
+                        .add(segment);
+                currentSize += Point.y(segment);
+
+                if (currentSize >= sizeHint || (!rowIterator.hasNext()) && !segmentIterator.hasNext()) {
+                    resultAreas.add(new Area(bucket, currentSize));
+                    buckets.add(new Int2ObjectRBTreeMap<>());
+                    currentSize = 0;
+                }
+            }
+        }
+
+        return resultAreas;
     }
 
     /**
@@ -116,13 +178,13 @@ public final class Area implements LongIterable {
     public static final class Builder {
 
         // Keys are y (row) coordinates. Values are x (column) coordinates.
-        private final Map<Integer, Set<Integer>> ROWS;
+        private final Int2ObjectSortedMap<IntList> ROWS;
 
         /**
          * Creates a new builder for an area.
          */
         public Builder() {
-            ROWS = new HashMap<>();
+            ROWS = new Int2ObjectRBTreeMap<>();
         }
 
         /**
@@ -132,7 +194,7 @@ public final class Area implements LongIterable {
          */
         public void addPixel(int x, int y) {
             if (!ROWS.containsKey(y)) {
-                ROWS.put(y, new HashSet<>());
+                ROWS.put(y, new IntArrayList());
             }
 
             ROWS.get(y).add(x);
@@ -151,10 +213,12 @@ public final class Area implements LongIterable {
          * @return  the area
          */
         public Area build() {
-            Set<Row> rows = new HashSet<>();
+            Int2ObjectSortedMap<LongList> rows = new Int2ObjectRBTreeMap<>();
+            int size = 0;
 
-            for (Map.Entry<Integer, Set<Integer>> entry : ROWS.entrySet()) {
-                List<Integer> xPoints = entry.getValue().stream().sorted().toList();
+            for (Int2ObjectMap.Entry<IntList> entry : ROWS.int2ObjectEntrySet()) {
+                IntList xPoints = entry.getValue();
+                xPoints.sort(Integer::compare);
                 int numPoints = xPoints.size();
 
                 int startIndex = 0;
@@ -162,18 +226,22 @@ public final class Area implements LongIterable {
                     int nextIndex = pointIndex + 1;
 
                     boolean isLastPoint = pointIndex == numPoints - 1;
-                    boolean isRowEnd = isLastPoint || xPoints.get(nextIndex) - xPoints.get(pointIndex) > 1;
+                    boolean isRowEnd = isLastPoint || xPoints.getInt(nextIndex) - xPoints.getInt(pointIndex) > 1;
 
                     if (isRowEnd) {
                         int width = pointIndex - startIndex + 1;
-                        rows.add(new Row(xPoints.get(startIndex), entry.getKey(), width));
+                        size += width;
+
+                        int y = entry.getIntKey();
+                        rows.computeIfAbsent(y, (key) -> new LongArrayList())
+                                .add(Point.pack(xPoints.getInt(startIndex), width));
 
                         startIndex = nextIndex;
                     }
                 }
             }
 
-            return new Area(rows);
+            return new Area(rows, size);
         }
 
     }
@@ -181,68 +249,35 @@ public final class Area implements LongIterable {
     /**
      * Creates a new area.
      * @param rows  all the horizontal strips in this image
+     * @param size  number of points in the area
      */
-    private Area(Set<Row> rows) {
+    private Area(Int2ObjectSortedMap<LongList> rows, int size) {
         ROWS = rows;
-    }
-
-    /**
-     * Represents continuous, one-pixel-high horizontal strips in an image.
-     * @author soir20
-     */
-    private static class Row {
-        private final int X;
-        private final int Y;
-        private final int WIDTH;
-
-        /**
-         * Creates a new row in this image.
-         * @param x         left x-coordinate of the row
-         * @param y         left y-coordinate of the row
-         * @param width     width of the row in pixels
-         */
-        public Row(int x, int y, int width) {
-            X = x;
-            Y = y;
-            WIDTH = width;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(X, Y, WIDTH);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (!(other instanceof Row otherRow)) {
-                return false;
-            }
-
-            return X == otherRow.X && Y == otherRow.Y && WIDTH == ((Row) other).WIDTH;
-        }
-
+        SIZE = size;
     }
 
     /**
      * Iterates over all the points in a {@link Area}.
      * @author soir20
      */
-    private static class PointIterator implements LongIterator {
-        private final Iterator<Row> rowIterator;
-        private Row currentRow;
+    private class PointIterator implements LongIterator {
+        private final Iterator<Int2ObjectMap.Entry<LongList>> ROW_ITERATOR = ROWS.int2ObjectEntrySet().iterator();
+        private int currentRowY;
+        private LongIterator segmentIterator;
+        private int currentSegmentX;
+        private int currentSegmentWidth;
         private int pixelCount;
 
         /**
          * Creates a new iterator.
-         * @param rows      all the rows in the area
          */
-        public PointIterator(Set<Row> rows) {
-            rowIterator = rows.iterator();
+        public PointIterator() {
+            segmentIterator = LongIterators.EMPTY_ITERATOR;
         }
 
         @Override
         public boolean hasNext() {
-            return rowIterator.hasNext() || (currentRow != null && pixelCount < currentRow.WIDTH);
+            return ROW_ITERATOR.hasNext() || segmentIterator.hasNext() || pixelCount < currentSegmentWidth;
         }
 
         /**
@@ -251,13 +286,23 @@ public final class Area implements LongIterable {
          */
         @Override
         public long nextLong() {
-            if (currentRow == null || pixelCount == currentRow.WIDTH) {
-                currentRow = rowIterator.next();
+            boolean atSegmentEnd = pixelCount == currentSegmentWidth;
+
+            if (atSegmentEnd && !segmentIterator.hasNext()) {
+                Int2ObjectMap.Entry<LongList> currentRow = ROW_ITERATOR.next();
+                segmentIterator = currentRow.getValue().iterator();
+                currentRowY = currentRow.getIntKey();
+            }
+
+            if (atSegmentEnd) {
+                long currentSegment = segmentIterator.nextLong();
+                currentSegmentX = Point.x(currentSegment);
+                currentSegmentWidth = Point.y(currentSegment);
                 pixelCount = 0;
             }
 
             pixelCount++;
-            return Point.pack(currentRow.X + pixelCount - 1, currentRow.Y);
+            return Point.pack(currentSegmentX + pixelCount - 1, currentRowY);
         }
 
     }
