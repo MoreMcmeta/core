@@ -36,6 +36,18 @@ public interface TextureComponent<V> {
     default void onTick(V currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {}
 
     /**
+     * Responds to the tick event of the associated texture after several ticks have passed. This method will be
+     * called at least as often as the texture is used. Note that the lifetime of the {@link CurrentFrameView}
+     * provided to this method is limited to the call of this method. Attempting to retain and use a
+     * {@link CurrentFrameView} at a later point will cause a {@link IllegalFrameReferenceException} exception
+     * to be thrown.
+     * @param currentFrame      view of the texture's current frame
+     * @param predefinedFrames  persistent views of all predefined frames
+     * @param ticks             number of ticks that have passed since the last time this method was called
+     */
+    default void onTick(V currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames, int ticks) {}
+
+    /**
      * Responds to the close event of the associated texture. Note that the lifetime of the {@link CurrentFrameView}
      * provided to this method is limited to the call of this method. Attempting to retain and use a
      * {@link CurrentFrameView} at a later point will cause a {@link IllegalFrameReferenceException} exception
