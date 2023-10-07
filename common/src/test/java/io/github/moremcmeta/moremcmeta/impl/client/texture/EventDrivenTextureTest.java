@@ -428,7 +428,7 @@ public final class EventDrivenTextureTest {
 
     @Test
     public void bind_SecondUploadNeeded_UploadFiredInOrder() {
-        Integer[] expected = {4, 5, 6, 7, 8, 9, 4, 5, 6};
+        Integer[] expected = {4, 5, 6, 7, 8, 9, 13, 14, 15, 4, 5, 6};
         testExpectedOrder((texture) -> {texture.upload(DUMMY_BASE_LOCATION); texture.tick(); texture.upload(DUMMY_BASE_LOCATION);}, true, expected);
     }
 
@@ -1183,6 +1183,7 @@ public final class EventDrivenTextureTest {
         final int UPLOAD_ID_BASE = 4;
         final int TICK_ID_BASE = 7;
         final int CLOSE_ID_BASE = 10;
+        final int TICK_2_ID_BASE = 13;
 
         List<Integer> execOrder = new ArrayList<>();
 
@@ -1193,6 +1194,12 @@ public final class EventDrivenTextureTest {
                 public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
                     if (flagForUpload) currentFrame.markNeedsUpload();
                     execOrder.add(TICK_ID_BASE + finalIndex);
+                }
+
+                @Override
+                public void onTick(EventDrivenTexture.TextureAndFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames, int ticks) {
+                    if (flagForUpload) currentFrame.markNeedsUpload();
+                    execOrder.add(TICK_2_ID_BASE + finalIndex);
                 }
 
                 @Override

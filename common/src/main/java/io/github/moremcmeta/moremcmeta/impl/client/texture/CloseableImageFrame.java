@@ -24,10 +24,19 @@ import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.adt.SparseIntMatrix;
 import io.github.moremcmeta.moremcmeta.impl.client.io.FrameReader;
-import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
-import it.unimi.dsi.fastutil.longs.LongPriorityQueue;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import java.util.function.LongConsumer;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -36,6 +45,8 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class CloseableImageFrame {
+    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
+    private static final int SUB_AREA_SIZE_HINT = 128 * 128;
     private final int WIDTH;
     private final int HEIGHT;
     private final ImmutableList<Layer> LOWER_LAYERS;
@@ -247,52 +258,60 @@ public class CloseableImageFrame {
 
         // Apply transformation to the original image
         Layer thisLayer = layer == TOP_LAYER_INDEX ? TOP_LAYER : LOWER_LAYERS.get(layer);
-        applyArea.forEach((LongConsumer) (point) -> {
-            int x = Point.x(point);
-            int y = Point.y(point);
-            checkPointInBounds(x, y);
+        List<LongList> results = new ArrayList<>();
 
-            int newColor = transform.transform(x, y, (depX, depY) -> {
-                checkPointInBounds(depX, depY);
-                return layerBelow.read(depX, depY);
-            });
-            thisLayer.write(x, y, newColor);
-        });
+        if (applyArea.size() > SUB_AREA_SIZE_HINT) {
+            List<Callable<LongList>> tasks = applyArea.split(SUB_AREA_SIZE_HINT).stream()
+                    .<Callable<LongList>>map((subArea) -> () -> applyTransform(transform, layerBelow, thisLayer, subArea))
+                    .collect(Collectors.toList());
+
+            try {
+                for (Future<LongList> future : THREAD_POOL.invokeAll(tasks)) {
+                    results.add(future.get());
+                }
+            } catch (InterruptedException err) {
+                throw new RuntimeException("Parallel frame generation was interrupted", err);
+            } catch (ExecutionException err) {
+                throw new RuntimeException("Exception during frame generation", err);
+            }
+        } else {
+            results.add(applyTransform(transform, layerBelow, thisLayer, applyArea));
+        }
 
         /* Update corresponding mipmap pixels.
            Plugins have no knowledge of mipmaps, and giving them that
            knowledge would require all of them to handle additional
            complexity. Instead, we can efficiently calculate the mipmaps
            ourselves. */
-        while (!TOP_LAYER.lastModified().isEmpty()) {
-            long point = TOP_LAYER.lastModified().dequeueLong();
+        for (int level = 1; level <= mipmapLevel(); level++) {
+            for (LongList lastModified : results) {
+                for (long point : lastModified) {
+                    int x = Point.x(point);
+                    int y = Point.y(point);
 
-            int x = Point.x(point);
-            int y = Point.y(point);
-            for (int level = 1; level <= mipmapLevel(); level++) {
+                    // Don't try to set a color when the mipmap is empty
+                    if (mipmaps.get(level).width() == 0 && mipmaps.get(level).height() == 0) {
+                        break;
+                    }
 
-                // Don't try to set a color when the mipmap is empty
-                if (mipmaps.get(level).width() == 0 && mipmaps.get(level).height() == 0) {
-                    break;
+                    int cornerX = makeEven(x >> (level - 1));
+                    int cornerY = makeEven(y >> (level - 1));
+
+                    CloseableImage prevImage = mipmaps.get(level - 1);
+                    int topLeft = prevImage.color(cornerX, cornerY);
+                    int topRight = prevImage.color(cornerX + 1, cornerY);
+                    int bottomLeft = prevImage.color(cornerX, cornerY + 1);
+                    int bottomRight = prevImage.color(cornerX + 1, cornerY + 1);
+
+                    int blended = ColorBlender.blend(
+                            topLeft,
+                            topRight,
+                            bottomLeft,
+                            bottomRight
+                    );
+
+                    mipmaps.get(level).setColor(x >> level, y >> level, blended);
                 }
-
-                int cornerX = makeEven(x >> (level - 1));
-                int cornerY = makeEven(y >> (level - 1));
-
-                CloseableImage prevImage = mipmaps.get(level - 1);
-                int topLeft = prevImage.color(cornerX, cornerY);
-                int topRight = prevImage.color(cornerX + 1, cornerY);
-                int bottomLeft = prevImage.color(cornerX, cornerY + 1);
-                int bottomRight = prevImage.color(cornerX + 1, cornerY + 1);
-
-                int blended = ColorBlender.blend(
-                        topLeft,
-                        topRight,
-                        bottomLeft,
-                        bottomRight
-                );
-
-                mipmaps.get(level).setColor(x >> level, y >> level, blended);
             }
         }
 
@@ -355,6 +374,35 @@ public class CloseableImageFrame {
     }
 
     /**
+     * Applies a transform to a sub area.
+     * @param transform     transform to apply
+     * @param layerBelow    layer below the layer being modified
+     * @param thisLayer     layer being modified
+     * @param subArea       sub area to apply the transform to
+     * @return all points where the underlying image was modified
+     */
+    private LongList applyTransform(ColorTransform transform, Layer layerBelow, Layer thisLayer, Area subArea) {
+        LongList modifiedPoints = new LongArrayList();
+
+        subArea.forEach((LongConsumer) (point) -> {
+            int x = Point.x(point);
+            int y = Point.y(point);
+            checkPointInBounds(x, y);
+
+            int newColor = transform.transform(x, y, (depX, depY) -> {
+                checkPointInBounds(depX, depY);
+                return layerBelow.read(depX, depY);
+            });
+
+            if (thisLayer.write(x, y, newColor)) {
+                modifiedPoints.add(point);
+            }
+        });
+
+        return modifiedPoints;
+    }
+
+    /**
      * Convert a number to the closest even integer that is smaller than
      * the given integer.
      * @param num           number to make even
@@ -379,8 +427,9 @@ public class CloseableImageFrame {
          * @param x         the x-coordinate to write the color at
          * @param y         the y-coordinate to write the color at
          * @param color     the color to write
+         * @return whether the underlying image was modified
          */
-        void write(int x, int y, int color);
+        boolean write(int x, int y, int color);
 
         /**
          * Reads a color from the specified point in this layer.
@@ -428,9 +477,9 @@ public class CloseableImageFrame {
         }
 
         @Override
-        public void write(int x, int y, int color) {
+        public boolean write(int x, int y, int color) {
             POINTS.set(x, y, color);
-            TOP_LAYER.tryWrite(x, y, color, INDEX);
+            return TOP_LAYER.tryWrite(x, y, color, INDEX);
         }
 
         @Override
@@ -469,9 +518,9 @@ public class CloseableImageFrame {
         }
 
         @Override
-        public void write(int x, int y, int color) {
+        public boolean write(int x, int y, int color) {
             POINTS.set(x, y, color);
-            TOP_LAYER.tryWrite(x, y, color, INDEX);
+            return TOP_LAYER.tryWrite(x, y, color, INDEX);
         }
 
         @Override
@@ -492,7 +541,6 @@ public class CloseableImageFrame {
         private final int WIDTH;
         private final byte INDEX;
         private final byte[] MODIFIED_BY;
-        private final LongPriorityQueue LAST_MODIFIED;
         private BottomLayer bottomLayer;
 
         /**
@@ -507,7 +555,6 @@ public class CloseableImageFrame {
             WIDTH = width;
             INDEX = index;
             MODIFIED_BY = new byte[width * height];
-            LAST_MODIFIED = new LongArrayFIFOQueue();
         }
 
         /**
@@ -519,26 +566,18 @@ public class CloseableImageFrame {
         }
 
         /**
-         * Retrieves the queue of points that have been modified in this layer. The returned
-         * queue is mutable. Note that it is possible for the queue to contain duplicates.
-         * @return the modified points in the topmost layer
-         */
-        public LongPriorityQueue lastModified() {
-            return LAST_MODIFIED;
-        }
-
-        /**
          * Writes to this layer from a lower layer. If the top layer has already
          * written to itself at the given point, then this method does nothing.
          * @param x         the x-coordinate to try to write to
          * @param y         the y-coordinate to try to write to
          * @param color     the color to write at the given point
          * @param layer     the layer that is writing to this layer
+         * @return whether the color was written to this layer
          */
-        public void tryWrite(int x, int y, int color, byte layer) {
+        public boolean tryWrite(int x, int y, int color, byte layer) {
             int pointIndex = pointIndex(x, y);
             if (layer < MODIFIED_BY[pointIndex]) {
-                return;
+                return false;
             }
 
             /* Attempting to write to the bottom layer handles three different cases:
@@ -563,12 +602,12 @@ public class CloseableImageFrame {
 
             IMAGE.setColor(x, y, color);
             MODIFIED_BY[pointIndex] = layer;
-            LAST_MODIFIED.enqueue(Point.pack(x, y));
+            return true;
         }
 
         @Override
-        public void write(int x, int y, int color) {
-            tryWrite(x, y, color, INDEX);
+        public boolean write(int x, int y, int color) {
+            return tryWrite(x, y, color, INDEX);
         }
 
         @Override
