@@ -86,36 +86,42 @@ public final class AreaTest {
     public void construct_EmptyArea_ConstructedCorrectly() {
         Area rect = new Area(0, 0, 0, 0);
         assertFalse(rect.iterator().hasNext());
+        assertEquals(0, rect.size());
     }
 
     @Test
     public void construct_EmptyWidthArea_ConstructedCorrectly() {
         Area rect = new Area(0, 0, 0, 10);
         assertFalse(rect.iterator().hasNext());
+        assertEquals(0, rect.size());
     }
 
     @Test
     public void construct_EmptyHeightArea_ConstructedCorrectly() {
         Area rect = new Area(0, 0, 10, 0);
         assertFalse(rect.iterator().hasNext());
+        assertEquals(0, rect.size());
     }
 
     @Test
     public void iterator_PositiveAreaAtCorner_AllPointsIterated() {
         Area rect = new Area(Integer.MAX_VALUE - 10, Integer.MAX_VALUE - 20, 10, 20);
         testIteratedRectangle(rect, Integer.MAX_VALUE - 10, Integer.MAX_VALUE - 20, 10, 20);
+        assertEquals(10 * 20, rect.size());
     }
 
     @Test
     public void iterator_NegativeAreaAtCorner_AllPointsIterated() {
         Area rect = new Area(Integer.MIN_VALUE, Integer.MIN_VALUE, 10, 20);
         testIteratedRectangle(rect, Integer.MIN_VALUE, Integer.MIN_VALUE, 10, 20);
+        assertEquals(10 * 20, rect.size());
     }
 
     @Test
     public void iterator_PositiveAndNegativeArea_AllPointsIterated() {
         Area rect = new Area(-5, -15, 11, 19);
         testIteratedRectangle(rect, -5, -15, 11, 19);
+        assertEquals(11 * 19, rect.size());
     }
 
     @Test
@@ -135,6 +141,7 @@ public final class AreaTest {
         Area.Builder builder = new Area.Builder();
         Area area = builder.build();
         assertFalse(area.iterator().hasNext());
+        assertEquals(0, area.size());
     }
 
     @Test
@@ -166,6 +173,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -197,6 +205,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -227,6 +236,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -264,6 +274,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertTrue(areaPoints.stream().allMatch(new HashSet<>()::add));
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -294,6 +305,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -326,6 +338,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -358,6 +371,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -389,6 +403,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -420,6 +435,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -450,6 +466,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -487,6 +504,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertTrue(areaPoints.stream().allMatch(new HashSet<>()::add));
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -517,6 +535,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -549,6 +568,7 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
     }
 
     @Test
@@ -581,6 +601,202 @@ public final class AreaTest {
 
         assertTrue(areaPoints.containsAll(points));
         assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
+    }
+
+    @Test
+    public void split_NegativeSizeHint_NegativeDimensionException() {
+        Area.Builder builder = new Area.Builder();
+        List<Long> points = new ArrayList<>();
+        points.add(Point.pack(0, 0));
+        points.add(Point.pack(0, 1));
+        points.add(Point.pack(0, 2));
+        points.add(Point.pack(1, 3));
+        points.add(Point.pack(1, 4));
+        points.add(Point.pack(1, 8));
+        points.add(Point.pack(1, 12));
+        points.add(Point.pack(1, 13));
+        points.add(Point.pack(2, 0));
+        points.add(Point.pack(2, 1));
+        points.add(Point.pack(2, 2));
+        points.add(Point.pack(2, 3));
+
+        for (long point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        expectedException.expect(NegativeDimensionException.class);
+        area.split(-1);
+    }
+
+    @Test
+    public void split_ZeroSizeHint_AllPointsIncluded() {
+        Area.Builder builder = new Area.Builder();
+        List<Long> points = new ArrayList<>();
+        points.add(Point.pack(0, 0));
+        points.add(Point.pack(0, 1));
+        points.add(Point.pack(0, 2));
+        points.add(Point.pack(1, 3));
+        points.add(Point.pack(1, 4));
+        points.add(Point.pack(1, 8));
+        points.add(Point.pack(1, 12));
+        points.add(Point.pack(1, 13));
+        points.add(Point.pack(2, 0));
+        points.add(Point.pack(2, 1));
+        points.add(Point.pack(2, 2));
+        points.add(Point.pack(2, 3));
+
+        for (long point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Long> areaPoints = new ArrayList<>();
+        int totalArea = 0;
+        for (Area subArea : area.split(0)) {
+            totalArea += subArea.size();
+            for (long point : subArea) {
+                areaPoints.add(point);
+            }
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
+        assertEquals(totalArea, area.size());
+    }
+
+    @Test
+    public void split_SizeHintSmallerThanAreaSize_AllPointsIncluded() {
+        Area.Builder builder = new Area.Builder();
+        List<Long> points = new ArrayList<>();
+        points.add(Point.pack(0, 0));
+        points.add(Point.pack(0, 1));
+        points.add(Point.pack(0, 2));
+        points.add(Point.pack(1, 3));
+        points.add(Point.pack(1, 4));
+        points.add(Point.pack(1, 8));
+        points.add(Point.pack(1, 12));
+        points.add(Point.pack(1, 13));
+        points.add(Point.pack(2, 0));
+        points.add(Point.pack(2, 1));
+        points.add(Point.pack(2, 2));
+        points.add(Point.pack(2, 3));
+
+        for (long point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Long> areaPoints = new ArrayList<>();
+        int totalArea = 0;
+        for (Area subArea : area.split(5)) {
+            totalArea += subArea.size();
+            for (long point : subArea) {
+                areaPoints.add(point);
+            }
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
+        assertEquals(totalArea, area.size());
+    }
+
+    @Test
+    public void split_SizeHintEqualToAreaSize_AllPointsIncluded() {
+        Area.Builder builder = new Area.Builder();
+        List<Long> points = new ArrayList<>();
+        points.add(Point.pack(0, 0));
+        points.add(Point.pack(0, 1));
+        points.add(Point.pack(0, 2));
+        points.add(Point.pack(1, 3));
+        points.add(Point.pack(1, 4));
+        points.add(Point.pack(1, 8));
+        points.add(Point.pack(1, 12));
+        points.add(Point.pack(1, 13));
+        points.add(Point.pack(2, 0));
+        points.add(Point.pack(2, 1));
+        points.add(Point.pack(2, 2));
+        points.add(Point.pack(2, 3));
+
+        for (long point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Long> areaPoints = new ArrayList<>();
+        int totalArea = 0;
+        for (Area subArea : area.split(points.size())) {
+            totalArea += subArea.size();
+            for (long point : subArea) {
+                areaPoints.add(point);
+            }
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
+        assertEquals(totalArea, area.size());
+    }
+
+    @Test
+    public void split_SizeHintLargerThanAreaSize_AllPointsIncluded() {
+        Area.Builder builder = new Area.Builder();
+        List<Long> points = new ArrayList<>();
+        points.add(Point.pack(0, 0));
+        points.add(Point.pack(0, 1));
+        points.add(Point.pack(0, 2));
+        points.add(Point.pack(1, 3));
+        points.add(Point.pack(1, 4));
+        points.add(Point.pack(1, 8));
+        points.add(Point.pack(1, 12));
+        points.add(Point.pack(1, 13));
+        points.add(Point.pack(2, 0));
+        points.add(Point.pack(2, 1));
+        points.add(Point.pack(2, 2));
+        points.add(Point.pack(2, 3));
+
+        for (long point : points) {
+            builder.addPixel(point);
+        }
+
+        Area area = builder.build();
+
+        List<Long> areaPoints = new ArrayList<>();
+        int totalArea = 0;
+        for (Area subArea : area.split(20)) {
+            totalArea += subArea.size();
+            for (long point : subArea) {
+                areaPoints.add(point);
+            }
+        }
+
+        assertTrue(areaPoints.containsAll(points));
+        assertEquals(points.size(), areaPoints.size());
+        assertEquals(points.size(), area.size());
+        assertEquals(totalArea, area.size());
+    }
+
+    @Test
+    public void split_EmptyArea_AllPointsIncluded() {
+        Area area = Area.of();
+
+        List<Long> areaPoints = new ArrayList<>();
+        for (Area subArea : area.split(0)) {
+            assertEquals(0, subArea.size());
+
+            for (long point : subArea) {
+                areaPoints.add(point);
+            }
+        }
+
+        assertTrue(areaPoints.isEmpty());
     }
 
     private static void testIteratedRectangle(Area rect, int topLeftX, int topLeftY, int width, int height) {
