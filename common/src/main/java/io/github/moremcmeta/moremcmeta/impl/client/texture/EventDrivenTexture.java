@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,6 +63,7 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
 
     private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
+    private int ticks;
 
     @Override
     public void setFilter(boolean blur, boolean clamp) {
@@ -79,6 +81,7 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
     @Override
     public void tick() {
         runListeners((component, view) -> component.onTick(view, CURRENT_STATE.predefinedFrames()));
+        ticks = Math.max(0, ticks + 1);
     }
 
     @Override
@@ -92,6 +95,11 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
      */
     public void upload(ResourceLocation base) {
         requireNonNull(base, "Base cannot be null");
+
+        if (ticks > 0) {
+            runListeners((component, view) -> component.onTick(view, CURRENT_STATE.predefinedFrames(), ticks));
+            ticks = 0;
+        }
 
         if (!CURRENT_STATE.BASES_UPLOADED_SINCE_UPDATE.contains(base)) {
             CURRENT_STATE.BASES_UPLOADED_SINCE_UPDATE.add(base);
@@ -201,6 +209,12 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
                 public void onTick(TextureAndFrameView currentFrame,
                                    FrameGroup<? extends PersistentFrameView> predefinedFrames) {
                     component.onTick(currentFrame, predefinedFrames);
+                }
+
+                @Override
+                public void onTick(TextureAndFrameView currentFrame,
+                                   FrameGroup<? extends PersistentFrameView> predefinedFrames, int ticks) {
+                    component.onTick(currentFrame, predefinedFrames, ticks);
                 }
 
                 @Override
@@ -344,6 +358,7 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
         /**
          * Flags the texture as needing an upload.
          */
+        @VisibleForTesting
         public void markNeedsUpload() {
             checkValid();
             STATE.markNeedsUpload();

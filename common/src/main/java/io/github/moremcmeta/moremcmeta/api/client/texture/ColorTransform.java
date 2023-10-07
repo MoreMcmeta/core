@@ -29,7 +29,8 @@ public interface ColorTransform {
      * Calculates the new color of the pixel at the given coordinate in the frame being modified.
      * While this method only takes the x and y-coordinates of the pixel, a {@link FrameView} for
      * the frame being modified is available in contexts where a {@link ColorTransform} would be
-     * provided.
+     * provided.<b>This method may be called from multiple threads concurrently. If there is any
+     * state shared between calls, it must be synchronized properly for concurrent usage.</b>
      * @param overwriteX            x-coordinate of the location of the pixel whose color will be replaced
      * @param overwriteY            y-coordinate of the location of the pixel whose color will be replaced
      * @param layerBelow            retrieves the color of pixels in the layer below this plugin's layer.
