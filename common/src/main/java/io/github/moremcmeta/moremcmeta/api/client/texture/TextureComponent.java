@@ -44,6 +44,7 @@ public interface TextureComponent<V> {
      * @param currentFrame      view of the texture's current frame
      * @param predefinedFrames  persistent views of all predefined frames
      * @param ticks             number of ticks that have passed since the last time this method was called
+     * @since 4.3.0
      */
     default void onTick(V currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames, int ticks) {}
 
