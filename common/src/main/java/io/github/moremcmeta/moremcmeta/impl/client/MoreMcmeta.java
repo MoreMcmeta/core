@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -746,6 +747,14 @@ public abstract class MoreMcmeta {
             addCompletedReloadCallback(TEX_MANAGER, PREPARER, SPRITE_FINDER, LAST_TEXTURES_ADDED, LOGGER);
 
             return CompletableFuture.runAsync(() -> {
+                OrderedResourceRepository repository = makeResourceRepository(
+                        Minecraft.getInstance().getResourcePackRepository(),
+                        LOGGER
+                );
+
+                // Clear the cache to avoid using closed resources if there is a reload with the same packs
+                CACHE.load(repository, ImmutableList.of());
+
                 LAST_TEXTURES_ADDED.keySet().forEach(TEX_MANAGER::unregister);
                 LAST_TEXTURES_ADDED.clear();
                 LAST_TEXTURES_ADDED.putAll(data.entrySet().stream().collect(Collectors.toMap(
