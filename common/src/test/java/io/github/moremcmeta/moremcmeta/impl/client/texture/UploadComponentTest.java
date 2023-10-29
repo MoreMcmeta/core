@@ -42,9 +42,12 @@ public final class UploadComponentTest {
     private static final ResourceLocation DUMMY_LOCATION = new ResourceLocation("dummy.png");
     private static final TexturePreparer DUMMY_PREPARER =  (id, mipmap, width, height) -> {};
     private static final BaseCollection DUMMY_BASE_COLLECTION = BaseCollection.find(
-            new SpriteFinder((atlasLocation) -> (spriteLocation) -> Optional.of(
-                    new MockSprite(new ResourceLocation("dummy"), Point.pack(0, 0), 1)
-            )),
+            new SpriteFinder(
+                    (atlasLocation) -> (spriteLocation) -> Optional.of(
+                            new MockSprite(new ResourceLocation("dummy"), Point.pack(0, 0), 1)
+                    ),
+                    SpriteFinderTest.ATLAS_LOCATIONS
+            ),
             DUMMY_LOCATION
     );
 

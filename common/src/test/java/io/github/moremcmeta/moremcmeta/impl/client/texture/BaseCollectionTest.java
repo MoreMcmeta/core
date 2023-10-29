@@ -44,18 +44,21 @@ public final class BaseCollectionTest {
     private static final ResourceLocation SPRITE_ATLAS_1 = new ResourceLocation("textures/atlas/blocks.png");
     private static final long SPRITE_UPLOAD_POINT_1 = Point.pack(20, 10);
     private static final int SPRITE_MIPMAP_1 = 3;
-    private static final SpriteFinder SPRITE_FINDER = new SpriteFinder((atlasLocation) -> (spriteLocation) -> {
-        if (atlasLocation.equals(SPRITE_ATLAS_1) && spriteLocation.equals(SPRITE_LOCATION_1)) {
-            return Optional.of(new MockSprite(
-                    SPRITE_LOCATION_1,
-                    SPRITE_UPLOAD_POINT_1,
-                    SPRITE_MIPMAP_1,
-                    SPRITE_ATLAS_1
-            ));
-        }
+    private static final SpriteFinder SPRITE_FINDER = new SpriteFinder(
+            (atlasLocation) -> (spriteLocation) -> {
+                if (atlasLocation.equals(SPRITE_ATLAS_1) && spriteLocation.equals(SPRITE_LOCATION_1)) {
+                    return Optional.of(new MockSprite(
+                            SPRITE_LOCATION_1,
+                            SPRITE_UPLOAD_POINT_1,
+                            SPRITE_MIPMAP_1,
+                            SPRITE_ATLAS_1
+                    ));
+                }
 
-        return Optional.empty();
-    });
+                return Optional.empty();
+            },
+            SpriteFinderTest.ATLAS_LOCATIONS
+    );
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
