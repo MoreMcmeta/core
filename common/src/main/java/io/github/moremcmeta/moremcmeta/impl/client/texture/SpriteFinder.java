@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -30,26 +31,17 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public final class SpriteFinder {
-    private static final ImmutableSet<ResourceLocation> ATLAS_LOCATIONS = ImmutableSet.of(
-            new ResourceLocation("textures/atlas/blocks.png"),
-            new ResourceLocation("textures/atlas/signs.png"),
-            new ResourceLocation("textures/atlas/banner_patterns.png"),
-            new ResourceLocation("textures/atlas/shield_patterns.png"),
-            new ResourceLocation("textures/atlas/chest.png"),
-            new ResourceLocation("textures/atlas/beds.png"),
-            new ResourceLocation("textures/atlas/particles.png"),
-            new ResourceLocation("textures/atlas/paintings.png"),
-            new ResourceLocation("textures/atlas/mob_effects.png")
-    );
-
     private final Function<ResourceLocation, ? extends Atlas> ATLAS_GETTER;
+    private final Set<ResourceLocation> ATLAS_LOCATIONS;
 
     /**
      * Creates a new sprite finder.
-     * @param atlasGetter  provides an atlas from a location
+     * @param atlasGetter       provides an atlas from a location
+     * @param atlasLocations    locations of all texture atlases
      */
-    public SpriteFinder(Function<ResourceLocation, ? extends Atlas> atlasGetter) {
+    public SpriteFinder(Function<ResourceLocation, ? extends Atlas> atlasGetter, Set<ResourceLocation> atlasLocations) {
         ATLAS_GETTER = requireNonNull(atlasGetter, "Atlas getter cannot be null");
+        ATLAS_LOCATIONS = ImmutableSet.copyOf(requireNonNull(atlasLocations, "Atlas locations cannot be null"));
     }
 
     /**
