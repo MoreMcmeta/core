@@ -25,8 +25,8 @@ import io.github.moremcmeta.moremcmeta.fabric.impl.client.event.ResourceManagerI
 import io.github.moremcmeta.moremcmeta.fabric.impl.client.mixin.LoadingOverlayAccessor;
 import io.github.moremcmeta.moremcmeta.fabric.impl.client.mixin.PackRepositoryAccessor;
 import io.github.moremcmeta.moremcmeta.fabric.impl.client.mixin.SpriteAccessor;
-import io.github.moremcmeta.moremcmeta.fabric.impl.client.mixin.TextureManagerAccessor;
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
+import io.github.moremcmeta.moremcmeta.impl.client.mixin.TextureManagerAccessor;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.StagedResourceReloadListener;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper;
