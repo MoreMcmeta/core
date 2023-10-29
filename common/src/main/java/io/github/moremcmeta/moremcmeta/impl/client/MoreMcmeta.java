@@ -38,6 +38,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.adapter.TextureManagerAdapter
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataAssembler;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataReader;
+import io.github.moremcmeta.moremcmeta.impl.client.mixin.TextureManagerAccessor;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MetadataRegistryImpl;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ModRepositorySource;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.OrderedResourceRepository;
@@ -58,6 +59,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
@@ -179,7 +181,6 @@ public abstract class MoreMcmeta {
         logPluginList(allPlugins, logger);
 
         // Texture manager
-        SpriteFinder spriteFinder = new SpriteFinder((loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)));
         TextureManagerWrapper<EventDrivenTexture> manager =
                 new TextureManagerWrapper<>(
                         new TextureManagerAdapter(minecraft::getTextureManager, unregisterAction())
@@ -248,7 +249,6 @@ public abstract class MoreMcmeta {
             rscManager.registerReloadListener(wrapListener(new TextureResourceReloadListener(
                     manager,
                     preparer(),
-                    spriteFinder,
                     cache,
                     packIdGetter,
                     logger
@@ -600,13 +600,11 @@ public abstract class MoreMcmeta {
      * Adds a callback for any necessary post-reload work.
      * @param manager           texture manager with unfinished work
      * @param preparer          prepares textures for OpenGL
-     * @param spriteFinder      finds sprites stitched to atlases
      * @param textures          most recent textures that have been loaded
      * @param logger            logger to report warnings or errors
      */
     private void addCompletedReloadCallback(TextureManagerWrapper<EventDrivenTexture> manager,
                                             TexturePreparer preparer,
-                                            SpriteFinder spriteFinder,
                                             Map<ResourceLocation, EventDrivenTexture.Builder> textures,
                                             Logger logger) {
         Optional<LoadingOverlay> overlay = loadingOverlay(logger);
@@ -618,6 +616,15 @@ public abstract class MoreMcmeta {
 
         Optional<ReloadInstance> reloadInstance = reloadInstance(overlay.get(), logger);
         reloadInstance.ifPresent((instance) -> instance.done().thenRun(() -> {
+            TextureManagerAccessor textureManager = (TextureManagerAccessor) Minecraft.getInstance().getTextureManager();
+            SpriteFinder spriteFinder = new SpriteFinder(
+                    (loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)),
+                    textureManager.moremcmeta_byPath().entrySet().stream()
+                            .filter((entry) -> entry.getValue() instanceof TextureAtlas)
+                            .map(Map.Entry::getKey)
+                            .collect(Collectors.toSet())
+            );
+
             textures.forEach((location, builder) -> {
                 BaseCollection allBases = BaseCollection.find(spriteFinder, location);
 
@@ -650,7 +657,6 @@ public abstract class MoreMcmeta {
         private final Map<ResourceLocation, EventDrivenTexture.Builder> LAST_TEXTURES_ADDED;
         private final TextureManagerWrapper<EventDrivenTexture> TEX_MANAGER;
         private final TexturePreparer PREPARER;
-        private final SpriteFinder SPRITE_FINDER;
         private final TextureCache<TextureData<NativeImageAdapter>, List<String>> CACHE;
         private final Supplier<List<String>> PACK_ID_GETTER;
         private final Logger LOGGER;
@@ -659,7 +665,6 @@ public abstract class MoreMcmeta {
          * Creates a new resource reload listener.
          * @param texManager            texture manager that accepts queued textures
          * @param preparer              prepares textures for OpenGL
-         * @param spriteFinder          finds sprites stitched to atlases
          * @param cache                 cache for texture data that should be loaded
          * @param packIdGetter          gets the IDs of the currently-selected packs
          * @param logger                a logger to write output
@@ -667,7 +672,6 @@ public abstract class MoreMcmeta {
         public TextureResourceReloadListener(
                 TextureManagerWrapper<EventDrivenTexture> texManager,
                 TexturePreparer preparer,
-                SpriteFinder spriteFinder,
                 TextureCache<TextureData<NativeImageAdapter>, List<String>> cache,
                 Supplier<List<String>> packIdGetter,
                 Logger logger
@@ -675,7 +679,6 @@ public abstract class MoreMcmeta {
             LAST_TEXTURES_ADDED = new HashMap<>();
             TEX_MANAGER = requireNonNull(texManager, "Texture manager cannot be null");
             PREPARER = requireNonNull(preparer, "Preparer cannot be null");
-            SPRITE_FINDER = requireNonNull(spriteFinder, "Sprite finder cannot be null");
             CACHE = requireNonNull(cache, "Cache cannot be null");
             PACK_ID_GETTER = requireNonNull(packIdGetter, "Pack ID getter cannot be null");
             LOGGER = requireNonNull(logger, "Logger cannot be null");
@@ -743,7 +746,7 @@ public abstract class MoreMcmeta {
             requireNonNull(applyProfiler, "Profiler cannot be null");
             requireNonNull(applyExecutor, "Executor cannot be null");
 
-            addCompletedReloadCallback(TEX_MANAGER, PREPARER, SPRITE_FINDER, LAST_TEXTURES_ADDED, LOGGER);
+            addCompletedReloadCallback(TEX_MANAGER, PREPARER, LAST_TEXTURES_ADDED, LOGGER);
 
             return CompletableFuture.runAsync(() -> {
                 OrderedResourceRepository repository = makeResourceRepository(
