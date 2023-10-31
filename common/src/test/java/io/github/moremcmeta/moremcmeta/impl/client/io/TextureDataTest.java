@@ -19,6 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.GuiScaling;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
@@ -30,6 +31,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -50,6 +52,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(100, 10),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -62,6 +65,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(101, 10),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -74,6 +78,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(Integer.MAX_VALUE, 10),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -85,6 +90,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 0),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -96,6 +102,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 7),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -107,6 +114,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 100),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100), ImmutableList.of()
         );
     }
@@ -118,6 +126,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 101),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -130,6 +139,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, Integer.MAX_VALUE),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -143,6 +153,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 10),
                 false,
                 false,
+                Optional.empty(),
                 null,
                 ImmutableList.of()
         );
@@ -154,6 +165,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -167,6 +179,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 true,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -180,6 +193,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -193,6 +207,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 false,
                 true,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -201,11 +216,40 @@ public final class TextureDataTest {
     }
 
     @Test
+    public void guiScaling_Empty_RetrievesEmpty() {
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new TextureData.FrameSize(10, 20),
+                false,
+                false,
+                Optional.empty(),
+                new MockCloseableImage(100, 100),
+                ImmutableList.of()
+        );
+
+        assertFalse(data.guiScaling().isPresent());
+    }
+
+    @Test
+    public void guiScaling_Present_RetrievesGiven() {
+        TextureData<MockCloseableImage> data = new TextureData<>(
+                new TextureData.FrameSize(10, 20),
+                false,
+                false,
+                Optional.of(new GuiScaling.Stretch()),
+                new MockCloseableImage(100, 100),
+                ImmutableList.of()
+        );
+
+        assertEquals(new GuiScaling.Stretch(), data.guiScaling().orElseThrow());
+    }
+
+    @Test
     public void frameSize_WidthProvided_RetrievesWidth() {
         TextureData<MockCloseableImage> data = new TextureData<>(
                 new TextureData.FrameSize(10, 20),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -218,6 +262,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 false,
                 false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of()
         );
@@ -231,6 +276,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 false,
                 false,
+                Optional.empty(),
                 image,
                 ImmutableList.of()
         );
@@ -246,6 +292,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 false,
                 false,
+                Optional.empty(),
                 image,
                 expectedMetadata
         );
@@ -267,6 +314,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 false,
                 false,
+                Optional.empty(),
                 image,
                 expectedMetadata
         );
@@ -309,6 +357,7 @@ public final class TextureDataTest {
                 new TextureData.FrameSize(10, 20),
                 false,
                 false,
+                Optional.empty(),
                 image,
                 expectedMetadata
         );
