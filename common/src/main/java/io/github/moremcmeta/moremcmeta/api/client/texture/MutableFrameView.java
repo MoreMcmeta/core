@@ -18,12 +18,14 @@
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.math.Area;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A {@link FrameView} that represents a predefined frame whose pixels can be modified.
  * @author soir20
  * @since 4.0.0
  */
+@ApiStatus.NonExtendable
 public interface MutableFrameView extends FrameView {
 
     /**
