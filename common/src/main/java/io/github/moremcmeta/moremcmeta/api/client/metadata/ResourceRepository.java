@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.api.client.metadata;
 
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -34,6 +35,7 @@ import java.util.function.Predicate;
  * @author soir20
  * @since 4.0.0
  */
+@ApiStatus.NonExtendable
 public interface ResourceRepository {
 
     /**
@@ -66,6 +68,7 @@ public interface ResourceRepository {
      * @author soir20
      * @since 4.0.0
      */
+    @ApiStatus.NonExtendable
     interface Pack {
 
         /**

@@ -18,12 +18,14 @@
 package io.github.moremcmeta.moremcmeta.api.client.metadata;
 
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A GUI scaling type supported by vanilla Minecraft.
  * @author soir20
  * @since 4.4.0
  */
+@ApiStatus.NonExtendable
 public interface GuiScaling {
 
     /**
