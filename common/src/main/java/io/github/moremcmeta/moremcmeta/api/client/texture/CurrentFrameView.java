@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
 import io.github.moremcmeta.moremcmeta.api.math.Area;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * {@link FrameView} with the ability to adjust the current frame. Predefined frames are
@@ -26,6 +27,7 @@ import io.github.moremcmeta.moremcmeta.api.math.Area;
  * @author soir20
  * @since 4.0.0
  */
+@ApiStatus.NonExtendable
 public interface CurrentFrameView extends FrameView {
 
     /**
