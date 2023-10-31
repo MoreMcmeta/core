@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.GuiScaling;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -30,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -109,8 +112,9 @@ public final class SpriteFrameSizeFixPack implements PackResources {
             TextureData<?> textureData = TEXTURES.get(textureLocation);
             int frameWidth = textureData.frameSize().width();
             int frameHeight = textureData.frameSize().height();
+            Optional<GuiScaling> guiScaling = textureData.guiScaling();
             return () -> new ByteArrayInputStream(
-                    makeEmptyAnimationJson(frameWidth, frameHeight).getBytes(StandardCharsets.UTF_8)
+                    makeReplacementJson(guiScaling, frameWidth, frameHeight).getBytes(StandardCharsets.UTF_8)
             );
         }
 
@@ -226,22 +230,44 @@ public final class SpriteFrameSizeFixPack implements PackResources {
     }
 
     /**
-     * Makes dummy metadata for an animation with one frame of the given size.
-     * @param frameWidth        width of a frame
-     * @param frameHeight       height of a frame
+     * Makes dummy metadata for a texture.
+     * @param guiScalingOptional    GUI scaling setting for the texture, if any
+     * @param frameWidth            width of a frame
+     * @param frameHeight           height of a frame
      * @return dummy metadata with the given frame size
      */
-    private String makeEmptyAnimationJson(int frameWidth, int frameHeight) {
-        return String.format(
-                "{" +
-                        "\"animation\": {" +
-                        "\"width\": %d," +
-                        "\"height\": %d," +
-                        "\"frames\": [0]" +
-                        "}" +
-                        "}",
-                frameWidth, frameHeight
-        );
+    private static String makeReplacementJson(Optional<GuiScaling> guiScalingOptional, int frameWidth, int frameHeight) {
+        List<String> sections = new ArrayList<>();
+        sections.add(String.format("\"animation\": { \"width\": %d, \"height\": %d, \"frames\": [0] }", frameWidth, frameHeight));
+        guiScalingOptional.ifPresent((guiScaling) -> sections.add(makeGuiScalingJson(guiScaling, frameWidth, frameHeight)));
+
+        return String.format("{ %s }", String.join(", ", sections));
+    }
+
+    /**
+     * Makes GUI scaling metadata from the given settings.
+     * @param guiScaling        GUI scaling setting for the texture
+     * @param frameWidth        width of a frame
+     * @param frameHeight       height of a frame
+     * @return scaling section metadata corresponding to given settings
+     */
+    private static String makeGuiScalingJson(GuiScaling guiScaling, int frameWidth, int frameHeight) {
+        String scaling = String.format("\"type\": \"%s\"", guiScaling.name());
+        if (guiScaling instanceof GuiScaling.Tile || guiScaling instanceof GuiScaling.NineSlice) {
+            scaling += String.format(", \"width\": %d, \"height\": %d", frameWidth, frameHeight);
+        }
+
+        if (guiScaling instanceof GuiScaling.NineSlice nineSlice) {
+            scaling += String.format(
+                    ", \"border\": { \"left\": %d, \"right\": %d, \"top\": %d, \"bottom\": %d }",
+                    nineSlice.left(),
+                    nineSlice.right(),
+                    nineSlice.top(),
+                    nineSlice.bottom()
+            );
+        }
+
+        return String.format("\"gui\": { \"scaling\": { %s } }", scaling);
     }
 
 }
