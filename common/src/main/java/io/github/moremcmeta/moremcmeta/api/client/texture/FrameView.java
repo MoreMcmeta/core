@@ -17,6 +17,8 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * <p>A view of information about a texture frame without any underlying implementation detail. This interface
  * specifies an immutable view of a frame, but sub-interfaces may specify additional methods that make the
@@ -29,6 +31,7 @@ package io.github.moremcmeta.moremcmeta.api.client.texture;
  * @author soir20
  * @since 4.0.0
  */
+@ApiStatus.NonExtendable
 public interface FrameView {
 
     /**

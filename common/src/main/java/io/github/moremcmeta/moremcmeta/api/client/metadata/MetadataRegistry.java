@@ -19,6 +19,7 @@ package io.github.moremcmeta.moremcmeta.api.client.metadata;
 
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import java.util.Optional;
  * @author soir20
  * @since 4.0.0
  */
+@ApiStatus.NonExtendable
 public interface MetadataRegistry {
 
     /**
