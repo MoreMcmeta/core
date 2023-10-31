@@ -17,12 +17,15 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * An ordered collection of {@link FrameView}s, which are accessible by index.
  * @param <F> type of {@link FrameView} available from this group
  * @author soir20
  * @since 4.0.0
  */
+@ApiStatus.NonExtendable
 public interface FrameGroup<F extends FrameView> extends Iterable<F> {
 
     /**
