@@ -17,11 +17,14 @@
 
 package io.github.moremcmeta.moremcmeta.api.client.texture;
 
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * A frame view that never becomes invalid and never throws an {@link IllegalFrameReferenceException}.
  * @author soir20
  * @since 4.0.0
  */
+@ApiStatus.NonExtendable
 public interface PersistentFrameView extends FrameView {
 
     /**
