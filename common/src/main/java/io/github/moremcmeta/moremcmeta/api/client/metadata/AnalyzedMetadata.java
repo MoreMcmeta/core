@@ -72,4 +72,16 @@ public interface AnalyzedMetadata {
         return Optional.empty();
     }
 
+    /**
+     * Gets the GUI scaling read from the metadata. {@link Optional#empty()} indicates "no opinion."
+     * All plugins that do not return {@link Optional#empty()} from this method must return equal
+     * {@link GuiScaling} objects; otherwise, the metadata is invalid.
+     * @return the GUI scaling setting this plugin determined or {@link Optional#empty()} if this plugin
+     *         has no opinion.
+     * @since 4.4.0
+     */
+    default Optional<GuiScaling> guiScaling() {
+        return Optional.empty();
+    }
+
 }

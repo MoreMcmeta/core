@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -53,6 +54,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -74,6 +76,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -95,6 +98,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -115,6 +119,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -137,6 +142,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -160,6 +166,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -181,6 +188,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -202,6 +210,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -222,6 +231,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -244,6 +254,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -267,6 +278,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -288,6 +300,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -309,6 +322,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -320,6 +334,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",
@@ -355,6 +370,7 @@ public final class MetadataRegistryImplTest {
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
+                        Optional.empty(),
                         new MockCloseableImage(100, 100),
                         ImmutableList.of(Triple.of(
                                 "plugin",

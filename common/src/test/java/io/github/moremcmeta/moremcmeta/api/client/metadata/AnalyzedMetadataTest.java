@@ -51,4 +51,9 @@ public final class AnalyzedMetadataTest {
         assertFalse((new AnalyzedMetadata() {}).clamp().isPresent());
     }
 
+    @Test
+    public void guiScaling_NotOverridden_Empty() {
+        assertFalse((new AnalyzedMetadata() {}).guiScaling().isPresent());
+    }
+
 }

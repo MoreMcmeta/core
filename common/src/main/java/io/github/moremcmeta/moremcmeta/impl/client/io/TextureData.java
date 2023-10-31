@@ -19,12 +19,14 @@ package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.GuiScaling;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.api.math.NegativeDimensionException;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.CloseableImage;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,6 +39,7 @@ public final class TextureData<I extends CloseableImage> {
     private final FrameSize FRAME_SIZE;
     private final boolean BLUR;
     private final boolean CLAMP;
+    private final Optional<GuiScaling> GUI_SCALING;
     private final I IMAGE;
     private final List<Triple<String, AnalyzedMetadata, ComponentBuilder>> ANALYZED_SECTIONS;
 
@@ -45,12 +48,13 @@ public final class TextureData<I extends CloseableImage> {
      * @param frameSize         size of a frame in the image
      * @param blur              whether to blur the image
      * @param clamp             whether to clamp the image
+     * @param guiScaling        GUI scaling settings for the texture
      * @param image             texture image
      * @param analyzedSections  analyzed metadata and component builders that will
      *                          process the metadata
      */
-    public TextureData(FrameSize frameSize, boolean blur, boolean clamp, I image,
-                       List<Triple<String, AnalyzedMetadata, ComponentBuilder>> analyzedSections) {
+    public TextureData(FrameSize frameSize, boolean blur, boolean clamp, Optional<GuiScaling> guiScaling,
+                       I image, List<Triple<String, AnalyzedMetadata, ComponentBuilder>> analyzedSections) {
         if (frameSize.width() > image.width()) {
             throw new IllegalArgumentException("Frame width cannot be larger than image width");
         }
@@ -62,6 +66,7 @@ public final class TextureData<I extends CloseableImage> {
         FRAME_SIZE = requireNonNull(frameSize, "Frame size cannot be null");
         BLUR = blur;
         CLAMP = clamp;
+        GUI_SCALING = requireNonNull(guiScaling, "GUI scaling cannot be null");
         IMAGE = requireNonNull(image, "Image cannot be null");
         ANALYZED_SECTIONS = requireNonNull(ImmutableList.copyOf(analyzedSections), "Analyzed sections cannot be null");
     }
@@ -88,6 +93,14 @@ public final class TextureData<I extends CloseableImage> {
      */
     public boolean blur() {
         return BLUR;
+    }
+
+    /**
+     * Gets the GUI scaling setting for the texture, if any.
+     * @return GUI scaling setting for the texture, if any
+     */
+    public Optional<GuiScaling> guiScaling() {
+        return GUI_SCALING;
     }
 
     /**

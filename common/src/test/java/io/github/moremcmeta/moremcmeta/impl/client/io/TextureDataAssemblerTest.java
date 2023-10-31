@@ -40,6 +40,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -107,6 +108,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, false,
+                Optional.empty(),
                 new MockCloseableImage(100, 100),
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     checkFunction.accept(frames);
@@ -135,6 +137,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, false,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                     new TextureComponent<CurrentFrameView>() {}
@@ -172,6 +175,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, false,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<CurrentFrameView>() {}
@@ -208,6 +212,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 true, false,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<CurrentFrameView>() {}
@@ -244,6 +249,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<CurrentFrameView>() {}
@@ -271,6 +277,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, false,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<CurrentFrameView>() {}
@@ -310,6 +317,7 @@ public final class TextureDataAssemblerTest {
         EventDrivenTexture texture = addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) ->
                         new TextureComponent<CurrentFrameView>() {}
@@ -338,6 +346,7 @@ public final class TextureDataAssemblerTest {
         addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(30, frames.frame(0).width());
@@ -365,6 +374,7 @@ public final class TextureDataAssemblerTest {
         addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
@@ -393,6 +403,7 @@ public final class TextureDataAssemblerTest {
         addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(40, frames.frame(0).height());
@@ -420,6 +431,7 @@ public final class TextureDataAssemblerTest {
         addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
@@ -449,6 +461,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform(null, Area.of(Point.pack(0, 0)));
@@ -475,6 +488,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, null);
@@ -501,6 +515,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(-1, 0)));
@@ -527,6 +542,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, -1)));
@@ -553,6 +569,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(30, 0)));
@@ -579,6 +596,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 40)));
@@ -604,6 +622,7 @@ public final class TextureDataAssemblerTest {
         addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> 100, Area.of(Point.pack(0, 0), Point.pack(20, 25)));
@@ -637,6 +656,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(-1, 0), Area.of(Point.pack(0, 0)));
@@ -663,6 +683,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(0, -1), Area.of(Point.pack(0, 0)));
@@ -689,6 +710,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(30, 0), Area.of(Point.pack(0, 0)));
@@ -715,6 +737,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform((x, y, depFunction) -> depFunction.color(0, 40), Area.of(Point.pack(0, 0)));
@@ -741,6 +764,7 @@ public final class TextureDataAssemblerTest {
         addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(0).transform(
@@ -778,6 +802,7 @@ public final class TextureDataAssemblerTest {
         addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frameView[0] = frames.frame(0);
@@ -807,6 +832,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(-1);
@@ -833,6 +859,7 @@ public final class TextureDataAssemblerTest {
         assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     frames.frame(6);
@@ -858,6 +885,7 @@ public final class TextureDataAssemblerTest {
         addExtraDefaultComponents(assembler.assemble(new TextureData<>(
                 new TextureData.FrameSize(30, 40),
                 false, true,
+                Optional.empty(),
                 originalImage,
                 ImmutableList.of(Triple.of("plugin", new AnalyzedMetadata() {}, (metadata, frames) -> {
                     assertEquals(6, frames.frames());
