@@ -18,6 +18,7 @@
 package io.github.moremcmeta.moremcmeta.impl.client.io;
 
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.GuiScaling;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
@@ -79,6 +80,7 @@ public final class TextureDataReader<I extends CloseableImage> implements Textur
         Optional<Integer> frameHeightOptional = Optional.empty();
         Optional<Boolean> blurOptional = Optional.empty();
         Optional<Boolean> clampOptional = Optional.empty();
+        Optional<GuiScaling> guiScalingOptional = Optional.empty();
 
         for (String section : metadata.keys()) {
             MoreMcmetaTexturePlugin plugin = SECTION_TO_PLUGIN.get(section);
@@ -102,6 +104,7 @@ public final class TextureDataReader<I extends CloseableImage> implements Textur
             frameHeightOptional = unwrapIfCompatible(frameHeightOptional, sectionData.frameHeight(), "frame width");
             blurOptional = unwrapIfCompatible(blurOptional, sectionData.blur(), "blur");
             clampOptional = unwrapIfCompatible(clampOptional, sectionData.clamp(), "clamp");
+            guiScalingOptional = unwrapIfCompatible(guiScalingOptional, sectionData.guiScaling(), "GUI scaling");
         }
 
         boolean blur = blurOptional.orElse(false);
@@ -129,6 +132,20 @@ public final class TextureDataReader<I extends CloseableImage> implements Textur
         }
         TextureData.FrameSize frameSize = new TextureData.FrameSize(frameWidth, frameHeight);
 
+        if (guiScalingOptional.isPresent() && guiScalingOptional.get() instanceof GuiScaling.NineSlice nineSlice) {
+            if (!nineSlice.hasCenterSlice(frameWidth, frameHeight)) {
+                throw new InvalidMetadataException(String.format(
+                        "Nine slice l=%d, r=%d, t=%d, b=%d has no center slice when frame size is %dx%d",
+                        nineSlice.left(),
+                        nineSlice.right(),
+                        nineSlice.top(),
+                        nineSlice.bottom(),
+                        frameWidth,
+                        frameHeight
+                ));
+            }
+        }
+
         if (analyzedSections.size() > MAX_PLUGINS_APPLIED) {
             throw new InvalidMetadataException(
                     analyzedSections.size() + " plugins applied, but " + MAX_PLUGINS_APPLIED + " is the maximum"
@@ -139,6 +156,7 @@ public final class TextureDataReader<I extends CloseableImage> implements Textur
                 frameSize,
                 blur,
                 clamp,
+                guiScalingOptional,
                 image,
                 analyzedSections
         );
