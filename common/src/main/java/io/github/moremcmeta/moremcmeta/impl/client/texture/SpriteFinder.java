@@ -20,6 +20,8 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -49,9 +51,8 @@ public final class SpriteFinder {
      * @param location          the location of the texture
      * @return an {@link Optional} containing the atlas sprite
      */
-    public Optional<Sprite> findSprite(ResourceLocation location) {
+    public List<Sprite> findSprites(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
-
         return findNew(location);
     }
 
@@ -60,19 +61,16 @@ public final class SpriteFinder {
      * @param location      the location of the texture to look for (with extension)
      * @return an {@link Optional} containing the atlas sprite
      */
-    private Optional<Sprite> findNew(ResourceLocation location) {
+    private List<Sprite> findNew(ResourceLocation location) {
+        List<Sprite> results = new ArrayList<>();
+
         for (ResourceLocation atlasLocation : ATLAS_LOCATIONS) {
             Atlas atlas = ATLAS_GETTER.apply(atlasLocation);
             requireNonNull(atlas, "Atlas getter cannot supply null");
-
-            Optional<Sprite> sprite = atlas.sprite(location);
-            if (sprite.isPresent()) {
-                return sprite;
-            }
-
+            atlas.sprite(location).ifPresent(results::add);
         }
 
-        return Optional.empty();
+        return results;
     }
 
 }
