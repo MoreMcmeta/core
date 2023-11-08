@@ -24,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -70,7 +71,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((location) -> null, ATLAS_LOCATIONS);
 
         expectedException.expect(NullPointerException.class);
-        finder.findSprite(TEST_LOCATION);
+        finder.findSprites(TEST_LOCATION);
     }
 
     @Test
@@ -82,7 +83,7 @@ public final class SpriteFinderTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        finder.findSprite(null);
+        finder.findSprites(null);
     }
 
     @SuppressWarnings("OptionalAssignedToNull")
@@ -94,7 +95,7 @@ public final class SpriteFinderTest {
         );
 
         expectedException.expect(NullPointerException.class);
-        finder.findSprite(TEST_LOCATION);
+        finder.findSprites(TEST_LOCATION);
     }
 
     @Test
@@ -104,8 +105,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertFalse(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -116,8 +117,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(ATLAS_LOCATIONS.size(), result.size());
     }
 
     @Test
@@ -129,8 +130,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -142,8 +143,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -155,8 +156,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -168,8 +169,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -181,8 +182,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -194,8 +195,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -207,8 +208,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -220,8 +221,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -233,8 +234,8 @@ public final class SpriteFinderTest {
                 ATLAS_LOCATIONS
         );
 
-        Optional<Sprite> result = finder.findSprite(TEST_LOCATION);
-        assertTrue(result.isPresent());
+        List<Sprite> result = finder.findSprites(TEST_LOCATION);
+        assertEquals(1, result.size());
     }
 
 }

@@ -24,12 +24,13 @@ import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -58,7 +59,7 @@ public final class BaseCollection {
                 new MipmappedBase(EventDrivenTexture.SELF_UPLOAD_POINT, EventDrivenTexture.SELF_MIPMAP_LEVEL)
         );
 
-        findSpriteBase(spriteFinder, textureLocation, EventDrivenTexture.SELF_UPLOAD_POINT).ifPresent(
+        findSpriteBases(spriteFinder, textureLocation, EventDrivenTexture.SELF_UPLOAD_POINT).forEach(
                 (pair) -> baseSet(newBases, pair.getFirst().atlas()).add(pair.getSecond())
         );
 
@@ -80,35 +81,37 @@ public final class BaseCollection {
     }
 
     /**
-     * Finds a {@link MipmappedBase} if the given base is associated with a sprite.
+     * Finds all {@link MipmappedBase}s if the given base is associated with any sprites.
      * @param spriteFinder      finds sprites stitched to atlases
      * @param baseLocation      location of the base to find
      * @param uploadPoint       upload point of the base
-     * @return if the base is associated with a sprite, the sprite and the {@link MipmappedBase}
+     * @return if the base is associated with a sprite, the sprites and the {@link MipmappedBase}s
      */
-    private static Optional<Pair<Sprite, MipmappedBase>> findSpriteBase(
+    private static List<Pair<Sprite, MipmappedBase>> findSpriteBases(
             SpriteFinder spriteFinder, ResourceLocation baseLocation,
             @SuppressWarnings("SameParameterValue") long uploadPoint) {
-        Optional<Sprite> spriteOptional = spriteFinder.findSprite(baseLocation);
-        if (!spriteOptional.isPresent()) {
-            return Optional.empty();
+        List<Sprite> sprites = spriteFinder.findSprites(baseLocation);
+        if (sprites.isEmpty()) {
+            return ImmutableList.of();
         }
 
-        Sprite sprite = spriteOptional.get();
-        long uploadPointInSprite = Point.pack(
-                Point.x(uploadPoint) + Point.x(sprite.uploadPoint()),
-                Point.y(uploadPoint) + Point.y(sprite.uploadPoint())
-        );
+        List<Pair<Sprite, MipmappedBase>> results = new ArrayList<>();
+        for (Sprite sprite : sprites) {
+            long uploadPointInSprite = Point.pack(
+                    Point.x(uploadPoint) + Point.x(sprite.uploadPoint()),
+                    Point.y(uploadPoint) + Point.y(sprite.uploadPoint())
+            );
 
-        return Optional.of(
-                Pair.of(
-                        sprite,
-                        new MipmappedBase(
-                                uploadPointInSprite,
-                                sprite.mipmapLevel()
-                        )
-                )
-        );
+            results.add(Pair.of(
+                    sprite,
+                    new MipmappedBase(
+                            uploadPointInSprite,
+                            sprite.mipmapLevel()
+                    )
+            ));
+        }
+
+        return results;
     }
 
     /**
