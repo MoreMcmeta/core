@@ -72,6 +72,7 @@ subprojects {
             modRuntimeOnly(include("io.github.moremcmeta:properties-parser-plugin-${project.name}:${project.propertiesReaderVersion}"))
             modRuntimeOnly(include("io.github.moremcmeta:animation-plugin-${project.name}:${project.animationVersion}"))
             modRuntimeOnly(include("io.github.moremcmeta:texture-plugin-${project.name}:${project.textureVersion}"))
+            modRuntimeOnly(include("io.github.moremcmeta:gui-plugin-${project.name}:${project.guiVersion}"))
         }
 
         testImplementation "junit:junit:${project.junitVersion}"
