@@ -34,7 +34,7 @@ public final class MockCloseableImage implements CloseableImage {
     private final int HEIGHT;
     private final int X_OFFSET;
     private final int Y_OFFSET;
-    private Long uploadPoint;
+    private final Long[] UPLOAD_POINT;
     private final AtomicBoolean CLOSED;
 
     public MockCloseableImage() {
@@ -47,14 +47,15 @@ public final class MockCloseableImage implements CloseableImage {
         HEIGHT = height;
         X_OFFSET = 0;
         Y_OFFSET = 0;
+        UPLOAD_POINT = new Long[1];
         CLOSED = new AtomicBoolean();
     }
 
     private MockCloseableImage(int[][] pixels, int xOffset, int yOffset, int width, int height,
-                               AtomicBoolean closedStatus) {
+                               Long[] uploadPoint, AtomicBoolean closedStatus) {
         int maxX = xOffset + width;
         int maxY = yOffset + height;
-        if (maxX < 0 || maxX > pixels.length || maxY < 0 || maxY > pixels[0].length) {
+        if (maxX < 0 || maxX > pixels.length || maxY < 0 || (pixels.length > 0 && maxY > pixels[0].length)) {
             throw new MockSubImageOutsideOriginalException();
         }
 
@@ -63,6 +64,7 @@ public final class MockCloseableImage implements CloseableImage {
         HEIGHT = height;
         X_OFFSET = xOffset;
         Y_OFFSET = yOffset;
+        UPLOAD_POINT = uploadPoint;
         CLOSED = closedStatus;
     }
 
@@ -122,12 +124,12 @@ public final class MockCloseableImage implements CloseableImage {
             throw new IllegalStateException("Mock image closed");
         }
 
-        uploadPoint = Point.pack(uploadX, uploadY);
+        UPLOAD_POINT[0] = Point.pack(uploadX, uploadY);
     }
 
     @Override
     public CloseableImage subImage(int topLeftX, int topLeftY, int width, int height) {
-        return new MockCloseableImage(PIXELS, topLeftX, topLeftY, width, height, CLOSED);
+        return new MockCloseableImage(PIXELS, topLeftX, topLeftY, width, height, UPLOAD_POINT, CLOSED);
     }
 
     @Override
@@ -140,7 +142,7 @@ public final class MockCloseableImage implements CloseableImage {
     }
 
     public Long lastUploadPoint() {
-        return uploadPoint;
+        return UPLOAD_POINT[0];
     }
 
     public boolean hasSamePixels(MockCloseableImage other) {

@@ -27,12 +27,6 @@ import net.minecraft.resources.ResourceLocation;
 public interface Sprite {
 
     /**
-     * Gets the name of this sprite (without an extension).
-     * @return the sprite's name
-     */
-    ResourceLocation name();
-
-    /**
      * Gets the full path of the atlas that this sprite is stitched to.
      * @return location of atlas this sprite is stitched to
      */
@@ -51,15 +45,27 @@ public interface Sprite {
     int mipmapLevel();
 
     /**
-     * Gets the width of the sprite.
-     * @return the width of the sprite
+     * X-coordinate of the top-left corner of this sprite if it is within another sprite.
+     * @return x-coordinate of the top-left corner of this sprite if it is within another sprite
      */
-    int width();
+    int xOffsetLeft();
 
     /**
-     * Gets the height of the sprite.
-     * @return the height of the sprite
+     * Y-coordinate of the top-left corner of this sprite if it is within another sprite.
+     * @return y-coordinate of the top-left corner of this sprite if it is within another sprite
      */
-    int height();
+    int yOffsetLeft();
+
+    /**
+     * X-coordinate of the bottom-right corner of this sprite if it is within another sprite.
+     * @return x-coordinate of the bottom-right corner of this sprite if it is within another sprite
+     */
+    int xOffsetRight();
+
+    /**
+     * Y-coordinate of the bottom-right corner of this sprite if it is within another sprite.
+     * @return y-coordinate of the bottom-right corner of this sprite if it is within another sprite
+     */
+    int yOffsetRight();
 
 }

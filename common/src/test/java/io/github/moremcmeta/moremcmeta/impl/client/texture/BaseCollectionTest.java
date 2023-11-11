@@ -48,7 +48,6 @@ public final class BaseCollectionTest {
             (atlasLocation) -> (spriteLocation) -> {
                 if (atlasLocation.equals(SPRITE_ATLAS_1) && spriteLocation.equals(SPRITE_LOCATION_1)) {
                     return Optional.of(new MockSprite(
-                            SPRITE_LOCATION_1,
                             SPRITE_UPLOAD_POINT_1,
                             SPRITE_MIPMAP_1,
                             SPRITE_ATLAS_1
