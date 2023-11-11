@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -43,7 +42,7 @@ public final class UploadComponentTest {
     private static final TexturePreparer DUMMY_PREPARER =  (id, mipmap, width, height) -> {};
     private static final BaseCollection DUMMY_BASE_COLLECTION = BaseCollection.find(
             new SpriteFinder(
-                    (atlasLocation) -> (spriteLocation) -> Optional.of(
+                    (atlasLocation) -> (spriteLocation) -> ImmutableList.of(
                             new MockSprite(Point.pack(0, 0), 1)
                     ),
                     SpriteFinderTest.ATLAS_LOCATIONS

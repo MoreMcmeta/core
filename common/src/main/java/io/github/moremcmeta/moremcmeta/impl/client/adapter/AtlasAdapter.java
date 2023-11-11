@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
+import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.SpriteName;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.Atlas;
@@ -28,7 +29,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.function.ToIntFunction;
 
 import static java.util.Objects.requireNonNull;
@@ -61,11 +62,11 @@ public final class AtlasAdapter implements Atlas {
     }
 
     @Override
-    public Optional<Sprite> sprite(ResourceLocation location) {
+    public List<Sprite> sprite(ResourceLocation location) {
         requireNonNull(location, "Sprite location cannot be null");
 
         if (ATLAS == null) {
-            return Optional.empty();
+            return ImmutableList.of();
         }
 
         ResourceLocation properSpriteName = SpriteName.fromTexturePath(location);
@@ -77,10 +78,10 @@ public final class AtlasAdapter implements Atlas {
 
         // Check the original location in case another mod added it by that name
         if (sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
-            return Optional.empty();
+            return ImmutableList.of();
         }
 
-        return Optional.of(new SpriteAdapter(
+        return ImmutableList.of(new SpriteAdapter(
                 sprite,
                 MIPMAP_LEVEL_GETTER.applyAsInt(sprite),
                 0,
