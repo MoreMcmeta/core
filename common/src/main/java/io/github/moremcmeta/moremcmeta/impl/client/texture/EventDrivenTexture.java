@@ -330,18 +330,22 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
          * Uploads the current frame at the given point. This should only
          * be called when the correct texture (usually this texture) is
          * bound in OpenGL.
-         * @param x         x-coordinate of the point to upload the frame at
-         * @param y         y-coordinate of the point to upload the frame at
-         * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
+         * @param x             x-coordinate of the point to upload the frame at
+         * @param y             y-coordinate of the point to upload the frame at
+         * @param mipmap        number of mipmaps to upload (the mipmap level of the base texture)
+         * @param subAreaX      x-coordinate of the top-left corner of the sub-area to upload
+         * @param subAreaY      y-coordinate of the top-left corner of the sub-area to upload
+         * @param subAreaWidth  width the sub-area to upload
+         * @param subAreaHeight height the sub-area to upload
          */
-        public void upload(int x, int y, int mipmap) {
+        public void upload(int x, int y, int mipmap, int subAreaX, int subAreaY, int subAreaWidth, int subAreaHeight) {
             checkValid();
 
             if (x < 0 || y < 0) {
                 throw new NegativeUploadPointException(x, y);
             }
 
-            STATE.uploadAt(x, y, mipmap);
+            STATE.uploadAt(x, y, mipmap, subAreaX, subAreaY, subAreaWidth, subAreaHeight);
         }
 
         /**
@@ -455,12 +459,16 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
          * Uploads the current frame at the given point. This should only
          * be called when the correct texture (usually this texture) is
          * bound in OpenGL.
-         * @param x         x-coordinate of the point to upload the frame at
-         * @param y         y-coordinate of the point to upload the frame at
-         * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
+         * @param x             x-coordinate of the point to upload the frame at
+         * @param y             y-coordinate of the point to upload the frame at
+         * @param mipmap        number of mipmaps to upload (the mipmap level of the base texture)
+         * @param subAreaX      x-coordinate of the top-left corner of the sub-area to upload
+         * @param subAreaY      y-coordinate of the top-left corner of the sub-area to upload
+         * @param subAreaWidth  width the sub-area to upload
+         * @param subAreaHeight height the sub-area to upload
          */
-        public void uploadAt(int x, int y, int mipmap) {
-            currentFrame().uploadAt(x, y, mipmap);
+        public void uploadAt(int x, int y, int mipmap, int subAreaX, int subAreaY, int subAreaWidth, int subAreaHeight) {
+            currentFrame().uploadAt(x, y, mipmap, subAreaX, subAreaY, subAreaWidth, subAreaHeight);
         }
 
         /**

@@ -18,7 +18,6 @@
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public final class SpriteFinderTest {
         expectedException.expect(NullPointerException.class);
         new SpriteFinder(
                 (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 null
         );
     }
@@ -78,7 +77,7 @@ public final class SpriteFinderTest {
     public void find_NullLocation_NullPointerException() {
         SpriteFinder finder = new SpriteFinder(
                 (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -113,7 +112,7 @@ public final class SpriteFinderTest {
     public void find_SpriteHasMissingLocation_SpriteFound() {
         SpriteFinder finder = new SpriteFinder(
                 (atlasLocation) -> (spriteLocation) ->
-                        Optional.of(new MockSprite(MissingTextureAtlasSprite.getLocation())),
+                        Optional.of(new MockSprite()),
                 ATLAS_LOCATIONS
         );
 
@@ -126,7 +125,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/blocks.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -139,7 +138,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/signs.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -152,7 +151,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/banner_patterns.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -165,7 +164,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/shield_patterns.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -178,7 +177,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/chest.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -191,7 +190,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/beds.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -204,7 +203,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/particles.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -217,7 +216,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/paintings.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
@@ -230,7 +229,7 @@ public final class SpriteFinderTest {
         SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(new ResourceLocation("textures/atlas/mob_effects.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
-                        Optional.of(new MockSprite(TEST_LOCATION)) : Optional.empty(),
+                        Optional.of(new MockSprite()) : Optional.empty(),
                 ATLAS_LOCATIONS
         );
 
