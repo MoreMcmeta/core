@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +28,6 @@ import org.junit.rules.ExpectedException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,14 +47,14 @@ public final class BaseCollectionTest {
     private static final SpriteFinder SPRITE_FINDER = new SpriteFinder(
             (atlasLocation) -> (spriteLocation) -> {
                 if (atlasLocation.equals(SPRITE_ATLAS_1) && spriteLocation.equals(SPRITE_LOCATION_1)) {
-                    return Optional.of(new MockSprite(
+                    return ImmutableList.of(new MockSprite(
                             SPRITE_UPLOAD_POINT_1,
                             SPRITE_MIPMAP_1,
                             SPRITE_ATLAS_1
                     ));
                 }
 
-                return Optional.empty();
+                return ImmutableList.of();
             },
             SpriteFinderTest.ATLAS_LOCATIONS
     );
