@@ -69,7 +69,20 @@ public final class UploadComponent implements CoreTextureComponent {
     public void onUpload(EventDrivenTexture.TextureAndFrameView currentFrame, ResourceLocation baseLocation) {
         BASE_DATA.baseData(baseLocation).forEach((base) -> {
             long uploadPoint = base.uploadPoint();
-            currentFrame.upload(Point.x(uploadPoint), Point.y(uploadPoint), base.mipmap());
+            int frameWidth = currentFrame.width();
+            int frameHeight = currentFrame.height();
+            int xOffsetLeft = base.xOffsetLeft();
+            int yOffsetLeft = base.yOffsetLeft();
+
+            currentFrame.upload(
+                    Point.x(uploadPoint),
+                    Point.y(uploadPoint),
+                    base.mipmap(),
+                    xOffsetLeft,
+                    yOffsetLeft,
+                    frameWidth - xOffsetLeft - base.xOffsetRight(),
+                    frameHeight - yOffsetLeft - base.yOffsetRight()
+            );
         });
     }
 

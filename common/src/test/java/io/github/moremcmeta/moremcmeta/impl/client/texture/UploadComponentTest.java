@@ -44,7 +44,7 @@ public final class UploadComponentTest {
     private static final BaseCollection DUMMY_BASE_COLLECTION = BaseCollection.find(
             new SpriteFinder(
                     (atlasLocation) -> (spriteLocation) -> Optional.of(
-                            new MockSprite(new ResourceLocation("dummy"), Point.pack(0, 0), 1)
+                            new MockSprite(Point.pack(0, 0), 1)
                     ),
                     SpriteFinderTest.ATLAS_LOCATIONS
             ),
