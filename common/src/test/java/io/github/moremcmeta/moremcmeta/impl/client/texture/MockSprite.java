@@ -25,33 +25,26 @@ import net.minecraft.resources.ResourceLocation;
  * @author soir20
  */
 public final class MockSprite implements Sprite {
-    private final ResourceLocation NAME;
     private final long UPLOAD_POINT;
     private final int MIPMAP_LEVEL;
     private final ResourceLocation ATLAS;
 
-    public MockSprite(ResourceLocation name) {
-        this(name, Point.pack(0, 0));
+    public MockSprite() {
+        this(Point.pack(0, 0));
     }
 
-    public MockSprite(ResourceLocation name, long uploadPoint) {
-        this(name, uploadPoint, 2);
+    public MockSprite(long uploadPoint) {
+        this(uploadPoint, 2);
     }
 
-    public MockSprite(ResourceLocation name, long uploadPoint, int mipmapLevel) {
-        this(name, uploadPoint, mipmapLevel, new ResourceLocation("textures/atlas/dummy.png"));
+    public MockSprite(long uploadPoint, int mipmapLevel) {
+        this(uploadPoint, mipmapLevel, new ResourceLocation("textures/atlas/dummy.png"));
     }
 
-    public MockSprite(ResourceLocation name, long uploadPoint, int mipmapLevel, ResourceLocation atlas) {
-        NAME = name;
+    public MockSprite(long uploadPoint, int mipmapLevel, ResourceLocation atlas) {
         UPLOAD_POINT = uploadPoint;
         MIPMAP_LEVEL = mipmapLevel;
         ATLAS = atlas;
-    }
-
-    @Override
-    public ResourceLocation name() {
-        return NAME;
     }
 
     @Override
@@ -70,12 +63,22 @@ public final class MockSprite implements Sprite {
     }
 
     @Override
-    public int width() {
-        return 16;
+    public int xOffsetLeft() {
+        return 0;
     }
 
     @Override
-    public int height() {
-        return 32;
+    public int yOffsetLeft() {
+        return 0;
+    }
+
+    @Override
+    public int xOffsetRight() {
+        return 0;
+    }
+
+    @Override
+    public int yOffsetRight() {
+        return 0;
     }
 }

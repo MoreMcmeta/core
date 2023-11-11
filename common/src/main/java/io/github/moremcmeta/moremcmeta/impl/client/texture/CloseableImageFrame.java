@@ -133,12 +133,16 @@ public class CloseableImageFrame {
 
     /**
      * Uploads this frame at a given position in the active texture.
-     * @param x         x-coordinate of the point to upload the top-left corner of this frame at
-     * @param y         y-coordinate of the point to upload the top-left corner of this frame at
-     * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
+     * @param x             x-coordinate of the point to upload the top-left corner of this frame at
+     * @param y             y-coordinate of the point to upload the top-left corner of this frame at
+     * @param mipmap        number of mipmaps to upload (the mipmap level of the base texture)
+     * @param subAreaX      x-coordinate of the top-left corner of the sub-area to upload
+     * @param subAreaY      y-coordinate of the top-left corner of the sub-area to upload
+     * @param subAreaWidth  width the sub-area to upload
+     * @param subAreaHeight height the sub-area to upload
      * @throws IllegalStateException if this frame has been closed
      */
-    public void uploadAt(int x, int y, int mipmap) {
+    public void uploadAt(int x, int y, int mipmap, int subAreaX, int subAreaY, int subAreaWidth, int subAreaHeight) {
         checkOpen();
 
         if (x < 0 || y < 0) {
@@ -155,15 +159,15 @@ public class CloseableImageFrame {
         }
 
         for (int level = 0; level <= mipmap; level++) {
-            int mipmappedX = x >> level;
-            int mipmappedY = y >> level;
+            CloseableImage mipmapImage = mipmaps.get(level).subImage(
+                    subAreaX >> level,
+                    subAreaY >> level,
+                    subAreaWidth >> level,
+                    subAreaHeight >> level
+            );
 
-            CloseableImage mipmapImage = mipmaps.get(level);
-            int mipmappedWidth = mipmapImage.width();
-            int mipmappedHeight = mipmapImage.height();
-
-            if (mipmappedWidth > 0 && mipmappedHeight > 0) {
-                mipmapImage.upload(mipmappedX, mipmappedY);
+            if (mipmapImage.width() > 0 && mipmapImage.height() > 0) {
+                mipmapImage.upload(x >> level, y >> level);
             }
         }
     }

@@ -56,7 +56,14 @@ public final class BaseCollection {
         Map<ResourceLocation, Collection<MipmappedBase>> newBases = new HashMap<>();
 
         baseSet(newBases, textureLocation).add(
-                new MipmappedBase(EventDrivenTexture.SELF_UPLOAD_POINT, EventDrivenTexture.SELF_MIPMAP_LEVEL)
+                new MipmappedBase(
+                        EventDrivenTexture.SELF_UPLOAD_POINT,
+                        EventDrivenTexture.SELF_MIPMAP_LEVEL,
+                        0,
+                        0,
+                        0,
+                        0
+                )
         );
 
         findSpriteBases(spriteFinder, textureLocation, EventDrivenTexture.SELF_UPLOAD_POINT).forEach(
@@ -106,7 +113,11 @@ public final class BaseCollection {
                     sprite,
                     new MipmappedBase(
                             uploadPointInSprite,
-                            sprite.mipmapLevel()
+                            sprite.mipmapLevel(),
+                            sprite.xOffsetLeft(),
+                            sprite.yOffsetLeft(),
+                            sprite.xOffsetRight(),
+                            sprite.yOffsetRight()
                     )
             ));
         }
@@ -162,6 +173,10 @@ public final class BaseCollection {
     public static final class MipmappedBase {
         private final long UPLOAD_POINT;
         private final int MIPMAP;
+        private final int X_OFFSET_LEFT;
+        private final int Y_OFFSET_LEFT;
+        private final int X_OFFSET_RIGHT;
+        private final int Y_OFFSET_RIGHT;
 
         /**
          * Gets the coordinate in the base texture at which the top-left corner of the dependency
@@ -179,6 +194,38 @@ public final class BaseCollection {
          */
         public int mipmap() {
             return MIPMAP;
+        }
+
+        /**
+         * X-coordinate of the top-left corner of the image to upload to this base.
+         * @return x-coordinate of the top-left corner of the image to upload to this base
+         */
+        public int xOffsetLeft() {
+            return X_OFFSET_LEFT;
+        }
+
+        /**
+         * Y-coordinate of the top-left corner of the image to upload to this base.
+         * @return y-coordinate of the top-left corner of the image to upload to this base
+         */
+        public int yOffsetLeft() {
+            return Y_OFFSET_LEFT;
+        }
+
+        /**
+         * X-coordinate of the bottom-right corner of the image to upload to this base.
+         * @return x-coordinate of the bottom-right corner of the image to upload to this base
+         */
+        public int xOffsetRight() {
+            return X_OFFSET_RIGHT;
+        }
+
+        /**
+         * Y-coordinate of the bottom-right corner of the image to upload to this base.
+         * @return y-coordinate of the bottom-right corner of the image to upload to this base
+         */
+        public int yOffsetRight() {
+            return Y_OFFSET_RIGHT;
         }
 
         @Override
@@ -202,10 +249,19 @@ public final class BaseCollection {
          * @param uploadPoint       coordinate in the base texture at which the top-left corner of the dependency
          *                          will be uploaded.
          * @param mipmap            mipmap level of the base
+         * @param subAreaXLeft      x-coordinate of the top-left corner of the sub-area to upload
+         * @param subAreaYLeft      y-coordinate of the top-left corner of the sub-area to upload
+         * @param subAreaXRight     x-coordinate of the bottom-right corner of the sub-area to upload
+         * @param subAreaYRight     y-coordinate of the bottom-right corner of the sub-area to upload
          */
-        private MipmappedBase(long uploadPoint, int mipmap) {
+        private MipmappedBase(long uploadPoint, int mipmap, int subAreaXLeft, int subAreaYLeft, int subAreaXRight,
+                              int subAreaYRight) {
             UPLOAD_POINT = uploadPoint;
             MIPMAP = mipmap;
+            X_OFFSET_LEFT = subAreaXLeft;
+            Y_OFFSET_LEFT = subAreaYLeft;
+            X_OFFSET_RIGHT = subAreaXRight;
+            Y_OFFSET_RIGHT = subAreaYRight;
         }
 
     }
