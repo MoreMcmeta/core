@@ -52,8 +52,8 @@ public final class MockCloseableImageFrame extends CloseableImageFrame {
     }
 
     @Override
-    public void uploadAt(int x, int y, int mipmap) {
-        super.uploadAt(x, y, mipmap);
+    public void uploadAt(int x, int y, int mipmap, int subAreaX, int subAreaY, int subAreaWidth, int subAreaHeight) {
+        super.uploadAt(x, y, mipmap, subAreaX, subAreaY, subAreaWidth, subAreaHeight);
         uploads++;
         lastUploadPoint = Point.pack(x, y);
     }

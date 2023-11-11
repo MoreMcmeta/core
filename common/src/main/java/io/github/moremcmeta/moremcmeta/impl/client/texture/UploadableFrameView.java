@@ -24,20 +24,23 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.NegativeUploadPointExc
 /**
  * A {@link FrameView} that represents a frame that can be uploaded.
  * @author soir20
- * @since 4.0.0
  */
 public interface UploadableFrameView extends FrameView {
 
     /**
      * Uploads the current frame to the texture currently bound in OpenGL.
-     * @param x         x-coordinate of the point to upload to
-     * @param y         y-coordinate of the point to upload to
-     * @param mipmap    number of mipmaps to upload (the mipmap level of the base texture)
+     * @param x             x-coordinate of the point to upload to
+     * @param y             y-coordinate of the point to upload to
+     * @param mipmap        number of mipmaps to upload (the mipmap level of the base texture)
+     * @param subAreaX      x-coordinate of the top-left corner of the sub-area to upload
+     * @param subAreaY      y-coordinate of the top-left corner of the sub-area to upload
+     * @param subAreaWidth  width the sub-area to upload
+     * @param subAreaHeight height the sub-area to upload
      * @throws IllegalFrameReferenceException if this view is no longer valid
      * @throws NegativeUploadPointException if the provided upload point is negative. The upload point may
      *                                      still be positive and out of bounds even if no exception is
      *                                      thrown.
      */
-    void upload(int x, int y, int mipmap);
+    void upload(int x, int y, int mipmap, int subAreaX, int subAreaY, int subAreaWidth, int subAreaHeight);
 
 }

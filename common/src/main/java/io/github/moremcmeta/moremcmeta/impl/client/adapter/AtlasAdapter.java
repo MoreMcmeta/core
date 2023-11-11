@@ -80,7 +80,14 @@ public final class AtlasAdapter implements Atlas {
             return Optional.empty();
         }
 
-        return Optional.of(new SpriteAdapter(sprite, MIPMAP_LEVEL_GETTER.applyAsInt(sprite)));
+        return Optional.of(new SpriteAdapter(
+                sprite,
+                MIPMAP_LEVEL_GETTER.applyAsInt(sprite),
+                0,
+                0,
+                sprite.contents().width(),
+                sprite.contents().height()
+        ));
     }
 
     /**
@@ -91,26 +98,38 @@ public final class AtlasAdapter implements Atlas {
         private final TextureAtlasSprite SPRITE;
         private final long UPLOAD_POINT;
         private final int MIPMAP_LEVEL;
+        private final int X_OFFSET_LEFT;
+        private final int Y_OFFSET_LEFT;
+        private final int X_OFFSET_RIGHT;
+        private final int Y_OFFSET_RIGHT;
 
         /**
          * Adapts the given sprite to be a {@link Sprite}.
          * @param sprite        the sprite to adapt
          * @param mipmapLevel   the number of mipmaps for this sprite
+         * @param subAreaX      x-coordinate of the top-left corner of the sub-area to upload
+         * @param subAreaY      y-coordinate of the top-left corner of the sub-area to upload
+         * @param subAreaWidth  width the sub-area to upload
+         * @param subAreaHeight height the sub-area to upload
          */
-        public SpriteAdapter(TextureAtlasSprite sprite, int mipmapLevel) {
+        public SpriteAdapter(TextureAtlasSprite sprite, int mipmapLevel, int subAreaX, int subAreaY,
+                             int subAreaWidth, int subAreaHeight) {
             SPRITE = sprite;
             UPLOAD_POINT = findUploadPoint();
 
             if (mipmapLevel < 0) {
                 throw new IllegalArgumentException("Sprite cannot have negative mipmaps");
             }
-
             MIPMAP_LEVEL = mipmapLevel;
-        }
 
-        @Override
-        public ResourceLocation name() {
-            return SPRITE.contents().name();
+            X_OFFSET_LEFT = subAreaX;
+            Y_OFFSET_LEFT = subAreaY;
+            X_OFFSET_RIGHT = sprite.contents().width() - subAreaX - subAreaWidth;
+            Y_OFFSET_RIGHT = sprite.contents().height() - subAreaY - subAreaHeight;
+
+            if (X_OFFSET_RIGHT < 0 || Y_OFFSET_RIGHT < 0) {
+                throw new IllegalArgumentException("Sub area is outside sprite bounds");
+            }
         }
 
         @Override
@@ -129,13 +148,23 @@ public final class AtlasAdapter implements Atlas {
         }
 
         @Override
-        public int width() {
-            return SPRITE.contents().width();
+        public int xOffsetLeft() {
+            return X_OFFSET_LEFT;
         }
 
         @Override
-        public int height() {
-            return SPRITE.contents().height();
+        public int yOffsetLeft() {
+            return Y_OFFSET_LEFT;
+        }
+
+        @Override
+        public int xOffsetRight() {
+            return X_OFFSET_RIGHT;
+        }
+
+        @Override
+        public int yOffsetRight() {
+            return Y_OFFSET_RIGHT;
         }
 
         /**
