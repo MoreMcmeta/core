@@ -19,7 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * An adapter for {@link net.minecraft.client.renderer.texture.TextureAtlas}
@@ -30,10 +30,10 @@ import java.util.Optional;
 public interface Atlas {
 
     /**
-     * Gets a sprite from this atlas if it is present.
-     * @param location      the location of the sprite
-     * @return the sprite at the given location if present
+     * Gets all sprites from this atlas if it is present.
+     * @param location      the full path of the texture
+     * @return the sprites at the given location if present
      */
-    Optional<Sprite> sprite(ResourceLocation location);
+    List<Sprite> sprite(ResourceLocation location);
 
 }

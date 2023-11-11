@@ -67,7 +67,7 @@ public final class SpriteFinder {
         for (ResourceLocation atlasLocation : ATLAS_LOCATIONS) {
             Atlas atlas = ATLAS_GETTER.apply(atlasLocation);
             requireNonNull(atlas, "Atlas getter cannot supply null");
-            atlas.sprite(location).ifPresent(results::add);
+            results.addAll(atlas.sprite(location));
         }
 
         return results;
