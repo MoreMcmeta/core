@@ -18,7 +18,8 @@
 package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 
 import com.google.common.collect.ImmutableList;
-import io.github.moremcmeta.moremcmeta.api.client.texture.SpriteName;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.Atlas;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
@@ -29,8 +30,15 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -39,8 +47,44 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public final class AtlasAdapter implements Atlas {
+    private static final Map<ResourceLocation, Map<ResourceLocation, Set<ResourceLocation>>> SPRITE_NAME_MAPPINGS = new ConcurrentHashMap<>();
+    private final ResourceLocation ATLAS_LOCATION;
     private final TextureAtlas ATLAS;
     private final ToIntFunction<TextureAtlasSprite> MIPMAP_LEVEL_GETTER;
+
+    /**
+     * Adds a name mapping from the full path of a source texture to a sprite ID.
+     * @param atlas         full path of the atlas
+     * @param fullPath      full path of the source texture
+     * @param spriteName    ID of the sprite
+     */
+    public static void addNameMapping(ResourceLocation atlas, ResourceLocation fullPath, ResourceLocation spriteName) {
+        requireNonNull(atlas, "Atlas location cannot be null");
+        requireNonNull(fullPath, "Full path cannot be null");
+        requireNonNull(spriteName, "Sprite name cannot be null");
+        SPRITE_NAME_MAPPINGS.computeIfAbsent(atlas, (key) -> new ConcurrentHashMap<>())
+                .computeIfAbsent(fullPath, (key) -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
+                .add(spriteName);
+    }
+
+    /**
+     * Removes sprite IDs matching the given predicate.
+     * @param atlas         full path of the atlas
+     * @param filter        predicate that returns true if the sprite ID should be removed
+     */
+    public static void removeNameMappings(ResourceLocation atlas, Predicate<ResourceLocation> filter) {
+        requireNonNull(atlas, "Atlas location cannot be null");
+        requireNonNull(filter, "Filter cannot be null");
+        SPRITE_NAME_MAPPINGS.computeIfAbsent(atlas, (key) -> new ConcurrentHashMap<>())
+                .forEach((fullPath, spriteNames) -> spriteNames.removeIf(filter));
+    }
+
+    /**
+     * Removes name mappings for all atlases.
+     */
+    public static void clearNameMappings() {
+        SPRITE_NAME_MAPPINGS.clear();
+    }
 
     /**
      * Creates a new adapter for an atlas at the given location. If no texture exists at the
@@ -50,7 +94,7 @@ public final class AtlasAdapter implements Atlas {
      * @param mipmapLevelGetter     gets the mipmap level of this atlas from a sprite
      */
     public AtlasAdapter(ResourceLocation location, ToIntFunction<TextureAtlasSprite> mipmapLevelGetter) {
-        requireNonNull(location, "Location cannot be null");
+        ATLAS_LOCATION = requireNonNull(location, "Location cannot be null");
         MIPMAP_LEVEL_GETTER = requireNonNull(mipmapLevelGetter, "Mipmap level getter cannot be null");
 
         AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(location);
@@ -69,26 +113,28 @@ public final class AtlasAdapter implements Atlas {
             return ImmutableList.of();
         }
 
-        ResourceLocation properSpriteName = SpriteName.fromTexturePath(location);
+        return SPRITE_NAME_MAPPINGS.getOrDefault(ATLAS_LOCATION, ImmutableMap.of())
+                .getOrDefault(location, ImmutableSet.of())
+                .stream()
+                .flatMap((spriteName) -> {
+                    TextureAtlasSprite sprite = ATLAS.getSprite(spriteName);
 
-        TextureAtlasSprite sprite = ATLAS.getSprite(properSpriteName);
-        if (sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
-            sprite = ATLAS.getSprite(location);
-        }
+                    if (sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
+                        return Stream.of();
+                    }
 
-        // Check the original location in case another mod added it by that name
-        if (sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
-            return ImmutableList.of();
-        }
-
-        return ImmutableList.of(new SpriteAdapter(
-                sprite,
-                MIPMAP_LEVEL_GETTER.applyAsInt(sprite),
-                0,
-                0,
-                sprite.contents().width(),
-                sprite.contents().height()
-        ));
+                    return Stream.of(
+                            (Sprite) new SpriteAdapter(
+                                    sprite,
+                                    MIPMAP_LEVEL_GETTER.applyAsInt(sprite),
+                                    0,
+                                    0,
+                                    sprite.contents().width(),
+                                    sprite.contents().height()
+                            )
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     /**

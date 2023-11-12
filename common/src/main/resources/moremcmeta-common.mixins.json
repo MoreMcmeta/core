@@ -9,7 +9,11 @@
     "AbstractTextureMixin",
     "RenderSystemMixin",
     "TextureManagerAccessor",
-    "TextureManagerMixin"
+    "TextureManagerMixin",
+    "SpriteResourceLoaderMixin",
+    "DirectoryListerMixin",
+    "SingleFileMixin",
+    "SourceFilterMixin"
   ],
   "injectors": {
     "defaultRequire": 1

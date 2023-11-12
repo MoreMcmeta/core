@@ -645,6 +645,7 @@ public abstract class MoreMcmeta {
             });
 
             MoreMcmeta.dependencies = ImmutableMap.copyOf(Maps.transformValues(dependencies, ImmutableSet.Builder::build));
+            AtlasAdapter.clearNameMappings();
         }));
     }
 
