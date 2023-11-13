@@ -19,8 +19,10 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import net.minecraft.DetectedVersion;
 import net.minecraft.SharedConstants;
-import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +39,17 @@ import static org.junit.Assert.assertEquals;
  */
 @SuppressWarnings("ConstantConditions")
 public final class ModRepositorySourceTest {
-    private static final int DUMMY_VERSION = DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES);
+    private static final Pack.ResourcesSupplier MOCK_RESOURCES_SUPPLIER = new Pack.ResourcesSupplier() {
+        @Override
+        public @NotNull PackResources openPrimary(String packId) {
+            return new MockPackResources();
+        }
+
+        @Override
+        public @NotNull PackResources openFull(String packId, Pack.Info info) {
+            return openPrimary(packId);
+        }
+    };
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -50,12 +62,12 @@ public final class ModRepositorySourceTest {
     @Test
     public void construct_NullPackGetter_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new ModRepositorySource(null, DUMMY_VERSION);
+        new ModRepositorySource(null);
     }
 
     @Test
     public void loadPacks_NullConsumer_NullPointerException() {
-        ModRepositorySource repositorySource = new ModRepositorySource((id) -> new MockPackResources(), DUMMY_VERSION);
+        ModRepositorySource repositorySource = new ModRepositorySource(MOCK_RESOURCES_SUPPLIER);
 
         expectedException.expect(NullPointerException.class);
         repositorySource.loadPacks(null);
@@ -63,7 +75,7 @@ public final class ModRepositorySourceTest {
 
     @Test
     public void loadPacks_ValidParameters_OnePackGiven() {
-        ModRepositorySource repositorySource = new ModRepositorySource((id) -> new MockPackResources(), DUMMY_VERSION);
+        ModRepositorySource repositorySource = new ModRepositorySource(MOCK_RESOURCES_SUPPLIER);
 
         AtomicInteger packsConsumed = new AtomicInteger();
         repositorySource.loadPacks((pack) -> packsConsumed.getAndIncrement());
@@ -73,7 +85,7 @@ public final class ModRepositorySourceTest {
 
     @Test
     public void loadPacks_ValidParameters_PackWithRightIdGiven() {
-        ModRepositorySource repositorySource = new ModRepositorySource((id) -> new MockPackResources(), DUMMY_VERSION);
+        ModRepositorySource repositorySource = new ModRepositorySource(MOCK_RESOURCES_SUPPLIER);
 
         AtomicReference<String> packId = new AtomicReference<>("");
 
@@ -84,7 +96,7 @@ public final class ModRepositorySourceTest {
 
     @Test
     public void loadPacks_ValidParameters_PackWithRightFormatVersionGiven() {
-        ModRepositorySource repositorySource = new ModRepositorySource((id) -> new MockPackResources(), DUMMY_VERSION);
+        ModRepositorySource repositorySource = new ModRepositorySource(MOCK_RESOURCES_SUPPLIER);
 
         AtomicReference<PackCompatibility> packCompatibility = new AtomicReference<>(null);
 

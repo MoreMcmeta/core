@@ -10,7 +10,7 @@
     "RenderSystemMixin",
     "TextureManagerAccessor",
     "TextureManagerMixin",
-    "SpriteResourceLoaderMixin",
+    "SpriteSourceListMixin",
     "DirectoryListerMixin",
     "SingleFileMixin",
     "SourceFilterMixin"

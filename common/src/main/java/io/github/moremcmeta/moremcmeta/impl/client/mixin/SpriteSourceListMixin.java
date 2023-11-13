@@ -18,8 +18,8 @@
 package io.github.moremcmeta.moremcmeta.impl.client.mixin;
 
 import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.LocatedSpriteSource;
-import net.minecraft.client.renderer.texture.atlas.SpriteResourceLoader;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
+import net.minecraft.client.renderer.texture.atlas.SpriteSourceList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,8 +35,8 @@ import java.util.List;
  * @author soir20
  */
 @SuppressWarnings("unused")
-@Mixin(SpriteResourceLoader.class)
-public final class SpriteResourceLoaderMixin {
+@Mixin(SpriteSourceList.class)
+public final class SpriteSourceListMixin {
     @Shadow
     private List<SpriteSource> sources;
 
@@ -47,11 +47,11 @@ public final class SpriteResourceLoaderMixin {
      * @param callbackInfo          callback info from Mixin
      */
     @SuppressWarnings("DataFlowIssue")
-    @Inject(method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/texture/atlas/SpriteResourceLoader;",
+    @Inject(method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/texture/atlas/SpriteSourceList;",
             at = @At("RETURN"))
     private static void moremcmeta_onLoad(ResourceManager resourceManager, ResourceLocation atlasName,
-                                          CallbackInfoReturnable<SpriteResourceLoader> callbackInfo) {
-        SpriteResourceLoaderMixin loader = (SpriteResourceLoaderMixin) (Object) callbackInfo.getReturnValue();
+                                          CallbackInfoReturnable<SpriteSourceList> callbackInfo) {
+        SpriteSourceListMixin loader = (SpriteSourceListMixin) (Object) callbackInfo.getReturnValue();
         ResourceLocation atlasLocation = atlasName.withPrefix("textures/atlas/").withSuffix(".png");
         loader.sources.forEach((source) -> {
 

@@ -63,6 +63,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -73,6 +74,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -215,30 +217,37 @@ public abstract class MoreMcmeta {
 
             int packVersion = SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES);
             ModRepositorySource source = new ModRepositorySource(
-                    (packId) -> {
-                        OrderedResourceRepository repository = makeResourceRepository(packRepository);
+                    new Pack.ResourcesSupplier() {
+                        @Override
+                        public @NotNull PackResources openPrimary(String packId) {
+                            OrderedResourceRepository repository = makeResourceRepository(packRepository);
 
-                        List<String> currentPackIds = packIdGetter.get();
+                            List<String> currentPackIds = packIdGetter.get();
 
-                        cache.load(repository, currentPackIds, "textures", "optifine");
-                        METADATA_REGISTRY.set(cache.get(currentPackIds));
+                            cache.load(repository, currentPackIds, "textures", "optifine");
+                            METADATA_REGISTRY.set(cache.get(currentPackIds));
 
 
-                        ResourceLocation packIcon = new ResourceLocation(MODID, "pack.png");
+                            ResourceLocation packIcon = new ResourceLocation(MODID, "pack.png");
 
-                        return new SpriteFrameSizeFixPack(
-                                cache.get(currentPackIds),
-                                ImmutableMap.of(
-                                        "pack.png",
-                                        () -> repository.firstCollectionWith(packIcon)
-                                                .collection()
-                                                .find(PackType.CLIENT_RESOURCES, packIcon),
-                                        "pack.mcmeta",
-                                        () -> makePackMetadataStream(packVersion, ModRepositorySource.DESCRIPTION)
-                                )
-                        );
-                    },
-                    packVersion
+                            return new SpriteFrameSizeFixPack(
+                                    cache.get(currentPackIds),
+                                    ImmutableMap.of(
+                                            "pack.png",
+                                            () -> repository.firstCollectionWith(packIcon)
+                                                    .collection()
+                                                    .find(PackType.CLIENT_RESOURCES, packIcon),
+                                            "pack.mcmeta",
+                                            () -> makePackMetadataStream(packVersion, ModRepositorySource.DESCRIPTION)
+                                    )
+                            );
+                        }
+
+                        @Override
+                        public @NotNull PackResources openFull(String packId, Pack.Info info) {
+                            return openPrimary(packId);
+                        }
+                    }
             );
 
             addRepositorySource(packRepository, source);

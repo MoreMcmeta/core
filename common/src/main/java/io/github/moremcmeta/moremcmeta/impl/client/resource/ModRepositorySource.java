@@ -17,11 +17,12 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -48,16 +49,13 @@ public final class ModRepositorySource implements RepositorySource {
     public static final String DESCRIPTION = "Used by the MoreMcmeta mod. Cannot be moved.";
 
     private final Pack.ResourcesSupplier PACK_GETTER;
-    private final int CURRENT_VERSION;
 
     /**
      * Creates a new resource pack repository.
      * @param packGetter        creates the resource pack added by this mod on each reload
-     * @param currentVersion    current game version
      */
-    public ModRepositorySource(Pack.ResourcesSupplier packGetter, int currentVersion) {
+    public ModRepositorySource(Pack.ResourcesSupplier packGetter) {
         PACK_GETTER = requireNonNull(packGetter, "Pack getter cannot be null");
-        CURRENT_VERSION = currentVersion;
     }
 
     /**
@@ -75,9 +73,10 @@ public final class ModRepositorySource implements RepositorySource {
                 PACK_GETTER,
                 new Pack.Info(
                         Component.literal(DESCRIPTION),
-                        CURRENT_VERSION, FeatureFlagSet.of()
+                        PackCompatibility.COMPATIBLE,
+                        FeatureFlagSet.of(),
+                        ImmutableList.of()
                 ),
-                PackType.CLIENT_RESOURCES,
                 Pack.Position.TOP,
                 true,
                 PackSource.BUILT_IN
