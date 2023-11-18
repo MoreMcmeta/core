@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.github.moremcmeta.moremcmeta.api.client.texture.SpriteName;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.Atlas;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.Sprite;
@@ -31,6 +32,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -113,9 +115,16 @@ public final class AtlasAdapter implements Atlas {
             return ImmutableList.of();
         }
 
-        return SPRITE_NAME_MAPPINGS.getOrDefault(ATLAS_LOCATION, ImmutableMap.of())
-                .getOrDefault(location, ImmutableSet.of())
-                .stream()
+        Set<ResourceLocation> names = new HashSet<>(
+                SPRITE_NAME_MAPPINGS.getOrDefault(ATLAS_LOCATION, ImmutableMap.of())
+                        .getOrDefault(location, ImmutableSet.of())
+        );
+
+        // Add legacy sprite names to handle most sprites added by mods
+        names.add(location);
+        names.add(SpriteName.fromTexturePath(location));
+
+        return names.stream()
                 .flatMap((spriteName) -> {
                     TextureAtlasSprite sprite = ATLAS.getSprite(spriteName);
 
