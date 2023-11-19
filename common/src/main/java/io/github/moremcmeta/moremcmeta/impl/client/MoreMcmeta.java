@@ -120,9 +120,9 @@ public abstract class MoreMcmeta {
     private final Set<String> DEFAULT_PLUGINS = ImmutableSet.of(
             "moremcmeta_texture_plugin",
             "moremcmeta_animation_plugin",
+            "moremcmeta_gui_plugin",
             "moremcmeta_properties_parser_plugin",
-            "moremcmeta_moremcmeta_parser_plugin",
-            "moremcmeta_mcmeta_parser_plugin"
+            "moremcmeta_moremcmeta_parser_plugin"
     );
 
     /**
