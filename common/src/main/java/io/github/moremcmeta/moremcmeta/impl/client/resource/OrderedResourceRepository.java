@@ -18,15 +18,12 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -43,7 +40,6 @@ import static java.util.Objects.requireNonNull;
 public class OrderedResourceRepository {
     private final PackType RESOURCE_TYPE;
     private final ImmutableList<ResourceCollection> COLLECTIONS;
-    private final ImmutableMap<String, List<ResourceCollectionResult>> COLLECTIONS_BY_NAMESPACE;
 
     /**
      * Creates a new ordered group of {@link ResourceCollection}s.
@@ -59,23 +55,6 @@ public class OrderedResourceRepository {
         }
 
         COLLECTIONS = ImmutableList.copyOf(resourceCollections);
-
-        Map<String, ImmutableList.Builder<ResourceCollectionResult>> builders = new HashMap<>();
-        IntStream.range(0, COLLECTIONS.size())
-                .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index))
-                .forEach(
-                        (collection) -> collection.collection().namespaces(resourceType).forEach(
-                                (namespace) -> builders.computeIfAbsent(
-                                        namespace,
-                                        (ns) -> new ImmutableList.Builder<>()
-                                ).add(collection)
-                        )
-                );
-
-        COLLECTIONS_BY_NAMESPACE = ImmutableMap.copyOf(builders.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                (entry) -> entry.getValue().build()
-        )));
     }
 
     /**
@@ -103,8 +82,7 @@ public class OrderedResourceRepository {
     public ResourceCollectionResult firstCollectionWith(ResourceLocation location) throws IOException {
         requireNonNull(location, "Location cannot be null");
 
-        Optional<ResourceCollectionResult> collectionWithResource = COLLECTIONS_BY_NAMESPACE
-                .getOrDefault(location.getNamespace(), ImmutableList.of())
+        Optional<ResourceCollectionResult> collectionWithResource = collectionsByNamespace(location.getNamespace())
                 .stream()
                 .filter((collectionResult) -> collectionResult.collection().contains(RESOURCE_TYPE, location))
                 .findFirst();
@@ -124,7 +102,7 @@ public class OrderedResourceRepository {
     public boolean contains(ResourceLocation location) {
         requireNonNull(location, "Location cannot be null");
 
-        return COLLECTIONS_BY_NAMESPACE.getOrDefault(location.getNamespace(), ImmutableList.of())
+        return collectionsByNamespace(location.getNamespace())
                 .stream()
                 .anyMatch((collectionResult) -> collectionResult.collection().contains(RESOURCE_TYPE, location));
     }
@@ -144,6 +122,21 @@ public class OrderedResourceRepository {
                         (namespace) -> collection.list(RESOURCE_TYPE, namespace, pathStart, fileFilter).stream()
                 )
         ).collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets all collections that contain resources for the given namespace.
+     * @param namespace     namespace to check
+     * @return all collections that have resources in the given namespace
+     */
+    private List<ResourceCollectionResult> collectionsByNamespace(String namespace) {
+
+        // Filter collections when resources requested, rather than constructor, avoids inf. recursion with other mods
+        return IntStream.range(0, COLLECTIONS.size())
+                .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index))
+                .filter((collection) -> collection.collection().namespaces(RESOURCE_TYPE).contains(namespace))
+                .collect(Collectors.toList());
+
     }
 
     /**
