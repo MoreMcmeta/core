@@ -18,15 +18,21 @@
 package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,6 +46,8 @@ import static java.util.Objects.requireNonNull;
 public class OrderedResourceRepository {
     private final PackType RESOURCE_TYPE;
     private final ImmutableList<ResourceCollection> COLLECTIONS;
+    private final Lock COLLECTIONS_BY_NAMESPACE_LOCK;
+    private ImmutableMap<String, List<ResourceCollectionResult>> collectionsByNamespace;
 
     /**
      * Creates a new ordered group of {@link ResourceCollection}s.
@@ -55,6 +63,7 @@ public class OrderedResourceRepository {
         }
 
         COLLECTIONS = ImmutableList.copyOf(resourceCollections);
+        COLLECTIONS_BY_NAMESPACE_LOCK = new ReentrantLock();
     }
 
     /**
@@ -130,13 +139,27 @@ public class OrderedResourceRepository {
      * @return all collections that have resources in the given namespace
      */
     private List<ResourceCollectionResult> collectionsByNamespace(String namespace) {
+        COLLECTIONS_BY_NAMESPACE_LOCK.lock();
 
-        // Filter collections when resources requested, rather than constructor, avoids inf. recursion with other mods
-        return IntStream.range(0, COLLECTIONS.size())
-                .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index))
-                .filter((collection) -> collection.collection().namespaces(RESOURCE_TYPE).contains(namespace))
-                .toList();
+        // Filtering collections when resources requested, rather than in constructor, avoids inf. recursion with other mods
+        if (collectionsByNamespace == null) {
+            Map<String, List<ResourceCollectionResult>> collections = new HashMap<>();
 
+            IntStream.range(0, COLLECTIONS.size())
+                    .mapToObj((index) -> new ResourceCollectionResult(COLLECTIONS.get(index), index))
+                    .forEach((collection) -> collection.collection().namespaces(RESOURCE_TYPE)
+                            .forEach((collectorNamespace) -> collections.computeIfAbsent(
+                                    collectorNamespace,
+                                    (key) -> new ArrayList<>()).add(collection)
+                            )
+                    );
+
+            collectionsByNamespace = ImmutableMap.copyOf(collections);
+        }
+
+        COLLECTIONS_BY_NAMESPACE_LOCK.unlock();
+
+        return collectionsByNamespace.getOrDefault(namespace, ImmutableList.of());
     }
 
     /**
