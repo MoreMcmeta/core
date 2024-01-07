@@ -227,7 +227,6 @@ public abstract class MoreMcmeta {
                             cache.load(repository, currentPackIds, "textures", "optifine");
                             METADATA_REGISTRY.set(cache.get(currentPackIds));
 
-
                             ResourceLocation packIcon = new ResourceLocation(MODID, "pack.png");
 
                             return new SpriteFrameSizeFixPack(
