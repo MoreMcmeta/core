@@ -62,11 +62,14 @@ import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
@@ -219,7 +222,7 @@ public abstract class MoreMcmeta {
             ModRepositorySource source = new ModRepositorySource(
                     new Pack.ResourcesSupplier() {
                         @Override
-                        public @NotNull PackResources openPrimary(String packId) {
+                        public @NotNull PackResources openPrimary(PackLocationInfo packId) {
                             OrderedResourceRepository repository = makeResourceRepository(packRepository);
 
                             List<String> currentPackIds = packIdGetter.get();
@@ -238,12 +241,18 @@ public abstract class MoreMcmeta {
                                                     .find(PackType.CLIENT_RESOURCES, packIcon),
                                             "pack.mcmeta",
                                             () -> makePackMetadataStream(packVersion, ModRepositorySource.DESCRIPTION)
+                                    ),
+                                    new PackLocationInfo(
+                                            ModRepositorySource.PACK_ID,
+                                            Component.literal(ModRepositorySource.TITLE),
+                                            PackSource.BUILT_IN,
+                                            Optional.empty()
                                     )
                             );
                         }
 
                         @Override
-                        public @NotNull PackResources openFull(String packId, Pack.Info info) {
+                        public @NotNull PackResources openFull(PackLocationInfo packId, Pack.Metadata info) {
                             return openPrimary(packId);
                         }
                     }

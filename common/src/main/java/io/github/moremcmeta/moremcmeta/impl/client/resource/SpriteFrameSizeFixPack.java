@@ -22,6 +22,7 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.GuiScaling;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
@@ -49,6 +50,7 @@ import static java.util.Objects.requireNonNull;
 @MethodsReturnNonnullByDefault
 public final class SpriteFrameSizeFixPack implements PackResources {
     private static final String VANILLA_METADATA_EXTENSION = ".mcmeta";
+    private final PackLocationInfo PACK_INFO;
     private final ImmutableMap<? extends ResourceLocation, ? extends TextureData<?>> TEXTURES;
     private final ImmutableMap<? extends String, ? extends StreamSource> ROOT_RESOURCES;
 
@@ -56,11 +58,14 @@ public final class SpriteFrameSizeFixPack implements PackResources {
      * Creates a new sprite fix pack.
      * @param textures              textures controlled by the mod. Every texture must have an image set.
      * @param rootResources         root resources for this pack
+     * @param packInfo              location of the resource pack
      */
     public SpriteFrameSizeFixPack(Map<? extends ResourceLocation, ? extends TextureData<?>> textures,
-                                  Map<? extends String, ? extends StreamSource> rootResources) {
+                                  Map<? extends String, ? extends StreamSource> rootResources,
+                                  PackLocationInfo packInfo) {
         requireNonNull(textures, "Textures cannot be null");
         requireNonNull(rootResources, "Root resources cannot be null");
+        PACK_INFO = requireNonNull(packInfo, "Pack info cannot be null");
         TEXTURES = ImmutableMap.copyOf(textures);
         ROOT_RESOURCES = ImmutableMap.copyOf(rootResources);
     }
@@ -185,12 +190,21 @@ public final class SpriteFrameSizeFixPack implements PackResources {
     }
 
     /**
+     * Gets the location of this resource pack.
+     * @return the location of this resource pack
+     */
+    @Override
+    public PackLocationInfo location() {
+        return PACK_INFO;
+    }
+
+    /**
      * Gets the name of this resource pack.
      * @return the name of this resource pack
      */
     @Override
     public String packId() {
-        return "__MoreMcmeta Internal__";
+        return PACK_INFO.id();
     }
 
     /**

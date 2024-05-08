@@ -19,6 +19,7 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 
 import net.minecraft.DetectedVersion;
 import net.minecraft.SharedConstants;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
@@ -41,12 +42,12 @@ import static org.junit.Assert.assertEquals;
 public final class ModRepositorySourceTest {
     private static final Pack.ResourcesSupplier MOCK_RESOURCES_SUPPLIER = new Pack.ResourcesSupplier() {
         @Override
-        public @NotNull PackResources openPrimary(String packId) {
+        public @NotNull PackResources openPrimary(PackLocationInfo packId) {
             return new MockPackResources();
         }
 
         @Override
-        public @NotNull PackResources openFull(String packId, Pack.Info info) {
+        public @NotNull PackResources openFull(PackLocationInfo packId, Pack.Metadata info) {
             return openPrimary(packId);
         }
     };

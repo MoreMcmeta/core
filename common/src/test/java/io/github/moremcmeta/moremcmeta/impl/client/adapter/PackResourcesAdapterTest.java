@@ -20,10 +20,13 @@ package io.github.moremcmeta.moremcmeta.impl.client.adapter;
 import com.google.common.hash.Hashing;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MockPackResources;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +37,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -529,6 +533,16 @@ public final class PackResourcesAdapterTest {
         @Override
         public <T> T getMetadataSection(MetadataSectionSerializer<T> metadataSectionSerializer) {
             throw new RuntimeException("dummy getMetadataSection exception");
+        }
+
+        @Override
+        public PackLocationInfo location() {
+            return new PackLocationInfo(
+                    "test-pack",
+                    Component.literal("Test Pack"),
+                    PackSource.BUILT_IN,
+                    Optional.empty()
+            );
         }
 
         @Override

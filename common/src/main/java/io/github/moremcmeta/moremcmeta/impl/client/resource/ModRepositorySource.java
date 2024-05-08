@@ -20,13 +20,16 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.flag.FeatureFlagSet;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
@@ -42,6 +45,11 @@ public final class ModRepositorySource implements RepositorySource {
      * The unique identifier for the mod's resource pack.
      */
     public static final String PACK_ID = "__moremcmeta-internal__";
+
+    /**
+     * The title of the mod's resource pack.
+     */
+    public static final String TITLE = "MoreMcmeta Internal";
 
     /**
      * The description for the mod's resource pack.
@@ -66,20 +74,20 @@ public final class ModRepositorySource implements RepositorySource {
     public void loadPacks(Consumer<Pack> consumer) {
         requireNonNull(consumer, "Pack consumer cannot be null");
 
-        Pack pack = Pack.create(
-                PACK_ID,
-                Component.literal("MoreMcmeta Internal"),
-                true,
+        Pack pack = new Pack(
+                new PackLocationInfo(
+                        PACK_ID,
+                        Component.literal(TITLE),
+                        PackSource.BUILT_IN,
+                        Optional.empty()
+                ),
                 PACK_GETTER,
-                new Pack.Info(
-                        Component.literal(DESCRIPTION),
+                new Pack.Metadata(Component.literal(DESCRIPTION),
                         PackCompatibility.COMPATIBLE,
                         FeatureFlagSet.of(),
                         ImmutableList.of()
                 ),
-                Pack.Position.TOP,
-                true,
-                PackSource.BUILT_IN
+                new PackSelectionConfig(true, Pack.Position.TOP, true)
         );
 
         consumer.accept(pack);
