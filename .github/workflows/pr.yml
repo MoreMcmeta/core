@@ -11,7 +11,7 @@ jobs:
 
       - uses: actions/setup-java@308abcba03229002f0055e17d79d00c32fca160f
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
 
       - name: Ensure Gradle wrapper is executable
