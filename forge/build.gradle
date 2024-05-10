@@ -1,3 +1,5 @@
+import net.fabricmc.loom.api.mappings.layered.MappingsNamespace
+
 /*
  * MoreMcmeta is a Minecraft mod expanding texture configuration capabilities.
  * Copyright (C) 2023 soir20
@@ -69,6 +71,11 @@ shadowJar {
 }
 
 remapJar {
+
+    // In 1.20.6+, Forge applies remapping at runtime, so we need to disable
+    // remapping in the output jar.
+    sourceNamespace = MappingsNamespace.INTERMEDIARY.toString()
+
     inputFile.set shadowJar.archiveFile
     dependsOn shadowJar
     archiveClassifier.set "forge"
