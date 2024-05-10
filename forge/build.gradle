@@ -28,7 +28,7 @@ architectury {
 
 loom {
     forge {
-        mixinConfig "moremcmeta-common.mixins.json"
+        mixinConfig "moremcmeta-forge.mixins.json"
     }
 }
 
