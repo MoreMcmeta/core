@@ -23,6 +23,7 @@ import com.mojang.blaze3d.platform.TextureUtil;
 import io.github.moremcmeta.moremcmeta.api.client.ClientPlugin;
 import io.github.moremcmeta.moremcmeta.forge.api.client.MoreMcmetaClientPlugin;
 import io.github.moremcmeta.moremcmeta.forge.impl.client.event.ClientTicker;
+import io.github.moremcmeta.moremcmeta.forge.impl.client.mixin.TextureManagerAccessor;
 import io.github.moremcmeta.moremcmeta.forge.impl.client.reflection.AnnotatedClassLoader;
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.StagedResourceReloadListener;
@@ -31,6 +32,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -167,6 +169,11 @@ public final class MoreMcmetaForge extends MoreMcmeta {
     @Override
     protected void startTicking(TextureManagerWrapper<EventDrivenTexture> texManager) {
         new ClientTicker(ImmutableList.of(texManager), MinecraftForge.EVENT_BUS, TickEvent.Phase.START, () -> true);
+    }
+
+    @Override
+    protected Map<ResourceLocation, AbstractTexture> allRegisteredTextures(TextureManager textureManager) {
+        return ((TextureManagerAccessor) textureManager).moremcmeta_byPath();
     }
 
 }

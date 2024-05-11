@@ -38,7 +38,6 @@ import io.github.moremcmeta.moremcmeta.impl.client.adapter.TextureManagerAdapter
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataAssembler;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataReader;
-import io.github.moremcmeta.moremcmeta.impl.client.mixin.TextureManagerAccessor;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MetadataRegistryImpl;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ModRepositorySource;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.OrderedResourceRepository;
@@ -58,6 +57,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -341,6 +341,13 @@ public abstract class MoreMcmeta {
      * @param texManager        the manager to begin ticking
      */
     protected abstract void startTicking(TextureManagerWrapper<EventDrivenTexture> texManager);
+
+    /**
+     * Get all textures currently registered with the texture manager.
+     * @param textureManager    texture manager containing registered textures
+     * @return all registered textures
+     */
+    protected abstract Map<ResourceLocation, AbstractTexture> allRegisteredTextures(TextureManager textureManager);
 
     /**
      * Divides the collection of all plugins into their separate subtypes.
@@ -635,10 +642,10 @@ public abstract class MoreMcmeta {
 
         Optional<ReloadInstance> reloadInstance = reloadInstance(overlay.get(), logger);
         reloadInstance.ifPresent((instance) -> instance.done().thenRun(() -> {
-            TextureManagerAccessor textureManager = (TextureManagerAccessor) Minecraft.getInstance().getTextureManager();
+            Map<ResourceLocation, AbstractTexture> allTextures = allRegisteredTextures(Minecraft.getInstance().getTextureManager());
             SpriteFinder spriteFinder = new SpriteFinder(
                     (loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)),
-                    textureManager.moremcmeta_byPath().entrySet().stream()
+                    allTextures.entrySet().stream()
                             .filter((entry) -> entry.getValue() instanceof TextureAtlas)
                             .map(Map.Entry::getKey)
                             .collect(Collectors.toSet())

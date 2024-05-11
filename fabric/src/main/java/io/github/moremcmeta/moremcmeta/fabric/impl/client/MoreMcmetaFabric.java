@@ -36,6 +36,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
@@ -131,6 +132,11 @@ public final class MoreMcmetaFabric extends MoreMcmeta implements ClientModIniti
     @Override
     protected void startTicking(TextureManagerWrapper<EventDrivenTexture> texManager) {
         ClientTickEvents.START_CLIENT_TICK.register((client) -> texManager.tick());
+    }
+
+    @Override
+    protected Map<ResourceLocation, AbstractTexture> allRegisteredTextures(TextureManager textureManager) {
+        return ((TextureManagerAccessor) textureManager).moremcmeta_byPath();
     }
 
     /**
