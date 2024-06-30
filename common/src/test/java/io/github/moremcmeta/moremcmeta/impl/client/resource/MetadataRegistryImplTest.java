@@ -48,7 +48,7 @@ public final class MetadataRegistryImplTest {
     public void getFromPath_NullPluginName_NullPointerException() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("block.png"),
+                ResourceLocation.parse("block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -63,14 +63,14 @@ public final class MetadataRegistryImplTest {
         ));
 
         expectedException.expect(NullPointerException.class);
-        registry.metadataFromPath(null, new ResourceLocation("block.png"));
+        registry.metadataFromPath(null, ResourceLocation.parse("block.png"));
     }
 
     @Test
     public void getFromPath_NullLocation_NullPointerException() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("block.png"),
+                ResourceLocation.parse("block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -92,7 +92,7 @@ public final class MetadataRegistryImplTest {
     public void getFromPath_SpriteName_NothingFound() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -106,14 +106,14 @@ public final class MetadataRegistryImplTest {
                 )
         ));
 
-        assertFalse(registry.metadataFromPath("plugin", new ResourceLocation("block")).isPresent());
+        assertFalse(registry.metadataFromPath("plugin", ResourceLocation.parse("block")).isPresent());
     }
 
     @Test
     public void getFromPath_DifferentPluginHasMetadata_NothingFound() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("block.png"),
+                ResourceLocation.parse("block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -127,7 +127,7 @@ public final class MetadataRegistryImplTest {
                 )
         ));
 
-        assertFalse(registry.metadataFromPath("other", new ResourceLocation("block.png")).isPresent());
+        assertFalse(registry.metadataFromPath("other", ResourceLocation.parse("block.png")).isPresent());
     }
 
     @Test
@@ -136,7 +136,7 @@ public final class MetadataRegistryImplTest {
 
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -152,7 +152,7 @@ public final class MetadataRegistryImplTest {
 
         assertEquals(
                 expected,
-                registry.metadataFromPath("plugin", new ResourceLocation("textures/block.png")).orElseThrow()
+                registry.metadataFromPath("plugin", ResourceLocation.parse("textures/block.png")).orElseThrow()
         );
     }
 
@@ -160,7 +160,7 @@ public final class MetadataRegistryImplTest {
     public void getFromSpriteName_NullPluginName_NullPointerException() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -175,14 +175,14 @@ public final class MetadataRegistryImplTest {
         ));
 
         expectedException.expect(NullPointerException.class);
-        registry.metadataFromSpriteName(null, new ResourceLocation("block.png"));
+        registry.metadataFromSpriteName(null, ResourceLocation.parse("block.png"));
     }
 
     @Test
     public void getFromSpriteName_NullLocation_NullPointerException() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -204,7 +204,7 @@ public final class MetadataRegistryImplTest {
     public void getFromSpriteName_FullTextureLocation_NothingFound() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -218,14 +218,14 @@ public final class MetadataRegistryImplTest {
                 )
         ));
 
-        assertFalse(registry.metadataFromSpriteName("plugin", new ResourceLocation("textures/block.png")).isPresent());
+        assertFalse(registry.metadataFromSpriteName("plugin", ResourceLocation.parse("textures/block.png")).isPresent());
     }
 
     @Test
     public void getFromSpriteName_DifferentPluginHasMetadata_NothingFound() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -239,7 +239,7 @@ public final class MetadataRegistryImplTest {
                 )
         ));
 
-        assertFalse(registry.metadataFromSpriteName("other", new ResourceLocation("block")).isPresent());
+        assertFalse(registry.metadataFromSpriteName("other", ResourceLocation.parse("block")).isPresent());
     }
 
     @Test
@@ -248,7 +248,7 @@ public final class MetadataRegistryImplTest {
 
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -264,7 +264,7 @@ public final class MetadataRegistryImplTest {
 
         assertEquals(
                 expected,
-                registry.metadataFromSpriteName("plugin", new ResourceLocation("block")).orElseThrow()
+                registry.metadataFromSpriteName("plugin", ResourceLocation.parse("block")).orElseThrow()
         );
     }
 
@@ -272,7 +272,7 @@ public final class MetadataRegistryImplTest {
     public void getByPlugin_NullPluginName_NullPointerException() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -294,7 +294,7 @@ public final class MetadataRegistryImplTest {
     public void getByPlugin_PluginHasNoMetadata_AllMetadataFound() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -316,7 +316,7 @@ public final class MetadataRegistryImplTest {
     public void getByPlugin_PluginHasMetadata_AllMetadataFound() {
         MetadataRegistryImpl registry = new MetadataRegistryImpl();
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -328,7 +328,7 @@ public final class MetadataRegistryImplTest {
                                 (metadata, frames) -> new TextureComponent<>() {}
                         ))
                 ),
-                new ResourceLocation("textures/block2.png"),
+                ResourceLocation.parse("textures/block2.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,
@@ -343,8 +343,8 @@ public final class MetadataRegistryImplTest {
         ));
 
         Map<ResourceLocation, AnalyzedMetadata> metadata = registry.metadataByPlugin("plugin");
-        assertTrue(metadata.containsKey(new ResourceLocation("textures/block.png")));
-        assertTrue(metadata.containsKey(new ResourceLocation("textures/block2.png")));
+        assertTrue(metadata.containsKey(ResourceLocation.parse("textures/block.png")));
+        assertTrue(metadata.containsKey(ResourceLocation.parse("textures/block2.png")));
         assertEquals(2, metadata.size());
     }
 
@@ -364,7 +364,7 @@ public final class MetadataRegistryImplTest {
 
         expectedException.expect(IllegalArgumentException.class);
         registry.set(ImmutableMap.of(
-                new ResourceLocation("textures/block.png"),
+                ResourceLocation.parse("textures/block.png"),
                 new TextureData<>(
                         new TextureData.FrameSize(30, 40),
                         false, false,

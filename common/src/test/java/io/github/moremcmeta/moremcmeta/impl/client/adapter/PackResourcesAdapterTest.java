@@ -62,7 +62,7 @@ public final class PackResourcesAdapterTest {
     public void find_ResourceTypeNull_NullPointerException() throws IOException {
         PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources());
         expectedException.expect(NullPointerException.class);
-        adapter.find(null, new ResourceLocation("testing"));
+        adapter.find(null, ResourceLocation.parse("testing"));
     }
 
     @Test
@@ -75,7 +75,7 @@ public final class PackResourcesAdapterTest {
     @Test
     public void find_GetExistingClientResource_ResourceRetrieved() throws IOException {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("textures/block/sea/rock/gravel.png");
+        ResourceLocation location = ResourceLocation.parse("textures/block/sea/rock/gravel.png");
         InputStream resource = adapter.find(PackType.CLIENT_RESOURCES, location);
 
         assertEquals(location.getPath(), new String(resource.readAllBytes()));
@@ -84,7 +84,7 @@ public final class PackResourcesAdapterTest {
     @Test
     public void find_GetExistingServerResource_ResourceRetrieved() throws IOException {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/config.json");
         InputStream resource = adapter.find(PackType.SERVER_DATA, location);
 
         assertEquals(location.getPath(), new String(resource.readAllBytes()));
@@ -93,7 +93,7 @@ public final class PackResourcesAdapterTest {
     @Test
     public void find_GetNotExistingClientResource_IOException() throws IOException {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("textures/block/sea/rock/other.png");
+        ResourceLocation location = ResourceLocation.parse("textures/block/sea/rock/other.png");
 
         expectedException.expect(IOException.class);
         adapter.find(PackType.CLIENT_RESOURCES, location);
@@ -102,7 +102,7 @@ public final class PackResourcesAdapterTest {
     @Test
     public void find_GetNotExistingServerResource_IOException() throws IOException {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("settings/server/network/other.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/other.json");
 
         expectedException.expect(IOException.class);
         adapter.find(PackType.SERVER_DATA, location);
@@ -111,7 +111,7 @@ public final class PackResourcesAdapterTest {
     @Test
     public void find_GetResourceDifferentResourceType_IOException() throws IOException {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/config.json");
 
         expectedException.expect(IOException.class);
         adapter.find(PackType.CLIENT_RESOURCES, location);
@@ -128,7 +128,7 @@ public final class PackResourcesAdapterTest {
                     }
                 }
         );
-        ResourceLocation location = new ResourceLocation("textures/block/sea/rock/other.png");
+        ResourceLocation location = ResourceLocation.parse("textures/block/sea/rock/other.png");
 
         expectedException.expect(IOException.class);
         adapter.find(PackType.CLIENT_RESOURCES, location);
@@ -139,7 +139,7 @@ public final class PackResourcesAdapterTest {
         PackResources original = new ExceptionPackResources();
         PackResourcesAdapter adapter = new PackResourcesAdapter(original);
 
-        ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/config.json");
 
         expectedException.expect(RuntimeException.class);
         adapter.find(PackType.SERVER_DATA, location);
@@ -176,7 +176,7 @@ public final class PackResourcesAdapterTest {
     public void contains_ResourceTypeNull_NullPointerException() {
         PackResourcesAdapter adapter = new PackResourcesAdapter(new MockPackResources());
         expectedException.expect(NullPointerException.class);
-        adapter.contains(null, new ResourceLocation("testing"));
+        adapter.contains(null, ResourceLocation.parse("testing"));
     }
 
     @Test
@@ -189,35 +189,35 @@ public final class PackResourcesAdapterTest {
     @Test
     public void contains_GetExistingClientResource_ResourceFound() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("textures/block/sea/rock/gravel.png");
+        ResourceLocation location = ResourceLocation.parse("textures/block/sea/rock/gravel.png");
         assertTrue(adapter.contains(PackType.CLIENT_RESOURCES, location));
     }
 
     @Test
     public void contains_GetExistingServerResource_ResourceFound() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/config.json");
         assertTrue(adapter.contains(PackType.SERVER_DATA, location));
     }
 
     @Test
     public void contains_GetNotExistingClientResource_ResourceNotFound() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("textures/block/sea/rock/other.png");
+        ResourceLocation location = ResourceLocation.parse("textures/block/sea/rock/other.png");
         assertFalse(adapter.contains(PackType.CLIENT_RESOURCES, location));
     }
 
     @Test
     public void contains_GetNotExistingServerResource_ResourceNotFound() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("settings/server/network/other.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/other.json");
         assertFalse(adapter.contains(PackType.SERVER_DATA, location));
     }
 
     @Test
     public void contains_GetResourceDifferentResourceType_ResourceNotFound() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/config.json");
         assertFalse(adapter.contains(PackType.CLIENT_RESOURCES, location));
     }
 
@@ -226,7 +226,7 @@ public final class PackResourcesAdapterTest {
         PackResources original = new ExceptionPackResources();
         PackResourcesAdapter adapter = new PackResourcesAdapter(original);
 
-        ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/config.json");
 
         expectedException.expect(RuntimeException.class);
         adapter.contains(PackType.SERVER_DATA, location);
@@ -293,8 +293,8 @@ public final class PackResourcesAdapterTest {
                 "textures", (file) -> file.endsWith(".png"));
 
         assertEquals(2, resources.size());
-        assertTrue(resources.contains(new ResourceLocation("textures/hello.png")));
-        assertTrue(resources.contains(new ResourceLocation("textures/block/sea/rock/gravel.png")));
+        assertTrue(resources.contains(ResourceLocation.parse("textures/hello.png")));
+        assertTrue(resources.contains(ResourceLocation.parse("textures/block/sea/rock/gravel.png")));
     }
 
     @Test
@@ -305,7 +305,7 @@ public final class PackResourcesAdapterTest {
                 "textures", (file) -> file.endsWith(".png"));
 
         assertEquals(1, resources.size());
-        assertTrue(resources.contains(new ResourceLocation("sea", "textures/block/coral.png")));
+        assertTrue(resources.contains(ResourceLocation.fromNamespaceAndPath("sea", "textures/block/coral.png")));
     }
 
     @Test
@@ -346,8 +346,8 @@ public final class PackResourcesAdapterTest {
                 "", (file) -> file.endsWith(".png"));
 
         assertEquals(2, resources.size());
-        assertTrue(resources.contains(new ResourceLocation("textures/hello.png")));
-        assertTrue(resources.contains(new ResourceLocation("textures/block/sea/rock/gravel.png")));
+        assertTrue(resources.contains(ResourceLocation.parse("textures/hello.png")));
+        assertTrue(resources.contains(ResourceLocation.parse("textures/block/sea/rock/gravel.png")));
     }
 
     @Test
@@ -430,15 +430,15 @@ public final class PackResourcesAdapterTest {
     public void getNamespaces_RootResourcesInPack_RootResourceNamespaceIncluded() {
         Set<String> rootResources = Set.of("image.png", "info.txt", "readme.md");
         Map<PackType, Set<ResourceLocation>> regularResources = new HashMap<>();
-        regularResources.put(PackType.CLIENT_RESOURCES, Set.of(new ResourceLocation("sea", "textures/hello.png"),
-                new ResourceLocation("sea", "textures/block/sea/rock/gravel.png"),
-                new ResourceLocation("sea", "textures/block/coral.png"),
-                new ResourceLocation("sea", "lang/en/us/words.txt"),
-                new ResourceLocation("moremcmeta", "config/textures/settings.json")));
-        regularResources.put(PackType.SERVER_DATA, Set.of(new ResourceLocation("settings/server/network/config.json"),
-                new ResourceLocation("sea", "lang/en/us/words.txt"),
-                new ResourceLocation("sea", "textures/block/coral.png"),
-                new ResourceLocation("sea", "textures/block/sea/rock/gravel.png")));
+        regularResources.put(PackType.CLIENT_RESOURCES, Set.of(ResourceLocation.fromNamespaceAndPath("sea", "textures/hello.png"),
+                ResourceLocation.fromNamespaceAndPath("sea", "textures/block/sea/rock/gravel.png"),
+                ResourceLocation.fromNamespaceAndPath("sea", "textures/block/coral.png"),
+                ResourceLocation.fromNamespaceAndPath("sea", "lang/en/us/words.txt"),
+                ResourceLocation.fromNamespaceAndPath("moremcmeta", "config/textures/settings.json")));
+        regularResources.put(PackType.SERVER_DATA, Set.of(ResourceLocation.parse("settings/server/network/config.json"),
+                ResourceLocation.fromNamespaceAndPath("sea", "lang/en/us/words.txt"),
+                ResourceLocation.fromNamespaceAndPath("sea", "textures/block/coral.png"),
+                ResourceLocation.fromNamespaceAndPath("sea", "textures/block/sea/rock/gravel.png")));
 
         PackResources original = new MockPackResources(rootResources, regularResources, "pack name");
 
@@ -462,21 +462,21 @@ public final class PackResourcesAdapterTest {
     public void locateRootResource_PackPng_UniqueLocationRetrieved() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png");
-        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon"), location);
+        assertEquals(ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon"), location);
     }
 
     @Test
     public void locateRootResource_PackMetadata_UniqueLocationRetrieved() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png.moremcmeta");
-        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon.moremcmeta"), location);
+        assertEquals(ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon.moremcmeta"), location);
     }
 
     @Test
     public void locateRootResource_NonPackPng_UniqueLocationRetrieved() {
         PackResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("root.png");
-        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/root.png"), location);
+        assertEquals(ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/root.png"), location);
     }
 
     private PackResourcesAdapter makeAdapterWithResources() {
@@ -484,18 +484,18 @@ public final class PackResourcesAdapterTest {
         Map<PackType, Set<ResourceLocation>> regularResources = new HashMap<>();
 
         //noinspection deprecation
-        regularResources.put(PackType.CLIENT_RESOURCES, Set.of(new ResourceLocation("textures/hello.png"),
-                new ResourceLocation("textures/block/sea/rock/gravel.png"),
-                new ResourceLocation("sea", "textures/block/coral.png"),
-                new ResourceLocation("lang/en/us/words.txt"),
-                new ResourceLocation("moremcmeta", "config/textures/settings.json"),
-                new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/" + Hashing.sha1().hashUnencodedChars("pack name")
+        regularResources.put(PackType.CLIENT_RESOURCES, Set.of(ResourceLocation.parse("textures/hello.png"),
+                ResourceLocation.parse("textures/block/sea/rock/gravel.png"),
+                ResourceLocation.fromNamespaceAndPath("sea", "textures/block/coral.png"),
+                ResourceLocation.parse("lang/en/us/words.txt"),
+                ResourceLocation.fromNamespaceAndPath("moremcmeta", "config/textures/settings.json"),
+                ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/" + Hashing.sha1().hashUnencodedChars("pack name")
                         + "/in-pack.png.moremcmeta")));
 
-        regularResources.put(PackType.SERVER_DATA, Set.of(new ResourceLocation("settings/server/network/config.json"),
-                new ResourceLocation("lang/en/us/words.txt"),
-                new ResourceLocation("sea", "textures/block/coral.png"),
-                new ResourceLocation("textures/block/sea/rock/gravel.png")));
+        regularResources.put(PackType.SERVER_DATA, Set.of(ResourceLocation.parse("settings/server/network/config.json"),
+                ResourceLocation.parse("lang/en/us/words.txt"),
+                ResourceLocation.fromNamespaceAndPath("sea", "textures/block/coral.png"),
+                ResourceLocation.parse("textures/block/sea/rock/gravel.png")));
 
         PackResources original = new MockPackResources(rootResources, regularResources, "pack name");
 

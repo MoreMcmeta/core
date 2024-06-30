@@ -146,7 +146,7 @@ public final class ClientTickerTest {
                 () -> true
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
+        ticker.tick(new TickEvent.ClientTickEvent.Pre());
 
         assertEquals(2, firstTickable.ticks());
         assertEquals(1, secondTickable.ticks());
@@ -166,7 +166,7 @@ public final class ClientTickerTest {
                 () -> true
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
+        ticker.tick(new TickEvent.ClientTickEvent.Pre());
 
         assertEquals(1, firstTickable.ticks());
         assertEquals(1, secondTickable.ticks());
@@ -186,7 +186,7 @@ public final class ClientTickerTest {
                 () -> false
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
+        ticker.tick(new TickEvent.ClientTickEvent.Pre());
 
         assertEquals(0, firstTickable.ticks());
         assertEquals(0, secondTickable.ticks());
@@ -206,7 +206,7 @@ public final class ClientTickerTest {
                 () -> true
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.END));
+        ticker.tick(new TickEvent.ClientTickEvent.Post());
 
         assertEquals(0, firstTickable.ticks());
         assertEquals(0, secondTickable.ticks());
@@ -226,7 +226,7 @@ public final class ClientTickerTest {
                 () -> false
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.END));
+        ticker.tick(new TickEvent.ClientTickEvent.Post());
 
         assertEquals(0, firstTickable.ticks());
         assertEquals(0, secondTickable.ticks());
@@ -246,7 +246,7 @@ public final class ClientTickerTest {
                 () -> true
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.END));
+        ticker.tick(new TickEvent.ClientTickEvent.Post());
 
         assertEquals(1, firstTickable.ticks());
         assertEquals(1, secondTickable.ticks());
@@ -266,7 +266,7 @@ public final class ClientTickerTest {
                 () -> false
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.END));
+        ticker.tick(new TickEvent.ClientTickEvent.Post());
 
         assertEquals(0, firstTickable.ticks());
         assertEquals(0, secondTickable.ticks());
@@ -286,7 +286,7 @@ public final class ClientTickerTest {
                 () -> true
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
+        ticker.tick(new TickEvent.ClientTickEvent.Pre());
 
         assertEquals(0, firstTickable.ticks());
         assertEquals(0, secondTickable.ticks());
@@ -306,7 +306,7 @@ public final class ClientTickerTest {
                 () -> false
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
+        ticker.tick(new TickEvent.ClientTickEvent.Pre());
 
         assertEquals(0, firstTickable.ticks());
         assertEquals(0, secondTickable.ticks());
@@ -344,7 +344,7 @@ public final class ClientTickerTest {
                 () -> true
         );
 
-        ticker.tick(new TickEvent.ClientTickEvent(TickEvent.Phase.START));
+        ticker.tick(new TickEvent.ClientTickEvent.Pre());
 
         ticker.stopTicking();
 

@@ -54,14 +54,14 @@ public final class RootResourcesAdapterTest {
 
     @Test
     public void locateForPackScreen_NonRootLocation_SameLocationReturned() {
-        ResourceLocation location = new ResourceLocation("test.png");
+        ResourceLocation location = ResourceLocation.parse("test.png");
         assertEquals(location, RootResourcesAdapter.locateForPackScreen(location));
     }
 
     @Test
     public void locateForPackScreen_NonRootLocation_UsesMinecraftNamespace() {
-        ResourceLocation location = new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "test.png");
-        assertEquals(new ResourceLocation("minecraft", "test.png"), RootResourcesAdapter.locateForPackScreen(location));
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "test.png");
+        assertEquals(ResourceLocation.fromNamespaceAndPath("minecraft", "test.png"), RootResourcesAdapter.locateForPackScreen(location));
     }
 
     @Test
@@ -72,13 +72,13 @@ public final class RootResourcesAdapterTest {
 
     @Test
     public void isRootResource_NonRootLocation_False() {
-        ResourceLocation location = new ResourceLocation("test.png");
+        ResourceLocation location = ResourceLocation.parse("test.png");
         assertFalse(RootResourcesAdapter.isRootResource(location));
     }
 
     @Test
     public void isRootResource_NonRootLocation_True() {
-        ResourceLocation location = new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "test.png");
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "test.png");
         assertTrue(RootResourcesAdapter.isRootResource(location));
     }
 
@@ -92,7 +92,7 @@ public final class RootResourcesAdapterTest {
     public void find_ResourceTypeNull_NullPointerException() throws IOException {
         RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources());
         expectedException.expect(NullPointerException.class);
-        adapter.find(null, new ResourceLocation("testing"));
+        adapter.find(null, ResourceLocation.parse("testing"));
     }
 
     @Test
@@ -105,7 +105,7 @@ public final class RootResourcesAdapterTest {
     @Test
     public void find_GetNonRootClientResource_IOException() throws IOException {
         RootResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("textures/block/sea/rock/gravel.png");
+        ResourceLocation location = ResourceLocation.parse("textures/block/sea/rock/gravel.png");
 
         expectedException.expect(IOException.class);
         adapter.find(PackType.CLIENT_RESOURCES, location);
@@ -114,7 +114,7 @@ public final class RootResourcesAdapterTest {
     @Test
     public void find_GetNonRootServerResource_IOException() throws IOException {
         RootResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/config.json");
 
         expectedException.expect(IOException.class);
         adapter.find(PackType.SERVER_DATA, location);
@@ -142,7 +142,7 @@ public final class RootResourcesAdapterTest {
     public void contains_ResourceTypeNull_NullPointerException() {
         RootResourcesAdapter adapter = new RootResourcesAdapter(new MockPackResources());
         expectedException.expect(NullPointerException.class);
-        adapter.contains(null, new ResourceLocation("testing"));
+        adapter.contains(null, ResourceLocation.parse("testing"));
     }
 
     @Test
@@ -155,14 +155,14 @@ public final class RootResourcesAdapterTest {
     @Test
     public void contains_GetNonRootClientResource_ResourceNotFound() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("textures/block/sea/rock/gravel.png");
+        ResourceLocation location = ResourceLocation.parse("textures/block/sea/rock/gravel.png");
         assertFalse(adapter.contains(PackType.CLIENT_RESOURCES, location));
     }
 
     @Test
     public void contains_GetNonRootServerResource_ResourceNotFound() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
-        ResourceLocation location = new ResourceLocation("settings/server/network/config.json");
+        ResourceLocation location = ResourceLocation.parse("settings/server/network/config.json");
         assertFalse(adapter.contains(PackType.SERVER_DATA, location));
     }
 
@@ -253,21 +253,21 @@ public final class RootResourcesAdapterTest {
     public void locateRootResource_PackPng_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png");
-        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon"), location);
+        assertEquals(ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon"), location);
     }
 
     @Test
     public void locateRootResource_PackMetadata_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("pack.png.moremcmeta");
-        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon.moremcmeta"), location);
+        assertEquals(ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/icon.moremcmeta"), location);
     }
 
     @Test
     public void locateRootResource_NonPackPng_UniqueLocationRetrieved() {
         RootResourcesAdapter adapter = makeAdapterWithResources();
         ResourceLocation location = adapter.locateRootResource("root.png");
-        assertEquals(new ResourceLocation(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/root.png"), location);
+        assertEquals(ResourceLocation.fromNamespaceAndPath(RootResourcesAdapter.ROOT_NAMESPACE, "pack/pack_name/400583302ac4dbbb6707031620374c9a45991149/root.png"), location);
     }
 
     private RootResourcesAdapter makeAdapterWithResources() {
@@ -275,18 +275,18 @@ public final class RootResourcesAdapterTest {
         Map<PackType, Set<ResourceLocation>> regularResources = new HashMap<>();
 
         //noinspection deprecation
-        regularResources.put(PackType.CLIENT_RESOURCES, Set.of(new ResourceLocation("textures/hello.png"),
-                new ResourceLocation("textures/block/sea/rock/gravel.png"),
-                new ResourceLocation("sea", "textures/block/coral.png"),
-                new ResourceLocation("lang/en/us/words.txt"),
-                new ResourceLocation("moremcmeta", "config/textures/settings.json"),
-                new ResourceLocation("pack/pack_name/" + Hashing.sha1().hashUnencodedChars("pack name")
+        regularResources.put(PackType.CLIENT_RESOURCES, Set.of(ResourceLocation.parse("textures/hello.png"),
+                ResourceLocation.parse("textures/block/sea/rock/gravel.png"),
+                ResourceLocation.fromNamespaceAndPath("sea", "textures/block/coral.png"),
+                ResourceLocation.parse("lang/en/us/words.txt"),
+                ResourceLocation.fromNamespaceAndPath("moremcmeta", "config/textures/settings.json"),
+                ResourceLocation.parse("pack/pack_name/" + Hashing.sha1().hashUnencodedChars("pack name")
                         + "/in-pack.png.moremcmeta")));
 
-        regularResources.put(PackType.SERVER_DATA, Set.of(new ResourceLocation("settings/server/network/config.json"),
-                new ResourceLocation("lang/en/us/words.txt"),
-                new ResourceLocation("sea", "textures/block/coral.png"),
-                new ResourceLocation("textures/block/sea/rock/gravel.png")));
+        regularResources.put(PackType.SERVER_DATA, Set.of(ResourceLocation.parse("settings/server/network/config.json"),
+                ResourceLocation.parse("lang/en/us/words.txt"),
+                ResourceLocation.fromNamespaceAndPath("sea", "textures/block/coral.png"),
+                ResourceLocation.parse("textures/block/sea/rock/gravel.png")));
 
         PackResources original = new MockPackResources(rootResources, regularResources, "pack name");
 

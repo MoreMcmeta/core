@@ -79,7 +79,7 @@ public final class RootResourcesAdapter implements ResourceCollection {
         requireNonNull(location, "Location cannot be null");
 
         if (isRootResource(location)) {
-            return new ResourceLocation("minecraft", location.getPath());
+            return ResourceLocation.fromNamespaceAndPath("minecraft", location.getPath());
         }
 
         return location;
@@ -145,7 +145,7 @@ public final class RootResourcesAdapter implements ResourceCollection {
         String fileName = rootResource.replaceAll("^pack.png", "icon");
 
         // Must be the same ResourceLocation as generated in PackSelectionScreen#loadPackIcon()
-        ResourceLocation location = new ResourceLocation(ROOT_NAMESPACE, ROOT_PATH_PREFIX + fileName);
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(ROOT_NAMESPACE, ROOT_PATH_PREFIX + fileName);
 
         ROOT_RESOURCES.computeIfAbsent(location, (loc) -> ORIGINAL.getRootResource(rootResource));
 

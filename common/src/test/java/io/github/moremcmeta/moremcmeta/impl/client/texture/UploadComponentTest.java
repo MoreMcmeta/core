@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 public final class UploadComponentTest {
-    private static final ResourceLocation DUMMY_LOCATION = new ResourceLocation("dummy.png");
+    private static final ResourceLocation DUMMY_LOCATION = ResourceLocation.parse("dummy.png");
     private static final TexturePreparer DUMMY_PREPARER =  (id, mipmap, width, height) -> {};
     private static final BaseCollection DUMMY_BASE_COLLECTION = BaseCollection.find(
             new SpriteFinder(

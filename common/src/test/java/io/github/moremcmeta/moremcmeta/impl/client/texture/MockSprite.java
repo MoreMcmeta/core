@@ -38,7 +38,7 @@ public final class MockSprite implements Sprite {
     }
 
     public MockSprite(long uploadPoint, int mipmapLevel) {
-        this(uploadPoint, mipmapLevel, new ResourceLocation("textures/atlas/dummy.png"));
+        this(uploadPoint, mipmapLevel, ResourceLocation.parse("textures/atlas/dummy.png"));
     }
 
     public MockSprite(long uploadPoint, int mipmapLevel, ResourceLocation atlas) {

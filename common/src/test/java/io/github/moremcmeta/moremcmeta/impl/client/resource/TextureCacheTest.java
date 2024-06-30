@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
  */
 public final class TextureCacheTest {
     private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceSearcher) -> Map.of(
-            new ResourceLocation(
+            ResourceLocation.fromNamespaceAndPath(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".moremcmeta", "")
             ),
@@ -160,8 +160,8 @@ public final class TextureCacheTest {
 
         ImmutableMap<ResourceLocation, Integer> actual = cache.get(1);
         ImmutableMap<ResourceLocation, Integer> expected = ImmutableMap.<ResourceLocation, Integer>builder()
-                .put(new ResourceLocation("textures/bat.png"), 1)
-                .put(new ResourceLocation("test/creeper.png"), 1)
+                .put(ResourceLocation.parse("textures/bat.png"), 1)
+                .put(ResourceLocation.parse("test/creeper.png"), 1)
                 .build();
 
         assertEquals(expected, actual);
@@ -188,8 +188,8 @@ public final class TextureCacheTest {
         thread.join();
 
         ImmutableMap<ResourceLocation, Integer> expected = ImmutableMap.<ResourceLocation, Integer>builder()
-                .put(new ResourceLocation("textures/bat.png"), 1)
-                .put(new ResourceLocation("test/creeper.png"), 1)
+                .put(ResourceLocation.parse("textures/bat.png"), 1)
+                .put(ResourceLocation.parse("test/creeper.png"), 1)
                 .build();
 
         assertEquals(expected, actual.get());
@@ -222,8 +222,8 @@ public final class TextureCacheTest {
         thread.join();
 
         ImmutableMap<ResourceLocation, Integer> expected = ImmutableMap.<ResourceLocation, Integer>builder()
-                .put(new ResourceLocation("textures/cat.png"), 1)
-                .put(new ResourceLocation("test/zombie.png"), 1)
+                .put(ResourceLocation.parse("textures/cat.png"), 1)
+                .put(ResourceLocation.parse("test/zombie.png"), 1)
                 .build();
 
         assertEquals(expected, actual.get());

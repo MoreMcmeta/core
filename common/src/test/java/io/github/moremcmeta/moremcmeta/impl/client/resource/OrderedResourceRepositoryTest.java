@@ -44,7 +44,7 @@ public final class OrderedResourceRepositoryTest {
     public void construct_NullPackType_NullPointerException() {
         expectedException.expect(NullPointerException.class);
         new OrderedResourceRepository(null,
-                ImmutableList.of(new MockResourceCollection(Set.of(new ResourceLocation("one.png")))));
+                ImmutableList.of(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png")))));
     }
 
     @Test
@@ -56,7 +56,7 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void construct_NullCollection_NullPointerException() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
         collections.add(null);
 
         expectedException.expect(NullPointerException.class);
@@ -66,9 +66,9 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void resourceType_ClientType_ReturnsClient() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
         assertEquals(PackType.CLIENT_RESOURCES, repository.resourceType());
@@ -77,9 +77,9 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void resourceType_ServerType_ReturnsServer() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
         assertEquals(PackType.SERVER_DATA, repository.resourceType());
@@ -88,9 +88,9 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void getFirstCollectionWith_NullLocation_NullPointerException() throws IOException {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
@@ -101,27 +101,27 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void getFirstCollectionWith_LocationNotFound_IOException() throws IOException {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         expectedException.expect(IOException.class);
-        repository.firstCollectionWith(new ResourceLocation("four.png"));
+        repository.firstCollectionWith(ResourceLocation.parse("four.png"));
     }
 
     @Test
     public void getFirstCollectionWith_LocationInSeveralCollections_FirstCollectionFound() throws IOException {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
-                new ResourceLocation("two.png")
+                ResourceLocation.parse("two.png")
         );
         assertEquals(collections.get(1), result.collection());
         assertEquals(1, result.collectionIndex());
@@ -130,14 +130,14 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void getFirstCollectionWith_ResourceInFirstPack_FirstPackFound() throws IOException {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
-                new ResourceLocation("one.png")
+                ResourceLocation.parse("one.png")
         );
         assertEquals(collections.get(0), result.collection());
         assertEquals(0, result.collectionIndex());
@@ -146,14 +146,14 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void getFirstCollectionWith_ResourceInMiddlePack_MiddlePackFound() throws IOException {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
-                new ResourceLocation("two.png")
+                ResourceLocation.parse("two.png")
         );
         assertEquals(collections.get(1), result.collection());
         assertEquals(1, result.collectionIndex());
@@ -162,14 +162,14 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void getFirstCollectionWith_ResourceInLastPack_LastPackFound() throws IOException {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
-                new ResourceLocation("three.png")
+                ResourceLocation.parse("three.png")
         );
         assertEquals(collections.get(2), result.collection());
         assertEquals(2, result.collectionIndex());
@@ -178,15 +178,15 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void getFirstCollectionWith_ClientRepository_ServerResourcesSkipped() throws IOException {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png")),
-                Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png")),
+                Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
-                new ResourceLocation("two.png")
+                ResourceLocation.parse("two.png")
         );
         assertEquals(collections.get(1), result.collection());
         assertEquals(1, result.collectionIndex());
@@ -195,15 +195,15 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void getFirstCollectionWith_ServerRepository_ClientResourcesSkipped() throws IOException {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png")),
-                Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png")),
+                Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
         OrderedResourceRepository.ResourceCollectionResult result = repository.firstCollectionWith(
-                new ResourceLocation("two.png")
+                ResourceLocation.parse("two.png")
         );
         assertEquals(collections.get(1), result.collection());
         assertEquals(1, result.collectionIndex());
@@ -212,9 +212,9 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void hasResource_NullLocation_NullPointerException() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
@@ -225,93 +225,93 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void hasResource_ResourceNotInAnyPack_NotFound() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertFalse(repository.contains(new ResourceLocation("four.png")));
+        assertFalse(repository.contains(ResourceLocation.parse("four.png")));
     }
 
     @Test
     public void hasResource_ResourceInFirstPackClient_Found() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertTrue(repository.contains(new ResourceLocation("one.png")));
+        assertTrue(repository.contains(ResourceLocation.parse("one.png")));
     }
 
     @Test
     public void hasResource_ResourceInMiddlePackClient_Found() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertTrue(repository.contains(new ResourceLocation("two.png")));
+        assertTrue(repository.contains(ResourceLocation.parse("two.png")));
     }
 
     @Test
     public void hasResource_ResourceInLastPackClient_Found() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
-        assertTrue(repository.contains(new ResourceLocation("three.png")));
+        assertTrue(repository.contains(ResourceLocation.parse("three.png")));
     }
 
     @Test
     public void hasResource_ResourceInFirstPackServer_Found() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        assertTrue(repository.contains(new ResourceLocation("one.png")));
+        assertTrue(repository.contains(ResourceLocation.parse("one.png")));
     }
 
     @Test
     public void hasResource_ResourceInMiddlePackServer_Found() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        assertTrue(repository.contains(new ResourceLocation("two.png")));
+        assertTrue(repository.contains(ResourceLocation.parse("two.png")));
     }
 
     @Test
     public void hasResource_ResourceInLastPackServer_Found() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
-        assertTrue(repository.contains(new ResourceLocation("three.png")));
+        assertTrue(repository.contains(ResourceLocation.parse("three.png")));
     }
 
     @Test
     public void listResources_NullPathStart_NullPointerException() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
@@ -322,9 +322,9 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void listResources_NullFilter_NullPointerException() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
@@ -335,9 +335,9 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void listResources_PathStartGiven_PassedExactly() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("texture/two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("text/three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("texture/two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("text/three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
@@ -345,17 +345,17 @@ public final class OrderedResourceRepositoryTest {
         Collection<ResourceLocation> results = repository.list("text", (file) -> true);
 
         assertEquals(3, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/one.png")));
-        assertTrue(results.contains(new ResourceLocation("texture/two.png")));
-        assertTrue(results.contains(new ResourceLocation("text/three.png")));
+        assertTrue(results.contains(ResourceLocation.parse("textures/one.png")));
+        assertTrue(results.contains(ResourceLocation.parse("texture/two.png")));
+        assertTrue(results.contains(ResourceLocation.parse("text/three.png")));
     }
 
     @Test
     public void listResources_PathStartBlank_PassedExactly() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("texture/two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("text/three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("texture/two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("text/three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
@@ -363,17 +363,17 @@ public final class OrderedResourceRepositoryTest {
         Collection<ResourceLocation> results = repository.list("", (file) -> true);
 
         assertEquals(3, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/one.png")));
-        assertTrue(results.contains(new ResourceLocation("texture/two.png")));
-        assertTrue(results.contains(new ResourceLocation("text/three.png")));
+        assertTrue(results.contains(ResourceLocation.parse("textures/one.png")));
+        assertTrue(results.contains(ResourceLocation.parse("texture/two.png")));
+        assertTrue(results.contains(ResourceLocation.parse("text/three.png")));
     }
 
     @Test
     public void listResources_PathStartDifferent_NoMatches() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("texture/two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("text/three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("texture/two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("text/three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
@@ -384,24 +384,24 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void listResources_FilterMatches_FoundMatches() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/two.jpg"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/two.jpg"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         Collection<ResourceLocation> results = repository.list("textures", (file) -> file.endsWith(".png"));
         assertEquals(2, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/one.png")));
-        assertTrue(results.contains(new ResourceLocation("textures/three.png")));
+        assertTrue(results.contains(ResourceLocation.parse("textures/one.png")));
+        assertTrue(results.contains(ResourceLocation.parse("textures/three.png")));
     }
 
     @Test
     public void listResources_FilterNoMatch_NoMatches() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/two.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/two.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
@@ -412,29 +412,29 @@ public final class OrderedResourceRepositoryTest {
     @Test
     public void listResources_ClientRepository_FoundClientResources() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/two.jpg"))));
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("textures/three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/two.jpg"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("textures/three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES, collections);
 
         Collection<ResourceLocation> results = repository.list("textures", (file) -> file.endsWith(".png"));
         assertEquals(1, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/one.png")));
+        assertTrue(results.contains(ResourceLocation.parse("textures/one.png")));
     }
 
     @Test
     public void listResources_ServerRepository_FoundServerResources() {
         List<ResourceCollection> collections = new ArrayList<>();
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/one.png"))));
-        collections.add(new MockResourceCollection(Set.of(new ResourceLocation("textures/two.jpg"))));
-        collections.add(new MockResourceCollection(Set.of(), Set.of(new ResourceLocation("textures/three.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/one.png"))));
+        collections.add(new MockResourceCollection(Set.of(ResourceLocation.parse("textures/two.jpg"))));
+        collections.add(new MockResourceCollection(Set.of(), Set.of(ResourceLocation.parse("textures/three.png"))));
 
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.SERVER_DATA, collections);
 
         Collection<ResourceLocation> results = repository.list("textures", (file) -> file.endsWith(".png"));
         assertEquals(1, results.size());
-        assertTrue(results.contains(new ResourceLocation("textures/three.png")));
+        assertTrue(results.contains(ResourceLocation.parse("textures/three.png")));
     }
 
 }

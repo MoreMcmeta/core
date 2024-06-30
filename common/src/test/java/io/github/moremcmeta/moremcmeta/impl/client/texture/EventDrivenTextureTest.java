@@ -45,7 +45,7 @@ import static org.junit.Assert.assertEquals;
  * @author soir20
  */
 public final class EventDrivenTextureTest {
-    private static final ResourceLocation DUMMY_BASE_LOCATION = new ResourceLocation("dummy.png");
+    private static final ResourceLocation DUMMY_BASE_LOCATION = ResourceLocation.parse("dummy.png");
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -127,7 +127,7 @@ public final class EventDrivenTextureTest {
         });
 
         EventDrivenTexture texture = builder.build();
-        texture.upload(new ResourceLocation("dummy.png"));
+        texture.upload(ResourceLocation.parse("dummy.png"));
 
         assertEquals(1, generatedFrame.uploadCount());
     }
@@ -435,13 +435,13 @@ public final class EventDrivenTextureTest {
     @Test
     public void upload_FirstUpload_UploadFiredInOrder() {
         Integer[] expected = {4, 5, 6};
-        testExpectedOrder((texture) -> texture.upload(new ResourceLocation("dummy.png")), false, expected);
+        testExpectedOrder((texture) -> texture.upload(ResourceLocation.parse("dummy.png")), false, expected);
     }
 
     @Test
     public void upload_SecondUploadNotNeeded_FirstUploadOnly() {
         Integer[] expected = {4, 5, 6};
-        ResourceLocation dummyBase = new ResourceLocation("dummy.png");
+        ResourceLocation dummyBase = ResourceLocation.parse("dummy.png");
         testExpectedOrder((texture) -> {texture.upload(dummyBase); texture.upload(dummyBase);}, false, expected);
 
     }

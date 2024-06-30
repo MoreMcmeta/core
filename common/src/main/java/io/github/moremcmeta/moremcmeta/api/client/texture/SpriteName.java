@@ -54,7 +54,7 @@ public final class SpriteName {
             path = path.substring(TEX_PATH_PREFIX_LENGTH, path.length() - TEX_PATH_SUFFIX_LENGTH);
         }
 
-        return new ResourceLocation(texturePath.getNamespace(), path);
+        return ResourceLocation.fromNamespaceAndPath(texturePath.getNamespace(), path);
     }
 
     /**
@@ -76,7 +76,7 @@ public final class SpriteName {
             return spriteName;
         }
 
-        return new ResourceLocation(
+        return ResourceLocation.fromNamespaceAndPath(
                 spriteName.getNamespace(),
                 String.format("%s%s%s", TEX_PATH_PREFIX, path, TEX_PATH_SUFFIX)
         );

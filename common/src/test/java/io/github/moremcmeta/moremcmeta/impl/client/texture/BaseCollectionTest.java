@@ -39,9 +39,9 @@ import static org.junit.Assert.assertTrue;
  * @author soir20
  */
 public final class BaseCollectionTest {
-    private static final ResourceLocation NO_SPRITE_LOCATION_1 = new ResourceLocation("no_sprite1.png");
-    private static final ResourceLocation SPRITE_LOCATION_1 = new ResourceLocation("sprite1.png");
-    private static final ResourceLocation SPRITE_ATLAS_1 = new ResourceLocation("textures/atlas/blocks.png");
+    private static final ResourceLocation NO_SPRITE_LOCATION_1 = ResourceLocation.parse("no_sprite1.png");
+    private static final ResourceLocation SPRITE_LOCATION_1 = ResourceLocation.parse("sprite1.png");
+    private static final ResourceLocation SPRITE_ATLAS_1 = ResourceLocation.parse("textures/atlas/blocks.png");
     private static final long SPRITE_UPLOAD_POINT_1 = Point.pack(20, 10);
     private static final int SPRITE_MIPMAP_1 = 3;
     private static final SpriteFinder SPRITE_FINDER = new SpriteFinder(
@@ -84,7 +84,7 @@ public final class BaseCollectionTest {
     @Test
     public void baseData_NoBasesAtLocation_EmptyCollection() {
         BaseCollection result = BaseCollection.find(SPRITE_FINDER, NO_SPRITE_LOCATION_1);
-        assertTrue(result.baseData(new ResourceLocation("other.png")).isEmpty());
+        assertTrue(result.baseData(ResourceLocation.parse("other.png")).isEmpty());
     }
 
     @Test

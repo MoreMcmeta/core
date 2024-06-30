@@ -57,7 +57,7 @@ public final class TextureManagerAdapterTest {
     public void register_NullManagerSupplied_NullPointerException() {
         TextureManagerAdapter adapter = new TextureManagerAdapter(() -> null, (manager, location) -> {});
         expectedException.expect(NullPointerException.class);
-        adapter.register(new ResourceLocation("dummy.png"), new MockAnimatedTexture());
+        adapter.register(ResourceLocation.parse("dummy.png"), new MockAnimatedTexture());
     }
 
     @Test
@@ -73,7 +73,7 @@ public final class TextureManagerAdapterTest {
         TextureManager texManager = new TextureManager(MOCK_RESOURCE_MANAGER);
         TextureManagerAdapter adapter = new TextureManagerAdapter(() -> texManager, (manager, location) -> {});
         expectedException.expect(NullPointerException.class);
-        adapter.register(new ResourceLocation("dummy.png"), null);
+        adapter.register(ResourceLocation.parse("dummy.png"), null);
     }
 
     @Test
@@ -82,8 +82,8 @@ public final class TextureManagerAdapterTest {
         TextureManagerAdapter adapter = new TextureManagerAdapter(() -> texManager, (manager, location) -> {});
 
         AbstractTexture texture = new MockAnimatedTexture();
-        adapter.register(new ResourceLocation("dummy.png"), texture);
-        assertEquals(texture, texManager.getTexture(new ResourceLocation("dummy.png")));
+        adapter.register(ResourceLocation.parse("dummy.png"), texture);
+        assertEquals(texture, texManager.getTexture(ResourceLocation.parse("dummy.png")));
     }
 
     @Test
@@ -92,7 +92,7 @@ public final class TextureManagerAdapterTest {
                 (manager, location) -> {});
 
         expectedException.expect(NullPointerException.class);
-        adapter.unregister(new ResourceLocation("dummy.png"));
+        adapter.unregister(ResourceLocation.parse("dummy.png"));
     }
 
     @Test
@@ -110,7 +110,7 @@ public final class TextureManagerAdapterTest {
         TextureManagerAdapter adapter = new TextureManagerAdapter(() -> texManager,
                 (manager, location) -> wasUnregistered[0] = true);
 
-        adapter.unregister(new ResourceLocation("dummy.png"));
+        adapter.unregister(ResourceLocation.parse("dummy.png"));
         assertTrue(wasUnregistered[0]);
     }
 
@@ -120,9 +120,9 @@ public final class TextureManagerAdapterTest {
         final boolean[] wasUnregistered = {false};
         TextureManagerAdapter adapter = new TextureManagerAdapter(() -> texManager,
                 (manager, location) -> wasUnregistered[0] = true);
-        texManager.register(new ResourceLocation("dummy.png"), new MockAnimatedTexture());
+        texManager.register(ResourceLocation.parse("dummy.png"), new MockAnimatedTexture());
 
-        adapter.unregister(new ResourceLocation("dummy.png"));
+        adapter.unregister(ResourceLocation.parse("dummy.png"));
         assertTrue(wasUnregistered[0]);
     }
 
@@ -148,7 +148,7 @@ public final class TextureManagerAdapterTest {
         TextureManagerAdapter adapter = new TextureManagerAdapter(() -> texManager, (manager, location) -> {});
 
         MockAnimatedTexture texture = new MockAnimatedTexture();
-        texManager.register(new ResourceLocation("dummy.png"), texture);
+        texManager.register(ResourceLocation.parse("dummy.png"), texture);
 
         adapter.tick();
         assertEquals(0, texture.ticks());
@@ -160,7 +160,7 @@ public final class TextureManagerAdapterTest {
         TextureManagerAdapter adapter = new TextureManagerAdapter(() -> texManager, (manager, location) -> {});
 
         MockAnimatedTexture texture = new MockTickableAnimatedTexture();
-        texManager.register(new ResourceLocation("dummy.png"), texture);
+        texManager.register(ResourceLocation.parse("dummy.png"), texture);
 
         adapter.tick();
         assertEquals(1, texture.ticks());

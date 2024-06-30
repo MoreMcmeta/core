@@ -41,40 +41,40 @@ public final class SpriteNameTest {
     @Test
     public void fromTexturePath_NoPrefixNoSuffix_NotConverted() {
         assertEquals(
-                new ResourceLocation("test", "block/glass/clear"),
-                SpriteName.fromTexturePath(new ResourceLocation("test", "block/glass/clear"))
+                ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear"),
+                SpriteName.fromTexturePath(ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear"))
         );
     }
 
     @Test
     public void fromTexturePath_HasPrefix_NotConverted() {
         assertEquals(
-                new ResourceLocation("test", "textures/block/glass/clear"),
-                SpriteName.fromTexturePath(new ResourceLocation("test", "textures/block/glass/clear"))
+                ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear"),
+                SpriteName.fromTexturePath(ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear"))
         );
     }
 
     @Test
     public void fromTexturePath_HasSuffix_NotConverted() {
         assertEquals(
-                new ResourceLocation("test", "block/glass/clear.png"),
-                SpriteName.fromTexturePath(new ResourceLocation("test", "block/glass/clear.png"))
+                ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear.png"),
+                SpriteName.fromTexturePath(ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear.png"))
         );
     }
 
     @Test
     public void fromTexturePath_HasPrefixHasSuffix_Converted() {
         assertEquals(
-                new ResourceLocation("test", "block/glass/clear"),
-                SpriteName.fromTexturePath(new ResourceLocation("test", "textures/block/glass/clear.png"))
+                ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear"),
+                SpriteName.fromTexturePath(ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear.png"))
         );
     }
 
     @Test
     public void fromTexturePath_BlankPath_Converted() {
         assertEquals(
-                new ResourceLocation("test", "textures/.png"),
-                SpriteName.fromTexturePath(new ResourceLocation("test", "textures/.png"))
+                ResourceLocation.fromNamespaceAndPath("test", "textures/.png"),
+                SpriteName.fromTexturePath(ResourceLocation.fromNamespaceAndPath("test", "textures/.png"))
         );
     }
 
@@ -87,32 +87,32 @@ public final class SpriteNameTest {
     @Test
     public void toTexturePath_NoPrefixNoSuffix_Converted() {
         assertEquals(
-                new ResourceLocation("test", "textures/block/glass/clear.png"),
-                SpriteName.toTexturePath(new ResourceLocation("test", "block/glass/clear"))
+                ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear.png"),
+                SpriteName.toTexturePath(ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear"))
         );
     }
 
     @Test
     public void toTexturePath_HasPrefix_NotConverted() {
         assertEquals(
-                new ResourceLocation("test", "textures/block/glass/clear"),
-                SpriteName.toTexturePath(new ResourceLocation("test", "textures/block/glass/clear"))
+                ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear"),
+                SpriteName.toTexturePath(ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear"))
         );
     }
 
     @Test
     public void toTexturePath_HasSuffix_NotConverted() {
         assertEquals(
-                new ResourceLocation("test", "block/glass/clear.png"),
-                SpriteName.toTexturePath(new ResourceLocation("test", "block/glass/clear.png"))
+                ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear.png"),
+                SpriteName.toTexturePath(ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear.png"))
         );
     }
 
     @Test
     public void toTexturePath_HasPrefixHasSuffix_NotConverted() {
         assertEquals(
-                new ResourceLocation("test", "textures/block/glass/clear.png"),
-                SpriteName.toTexturePath(new ResourceLocation("test", "textures/block/glass/clear.png"))
+                ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear.png"),
+                SpriteName.toTexturePath(ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear.png"))
         );
     }
 
@@ -124,27 +124,27 @@ public final class SpriteNameTest {
 
     @Test
     public void isSpriteName_NoPrefixNoSuffix_True() {
-        assertTrue(SpriteName.isSpriteName(new ResourceLocation("test", "block/glass/clear")));
+        assertTrue(SpriteName.isSpriteName(ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear")));
     }
 
     @Test
     public void isSpriteName_HasPrefix_False() {
-        assertFalse(SpriteName.isSpriteName(new ResourceLocation("test", "textures/block/glass/clear")));
+        assertFalse(SpriteName.isSpriteName(ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear")));
     }
 
     @Test
     public void isSpriteName_HasSuffix_False() {
-        assertFalse(SpriteName.isSpriteName(new ResourceLocation("test", "block/glass/clear.png")));
+        assertFalse(SpriteName.isSpriteName(ResourceLocation.fromNamespaceAndPath("test", "block/glass/clear.png")));
     }
 
     @Test
     public void isSpriteName_HasPrefixHasSuffix_False() {
-        assertFalse(SpriteName.isSpriteName(new ResourceLocation("test", "textures/block/glass/clear.png")));
+        assertFalse(SpriteName.isSpriteName(ResourceLocation.fromNamespaceAndPath("test", "textures/block/glass/clear.png")));
     }
 
     @Test
     public void isSpriteName_BlankPath_False() {
-        assertFalse(SpriteName.isSpriteName(new ResourceLocation("test", "")));
+        assertFalse(SpriteName.isSpriteName(ResourceLocation.fromNamespaceAndPath("test", "")));
     }
 
 }

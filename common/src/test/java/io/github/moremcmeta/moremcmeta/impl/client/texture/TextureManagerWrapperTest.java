@@ -54,13 +54,13 @@ public final class TextureManagerWrapperTest {
         TextureManagerWrapper<MockAnimatedTexture> wrapper = new TextureManagerWrapper<>(texManager);
 
         expectedException.expect(NullPointerException.class);
-        wrapper.register(new ResourceLocation("bat.png"), null);
+        wrapper.register(ResourceLocation.parse("bat.png"), null);
     }
 
     @Test
     public void register_ManagerHasTexture_OldUnregistered() {
         MockManager<AbstractTexture> texManager = new MockManager<>();
-        ResourceLocation location = new ResourceLocation("bat.png");
+        ResourceLocation location = ResourceLocation.parse("bat.png");
 
         texManager.register(location, new MockAnimatedTexture());
 
@@ -76,13 +76,13 @@ public final class TextureManagerWrapperTest {
         MockManager<AbstractTexture> texManager = new MockManager<>();
         TextureManagerWrapper<MockAnimatedTexture> wrapper = new TextureManagerWrapper<>(texManager);
 
-        ResourceLocation location1 = new ResourceLocation("bat.png");
+        ResourceLocation location1 = ResourceLocation.parse("bat.png");
         wrapper.register(location1, new MockAnimatedTexture());
 
-        ResourceLocation location2 = new ResourceLocation("cat.png");
+        ResourceLocation location2 = ResourceLocation.parse("cat.png");
         wrapper.register(location2, new MockAnimatedTexture());
 
-        ResourceLocation location3 = new ResourceLocation("ocelot.png");
+        ResourceLocation location3 = ResourceLocation.parse("ocelot.png");
         wrapper.register(location3, new MockAnimatedTexture());
 
         assertTrue(texManager.texture(location1) instanceof MockAnimatedTexture);
@@ -104,13 +104,13 @@ public final class TextureManagerWrapperTest {
         MockManager<AbstractTexture> texManager = new MockManager<>();
         TextureManagerWrapper<MockAnimatedTexture> wrapper = new TextureManagerWrapper<>(texManager);
 
-        ResourceLocation location1 = new ResourceLocation("bat.png");
+        ResourceLocation location1 = ResourceLocation.parse("bat.png");
         wrapper.register(location1, new MockAnimatedTexture());
 
-        ResourceLocation location2 = new ResourceLocation("cat.png");
+        ResourceLocation location2 = ResourceLocation.parse("cat.png");
         wrapper.register(location2, new MockAnimatedTexture());
 
-        ResourceLocation location3 = new ResourceLocation("ocelot.png");
+        ResourceLocation location3 = ResourceLocation.parse("ocelot.png");
         wrapper.register(location3, new MockAnimatedTexture());
 
         wrapper.unregister(location1);
@@ -125,15 +125,15 @@ public final class TextureManagerWrapperTest {
         MockManager<AbstractTexture> texManager = new MockManager<>();
         TextureManagerWrapper<MockAnimatedTexture> wrapper = new TextureManagerWrapper<>(texManager);
 
-        ResourceLocation location1 = new ResourceLocation("bat.png");
+        ResourceLocation location1 = ResourceLocation.parse("bat.png");
         MockAnimatedTexture texture1 = new MockAnimatedTexture();
         wrapper.register(location1, texture1);
 
-        ResourceLocation location2 = new ResourceLocation("cat.png");
+        ResourceLocation location2 = ResourceLocation.parse("cat.png");
         MockAnimatedTexture texture2 = new MockAnimatedTexture();
         wrapper.register(location2, texture2);
 
-        ResourceLocation location3 = new ResourceLocation("ocelot.png");
+        ResourceLocation location3 = ResourceLocation.parse("ocelot.png");
         MockAnimatedTexture texture3 = new MockAnimatedTexture();
         wrapper.register(location3, texture3);
 

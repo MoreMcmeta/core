@@ -39,7 +39,7 @@ public final class AtlasAdapterTest {
     @Test
     public void construct_NullGetter_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AtlasAdapter(new ResourceLocation("textures/atlas/blocks.png"), null);
+        new AtlasAdapter(ResourceLocation.parse("textures/atlas/blocks.png"), null);
     }
 
 }

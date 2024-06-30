@@ -121,7 +121,7 @@ public final class MoreMcmetaFabric extends MoreMcmeta implements ClientModIniti
             StagedResourceReloadListener<Map<ResourceLocation, EventDrivenTexture.Builder>> original
     ) {
         return new SimpleReloadListenerAdapter<>(original,
-                new ResourceLocation("moremcmeta", "texture_reload_listener"));
+                ResourceLocation.fromNamespaceAndPath("moremcmeta", "texture_reload_listener"));
     }
 
     @Override

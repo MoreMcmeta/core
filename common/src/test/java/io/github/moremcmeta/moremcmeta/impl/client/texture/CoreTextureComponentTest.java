@@ -67,7 +67,7 @@ public final class CoreTextureComponentTest {
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
-        builder.build().upload(new ResourceLocation("dummy.png"));
+        builder.build().upload(ResourceLocation.parse("dummy.png"));
     }
 
     @Test

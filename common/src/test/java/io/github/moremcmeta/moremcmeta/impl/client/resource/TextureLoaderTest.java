@@ -67,14 +67,14 @@ import static org.junit.Assert.assertTrue;
 public final class TextureLoaderTest {
     private final Logger LOGGER = LogManager.getLogger();
     private final MetadataParser MOCK_READER = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
-            new ResourceLocation(
+            ResourceLocation.fromNamespaceAndPath(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace("2.moremcmeta", "").replace(".moremcmeta", "")
             ),
             new MockMetadataView(List.of("one", "two", "three"))
     );
     private final MetadataParser MOCK_READER_2 = (metadataLocation, metadataStream, resourceRepository) -> Map.of(
-            new ResourceLocation(
+            ResourceLocation.fromNamespaceAndPath(
                     metadataLocation.getNamespace(),
                     metadataLocation.getPath().replace(".other", "")
             ),
@@ -265,9 +265,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(3, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
@@ -292,7 +292,7 @@ public final class TextureLoaderTest {
                 ImmutableMap.of(".moremcmeta", (metadataLocation, metadataStream, resourceRepository) -> {
                     if (metadataLocation.getPath().equals("textures/bat2.png.moremcmeta")) {
                         return Map.of(
-                                new ResourceLocation("textures/bat.png"),
+                                ResourceLocation.parse("textures/bat.png"),
                                 new MockMetadataView(List.of("four", "one", "six"))
                         );
                     }
@@ -305,9 +305,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(3, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/zombie.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat.png")));
     }
 
     @Test
@@ -330,9 +330,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "other");
 
         assertEquals(3, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("other/bat.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("other/creeper.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("other/zombie.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("other/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("other/creeper.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("other/zombie.png")));
     }
 
     @Test
@@ -349,7 +349,7 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(1, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat.png")));
     }
 
     @Test
@@ -379,8 +379,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper_abcd.png")));
     }
 
     @Test
@@ -400,12 +400,12 @@ public final class TextureLoaderTest {
                     );
 
                     Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
-                            new ResourceLocation("textures/bat_abcd.png")
+                            ResourceLocation.parse("textures/bat_abcd.png")
                     );
                     assertTrue(pack.isPresent());
-                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
-                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
-                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+                    assertTrue(pack.get().resource(ResourceLocation.parse("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(ResourceLocation.parse("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(ResourceLocation.parse("dummy")).isPresent());
 
                     return locations.stream().collect(Collectors.toMap(
                             Function.identity(),
@@ -418,8 +418,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper_abcd.png")));
     }
 
     @Test
@@ -440,12 +440,12 @@ public final class TextureLoaderTest {
                     );
 
                     ResourceRepository.Pack pack = resourceRepository.highestPackWith(
-                            new ResourceLocation("textures/bat_abcd.png")
+                            ResourceLocation.parse("textures/bat_abcd.png")
                     ).orElseThrow();
 
                     assertEquals(
                             pack.locateRootResource(new RootResourceName("pack.png")),
-                            new ResourceLocation("pack.png")
+                            ResourceLocation.parse("pack.png")
                     );
                     executed.set(true);
 
@@ -478,13 +478,13 @@ public final class TextureLoaderTest {
                     );
 
                     Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
-                            new ResourceLocation("textures/bat_abcd.png"),
-                            new ResourceLocation("textures/bat_efgh.png")
+                            ResourceLocation.parse("textures/bat_abcd.png"),
+                            ResourceLocation.parse("textures/bat_efgh.png")
                     );
                     assertTrue(pack.isPresent());
-                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
-                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
-                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+                    assertTrue(pack.get().resource(ResourceLocation.parse("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(ResourceLocation.parse("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(ResourceLocation.parse("dummy")).isPresent());
 
                     return locations.stream().collect(Collectors.toMap(
                             Function.identity(),
@@ -497,8 +497,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper_abcd.png")));
     }
 
     @Test
@@ -523,13 +523,13 @@ public final class TextureLoaderTest {
                     );
 
                     Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
-                            new ResourceLocation("textures/bat_abcd.png"),
-                            new ResourceLocation("textures/bat_efgh.png")
+                            ResourceLocation.parse("textures/bat_abcd.png"),
+                            ResourceLocation.parse("textures/bat_efgh.png")
                     );
                     assertTrue(pack.isPresent());
-                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
-                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
-                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+                    assertTrue(pack.get().resource(ResourceLocation.parse("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(ResourceLocation.parse("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(ResourceLocation.parse("dummy")).isPresent());
 
                     return locations.stream().collect(Collectors.toMap(
                             Function.identity(),
@@ -542,8 +542,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper_abcd.png")));
     }
 
     @Test
@@ -566,13 +566,13 @@ public final class TextureLoaderTest {
                     );
 
                     Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
-                            new ResourceLocation("textures/bat_abcd.png"),
-                            new ResourceLocation("textures/bat_efgh.png")
+                            ResourceLocation.parse("textures/bat_abcd.png"),
+                            ResourceLocation.parse("textures/bat_efgh.png")
                     );
                     assertTrue(pack.isPresent());
-                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
-                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
-                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+                    assertTrue(pack.get().resource(ResourceLocation.parse("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(ResourceLocation.parse("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(ResourceLocation.parse("dummy")).isPresent());
 
                     return locations.stream().collect(Collectors.toMap(
                             Function.identity(),
@@ -585,8 +585,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper_abcd.png")));
     }
 
     @Test
@@ -612,8 +612,8 @@ public final class TextureLoaderTest {
 
                     assertFalse(
                             resourceRepository.highestPackWith(
-                                    new ResourceLocation("textures/bat_abcd.png"),
-                                    new ResourceLocation("textures/bat_efgh.png")
+                                    ResourceLocation.parse("textures/bat_abcd.png"),
+                                    ResourceLocation.parse("textures/bat_efgh.png")
                             ).isPresent()
                     );
 
@@ -628,8 +628,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper_abcd.png")));
     }
 
     @Test
@@ -651,13 +651,13 @@ public final class TextureLoaderTest {
                     );
 
                     Optional<ResourceRepository.Pack> pack = resourceRepository.highestPackWith(
-                            new ResourceLocation("textures/bat_abcd.png"),
-                            new ResourceLocation("textures/bat_abcd.png")
+                            ResourceLocation.parse("textures/bat_abcd.png"),
+                            ResourceLocation.parse("textures/bat_abcd.png")
                     );
                     assertTrue(pack.isPresent());
-                    assertTrue(pack.get().resource(new ResourceLocation("zombie.png")).isPresent());
-                    assertFalse(pack.get().resource(new ResourceLocation("zombie2.png")).isPresent());
-                    assertFalse(resourceRepository.highestPackWith(new ResourceLocation("dummy")).isPresent());
+                    assertTrue(pack.get().resource(ResourceLocation.parse("zombie.png")).isPresent());
+                    assertFalse(pack.get().resource(ResourceLocation.parse("zombie2.png")).isPresent());
+                    assertFalse(resourceRepository.highestPackWith(ResourceLocation.parse("dummy")).isPresent());
 
                     return locations.stream().collect(Collectors.toMap(
                             Function.identity(),
@@ -670,8 +670,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat_abcd.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/creeper_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat_abcd.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/creeper_abcd.png")));
     }
 
     @Test
@@ -688,7 +688,7 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(1, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat.png")));
     }
 
     @Test
@@ -705,7 +705,7 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(1, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat.png")));
     }
 
     @Test
@@ -733,8 +733,8 @@ public final class TextureLoaderTest {
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
@@ -789,8 +789,8 @@ public final class TextureLoaderTest {
 
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
         assertEquals(2, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
@@ -878,12 +878,12 @@ public final class TextureLoaderTest {
     public void load_ResourceManagerThrowsUnknownException_ExceptionNotCaught() {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
                 Set.of(new MockResourceCollection(Set.of(
-                        new ResourceLocation("textures/bat.png"),
-                        new ResourceLocation("textures/creeper.png"),
-                        new ResourceLocation("textures/zombie.png"),
-                        new ResourceLocation("textures/bat.png.moremcmeta"),
-                        new ResourceLocation("textures/creeper.png.moremcmeta"),
-                        new ResourceLocation("textures/zombie.png.moremcmeta")
+                        ResourceLocation.parse("textures/bat.png"),
+                        ResourceLocation.parse("textures/creeper.png"),
+                        ResourceLocation.parse("textures/zombie.png"),
+                        ResourceLocation.parse("textures/bat.png.moremcmeta"),
+                        ResourceLocation.parse("textures/creeper.png.moremcmeta"),
+                        ResourceLocation.parse("textures/zombie.png.moremcmeta")
                 )))
         ) {
             @Override
@@ -906,12 +906,12 @@ public final class TextureLoaderTest {
     @Test
     public void load_ResourceManagerReturnsNullTexture_NullPointerException() {
         ResourceCollection collection = new MockResourceCollection(Set.of(
-                new ResourceLocation("textures/bat.png"),
-                new ResourceLocation("textures/creeper.png"),
-                new ResourceLocation("textures/zombie.png"),
-                new ResourceLocation("textures/bat.png.moremcmeta"),
-                new ResourceLocation("textures/creeper.png.moremcmeta"),
-                new ResourceLocation("textures/zombie.png.moremcmeta")
+                ResourceLocation.parse("textures/bat.png"),
+                ResourceLocation.parse("textures/creeper.png"),
+                ResourceLocation.parse("textures/zombie.png"),
+                ResourceLocation.parse("textures/bat.png.moremcmeta"),
+                ResourceLocation.parse("textures/creeper.png.moremcmeta"),
+                ResourceLocation.parse("textures/zombie.png.moremcmeta")
         )) {
             public InputStream find(PackType resourceType, ResourceLocation location) throws IOException {
                 if (contains(resourceType, location) && !location.getPath().endsWith(".moremcmeta")) {
@@ -939,12 +939,12 @@ public final class TextureLoaderTest {
     @Test
     public void load_ResourceManagerReturnsNullMetadata_NullPointerException() {
         ResourceCollection collection = new MockResourceCollection(Set.of(
-                new ResourceLocation("textures/bat.png"),
-                new ResourceLocation("textures/creeper.png"),
-                new ResourceLocation("textures/zombie.png"),
-                new ResourceLocation("textures/bat.png.moremcmeta"),
-                new ResourceLocation("textures/creeper.png.moremcmeta"),
-                new ResourceLocation("textures/zombie.png.moremcmeta")
+                ResourceLocation.parse("textures/bat.png"),
+                ResourceLocation.parse("textures/creeper.png"),
+                ResourceLocation.parse("textures/zombie.png"),
+                ResourceLocation.parse("textures/bat.png.moremcmeta"),
+                ResourceLocation.parse("textures/creeper.png.moremcmeta"),
+                ResourceLocation.parse("textures/zombie.png.moremcmeta")
         )) {
             public InputStream find(PackType resourceType, ResourceLocation location) throws IOException {
                 if (contains(resourceType, location) && location.getPath().endsWith(".moremcmeta")) {
@@ -972,12 +972,12 @@ public final class TextureLoaderTest {
     @Test
     public void load_ClosureIOException_LoadsValidTextures() {
         ResourceCollection collection = new MockResourceCollection(Set.of(
-                new ResourceLocation("textures/bat.png"),
-                new ResourceLocation("textures/creeper.png"),
-                new ResourceLocation("textures/zombie.png"),
-                new ResourceLocation("textures/bat.png.moremcmeta"),
-                new ResourceLocation("textures/creeper.png.moremcmeta"),
-                new ResourceLocation("textures/zombie.png.moremcmeta")
+                ResourceLocation.parse("textures/bat.png"),
+                ResourceLocation.parse("textures/creeper.png"),
+                ResourceLocation.parse("textures/zombie.png"),
+                ResourceLocation.parse("textures/bat.png.moremcmeta"),
+                ResourceLocation.parse("textures/creeper.png.moremcmeta"),
+                ResourceLocation.parse("textures/zombie.png.moremcmeta")
         )) {
             public InputStream find(PackType resourceType, ResourceLocation location) throws IOException {
                 if (contains(resourceType, location) && !location.getPath().contains("bat")) {
@@ -1011,18 +1011,18 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(1, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/bat.png")));
     }
 
     @Test
     public void load_ClosureUnknownException_ExceptionNotCaught() {
         ResourceCollection collection = new MockResourceCollection(Set.of(
-                new ResourceLocation("textures/bat.png"),
-                new ResourceLocation("textures/creeper.png"),
-                new ResourceLocation("textures/zombie.png"),
-                new ResourceLocation("textures/bat.png.moremcmeta"),
-                new ResourceLocation("textures/creeper.png.moremcmeta"),
-                new ResourceLocation("textures/zombie.png.moremcmeta")
+                ResourceLocation.parse("textures/bat.png"),
+                ResourceLocation.parse("textures/creeper.png"),
+                ResourceLocation.parse("textures/zombie.png"),
+                ResourceLocation.parse("textures/bat.png.moremcmeta"),
+                ResourceLocation.parse("textures/creeper.png.moremcmeta"),
+                ResourceLocation.parse("textures/zombie.png.moremcmeta")
         )) {
             public InputStream find(PackType resourceType, ResourceLocation location) throws IOException {
                 if (contains(resourceType, location) && location.getPath().contains("bat")) {
@@ -1074,9 +1074,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(3, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
     }
 
     @Test
@@ -1096,9 +1096,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(3, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
     }
 
     @Test
@@ -1118,7 +1118,7 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(1, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
     }
 
     @Test
@@ -1138,9 +1138,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(3, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
     }
 
     @Test
@@ -1160,8 +1160,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(2, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
     }
 
     @Test
@@ -1181,8 +1181,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(2, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
@@ -1208,11 +1208,11 @@ public final class TextureLoaderTest {
                             @Override
                             public MetadataView combine(ResourceLocation textureLocation,
                                                         Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
-                                assertEquals(new ResourceLocation("textures/zombie.png"), textureLocation);
+                                assertEquals(ResourceLocation.parse("textures/zombie.png"), textureLocation);
                                 assertEquals(
                                         Set.of(
-                                                new ResourceLocation("textures/zombie.png2.moremcmeta"),
-                                                new ResourceLocation("textures/zombie.png.moremcmeta")
+                                                ResourceLocation.parse("textures/zombie.png2.moremcmeta"),
+                                                ResourceLocation.parse("textures/zombie.png.moremcmeta")
                                         ),
                                         metadataByLocation.keySet()
                                 );
@@ -1226,9 +1226,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(3, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
@@ -1254,11 +1254,11 @@ public final class TextureLoaderTest {
                             @Override
                             public MetadataView combine(ResourceLocation textureLocation,
                                                         Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
-                                assertEquals(new ResourceLocation("textures/creeper.png"), textureLocation);
+                                assertEquals(ResourceLocation.parse("textures/creeper.png"), textureLocation);
                                 assertEquals(
                                         Set.of(
-                                                new ResourceLocation("textures/creeper.png2.moremcmeta"),
-                                                new ResourceLocation("textures/creeper.png.moremcmeta")
+                                                ResourceLocation.parse("textures/creeper.png2.moremcmeta"),
+                                                ResourceLocation.parse("textures/creeper.png.moremcmeta")
                                         ),
                                         metadataByLocation.keySet()
                                 );
@@ -1272,9 +1272,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(3, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
@@ -1294,8 +1294,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(2, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
@@ -1315,8 +1315,8 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(2, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
     }
 
     @Test
@@ -1354,11 +1354,11 @@ public final class TextureLoaderTest {
                             @Override
                             public MetadataView combine(ResourceLocation textureLocation,
                                                         Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
-                                assertEquals(new ResourceLocation("textures/zombie.png"), textureLocation);
+                                assertEquals(ResourceLocation.parse("textures/zombie.png"), textureLocation);
                                 assertEquals(
                                         Set.of(
-                                                new ResourceLocation("textures/zombie.png2.moremcmeta"),
-                                                new ResourceLocation("textures/zombie.png.moremcmeta")
+                                                ResourceLocation.parse("textures/zombie.png2.moremcmeta"),
+                                                ResourceLocation.parse("textures/zombie.png.moremcmeta")
                                         ),
                                         metadataByLocation.keySet()
                                 );
@@ -1372,9 +1372,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(3, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
@@ -1412,11 +1412,11 @@ public final class TextureLoaderTest {
                             @Override
                             public MetadataView combine(ResourceLocation textureLocation,
                                                         Map<? extends ResourceLocation, ? extends MetadataView> metadataByLocation) {
-                                assertEquals(new ResourceLocation("textures/zombie.png"), textureLocation);
+                                assertEquals(ResourceLocation.parse("textures/zombie.png"), textureLocation);
                                 assertEquals(
                                         Set.of(
-                                                new ResourceLocation("textures/zombie.png2.moremcmeta"),
-                                                new ResourceLocation("textures/zombie.png.moremcmeta")
+                                                ResourceLocation.parse("textures/zombie.png2.moremcmeta"),
+                                                ResourceLocation.parse("textures/zombie.png.moremcmeta")
                                         ),
                                         metadataByLocation.keySet()
                                 );
@@ -1430,21 +1430,21 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> results = loader.load(repository, "textures");
 
         assertEquals(3, results.size());
-        assertTrue(results.containsKey(new ResourceLocation("textures/bat.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/creeper.png")));
-        assertTrue(results.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/bat.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/creeper.png")));
+        assertTrue(results.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @Test
     public void load_ResourceLocationException_ExceptionNotCaught() {
         OrderedResourceRepository repository = new OrderedResourceRepository(PackType.CLIENT_RESOURCES,
                 Set.of(new MockResourceCollection(Set.of(
-                        new ResourceLocation("textures/bat.png"),
-                        new ResourceLocation("textures/creeper.png"),
-                        new ResourceLocation("textures/zombie.png"),
-                        new ResourceLocation("textures/bat.png.moremcmeta"),
-                        new ResourceLocation("textures/creeper.png.moremcmeta"),
-                        new ResourceLocation("textures/zombie.png.moremcmeta")
+                        ResourceLocation.parse("textures/bat.png"),
+                        ResourceLocation.parse("textures/creeper.png"),
+                        ResourceLocation.parse("textures/zombie.png"),
+                        ResourceLocation.parse("textures/bat.png.moremcmeta"),
+                        ResourceLocation.parse("textures/creeper.png.moremcmeta"),
+                        ResourceLocation.parse("textures/zombie.png.moremcmeta")
                 )))
         ) {
             @Override
@@ -1484,9 +1484,9 @@ public final class TextureLoaderTest {
         Map<ResourceLocation, Integer> locations = loader.load(repository, "textures");
 
         assertEquals(3, locations.size());
-        assertTrue(locations.containsKey(new ResourceLocation("test", "textures/bat.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("moremcmeta", "textures/creeper.png")));
-        assertTrue(locations.containsKey(new ResourceLocation("textures/zombie.png")));
+        assertTrue(locations.containsKey(ResourceLocation.fromNamespaceAndPath("test", "textures/bat.png")));
+        assertTrue(locations.containsKey(ResourceLocation.fromNamespaceAndPath("moremcmeta", "textures/creeper.png")));
+        assertTrue(locations.containsKey(ResourceLocation.parse("textures/zombie.png")));
     }
 
     @SafeVarargs
@@ -1495,7 +1495,7 @@ public final class TextureLoaderTest {
 
         for (Set<String> files : presentFiles) {
             builder.add(new MockResourceCollection(
-                    files.stream().map(ResourceLocation::new).collect(Collectors.toSet())
+                    files.stream().map(ResourceLocation::parse).collect(Collectors.toSet())
             ));
         }
 

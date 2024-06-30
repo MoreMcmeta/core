@@ -91,6 +91,6 @@ public class MockResourceCollection implements ResourceCollection {
 
     @Override
     public ResourceLocation locateRootResource(String rootResource) {
-        return new ResourceLocation(rootResource);
+        return ResourceLocation.parse(rootResource);
     }
 }
