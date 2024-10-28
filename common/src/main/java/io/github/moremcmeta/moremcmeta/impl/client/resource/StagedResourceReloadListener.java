@@ -20,7 +20,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.resource;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -40,38 +39,32 @@ public interface StagedResourceReloadListener<T> extends PreparableReloadListene
      * Executes the load and apply tasks in order when the resource manager reloads.
      * @param barrier           barrier between data gathering and using that data
      * @param manager           Minecraft's resource manager
-     * @param loadProfiler      profiler for load stage
-     * @param applyProfiler     profiler for apply stage
      * @param loadExecutor      asynchronously executes load stage tasks
      * @param applyExecutor     asynchronously executes apply stage tasks
      * @return a task for both the load and apply stages
      */
     default CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier barrier, ResourceManager manager,
-                                           ProfilerFiller loadProfiler, ProfilerFiller applyProfiler,
                                            Executor loadExecutor, Executor applyExecutor) {
-        return load(manager, loadProfiler, loadExecutor).thenCompose(barrier::wait).thenCompose(
-                (data) -> this.apply(data, manager, applyProfiler, applyExecutor)
+        return load(manager, loadExecutor).thenCompose(barrier::wait).thenCompose(
+                (data) -> this.apply(data, manager, applyExecutor)
         );
     }
 
     /**
      * Load stage that gathers resources.
      * @param manager           Minecraft's resource manager
-     * @param loadProfiler      profiler for load stage
      * @param loadExecutor      asynchronously executes load stage tasks
      * @return the task for the load stage returning the retrieved data
      */
-    CompletableFuture<T> load(ResourceManager manager, ProfilerFiller loadProfiler, Executor loadExecutor);
+    CompletableFuture<T> load(ResourceManager manager, Executor loadExecutor);
 
     /**
      * Apply stage that uses resources from the load stage.
      * @param data              the retrieved data from the load stage
      * @param manager           Minecraft's resource manager
-     * @param applyProfiler     profiler for apply stage
      * @param applyExecutor     asynchronously executes apply stage tasks
      * @return the task for the "apply" stage that does not return anything
      */
-    CompletableFuture<Void> apply(T data, ResourceManager manager,
-                                  ProfilerFiller applyProfiler, Executor applyExecutor);
+    CompletableFuture<Void> apply(T data, ResourceManager manager, Executor applyExecutor);
 
 }

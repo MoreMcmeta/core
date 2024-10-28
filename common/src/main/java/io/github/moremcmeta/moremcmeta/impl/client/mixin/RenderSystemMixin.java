@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 /**
- * Allows textures used through {@link RenderSystem#_setShaderTexture(int, int)} to be updated,
+ * Allows textures used through {@link RenderSystem#setShaderTexture(int, int)} to be updated,
  * even though they are not bound normally.
  * @author soir20
  */
@@ -42,7 +42,7 @@ public final class RenderSystemMixin {
      * @param textureLocation       location of the texture to bind
      * @param callbackInfo          callback info from Mixin
      */
-    @Inject(method = "_setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V", at = @At("HEAD"),
+    @Inject(method = "setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V", at = @At("HEAD"),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private static void moremcmeta_onSetShaderTexture(int shaderIndex, ResourceLocation textureLocation,
                                                      CallbackInfo callbackInfo) {

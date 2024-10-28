@@ -74,7 +74,6 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -714,16 +713,13 @@ public abstract class MoreMcmeta {
         /**
          * Loads textures and adds the resource pack to fix MoreMcmeta-controlled sprites.
          * @param manager           Minecraft's resource manager
-         * @param loadProfiler      load stage profiler
          * @param loadExecutor          asynchronously executes load stage tasks
          * @return task returning loaded texture builders by location
          */
         @Override
         public CompletableFuture<Map<ResourceLocation, EventDrivenTexture.Builder>> load(ResourceManager manager,
-                                                                                         ProfilerFiller loadProfiler,
                                                                                          Executor loadExecutor) {
             requireNonNull(manager, "Resource manager cannot be null");
-            requireNonNull(loadProfiler, "Profiler cannot be null");
             requireNonNull(loadExecutor, "Executor cannot be null");
 
             TextureDataAssembler<NativeImageAdapter> assembler = new TextureDataAssembler<>(
@@ -763,17 +759,14 @@ public abstract class MoreMcmeta {
          * Clears old textures, if any, and registers new ones.
          * @param data          texture builders by location that were just loaded
          * @param manager       Minecraft's resource manager
-         * @param applyProfiler      apply stage profiler
          * @param applyExecutor      asynchronously executes apply stage tasks
          * @return task with no return data
          */
         @Override
         public CompletableFuture<Void> apply(Map<ResourceLocation, EventDrivenTexture.Builder> data,
-                                             ResourceManager manager, ProfilerFiller applyProfiler,
-                                             Executor applyExecutor) {
+                                             ResourceManager manager, Executor applyExecutor) {
             requireNonNull(data, "Data cannot be null");
             requireNonNull(manager, "Resource manager cannot be null");
-            requireNonNull(applyProfiler, "Profiler cannot be null");
             requireNonNull(applyExecutor, "Executor cannot be null");
 
             addCompletedReloadCallback(TEX_MANAGER, PREPARER, LAST_TEXTURES_ADDED, LOGGER);
@@ -799,7 +792,6 @@ public abstract class MoreMcmeta {
 
             }, applyExecutor);
         }
-
     }
 
 }

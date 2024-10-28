@@ -22,7 +22,6 @@ import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -54,26 +53,24 @@ public final class SimpleReloadListenerAdapter<T> implements SimpleResourceReloa
 
     @Override
     public CompletableFuture<Void> reload(PreparationBarrier barrier, ResourceManager manager,
-                                          ProfilerFiller loadProfiler, ProfilerFiller applyProfiler,
                                           Executor loadExecutor, Executor applyExecutor) {
-        return SimpleResourceReloadListener.super.reload(barrier, manager, loadProfiler, applyProfiler, loadExecutor,
+        return SimpleResourceReloadListener.super.reload(barrier, manager, loadExecutor,
                 applyExecutor);
     }
 
     @Override
-    public CompletableFuture<T> load(ResourceManager manager, ProfilerFiller loadProfiler, Executor loadExecutor) {
+    public CompletableFuture<T> load(ResourceManager manager, Executor loadExecutor) {
 
         // Let delegate do null checks in case null values are acceptable
-        return DELEGATE.load(manager, loadProfiler, loadExecutor);
+        return DELEGATE.load(manager, loadExecutor);
 
     }
 
     @Override
-    public CompletableFuture<Void> apply(T data, ResourceManager manager, ProfilerFiller applyProfiler,
-                                         Executor applyExecutor) {
+    public CompletableFuture<Void> apply(T data, ResourceManager manager, Executor applyExecutor) {
 
         // Let delegate do null checks in case null values are acceptable
-        return DELEGATE.apply(data, manager, applyProfiler, applyExecutor);
+        return DELEGATE.apply(data, manager, applyExecutor);
 
     }
 

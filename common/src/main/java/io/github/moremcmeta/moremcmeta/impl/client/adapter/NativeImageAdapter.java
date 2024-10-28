@@ -58,14 +58,14 @@ public final class NativeImageAdapter implements CloseableImage {
     public int color(int x, int y) {
         checkOpen();
         checkInBounds(x, y);
-        return IMAGE.getPixelRGBA(x + X_OFFSET, y + Y_OFFSET);
+        return IMAGE.getPixel(x + X_OFFSET, y + Y_OFFSET);
     }
 
     @Override
     public void setColor(int x, int y, int color) {
         checkOpen();
         checkInBounds(x, y);
-        IMAGE.setPixelRGBA(x + X_OFFSET, y + Y_OFFSET, color);
+        IMAGE.setPixel(x + X_OFFSET, y + Y_OFFSET, color);
     }
 
     @Override
