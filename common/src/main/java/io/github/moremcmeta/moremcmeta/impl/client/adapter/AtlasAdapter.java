@@ -189,8 +189,8 @@ public final class AtlasAdapter implements Atlas {
         }
 
         @Override
-        public ResourceLocation atlas() {
-            return SPRITE.atlasLocation();
+        public ResourceLocation name() {
+            return SPRITE.contents().name();
         }
 
         @Override

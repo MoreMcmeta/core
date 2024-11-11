@@ -45,12 +45,12 @@ public final class BaseCollection {
     /**
      * Finds all bases associated with the given texture. Duplicates (where both the base
      * and the mipmap level are the same) are combined.
-     * @param spriteFinder      checks if a texture is a sprite stitched onto an atlas
+     * @param atlasFinder      checks if a texture is a sprite stitched onto an atlas
      * @param textureLocation   location of the texture whose bases to retrieve
      * @return all bases associated with the texture at the given location
      */
-    public static BaseCollection find(SpriteFinder spriteFinder, ResourceLocation textureLocation) {
-        requireNonNull(spriteFinder, "Sprite finder cannot be null");
+    public static BaseCollection find(AtlasFinder atlasFinder, ResourceLocation textureLocation) {
+        requireNonNull(atlasFinder, "Sprite finder cannot be null");
         requireNonNull(textureLocation, "Texture location cannot be null");
 
         Map<ResourceLocation, Collection<MipmappedBase>> newBases = new HashMap<>();
@@ -66,8 +66,8 @@ public final class BaseCollection {
                 )
         );
 
-        findSpriteBases(spriteFinder, textureLocation, EventDrivenTexture.SELF_UPLOAD_POINT).forEach(
-                (pair) -> baseSet(newBases, pair.getFirst().atlas()).add(pair.getSecond())
+        findSpriteBases(atlasFinder, textureLocation, EventDrivenTexture.SELF_UPLOAD_POINT).forEach(
+                (pair) -> baseSet(newBases, pair.getFirst().name()).add(pair.getSecond())
         );
 
         return new BaseCollection(newBases);
@@ -89,15 +89,15 @@ public final class BaseCollection {
 
     /**
      * Finds all {@link MipmappedBase}s if the given base is associated with any sprites.
-     * @param spriteFinder      finds sprites stitched to atlases
+     * @param atlasFinder      finds sprites stitched to atlases
      * @param baseLocation      location of the base to find
      * @param uploadPoint       upload point of the base
      * @return if the base is associated with a sprite, the sprites and the {@link MipmappedBase}s
      */
     private static List<Pair<Sprite, MipmappedBase>> findSpriteBases(
-            SpriteFinder spriteFinder, ResourceLocation baseLocation,
+            AtlasFinder atlasFinder, ResourceLocation baseLocation,
             @SuppressWarnings("SameParameterValue") long uploadPoint) {
-        List<Sprite> sprites = spriteFinder.findSprites(baseLocation);
+        List<Sprite> sprites = atlasFinder.findSprites(baseLocation);
         if (sprites.isEmpty()) {
             return ImmutableList.of();
         }

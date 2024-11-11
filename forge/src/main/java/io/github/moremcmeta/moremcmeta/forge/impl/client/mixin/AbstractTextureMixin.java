@@ -17,82 +17,62 @@
 
 package io.github.moremcmeta.moremcmeta.forge.impl.client.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.NamedTexture;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
-import net.minecraft.client.Minecraft;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.BoundTextureState;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Uploads all dependencies when this texture is bound.
+ * Tracks this texture's names and ID.
  * @author soir20
  */
 @SuppressWarnings("unused")
 @Mixin(value = AbstractTexture.class, remap = false)
 public abstract class AbstractTextureMixin implements NamedTexture {
+    @Shadow
+    private int id;
+
     @Unique
-    private static AbstractTexture lastBound;
-    @Unique
-    private final Set<ResourceLocation> MOREMCMETA_NAMES = new HashSet<>();
+    private final Set<ResourceLocation> MOREMCMETA_NAMES = ConcurrentHashMap.newKeySet();
 
     @Unique
     @Override
     public void moremcmeta_addName(ResourceLocation name) {
-        onRenderThread(() -> MOREMCMETA_NAMES.add(name));
+        MOREMCMETA_NAMES.add(name);
     }
 
-    /**
-     * Uploads all dependencies when this texture is bound.
-     * @param callbackInfo      callback info from Mixin
-     */
-    @Inject(method = "bind()V", at = @At("RETURN"))
-    public void moremcmeta_onBind(CallbackInfo callbackInfo) {
-        onRenderThread(this::uploadDependencies);
-    }
-
-    /**
-     * Ensures that all work is done on the same thread. This is a defense against any subtle
-     * multithreading issues.
-     * @param action    action to perform on the render thread
-     */
     @Unique
-    private void onRenderThread(Runnable action) {
-        if (!RenderSystem.isOnRenderThreadOrInit()) {
-            RenderSystem.recordRenderCall(action::run);
-        } else {
-            action.run();
-        }
+    @Override
+    public Set<ResourceLocation> moremcmeta_names() {
+        return MOREMCMETA_NAMES;
     }
 
     /**
-     * Uploads all of a base texture's dependencies, assuming it is already bound.
+     * Updates this texture's ID when a new one is generated.
+     * @param callbackInfo  callback info from Mixin
      */
-    @Unique
-    private void uploadDependencies() {
-        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+    @Inject(method = "getId()I", at = @At("RETURN"))
+    public void moremcmeta_onGetId(CallbackInfoReturnable<Integer> callbackInfo) {
+        BoundTextureState.TEXTURES_BY_ID.put(id, this);
+    }
 
-        MOREMCMETA_NAMES.forEach((base) -> {
-            Set<ResourceLocation> dependencies = MoreMcmeta.dependencies(base);
-            dependencies.forEach((dependency) -> {
-                AbstractTexture texture = textureManager.getTexture(dependency, MissingTextureAtlasSprite.getTexture());
-
-                if (texture instanceof EventDrivenTexture) {
-                    ((EventDrivenTexture) texture).upload(base);
-                }
-            });
-        });
+    /**
+     * Delete this texture's ID when it is released
+     * @param callbackInfo  callback info from Mixin
+     */
+    @Inject(method = "releaseId()V", at = @At("RETURN"))
+    public void moremcmeta_onRelease(CallbackInfo callbackInfo) {
+        BoundTextureState.TEXTURES_BY_ID.remove(id);
     }
 
 }
