@@ -7,13 +7,16 @@
   ],
   "client": [
     "AbstractTextureMixin",
-    "RenderSystemMixin",
     "TextureManagerAccessor",
     "TextureManagerMixin",
     "SpriteResourceLoaderMixin",
     "DirectoryListerMixin",
     "SingleFileMixin",
-    "SourceFilterMixin"
+    "SourceFilterMixin",
+    "VertexBufferMixin",
+    "TextureAtlasMixin",
+    "GlStateManagerMixin",
+    "SodiumSpriteUtilMixin"
   ],
   "injectors": {
     "defaultRequire": 1

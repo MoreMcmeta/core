@@ -75,6 +75,8 @@ subprojects {
             modRuntimeOnly(include("io.github.moremcmeta:gui-plugin-${project.name}:${project.guiVersion}"))
         }
 
+        modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
+
         testImplementation "junit:junit:${project.junitVersion}"
         testImplementation "org.lwjgl:lwjgl:${rootProject.lwjglVersion}"
         testRuntimeOnly "org.lwjgl:lwjgl:${rootProject.lwjglVersion}:${lwjglNatives}"
@@ -122,6 +124,17 @@ allprojects {
             credentials {
                 username System.getenv("MOREMCMETA_MAVEN_USER") ?: project.moremcmetaMavenUser
                 password System.getenv("MOREMCMETA_MAVEN_PASS") ?: project.moremcmetaMavenPass
+            }
+        }
+
+        exclusiveContent {
+            forRepository {
+                maven {
+                    url = "https://api.modrinth.com/maven"
+                }
+            }
+            filter {
+                includeGroup "maven.modrinth"
             }
         }
     }

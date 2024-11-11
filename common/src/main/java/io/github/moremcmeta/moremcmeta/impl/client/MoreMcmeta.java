@@ -39,6 +39,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataAssembler;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataReader;
 import io.github.moremcmeta.moremcmeta.impl.client.mixin.TextureManagerAccessor;
+import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.LocatableSpriteAtlas;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MetadataRegistryImpl;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ModRepositorySource;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.OrderedResourceRepository;
@@ -49,7 +50,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureCache;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureLoader;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.BaseCollection;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.SpriteFinder;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.AtlasFinder;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.UploadComponent;
@@ -58,6 +59,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -619,16 +621,22 @@ public abstract class MoreMcmeta {
         Optional<ReloadInstance> reloadInstance = reloadInstance(overlay.get(), logger);
         reloadInstance.ifPresent((instance) -> instance.done().thenRun(() -> {
             TextureManagerAccessor textureManager = (TextureManagerAccessor) Minecraft.getInstance().getTextureManager();
-            SpriteFinder spriteFinder = new SpriteFinder(
+            Map<ResourceLocation, AbstractTexture> allTextures = textureManager.moremcmeta_byPath();
+            Set<ResourceLocation> atlasLocations = allTextures.entrySet().stream()
+                    .filter((entry) -> entry.getValue() instanceof TextureAtlas)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+            AtlasFinder atlasFinder = new AtlasFinder(
                     (loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)),
-                    textureManager.moremcmeta_byPath().entrySet().stream()
-                            .filter((entry) -> entry.getValue() instanceof TextureAtlas)
-                            .map(Map.Entry::getKey)
-                            .collect(Collectors.toSet())
+                    atlasLocations
             );
 
+            for (ResourceLocation atlasLocation : atlasLocations) {
+                ((LocatableSpriteAtlas) allTextures.get(atlasLocation)).moremcmeta_resetSpriteFinder();
+            }
+
             textures.forEach((location, builder) -> {
-                BaseCollection allBases = BaseCollection.find(spriteFinder, location);
+                BaseCollection allBases = BaseCollection.find(atlasFinder, location);
 
                 allBases.baseNames().forEach((base) ->
                         dependencies.computeIfAbsent(base, (loc) -> new ImmutableSet.Builder<>())
