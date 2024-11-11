@@ -52,8 +52,6 @@ import java.util.Set;
 @SuppressWarnings("unused")
 @Mixin(value = VertexBuffer.class, remap = false)
 public class VertexBufferMixin {
-    private static final int VERTS_PER_QUAD = 4;
-
     @Unique
     private final Map<NamedTexture, Set<ResourceLocation>> BOUND_TEXTURE_TO_BASES = new HashMap<>();
     @Unique
@@ -75,6 +73,7 @@ public class VertexBufferMixin {
     private void moremcmeta_onBufferUpload(MeshData meshData, CallbackInfo callbackInfo) {
         MeshData.DrawState drawState = meshData.drawState();
         VertexFormat newFormat = drawState.format();
+        int verticesPerPolygon = drawState.mode().primitiveLength;
 
         int uOffset = newFormat.getOffset(VertexFormatElement.UV);
 
@@ -99,17 +98,17 @@ public class VertexBufferMixin {
         int vertices = drawState.vertexCount();
 
         int baseIndex = 0;
-        for (int quad = 0; quad < vertices / VERTS_PER_QUAD; quad++) {
+        for (int polygon = 0; polygon < vertices / verticesPerPolygon; polygon++) {
             float uSum = 0.0f;
             float vSum = 0.0f;
-            for (int vertex = 0; vertex < VERTS_PER_QUAD; vertex++) {
+            for (int vertex = 0; vertex < verticesPerPolygon; vertex++) {
                 uSum += vertexBuffer.getFloat(baseIndex + uOffset);
                 vSum += vertexBuffer.getFloat(baseIndex + vOffset);
                 baseIndex += vertexSize;
             }
 
-            float centerU = uSum / VERTS_PER_QUAD;
-            float centerV = vSum / VERTS_PER_QUAD;
+            float centerU = uSum / verticesPerPolygon;
+            float centerV = vSum / verticesPerPolygon;
 
             UV_COORDS.add(packUv(centerU, centerV));
         }
