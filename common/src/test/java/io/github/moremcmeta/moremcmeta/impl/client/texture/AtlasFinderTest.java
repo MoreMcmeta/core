@@ -30,10 +30,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests the {@link SpriteFinder}.
+ * Tests the {@link AtlasFinder}.
  * @author soir20
  */
-public final class SpriteFinderTest {
+public final class AtlasFinderTest {
     public static final ImmutableSet<ResourceLocation> ATLAS_LOCATIONS = ImmutableSet.of(
             ResourceLocation.parse("textures/atlas/blocks.png"),
             ResourceLocation.parse("textures/atlas/signs.png"),
@@ -53,14 +53,14 @@ public final class SpriteFinderTest {
     @Test
     public void construct_NullAtlasGetter_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new SpriteFinder(null, ATLAS_LOCATIONS);
+        new AtlasFinder(null, ATLAS_LOCATIONS);
     }
 
 
     @Test
     public void find_NullLocationSet_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new SpriteFinder(
+        new AtlasFinder(
                 (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
                 null
@@ -68,7 +68,7 @@ public final class SpriteFinderTest {
     }
     @Test
     public void find_GetterReturnsNull_NullPointerException() {
-        SpriteFinder finder = new SpriteFinder((location) -> null, ATLAS_LOCATIONS);
+        AtlasFinder finder = new AtlasFinder((location) -> null, ATLAS_LOCATIONS);
 
         expectedException.expect(NullPointerException.class);
         finder.findSprites(TEST_LOCATION);
@@ -76,7 +76,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_NullLocation_NullPointerException() {
-        SpriteFinder finder = new SpriteFinder(
+        AtlasFinder finder = new AtlasFinder(
                 (atlasLocation) -> (spriteLocation) -> spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
                 ATLAS_LOCATIONS
@@ -88,7 +88,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_NullAtlases_NullPointerException() {
-        SpriteFinder finder = new SpriteFinder(
+        AtlasFinder finder = new AtlasFinder(
                 (atlasLocation) -> (spriteLocation) -> null,
                 ATLAS_LOCATIONS
         );
@@ -99,7 +99,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteNotPresent_SpriteNotFound() {
-        SpriteFinder finder = new SpriteFinder(
+        AtlasFinder finder = new AtlasFinder(
                 (atlasLocation) -> (spriteLocation) -> ImmutableList.of(),
                 ATLAS_LOCATIONS
         );
@@ -110,7 +110,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteHasMissingLocation_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder(
+        AtlasFinder finder = new AtlasFinder(
                 (atlasLocation) -> (spriteLocation) ->
                         ImmutableList.of(new MockSprite()),
                 ATLAS_LOCATIONS
@@ -122,7 +122,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInBlockAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/blocks.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
@@ -135,7 +135,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInSignAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/signs.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
@@ -148,7 +148,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInBannerAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/banner_patterns.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
@@ -161,7 +161,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInShieldAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/shield_patterns.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
@@ -174,7 +174,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInChestAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/chest.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
@@ -187,7 +187,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInBedAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/beds.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
@@ -200,7 +200,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInParticleAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/particles.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
@@ -213,7 +213,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInPaintingAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/paintings.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),
@@ -226,7 +226,7 @@ public final class SpriteFinderTest {
 
     @Test
     public void find_SpriteInEffectAtlas_SpriteFound() {
-        SpriteFinder finder = new SpriteFinder((atlasLocation) -> (spriteLocation) ->
+        AtlasFinder finder = new AtlasFinder((atlasLocation) -> (spriteLocation) ->
                 atlasLocation.equals(ResourceLocation.parse("textures/atlas/mob_effects.png"))
                         && spriteLocation.equals(TEST_LOCATION) ?
                         ImmutableList.of(new MockSprite()) : ImmutableList.of(),

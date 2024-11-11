@@ -44,7 +44,7 @@ public final class BaseCollectionTest {
     private static final ResourceLocation SPRITE_ATLAS_1 = ResourceLocation.parse("textures/atlas/blocks.png");
     private static final long SPRITE_UPLOAD_POINT_1 = Point.pack(20, 10);
     private static final int SPRITE_MIPMAP_1 = 3;
-    private static final SpriteFinder SPRITE_FINDER = new SpriteFinder(
+    private static final AtlasFinder SPRITE_FINDER = new AtlasFinder(
             (atlasLocation) -> (spriteLocation) -> {
                 if (atlasLocation.equals(SPRITE_ATLAS_1) && spriteLocation.equals(SPRITE_LOCATION_1)) {
                     return ImmutableList.of(new MockSprite(
@@ -56,7 +56,7 @@ public final class BaseCollectionTest {
 
                 return ImmutableList.of();
             },
-            SpriteFinderTest.ATLAS_LOCATIONS
+            AtlasFinderTest.ATLAS_LOCATIONS
     );
 
     @Rule

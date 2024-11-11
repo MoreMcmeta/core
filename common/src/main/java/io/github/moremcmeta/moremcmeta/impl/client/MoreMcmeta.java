@@ -38,6 +38,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.adapter.TextureManagerAdapter
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureData;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataAssembler;
 import io.github.moremcmeta.moremcmeta.impl.client.io.TextureDataReader;
+import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.LocatableSpriteAtlas;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.MetadataRegistryImpl;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.ModRepositorySource;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.OrderedResourceRepository;
@@ -48,7 +49,7 @@ import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureCache;
 import io.github.moremcmeta.moremcmeta.impl.client.resource.TextureLoader;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.BaseCollection;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
-import io.github.moremcmeta.moremcmeta.impl.client.texture.SpriteFinder;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.AtlasFinder;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TextureManagerWrapper;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.TexturePreparer;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.UploadComponent;
@@ -643,16 +644,21 @@ public abstract class MoreMcmeta {
         Optional<ReloadInstance> reloadInstance = reloadInstance(overlay.get(), logger);
         reloadInstance.ifPresent((instance) -> instance.done().thenRun(() -> {
             Map<ResourceLocation, AbstractTexture> allTextures = allRegisteredTextures(Minecraft.getInstance().getTextureManager());
-            SpriteFinder spriteFinder = new SpriteFinder(
+            Set<ResourceLocation> atlasLocations = allTextures.entrySet().stream()
+                    .filter((entry) -> entry.getValue() instanceof TextureAtlas)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+            AtlasFinder atlasFinder = new AtlasFinder(
                     (loc) -> new AtlasAdapter(loc, mipmapLevelGetter(logger)),
-                    allTextures.entrySet().stream()
-                            .filter((entry) -> entry.getValue() instanceof TextureAtlas)
-                            .map(Map.Entry::getKey)
-                            .collect(Collectors.toSet())
+                    atlasLocations
             );
 
+            for (ResourceLocation atlasLocation : atlasLocations) {
+                ((LocatableSpriteAtlas) allTextures.get(atlasLocation)).moremcmeta_resetSpriteFinder();
+            }
+
             textures.forEach((location, builder) -> {
-                BaseCollection allBases = BaseCollection.find(spriteFinder, location);
+                BaseCollection allBases = BaseCollection.find(atlasFinder, location);
 
                 allBases.baseNames().forEach((base) ->
                         dependencies.computeIfAbsent(base, (loc) -> new ImmutableSet.Builder<>())
