@@ -280,11 +280,11 @@ public final class TextureLoader<R> {
 
             results.put(metadataLocation, new ReadMetadataFile(metadata, metadataResources.collectionIndex(), extension));
         } catch (IOException ioException) {
-            LOGGER.error("Texture associated with metadata in file {} is missing: {}",
+            LOGGER.warn("Texture associated with metadata in file {} is missing: {}",
                     metadataLocation, ioException);
         } catch (InvalidMetadataException metadataError) {
             if (!metadataError.silenced()) {
-                LOGGER.error("Invalid metadata in file {}: {}", metadataLocation, metadataError);
+                LOGGER.warn("Invalid metadata in file {}: {}", metadataLocation, metadataError);
             }
         }
     }
@@ -320,7 +320,7 @@ public final class TextureLoader<R> {
         textureToAllMetadata.forEach((textureLocation, allMetadata) -> {
             Optional<Integer> textureIndexOptional = findCollectionIndex(repository, textureLocation);
             if (textureIndexOptional.isEmpty()) {
-                LOGGER.error(
+                LOGGER.warn(
                         "Unable to find texture {} (referenced by {})",
                         textureLocation,
                         join(allMetadata.metadataLocations())
@@ -340,7 +340,7 @@ public final class TextureLoader<R> {
             }
 
             if (extensions.size() != 1) {
-                LOGGER.error(
+                LOGGER.warn(
                         "Cannot apply metadata in multiple formats to texture {} (applied {})",
                         textureLocation,
                         join(allMetadata.metadataLocations())
@@ -357,7 +357,7 @@ public final class TextureLoader<R> {
                             .combine(textureLocation, allMetadata.metadataByLocation());
                 } catch (InvalidMetadataException err) {
                     if (!err.silenced()) {
-                        LOGGER.error(
+                        LOGGER.warn(
                                 "Unable to combine metadata for texture {} (applied {}): {}",
                                 textureLocation,
                                 join(allMetadata.metadataLocations()),
@@ -414,10 +414,10 @@ public final class TextureLoader<R> {
 
             results.put(textureLocation, texture);
         } catch (IOException err) {
-            LOGGER.error("Unable to read texture {}: {}", textureLocation, err);
+            LOGGER.warn("Unable to read texture {}: {}", textureLocation, err);
         } catch (InvalidMetadataException metadataError) {
             if (!metadataError.silenced()) {
-                LOGGER.error("Invalid metadata for texture {}: {}", textureLocation, metadataError);
+                LOGGER.warn("Invalid metadata for texture {}: {}", textureLocation, metadataError);
             }
         }
     }
