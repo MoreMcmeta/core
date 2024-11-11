@@ -27,7 +27,7 @@ import net.minecraft.resources.ResourceLocation;
 public final class MockSprite implements Sprite {
     private final long UPLOAD_POINT;
     private final int MIPMAP_LEVEL;
-    private final ResourceLocation ATLAS;
+    private final ResourceLocation NAME;
 
     public MockSprite() {
         this(Point.pack(0, 0));
@@ -38,18 +38,18 @@ public final class MockSprite implements Sprite {
     }
 
     public MockSprite(long uploadPoint, int mipmapLevel) {
-        this(uploadPoint, mipmapLevel, ResourceLocation.parse("textures/atlas/dummy.png"));
+        this(uploadPoint, mipmapLevel, ResourceLocation.parse("sprite/dummy"));
     }
 
     public MockSprite(long uploadPoint, int mipmapLevel, ResourceLocation atlas) {
         UPLOAD_POINT = uploadPoint;
         MIPMAP_LEVEL = mipmapLevel;
-        ATLAS = atlas;
+        NAME = atlas;
     }
 
     @Override
-    public ResourceLocation atlas() {
-        return ATLAS;
+    public ResourceLocation name() {
+        return NAME;
     }
 
     @Override
