@@ -32,7 +32,7 @@ import static java.util.Objects.requireNonNull;
  * Searches atlas textures for sprites.
  * @author soir20
  */
-public final class SpriteFinder {
+public final class AtlasFinder {
     private final Function<ResourceLocation, ? extends Atlas> ATLAS_GETTER;
     private final Set<ResourceLocation> ATLAS_LOCATIONS;
 
@@ -41,7 +41,7 @@ public final class SpriteFinder {
      * @param atlasGetter       provides an atlas from a location
      * @param atlasLocations    locations of all texture atlases
      */
-    public SpriteFinder(Function<ResourceLocation, ? extends Atlas> atlasGetter, Set<ResourceLocation> atlasLocations) {
+    public AtlasFinder(Function<ResourceLocation, ? extends Atlas> atlasGetter, Set<ResourceLocation> atlasLocations) {
         ATLAS_GETTER = requireNonNull(atlasGetter, "Atlas getter cannot be null");
         ATLAS_LOCATIONS = ImmutableSet.copyOf(requireNonNull(atlasLocations, "Atlas locations cannot be null"));
     }

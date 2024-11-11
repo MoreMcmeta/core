@@ -17,7 +17,16 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.mixinaccess;
 
+import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
+import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
+import org.spongepowered.asm.mixin.Unique;
+
+import java.util.Set;
 
 /**
  * A texture that tracks its own name(s).
@@ -30,5 +39,31 @@ public interface NamedTexture {
      * @param name      name to add to this texture
      */
     void moremcmeta_addName(ResourceLocation name);
+
+    /**
+     * Gets all of this texture's names.
+     * @return all of this texture's names
+     */
+    Set<ResourceLocation> moremcmeta_names();
+
+    /**
+     * Uploads all of a base texture's dependencies, assuming it is already bound.
+     * @param textureNames  textures to update if necessary
+     */
+    @Unique
+    static void uploadDependencies(Set<ResourceLocation> textureNames) {
+        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+
+        textureNames.forEach((base) -> {
+            Set<ResourceLocation> dependencies = MoreMcmeta.dependencies(base);
+            dependencies.forEach((dependency) -> {
+                AbstractTexture texture = textureManager.getTexture(dependency, MissingTextureAtlasSprite.getTexture());
+
+                if (texture instanceof EventDrivenTexture) {
+                    ((EventDrivenTexture) texture).upload(base);
+                }
+            });
+        });
+    }
 
 }
