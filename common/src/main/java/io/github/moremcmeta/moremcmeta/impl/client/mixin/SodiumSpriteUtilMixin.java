@@ -32,8 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @author soir20
  */
 @SuppressWarnings("unused")
-@Mixin(value = {me.jellysquid.mods.sodium.client.render.texture.SpriteUtil.class},
-        remap = false)
+@Mixin(value = {me.jellysquid.mods.sodium.client.render.texture.SpriteUtil.class})
 public class SodiumSpriteUtilMixin {
 
     /**
