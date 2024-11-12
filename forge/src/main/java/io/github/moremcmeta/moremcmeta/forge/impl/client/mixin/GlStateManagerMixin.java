@@ -18,7 +18,9 @@
 package io.github.moremcmeta.moremcmeta.forge.impl.client.mixin;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.NamedTexture;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.BoundTextureState;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -71,8 +73,14 @@ public class GlStateManagerMixin {
      * @param textureId     texture ID to bind
      * @param callbackInfo  callback info from Mixin
      */
-    @Inject(method = "_bindTexture(I)V", at = @At("HEAD"))
+    @Inject(method = "_bindTexture(I)V", at = @At("RETURN"))
     private static void moremcmeta_onBindTexture(int textureId, CallbackInfo callbackInfo) {
         BoundTextureState.BOUND_TEXTURES[activeTexture] = textureId;
+
+        // Update non-atlas textures on bind for better compatibility with other mods
+        NamedTexture boundTexture = BoundTextureState.TEXTURES_BY_ID.get(textureId);
+        if (boundTexture != null && !(boundTexture instanceof TextureAtlas)) {
+            NamedTexture.uploadDependencies(boundTexture.moremcmeta_names());
+        }
     }
 }
