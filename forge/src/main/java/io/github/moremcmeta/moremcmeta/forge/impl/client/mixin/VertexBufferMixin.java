@@ -50,6 +50,7 @@ import java.util.Set;
  * @author soir20
  */
 @SuppressWarnings("unused")
+@Mixin(value = VertexBuffer.class, remap = false)
 public class VertexBufferMixin {
     @Unique
     private final Map<NamedTexture, Set<ResourceLocation>> BOUND_TEXTURE_TO_BASES = new HashMap<>();
