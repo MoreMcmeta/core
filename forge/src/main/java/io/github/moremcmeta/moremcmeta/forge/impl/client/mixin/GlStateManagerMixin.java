@@ -75,6 +75,10 @@ public class GlStateManagerMixin {
      */
     @Inject(method = "_bindTexture(I)V", at = @At("RETURN"))
     private static void moremcmeta_onBindTexture(int textureId, CallbackInfo callbackInfo) {
+        if (activeTexture < 0 || activeTexture >= BoundTextureState.BOUND_TEXTURES.length) {
+            return;
+        }
+
         BoundTextureState.BOUND_TEXTURES[activeTexture] = textureId;
 
         // Update non-atlas textures on bind for better compatibility with other mods
