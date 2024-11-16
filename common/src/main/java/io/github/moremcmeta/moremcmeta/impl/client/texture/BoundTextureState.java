@@ -45,7 +45,12 @@ public final class BoundTextureState {
      * @return bound texture in the active slot
      */
     public static Optional<NamedTexture> currentTexture() {
-        int textureId = BOUND_TEXTURES[GlStateManager._getActiveTexture() - GL32C.GL_TEXTURE0];
+        int activeTexture = GlStateManager._getActiveTexture() - GL32C.GL_TEXTURE0;
+        if (activeTexture < 0 || activeTexture >= BOUND_TEXTURES.length) {
+            return Optional.empty();
+        }
+
+        int textureId = BOUND_TEXTURES[activeTexture];
         if (textureId == -1) {
             return Optional.empty();
         }
