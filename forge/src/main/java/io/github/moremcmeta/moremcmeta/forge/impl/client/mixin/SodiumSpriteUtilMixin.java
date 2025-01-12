@@ -20,6 +20,7 @@ package io.github.moremcmeta.moremcmeta.forge.impl.client.mixin;
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.LocatableSpriteAtlas;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,9 +45,11 @@ public class SodiumSpriteUtilMixin {
     @Inject(method = "markSpriteActive(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
             at = @At("RETURN"), require = 0)
     private static void moremcmeta_onSodiumMarkSpriteActive(TextureAtlasSprite sprite, CallbackInfo callbackInfo) {
-        LocatableSpriteAtlas atlas = (LocatableSpriteAtlas) Minecraft.getInstance().getTextureManager()
+        AbstractTexture rawAtlas = Minecraft.getInstance().getTextureManager()
                 .getTexture(sprite.atlasLocation());
-        atlas.moremcmeta_queueSpriteForUpdate(sprite.contents().name());
+        if (rawAtlas instanceof LocatableSpriteAtlas atlas) {
+            atlas.moremcmeta_queueSpriteForUpdate(sprite.contents().name());
+        }
     }
 
     /**

@@ -654,7 +654,10 @@ public abstract class MoreMcmeta {
             );
 
             for (ResourceLocation atlasLocation : atlasLocations) {
-                ((LocatableSpriteAtlas) allTextures.get(atlasLocation)).moremcmeta_resetSpriteFinder();
+                AbstractTexture rawAtlas = allTextures.get(atlasLocation);
+                if (rawAtlas instanceof LocatableSpriteAtlas atlas) {
+                    atlas.moremcmeta_resetSpriteFinder();
+                }
             }
 
             textures.forEach((location, builder) -> {
