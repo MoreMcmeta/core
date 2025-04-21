@@ -25,7 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 
@@ -184,7 +184,7 @@ public final class SpriteFrameSizeFixPack implements PackResources {
      */
     @Nullable
     @Override
-    public <T> T getMetadataSection(MetadataSectionSerializer<T> metadataSectionSerializer) {
+    public <T> T getMetadataSection(MetadataSectionType<T> metadataSectionSerializer) {
         requireNonNull(metadataSectionSerializer, "Serializer cannot be null");
         return null;
     }

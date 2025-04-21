@@ -161,7 +161,7 @@ public final class UploadComponentTest {
         assertEquals(2, frame1.mipmapLevel());
         assertEquals(2, frame2.mipmapLevel());
         assertEquals(2, frame3.mipmapLevel());
-        texture.load(null);
+        texture.load();
         assertEquals(1, frame1.mipmapLevel());
         assertEquals(1, frame2.mipmapLevel());
         assertEquals(1, frame3.mipmapLevel());

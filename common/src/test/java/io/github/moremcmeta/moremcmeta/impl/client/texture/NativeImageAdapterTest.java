@@ -35,7 +35,7 @@ public final class NativeImageAdapterTest {
     @Test
     public void constructReduced_NullImage_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new NativeImageAdapter(null, 0, false, false);
+        new NativeImageAdapter(null, 0);
     }
 
 }

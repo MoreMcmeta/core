@@ -88,7 +88,7 @@ public final class EventDrivenTextureTest {
                 assertEquals(2, predefinedFrames.frames());
             }
         });
-        builder.build().load(null);
+        builder.build().load();
     }
 
     @Test
@@ -404,14 +404,14 @@ public final class EventDrivenTextureTest {
     @Test
     public void register_FirstRegistration_RegisterFiredInOrder() {
         Integer[] expected = {1, 2, 3};
-        testExpectedOrder((texture) -> texture.load(null), false, expected);
+        testExpectedOrder(EventDrivenTexture::load, false, expected);
     }
 
     @Test
     public void register_SecondRegistration_RegisterFiredInOrderTwice() {
         Integer[] expected = {1, 2, 3, 1, 2, 3};
-        testExpectedOrder((texture) -> { texture.load(null);
-            texture.load(null); }, false, expected);
+        testExpectedOrder((texture) -> { texture.load();
+            texture.load(); }, false, expected);
     }
 
     @Test

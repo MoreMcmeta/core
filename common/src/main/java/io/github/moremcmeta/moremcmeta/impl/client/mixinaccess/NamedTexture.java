@@ -20,8 +20,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.mixinaccess;
 import io.github.moremcmeta.moremcmeta.impl.client.MoreMcmeta;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Unique;
@@ -57,11 +55,12 @@ public interface NamedTexture {
         textureNames.forEach((base) -> {
             Set<ResourceLocation> dependencies = MoreMcmeta.dependencies(base);
             dependencies.forEach((dependency) -> {
-                AbstractTexture texture = textureManager.getTexture(dependency, MissingTextureAtlasSprite.getTexture());
-
-                if (texture instanceof EventDrivenTexture) {
-                    ((EventDrivenTexture) texture).upload(base);
-                }
+                ExtendedTextureManager extendedTextureManager = ((ExtendedTextureManager) textureManager);
+                extendedTextureManager.texture(dependency).ifPresent((texture) -> {
+                    if (texture instanceof EventDrivenTexture) {
+                        ((EventDrivenTexture) texture).upload(base);
+                    }
+                });
             });
         });
     }

@@ -194,8 +194,8 @@ public abstract class MoreMcmeta {
         // Resource loaders
         TextureDataReader<NativeImageAdapter> reader = new TextureDataReader<>(
                 texturePlugins,
-                (stream) -> new NativeImageAdapter(NativeImage.read(stream), 0, false, false),
-                (image, blur, clamp) -> new NativeImageAdapter(image.image(), image.mipmapLevel(), blur, clamp)
+                (stream) -> new NativeImageAdapter(NativeImage.read(stream), 0),
+                (image, blur, clamp) -> new NativeImageAdapter(image.image(), image.mipmapLevel())
         );
         TextureLoader<TextureData<NativeImageAdapter>> loader = new TextureLoader<>(
                 reader,
@@ -734,7 +734,7 @@ public abstract class MoreMcmeta {
             TextureDataAssembler<NativeImageAdapter> assembler = new TextureDataAssembler<>(
                     (int width, int height, int mipmapLevel, boolean blur, boolean clamp) -> {
                         NativeImage image = new NativeImage(width, height, true);
-                        return new NativeImageAdapter(image, mipmapLevel, blur, clamp);
+                        return new NativeImageAdapter(image, mipmapLevel);
                     },
                     (image, mipmap) -> {
                         int maxMipmapSettings = Minecraft.getInstance().options.mipmapLevels().get();
@@ -748,8 +748,7 @@ public abstract class MoreMcmeta {
                         for (int level = 0; level < mipmaps.length; level++) {
                             wrappedMipmaps.add(new NativeImageAdapter(
                                     mipmaps[level],
-                                    level,
-                                    image.blur(), image.clamp()
+                                    level
                             ));
                         }
 

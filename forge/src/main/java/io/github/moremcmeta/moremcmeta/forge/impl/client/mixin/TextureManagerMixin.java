@@ -17,17 +17,21 @@
 
 package io.github.moremcmeta.moremcmeta.forge.impl.client.mixin;
 
+import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.ExtendedTextureManager;
 import io.github.moremcmeta.moremcmeta.impl.client.mixinaccess.NamedTexture;
 import io.github.moremcmeta.moremcmeta.impl.client.texture.EventDrivenTexture;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Makes {@link AbstractTexture}s track their own names as they are registered to the {@link TextureManager}.
@@ -35,7 +39,20 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
  */
 @SuppressWarnings("unused")
 @Mixin(value = TextureManager.class, remap = false)
-public abstract class TextureManagerMixin {
+public abstract class TextureManagerMixin implements ExtendedTextureManager {
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    @Shadow
+    private Map<ResourceLocation, AbstractTexture> byPath;
+
+    @Override
+    public boolean contains(ResourceLocation location) {
+        return byPath.containsKey(location);
+    }
+
+    @Override
+    public Optional<AbstractTexture> texture(ResourceLocation location) {
+        return Optional.ofNullable(byPath.get(location));
+    }
 
     /**
      * Makes {@link AbstractTexture}s track their own names as they are registered to the {@link TextureManager}.
@@ -52,13 +69,16 @@ public abstract class TextureManagerMixin {
         if (path.startsWith("pack/") && path.endsWith("/icon")) {
             TextureManager textureManager = ((TextureManager) (Object) this);
 
-            if (textureManager.getTexture(location, MissingTextureAtlasSprite.getTexture()) instanceof EventDrivenTexture) {
+            if (texture(location).map((tex) -> tex instanceof EventDrivenTexture).orElse(false)) {
                 callbackInfo.cancel();
                 return;
             }
         }
 
         ((NamedTexture) texture).moremcmeta_addName(location);
+        if (texture instanceof EventDrivenTexture eventDrivenTexture) {
+            eventDrivenTexture.load();
+        }
     }
 
 }

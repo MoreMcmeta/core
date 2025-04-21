@@ -19,7 +19,6 @@ package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.server.packs.resources.ResourceManager;
 
 /**
  * A fake tickable texture.
@@ -37,8 +36,5 @@ public class MockAnimatedTexture extends AbstractTexture implements CustomTickab
     public int ticks() {
         return ticks;
     }
-
-    @Override
-    public void load(ResourceManager resourceManager) {}
 
 }

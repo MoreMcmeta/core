@@ -55,7 +55,7 @@ public final class CoreTextureComponentTest {
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1)));
         builder.setPredefinedFrames(List.of(new MockCloseableImageFrame(1), new MockCloseableImageFrame(1)));
         builder.add(component);
-        builder.build().load(null);
+        builder.build().load();
     }
 
     @Test

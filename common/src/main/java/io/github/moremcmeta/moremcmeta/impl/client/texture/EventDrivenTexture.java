@@ -28,8 +28,6 @@ import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
@@ -73,8 +71,10 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
 
     }
 
-    @Override
-    public void load(@Nullable ResourceManager resourceManager) {
+    /**
+     * Run registration listeners for this texture.
+     */
+    public void load() {
         runListeners((component, view) -> component.onRegistration(view, CURRENT_STATE.predefinedFrames()));
     }
 
