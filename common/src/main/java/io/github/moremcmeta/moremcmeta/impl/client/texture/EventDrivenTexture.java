@@ -17,6 +17,8 @@
 
 package io.github.moremcmeta.moremcmeta.impl.client.texture;
 
+import com.mojang.blaze3d.pipeline.RenderCall;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ColorTransform;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
@@ -61,12 +63,14 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
 
     private final List<CoreTextureComponent> COMPONENTS;
     private final TextureState CURRENT_STATE;
+    private final boolean BLUR;
+    private final boolean CLAMP;
     private int ticks;
 
     @Override
-    public void setFilter(boolean blur, boolean clamp) {
+    public void setFilter(boolean blur, boolean mipmapped) {
 
-        // Prevent blur and clamp settings in the NativeImageAdapter from being overridden by TextureStateShard
+        // Prevent blur settings in the NativeImageAdapter from being overridden by TextureStateShard
         this.bind();
 
     }
@@ -76,6 +80,15 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
      */
     public void load() {
         runListeners((component, view) -> component.onRegistration(view, CURRENT_STATE.predefinedFrames()));
+        RenderCall updateBlurClamp = () -> {
+            super.setFilter(BLUR, CURRENT_STATE.mipmapLevel() > 1);
+            super.setClamp(CLAMP);
+        };
+        if (!RenderSystem.isOnRenderThreadOrInit()) {
+            RenderSystem.recordRenderCall(updateBlurClamp);
+        } else {
+            updateBlurClamp.execute();
+        }
     }
 
     @Override
@@ -125,14 +138,20 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
      * @param components                components that listen to texture events
      * @param predefinedFrames          frames already existing in the original image
      * @param generatedFrame            initial image for this texture
+     * @param blur                      whether to blur this texture
+     * @param clamp                     whether to clamp this texture
      */
     private EventDrivenTexture(
             List<CoreTextureComponent> components,
             List<? extends CloseableImageFrame> predefinedFrames,
-            CloseableImageFrame generatedFrame) {
+            CloseableImageFrame generatedFrame,
+            boolean blur,
+            boolean clamp) {
         super();
         COMPONENTS = components;
         CURRENT_STATE = new TextureState(this, predefinedFrames, generatedFrame);
+        BLUR = blur;
+        CLAMP = clamp;
     }
 
     /**
@@ -143,6 +162,8 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
         private final List<CoreTextureComponent> COMPONENTS;
         private List<? extends CloseableImageFrame> predefinedFrames;
         private CloseableImageFrame generatedFrame;
+        private boolean blur;
+        private boolean clamp;
 
         /**
          * Creates a new event-driven texture builder.
@@ -194,6 +215,26 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
         public Builder setGeneratedFrame(CloseableImageFrame frame) {
             requireNonNull(frame, "Generated frame cannot be null");
             generatedFrame = frame;
+            return this;
+        }
+
+        /**
+         * Sets whether to blur this texture.
+         * @param blur      whether to blur this texture
+         * @return this builder for chaining
+         */
+        public Builder setBlur(boolean blur) {
+            this.blur = blur;
+            return this;
+        }
+
+        /**
+         * Sets whether to clamp this texture.
+         * @param clamp     whether to clamp this texture
+         * @return this builder for chaining
+         */
+        public Builder setClamp(boolean clamp) {
+            this.clamp = clamp;
             return this;
         }
 
@@ -285,7 +326,7 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
                 ));
             }
 
-            return new EventDrivenTexture(COMPONENTS, predefinedFrames, generatedFrame);
+            return new EventDrivenTexture(COMPONENTS, predefinedFrames, generatedFrame, blur, clamp);
         }
 
     }
@@ -483,6 +524,14 @@ public final class EventDrivenTexture extends AbstractTexture implements CustomT
             }
 
             GENERATED_FRAME.lowerMipmapLevel(newMipmapLevel);
+        }
+
+        /**
+         * Gets the current mipmap level of this texture.
+         * @return current mipmap level of this texture
+         */
+        public int mipmapLevel() {
+            return GENERATED_FRAME.mipmapLevel();
         }
 
         /**

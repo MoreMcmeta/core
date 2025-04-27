@@ -112,7 +112,9 @@ public final class TextureDataAssembler<I extends CloseableImage> {
         // Add components
         EventDrivenTexture.Builder builder = new EventDrivenTexture.Builder();
         builder.setPredefinedFrames(frames)
-                .setGeneratedFrame(generatedFrame);
+                .setGeneratedFrame(generatedFrame)
+                .setBlur(data.blur())
+                .setClamp(data.clamp());
 
         for (int index = 0; index < data.analyzedMetadata().size(); index++) {
             Triple<String, AnalyzedMetadata, ComponentBuilder> metadata = data.analyzedMetadata().get(index);
