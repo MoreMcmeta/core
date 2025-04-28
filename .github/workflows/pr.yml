@@ -17,10 +17,8 @@ jobs:
       - name: Ensure Gradle wrapper is executable
         run: chmod +x ./gradlew
 
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@9aa31f26bc8e536d1faf4b332bb8365350743a18
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@245c8a24de79c0dbeabaf19ebcbbd3b2c36f278d
 
       - name: Run tests
-        uses: gradle/gradle-build-action@cfc50b189af149aeb55f94103f47753382d88d33
-        with:
-          arguments: test
+        run: ./gradlew test
