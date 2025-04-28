@@ -33,8 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @author soir20
  */
 @SuppressWarnings("unused")
-@Mixin(value = {net.caffeinemc.mods.sodium.client.render.texture.SpriteUtil.class, org.embeddedt.embeddium.api.render.texture.SpriteUtil.class},
-        remap = false)
+@Mixin(value = net.caffeinemc.mods.sodium.client.render.texture.SpriteUtilImpl.class, remap = false)
 public class SodiumSpriteUtilMixin {
 
     /**
@@ -44,7 +43,7 @@ public class SodiumSpriteUtilMixin {
      */
     @Inject(method = "markSpriteActive(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
             at = @At("RETURN"), require = 0)
-    private static void moremcmeta_onSodiumMarkSpriteActive(TextureAtlasSprite sprite, CallbackInfo callbackInfo) {
+    private void moremcmeta_onSodiumMarkSpriteActive(TextureAtlasSprite sprite, CallbackInfo callbackInfo) {
         AbstractTexture rawAtlas = Minecraft.getInstance().getTextureManager()
                 .getTexture(sprite.atlasLocation());
         if (rawAtlas instanceof LocatableSpriteAtlas atlas) {
@@ -59,7 +58,7 @@ public class SodiumSpriteUtilMixin {
      */
     @Inject(method = "hasAnimation(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z",
             at = @At("RETURN"), cancellable = true, require = 0)
-    private static void moremcmeta_onSodiumSpriteHasAnimation(TextureAtlasSprite sprite, CallbackInfoReturnable<Boolean> callbackInfo) {
+    private void moremcmeta_onSodiumSpriteHasAnimation(TextureAtlasSprite sprite, CallbackInfoReturnable<Boolean> callbackInfo) {
         if (!MoreMcmeta.dependencies(sprite.contents().name()).isEmpty()) {
             callbackInfo.setReturnValue(true);
         }
